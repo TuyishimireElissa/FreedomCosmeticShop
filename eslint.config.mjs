@@ -79,6 +79,7 @@ const eslintConfig = [
       "mini-services/**",
       "*.config.mjs",
       "*.config.ts",
+      "mobile/**", // React Native app (separate project)
     ],
   },
 ];

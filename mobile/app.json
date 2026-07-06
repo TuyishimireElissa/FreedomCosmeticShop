@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Ubumwe Beauty",
+    "slug": "ubumwe-beauty",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#b76e79"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ubumwe.beauty",
+      "infoPlist": {
+        "NSCameraUsageDescription": "We need camera access for product review photos",
+        "NSFaceIDUsageDescription": "Use Face ID for quick login"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#b76e79"
+      },
+      "package": "com.ubumwe.beauty",
+      "permissions": [
+        "CAMERA",
+        "USE_BIOMETRIC",
+        "USE_FINGERPRINT",
+        "VIBRATE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-notifications",
+      "expo-camera",
+      "expo-secure-store",
+      "expo-local-authentication"
+    ],
+    "scheme": "ubumwe",
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    },
+    "notification": {
+      "androidMode": "default",
+      "androidCollapsedTitle": "Ubumwe Beauty",
+      "iosDisplayInForeground": true
+    }
+  }
+}
