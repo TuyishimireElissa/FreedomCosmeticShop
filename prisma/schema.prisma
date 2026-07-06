@@ -1,0 +1,112 @@
+// Prisma schema for Ubumwe Beauty - Rwanda Cosmetics E-Commerce
+// Using SQLite for MVP (swap to PostgreSQL for production)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Product categories: Skincare, Makeup, Haircare
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+}
+
+// Product catalog
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+  // Price in RWF (Rwandan Franc). Stored as Int to avoid float precision issues.
+  price       Int
+  // Optional compare-at price for "on sale" display
+  compareAt   Int?
+  // JSON string of image URLs (SQLite doesn't support arrays)
+  images      String
+  // Average rating 0-5 (one decimal)
+  rating      Float    @default(0)
+  // Number of reviews
+  reviews     Int      @default(0)
+  // Stock quantity
+  stock       Int      @default(0)
+  // SKU / product code
+  sku         String?
+  // Brand name
+  brand       String?
+  // Flag for featured products on homepage
+  featured    Boolean  @default(false)
+  // Soft flag
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  orderItems  OrderItem[]
+
+  @@index([categoryId])
+  @@index([featured])
+  @@index([slug])
+}
+
+// Customer orders
+model Order {
+  id            String      @id @default(cuid())
+  // Human-readable order number e.g. UB-2024-00001
+  orderNumber   String      @unique
+  // Guest checkout fields
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  // Delivery address
+  address       String
+  city          String
+  province      String
+  notes         String?
+  // Payment method: MTN_MOMO | AIRTEL_MONEY | COD | CARD
+  paymentMethod String      @default("COD")
+  // Payment status: PENDING | PAID | FAILED | REFUNDED
+  paymentStatus String      @default("PENDING")
+  // Order status: PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED
+  status        String      @default("PENDING")
+  // Totals in RWF
+  subtotal      Int
+  deliveryFee   Int         @default(0)
+  total         Int
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([status])
+  @@index([customerPhone])
+  @@index([createdAt])
+}
+
+// Line items in an order (snapshot of product at purchase time)
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  order      Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id])
+  // Snapshot fields in case product is deleted later
+  name       String
+  price      Int
+  quantity   Int
+  image      String?
+  createdAt  DateTime @default(now())
+
+  @@index([orderId])
+}
