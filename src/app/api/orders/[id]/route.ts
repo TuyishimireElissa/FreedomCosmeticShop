@@ -19,22 +19,14 @@ const VALID_STATUSES = [
   "CANCELLED",
 ] as const
 
-const VALID_PAYMENT_STATUSES = [
-  "PENDING",
-  "PAID",
-  "FAILED",
-  "REFUNDED",
-] as const
+const VALID_PAYMENT_STATUSES = ["PENDING", "PAID", "FAILED", "REFUNDED"] as const
 
 const PatchSchema = z.object({
   status: z.enum(VALID_STATUSES).optional(),
   paymentStatus: z.enum(VALID_PAYMENT_STATUSES).optional(),
 })
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
 
@@ -52,17 +44,11 @@ export async function GET(
     return NextResponse.json({ order })
   } catch (error) {
     console.error("Failed to fetch order:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch order" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch order" }, { status: 500 })
   }
 }
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const body = await req.json()
@@ -94,9 +80,6 @@ export async function PATCH(
     return NextResponse.json({ order: updated })
   } catch (error) {
     console.error("Failed to update order:", error)
-    return NextResponse.json(
-      { error: "Failed to update order" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to update order" }, { status: 500 })
   }
 }

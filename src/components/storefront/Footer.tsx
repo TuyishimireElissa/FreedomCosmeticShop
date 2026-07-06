@@ -22,30 +22,27 @@ export function Footer() {
   const { goCatalog, goHome, goAdmin } = useStore()
 
   return (
-    <footer className="border-t bg-secondary/40">
+    <footer className="bg-secondary/40 border-t">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-3">
-            <button
-              onClick={goHome}
-              className="flex items-center gap-2"
-            >
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-primary text-primary-foreground">
+            <button onClick={goHome} className="flex items-center gap-2">
+              <span className="bg-primary text-primary-foreground grid h-8 w-8 place-items-center rounded-full">
                 <Sparkles className="h-4 w-4" />
               </span>
               <span className="text-base font-semibold">
                 Ubumwe <span className="text-primary">Beauty</span>
               </span>
             </button>
-            <p className="text-sm text-muted-foreground">
-              Rwanda&apos;s home for skincare, makeup &amp; haircare. Authentic
-              products, fair prices, fast delivery across all provinces.
+            <p className="text-muted-foreground text-sm">
+              Rwanda&apos;s home for skincare, makeup &amp; haircare. Authentic products, fair
+              prices, fast delivery across all provinces.
             </p>
             <div className="flex gap-2 pt-1">
               <a
                 href="#"
-                className="grid h-8 w-8 place-items-center rounded-full bg-background text-foreground/70 hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="bg-background text-foreground/70 hover:bg-primary hover:text-primary-foreground grid h-8 w-8 place-items-center rounded-full transition-colors"
                 aria-label="Instagram"
                 onClick={(e) => e.preventDefault()}
               >
@@ -53,7 +50,7 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="grid h-8 w-8 place-items-center rounded-full bg-background text-foreground/70 hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="bg-background text-foreground/70 hover:bg-primary hover:text-primary-foreground grid h-8 w-8 place-items-center rounded-full transition-colors"
                 aria-label="Facebook"
                 onClick={(e) => e.preventDefault()}
               >
@@ -61,7 +58,7 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="grid h-8 w-8 place-items-center rounded-full bg-background text-foreground/70 hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="bg-background text-foreground/70 hover:bg-primary hover:text-primary-foreground grid h-8 w-8 place-items-center rounded-full transition-colors"
                 aria-label="WhatsApp"
                 onClick={(e) => e.preventDefault()}
               >
@@ -72,7 +69,7 @@ export function Footer() {
 
           {/* Shop */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/70">
+            <h3 className="text-foreground/70 text-sm font-semibold tracking-wider uppercase">
               Shop
             </h3>
             <ul className="space-y-2 text-sm">
@@ -113,21 +110,20 @@ export function Footer() {
 
           {/* Help */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/70">
+            <h3 className="text-foreground/70 text-sm font-semibold tracking-wider uppercase">
               Help
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <span className="text-muted-foreground">Delivery: 1-3 days Kigali, 3-5 days provinces</span>
+                <span className="text-muted-foreground">
+                  Delivery: 1-3 days Kigali, 3-5 days provinces
+                </span>
               </li>
               <li>
                 <span className="text-muted-foreground">Returns within 7 days</span>
               </li>
               <li>
-                <button
-                  onClick={goAdmin}
-                  className="text-muted-foreground hover:text-primary"
-                >
+                <button onClick={goAdmin} className="text-muted-foreground hover:text-primary">
                   Admin Dashboard
                 </button>
               </li>
@@ -136,22 +132,22 @@ export function Footer() {
 
           {/* Contact */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/70">
+            <h3 className="text-foreground/70 text-sm font-semibold tracking-wider uppercase">
               Contact
             </h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="text-muted-foreground space-y-2 text-sm">
               <li className="flex items-start gap-2">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <MapPin className="text-primary mt-0.5 h-4 w-4 shrink-0" />
                 <span>KN 4 Ave, Kigali Heights, Kigali, Rwanda</span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-primary" />
+                <Phone className="text-primary h-4 w-4 shrink-0" />
                 <a href="tel:+250788123456" className="hover:text-primary">
                   +250 788 123 456
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0 text-primary" />
+                <Mail className="text-primary h-4 w-4 shrink-0" />
                 <a href="mailto:hello@ubumwe.beauty" className="hover:text-primary">
                   hello@ubumwe.beauty
                 </a>
@@ -163,29 +159,29 @@ export function Footer() {
         {/* Payment methods */}
         <div className="mt-8 flex flex-col items-start gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
               We accept:
             </span>
-            <span className="rounded-md bg-background px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
+            <span className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-semibold shadow-sm">
               MTN MoMo
             </span>
-            <span className="rounded-md bg-background px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
+            <span className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-semibold shadow-sm">
               Airtel Money
             </span>
-            <span className="rounded-md bg-background px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
+            <span className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-semibold shadow-sm">
               Visa
             </span>
-            <span className="rounded-md bg-background px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
+            <span className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-semibold shadow-sm">
               Mastercard
             </span>
-            <span className="rounded-md bg-background px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">
+            <span className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-semibold shadow-sm">
               Cash on Delivery
             </span>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="mt-6 border-t pt-6 text-center text-xs text-muted-foreground sm:flex sm:justify-between sm:text-left">
+        <div className="text-muted-foreground mt-6 border-t pt-6 text-center text-xs sm:flex sm:justify-between sm:text-left">
           <p>© {new Date().getFullYear()} Ubumwe Beauty. Made with love in Kigali, Rwanda.</p>
           <p className="mt-2 sm:mt-0">Ubumwe — beauty that unites us.</p>
         </div>

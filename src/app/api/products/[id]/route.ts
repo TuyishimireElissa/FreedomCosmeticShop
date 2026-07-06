@@ -7,10 +7,7 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
 
@@ -53,9 +50,6 @@ export async function GET(
     })
   } catch (error) {
     console.error("Failed to fetch product:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch product" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 })
   }
 }

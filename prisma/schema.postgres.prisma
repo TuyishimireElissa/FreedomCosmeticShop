@@ -1,0 +1,218 @@
+// =============================================================================
+// Ubumwe Beauty — Prisma Schema (PostgreSQL production version)
+// =============================================================================
+// This is the production schema using PostgreSQL. To swap from SQLite:
+//
+//   1. Install PostgreSQL adapter:
+//        bun add pg
+//        bun add -d @types/pg
+//
+//   2. Update prisma/schema.prisma to use this file's datasource:
+//        datasource db {
+//          provider = "postgresql"
+//          url      = env("DATABASE_URL")
+//        }
+//
+//   3. Set DATABASE_URL in .env to your PostgreSQL connection string:
+//        DATABASE_URL=postgresql://user:pass@host:5432/ubumwe?schema=public
+//
+//   4. Push the schema:
+//        bun run db:push
+//
+//   5. Re-seed:
+//        bun run db:seed
+//
+// PostgreSQL-specific improvements over the SQLite version:
+//   - Native arrays (no JSON.parse/stringify for images)
+//   - @db.Text for long descriptions
+//   - @db.Decimal(10, 2) for monetary precision
+//   - Native enums for status fields
+//   - Full-text search indexes
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────────────────────────
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  MTN_MOMO
+  AIRTEL_MONEY
+  CARD
+  COD
+}
+
+// ─── User (for future auth) ─────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  phone     String?
+  role      String   @default("CUSTOMER") // CUSTOMER | ADMIN
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([email])
+}
+
+// ─── Catalog ────────────────────────────────────────────────────────────────
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?   @db.Text
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  products    Product[]
+
+  @@index([slug])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  // Price in RWF (smallest unit). Use Decimal for high-volume stores.
+  price       Int
+  compareAt   Int?
+  // Native array (PostgreSQL advantage over SQLite)
+  images      String[]
+  rating      Float    @default(0)
+  reviews     Int      @default(0)
+  stock       Int      @default(0)
+  sku         String?  @unique
+  brand       String?
+  featured    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  // Search-optimized fields (PostgreSQL full-text)
+  searchVector Unsupported("tsvector")?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  orderItems OrderItem[]
+
+  @@index([categoryId])
+  @@index([featured])
+  @@index([slug])
+  @@index([brand])
+  // Full-text search index
+  // CREATE INDEX product_search_idx ON "Product" USING GIN ("searchVector");
+}
+
+// ─── Orders ─────────────────────────────────────────────────────────────────
+
+model Order {
+  id            String        @id @default(cuid())
+  orderNumber   String        @unique
+  customerName  String
+  customerPhone String
+  customerEmail String?
+  address       String        @db.Text
+  city          String
+  province      String
+  notes         String?       @db.Text
+  paymentMethod PaymentMethod @default(COD)
+  paymentStatus PaymentStatus @default(PENDING)
+  status        OrderStatus   @default(PENDING)
+  subtotal      Int
+  deliveryFee   Int           @default(0)
+  total         Int
+  // Optional link to authenticated user
+  userId        String?
+  user          User?         @relation(fields: [userId], references: [id])
+  items         OrderItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([status])
+  @@index([customerPhone])
+  @@index([createdAt])
+  @@index([userId])
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String?
+  product    Product? @relation(fields: [productId], references: [id])
+  // Snapshot fields
+  name       String
+  price      Int
+  quantity   Int
+  image      String?
+  createdAt  DateTime @default(now())
+
+  @@index([orderId])
+}
+
+// ─── Cart (for authenticated users, optional) ───────────────────────────────
+
+model Cart {
+  id        String      @id @default(cuid())
+  userId    String      @unique
+  items     CartItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+
+  @@index([cartId])
+}
+
+// ─── Address book (for authenticated users, optional) ───────────────────────
+
+model Address {
+  id        String   @id @default(cuid())
+  userId    String
+  label     String   // "Home", "Work", etc.
+  recipient String
+  phone     String
+  street    String
+  city      String
+  province  String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}

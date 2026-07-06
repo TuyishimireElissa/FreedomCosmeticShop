@@ -18,9 +18,6 @@ export async function POST() {
     return NextResponse.json({ ok: true, message: "Database re-seeded" })
   } catch (error) {
     console.error("Seed failed:", error)
-    return NextResponse.json(
-      { error: "Failed to seed database" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to seed database" }, { status: 500 })
   }
 }

@@ -24,20 +24,16 @@ export default function Home() {
   const { view, activeProductSlug, lastOrderId } = useStore()
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="bg-background flex min-h-screen flex-col">
       <Header />
 
       <main className="flex-1">
         {view === "home" && <HomeView />}
         {view === "catalog" && <CatalogView />}
-        {view === "product" && activeProductSlug && (
-          <ProductDetailView slug={activeProductSlug} />
-        )}
+        {view === "product" && activeProductSlug && <ProductDetailView slug={activeProductSlug} />}
         {view === "cart" && <CartView />}
         {view === "checkout" && <CheckoutView />}
-        {view === "confirmation" && lastOrderId && (
-          <ConfirmationView orderId={lastOrderId} />
-        )}
+        {view === "confirmation" && lastOrderId && <ConfirmationView orderId={lastOrderId} />}
         {view === "admin" && <AdminView />}
       </main>
 

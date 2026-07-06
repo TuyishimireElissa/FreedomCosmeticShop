@@ -54,10 +54,10 @@ export async function GET(req: Request) {
       sort === "price-asc"
         ? { price: "asc" }
         : sort === "price-desc"
-        ? { price: "desc" }
-        : sort === "rating"
-        ? { rating: "desc" }
-        : { createdAt: "desc" }
+          ? { price: "desc" }
+          : sort === "rating"
+            ? { rating: "desc" }
+            : { createdAt: "desc" }
 
     const products = await db.product.findMany({
       where,
@@ -75,9 +75,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ products: serialized, count: serialized.length })
   } catch (error) {
     console.error("Failed to fetch products:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch products" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
   }
 }

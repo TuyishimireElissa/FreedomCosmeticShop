@@ -80,10 +80,7 @@ export async function POST(req: Request) {
     })
 
     if (products.length !== productIds.length) {
-      return NextResponse.json(
-        { error: "One or more products are unavailable" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "One or more products are unavailable" }, { status: 400 })
     }
 
     // Validate stock + build line items
@@ -101,10 +98,7 @@ export async function POST(req: Request) {
       }
     })
 
-    const subtotal = orderItems.reduce(
-      (sum, i) => sum + i.price * i.quantity,
-      0
-    )
+    const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
     const deliveryFee = deliveryFeeFor(data.province)
     const total = subtotal + deliveryFee
     const orderNumber = await generateOrderNumber()
@@ -148,8 +142,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ order }, { status: 201 })
   } catch (error) {
     console.error("Failed to create order:", error)
-    const message =
-      error instanceof Error ? error.message : "Failed to create order"
+    const message = error instanceof Error ? error.message : "Failed to create order"
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
@@ -169,9 +162,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ orders })
   } catch (error) {
     console.error("Failed to fetch orders:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch orders" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 })
   }
 }

@@ -14,24 +14,16 @@
  */
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
 import { useStore } from "@/store/useStore"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Search, ShoppingBag, Menu, Sparkles, Shield } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 export function Header() {
-  const { goHome, goCatalog, goCart, goAdmin, setCatalogSearch, cartCount } =
-    useStore()
+  const { goHome, goCatalog, goCart, goAdmin, setCatalogSearch, cartCount } = useStore()
   const { toast } = useToast()
   const [searchInput, setSearchInput] = useState("")
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -66,28 +58,21 @@ export function Header() {
   return (
     <header
       className={`sticky top-0 z-40 w-full border-b transition-all duration-300 ${
-        scrolled
-          ? "bg-background/85 backdrop-blur-md shadow-sm"
-          : "bg-background/95"
+        scrolled ? "bg-background/85 shadow-sm backdrop-blur-md" : "bg-background/95"
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:gap-6 sm:px-6 lg:px-8">
         {/* Mobile menu */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              aria-label="Open menu"
-            >
+            <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-72">
             <SheetHeader>
               <SheetTitle className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
+                <Sparkles className="text-primary h-4 w-4" />
                 Ubumwe Beauty
               </SheetTitle>
             </SheetHeader>
@@ -97,7 +82,7 @@ export function Header() {
                   goHome()
                   setMobileOpen(false)
                 }}
-                className="rounded-lg px-3 py-2.5 text-left text-sm font-medium hover:bg-secondary"
+                className="hover:bg-secondary rounded-lg px-3 py-2.5 text-left text-sm font-medium"
               >
                 Home
               </button>
@@ -108,18 +93,18 @@ export function Header() {
                     goCatalog(l.slug)
                     setMobileOpen(false)
                   }}
-                  className="rounded-lg px-3 py-2.5 text-left text-sm font-medium hover:bg-secondary"
+                  className="hover:bg-secondary rounded-lg px-3 py-2.5 text-left text-sm font-medium"
                 >
                   {l.label}
                 </button>
               ))}
-              <div className="my-2 h-px bg-border" />
+              <div className="bg-border my-2 h-px" />
               <button
                 onClick={() => {
                   goAdmin()
                   setMobileOpen(false)
                 }}
-                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-muted-foreground hover:bg-secondary"
+                className="text-muted-foreground hover:bg-secondary flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium"
               >
                 <Shield className="h-4 w-4" />
                 Admin
@@ -134,7 +119,7 @@ export function Header() {
           className="flex shrink-0 items-center gap-2"
           aria-label="Go to homepage"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground">
+          <span className="bg-primary text-primary-foreground grid h-9 w-9 place-items-center rounded-full">
             <Sparkles className="h-4 w-4" />
           </span>
           <span className="hidden text-lg font-semibold tracking-tight sm:inline">
@@ -148,7 +133,7 @@ export function Header() {
             <button
               key={l.slug}
               onClick={() => goCatalog(l.slug)}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-foreground/80 transition-colors hover:bg-secondary hover:text-foreground"
+              className="text-foreground/80 hover:bg-secondary hover:text-foreground rounded-lg px-3 py-2 text-sm font-medium transition-colors"
             >
               {l.label}
             </button>
@@ -158,16 +143,16 @@ export function Header() {
         {/* Search (desktop) */}
         <form
           onSubmit={handleSearch}
-          className="ml-auto hidden flex-1 max-w-xs items-center lg:flex"
+          className="ml-auto hidden max-w-xs flex-1 items-center lg:flex"
         >
           <div className="relative w-full">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               type="search"
               placeholder="Search products..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="h-9 rounded-full pl-9 pr-3"
+              className="h-9 rounded-full pr-3 pl-9"
               aria-label="Search products"
             />
           </div>
@@ -194,12 +179,7 @@ export function Header() {
           </Button>
 
           {/* Admin link (desktop) */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="hidden lg:inline-flex"
-            onClick={goAdmin}
-          >
+          <Button variant="ghost" size="sm" className="hidden lg:inline-flex" onClick={goAdmin}>
             <Shield className="mr-1.5 h-4 w-4" />
             Admin
           </Button>
@@ -216,7 +196,7 @@ export function Header() {
             {cartCount() > 0 && (
               <Badge
                 variant="default"
-                className="absolute -right-1 -top-1 h-5 min-w-5 justify-center rounded-full px-1.5 text-[10px] font-semibold"
+                className="absolute -top-1 -right-1 h-5 min-w-5 justify-center rounded-full px-1.5 text-[10px] font-semibold"
               >
                 {cartCount() > 99 ? "99+" : cartCount()}
               </Badge>
@@ -228,13 +208,13 @@ export function Header() {
       {/* Mobile search row (only on small screens) */}
       <div className="border-t px-4 py-2 lg:hidden">
         <form onSubmit={handleSearch} className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             type="search"
             placeholder="Search skincare, makeup, haircare..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="h-9 rounded-full pl-9 pr-3"
+            className="h-9 rounded-full pr-3 pl-9"
             aria-label="Search products"
           />
         </form>

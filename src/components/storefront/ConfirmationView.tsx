@@ -79,7 +79,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Order not found</h1>
-        <p className="mt-2 text-muted-foreground">
+        <p className="text-muted-foreground mt-2">
           We couldn&apos;t find this order. It may have been removed.
         </p>
         <Button className="mt-6" onClick={goHome}>
@@ -94,8 +94,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
   const isCancelled = order.status === "CANCELLED"
 
   const paymentMethod = order.paymentMethod as PaymentMethodKey
-  const paymentLabel =
-    PAYMENT_METHODS[paymentMethod]?.label || order.paymentMethod
+  const paymentLabel = PAYMENT_METHODS[paymentMethod]?.label || order.paymentMethod
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
@@ -107,27 +106,22 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
           {isCancelled ? "Order cancelled" : "Thank you for your order!"}
         </h1>
-        <p className="mt-2 text-muted-foreground">
+        <p className="text-muted-foreground mt-2">
           We&apos;ve received your order and will contact you on{" "}
-          <span className="font-medium text-foreground">
-            {order.customerPhone}
-          </span>{" "}
-          to confirm.
+          <span className="text-foreground font-medium">{order.customerPhone}</span> to confirm.
         </p>
-        <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5">
-          <span className="text-xs uppercase tracking-wider text-muted-foreground">
+        <div className="bg-secondary mt-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5">
+          <span className="text-muted-foreground text-xs tracking-wider uppercase">
             Order number
           </span>
-          <span className="font-mono text-sm font-semibold">
-            {order.orderNumber}
-          </span>
+          <span className="font-mono text-sm font-semibold">{order.orderNumber}</span>
         </div>
       </div>
 
       {/* Status timeline */}
       {!isCancelled && (
-        <div className="mt-8 rounded-2xl border bg-card p-5">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="bg-card mt-8 rounded-2xl border p-5">
+          <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wider uppercase">
             Order status
           </h2>
           <ol className="grid grid-cols-4 gap-2 sm:gap-4">
@@ -141,7 +135,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
                       done
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-background text-muted-foreground"
-                    } ${isCurrent ? "ring-4 ring-primary/20" : ""}`}
+                    } ${isCurrent ? "ring-primary/20 ring-4" : ""}`}
                   >
                     <step.icon className="h-5 w-5" />
                   </div>
@@ -156,12 +150,10 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
               )
             })}
           </ol>
-          <p className="mt-4 text-center text-xs text-muted-foreground">
+          <p className="text-muted-foreground mt-4 text-center text-xs">
             Estimated delivery:{" "}
-            <span className="font-medium text-foreground">
-              {order.province === "Kigali City"
-                ? "1-2 business days"
-                : "3-5 business days"}
+            <span className="text-foreground font-medium">
+              {order.province === "Kigali City" ? "1-2 business days" : "3-5 business days"}
             </span>
           </p>
         </div>
@@ -169,27 +161,25 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
 
       {/* Customer + delivery info */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border bg-card p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="bg-card rounded-2xl border p-5">
+          <h2 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
             Customer
           </h2>
           <p className="mt-2 font-medium">{order.customerName}</p>
-          <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-1 flex items-center gap-1.5 text-sm">
             <Phone className="h-3.5 w-3.5" />
             {order.customerPhone}
           </p>
           {order.customerEmail && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {order.customerEmail}
-            </p>
+            <p className="text-muted-foreground mt-1 text-sm">{order.customerEmail}</p>
           )}
         </div>
-        <div className="rounded-2xl border bg-card p-5">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="bg-card rounded-2xl border p-5">
+          <h2 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
             Delivery address
           </h2>
           <p className="mt-2 flex items-start gap-1.5 text-sm">
-            <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+            <MapPin className="text-primary mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span>
               {order.address}
               <br />
@@ -197,43 +187,35 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
             </span>
           </p>
           {order.notes && (
-            <p className="mt-2 text-xs italic text-muted-foreground">
-              &ldquo;{order.notes}&rdquo;
-            </p>
+            <p className="text-muted-foreground mt-2 text-xs italic">&ldquo;{order.notes}&rdquo;</p>
           )}
         </div>
       </div>
 
       {/* Order items */}
-      <div className="mt-6 rounded-2xl border bg-card p-5">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+      <div className="bg-card mt-6 rounded-2xl border p-5">
+        <h2 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
           Items
         </h2>
         <ul className="mt-3 space-y-3">
           {order.items.map((item) => (
             <li key={item.id} className="flex gap-3">
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-secondary/30">
+              <div className="bg-secondary/30 h-14 w-14 shrink-0 overflow-hidden rounded-lg">
                 {item.image ? (
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
                 ) : (
-                  <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">
+                  <div className="text-muted-foreground grid h-full w-full place-items-center text-xs">
                     —
                   </div>
                 )}
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium leading-snug">{item.name}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm leading-snug font-medium">{item.name}</p>
+                <p className="text-muted-foreground text-xs">
                   {formatRWF(item.price)} × {item.quantity}
                 </p>
               </div>
-              <p className="text-sm font-semibold">
-                {formatRWF(item.price * item.quantity)}
-              </p>
+              <p className="text-sm font-semibold">{formatRWF(item.price * item.quantity)}</p>
             </li>
           ))}
         </ul>
@@ -254,16 +236,12 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-3 text-sm">
+        <div className="bg-secondary/40 mt-4 flex items-center justify-between rounded-lg px-4 py-3 text-sm">
           <span className="text-muted-foreground">Payment</span>
           <span className="font-medium">
             {paymentLabel} ·{" "}
             <span
-              className={
-                order.paymentStatus === "PAID"
-                  ? "text-emerald-600"
-                  : "text-amber-600"
-              }
+              className={order.paymentStatus === "PAID" ? "text-emerald-600" : "text-amber-600"}
             >
               {order.paymentStatus}
             </span>
@@ -272,15 +250,15 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
       </div>
 
       {/* Next steps */}
-      <div className="mt-6 rounded-2xl bg-secondary/40 p-5">
+      <div className="bg-secondary/40 mt-6 rounded-2xl p-5">
         <div className="flex items-start gap-3">
-          <MessageSquare className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+          <MessageSquare className="text-primary mt-0.5 h-5 w-5 shrink-0" />
           <div>
             <p className="font-medium">What happens next?</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              We&apos;ll send SMS updates to {order.customerPhone} as your order
-              is confirmed, shipped, and delivered. If you have any questions,
-              call us at <span className="font-medium text-foreground">+250 788 123 456</span>.
+            <p className="text-muted-foreground mt-1 text-sm">
+              We&apos;ll send SMS updates to {order.customerPhone} as your order is confirmed,
+              shipped, and delivered. If you have any questions, call us at{" "}
+              <span className="text-foreground font-medium">+250 788 123 456</span>.
             </p>
           </div>
         </div>

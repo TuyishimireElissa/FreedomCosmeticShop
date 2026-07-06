@@ -32,8 +32,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   const images = product.images || []
   const primaryImage = images[0] || "/placeholder.svg"
-  const hasDiscount =
-    product.compareAt !== null && product.compareAt > product.price
+  const hasDiscount = product.compareAt !== null && product.compareAt > product.price
   const discountPercent = hasDiscount
     ? Math.round(((product.compareAt! - product.price) / product.compareAt!) * 100)
     : 0
@@ -61,10 +60,10 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <article
       onClick={() => goProduct(product.slug)}
-      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+      className="group bg-card relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
     >
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-secondary/30">
+      <div className="bg-secondary/30 relative aspect-square overflow-hidden">
         {primaryImage ? (
           <img
             src={primaryImage}
@@ -75,29 +74,23 @@ export function ProductCard({ product }: ProductCardProps) {
             loading="lazy"
           />
         ) : (
-          <div className="grid h-full w-full place-items-center text-muted-foreground">
+          <div className="text-muted-foreground grid h-full w-full place-items-center">
             No image
           </div>
         )}
 
         {/* Top-left badges */}
-        <div className="absolute left-2 top-2 flex flex-col gap-1.5">
+        <div className="absolute top-2 left-2 flex flex-col gap-1.5">
           {hasDiscount && (
-            <Badge className="bg-primary text-primary-foreground shadow">
-              -{discountPercent}%
-            </Badge>
+            <Badge className="bg-primary text-primary-foreground shadow">-{discountPercent}%</Badge>
           )}
-          {product.featured && (
-            <Badge className="bg-amber-500 text-white shadow">
-              ★ Featured
-            </Badge>
-          )}
+          {product.featured && <Badge className="bg-amber-500 text-white shadow">★ Featured</Badge>}
         </div>
 
         {/* Out-of-stock overlay */}
         {outOfStock && (
-          <div className="absolute inset-0 grid place-items-center bg-background/40">
-            <span className="rounded-full bg-foreground/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-background">
+          <div className="bg-background/40 absolute inset-0 grid place-items-center">
+            <span className="bg-foreground/80 text-background rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase">
               Sold out
             </span>
           </div>
@@ -107,30 +100,28 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Body */}
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         {product.brand && (
-          <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          <p className="text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
             {product.brand}
           </p>
         )}
-        <h3 className="mt-0.5 line-clamp-2 text-sm font-medium leading-snug sm:text-[15px]">
+        <h3 className="mt-0.5 line-clamp-2 text-sm leading-snug font-medium sm:text-[15px]">
           {product.name}
         </h3>
 
         {/* Rating */}
-        <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+        <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-          <span className="font-medium text-foreground/80">
-            {product.rating.toFixed(1)}
-          </span>
+          <span className="text-foreground/80 font-medium">{product.rating.toFixed(1)}</span>
           <span>({product.reviews})</span>
         </div>
 
         {/* Price */}
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-base font-semibold text-foreground sm:text-lg">
+          <span className="text-foreground text-base font-semibold sm:text-lg">
             {formatRWF(product.price)}
           </span>
           {hasDiscount && (
-            <span className="text-xs text-muted-foreground line-through">
+            <span className="text-muted-foreground text-xs line-through">
               {formatRWF(product.compareAt!)}
             </span>
           )}

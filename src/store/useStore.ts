@@ -14,13 +14,7 @@ import { persist, createJSONStorage } from "zustand/middleware"
 /* ---------- Types ---------- */
 
 export type ViewKey =
-  | "home"
-  | "catalog"
-  | "product"
-  | "cart"
-  | "checkout"
-  | "confirmation"
-  | "admin"
+  "home" | "catalog" | "product" | "cart" | "checkout" | "confirmation" | "admin"
 
 export interface CartItem {
   productId: string
@@ -133,7 +127,10 @@ export const useStore = create<StoreState>()(
             isCartOpen: true,
           })
         } else {
-          set({ items: [...get().items, { ...item, quantity: Math.min(qty, item.stock) }], isCartOpen: true })
+          set({
+            items: [...get().items, { ...item, quantity: Math.min(qty, item.stock) }],
+            isCartOpen: true,
+          })
         }
       },
       removeFromCart: (productId) =>
@@ -145,9 +142,7 @@ export const useStore = create<StoreState>()(
         }
         set({
           items: get().items.map((i) =>
-            i.productId === productId
-              ? { ...i, quantity: Math.min(qty, i.stock) }
-              : i
+            i.productId === productId ? { ...i, quantity: Math.min(qty, i.stock) } : i
           ),
         })
       },

@@ -19,7 +19,6 @@ import { Product, Category } from "@/lib/types"
 import { ProductCard } from "./ProductCard"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Select,
@@ -28,25 +27,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { SlidersHorizontal, Search, X, PackageOpen } from "lucide-react"
 
 type SortKey = "newest" | "price-asc" | "price-desc" | "rating"
 
 export function CatalogView() {
-  const {
-    catalogCategory,
-    catalogSearch,
-    setCatalogSearch,
-    clearCatalogSearch,
-    goCatalog,
-  } = useStore()
+  const { catalogCategory, catalogSearch, setCatalogSearch, clearCatalogSearch, goCatalog } =
+    useStore()
 
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -109,18 +97,14 @@ export function CatalogView() {
   }
 
   const hasActiveFilters =
-    catalogCategory ||
-    catalogSearch ||
-    minPrice ||
-    maxPrice ||
-    sort !== "newest"
+    catalogCategory || catalogSearch || minPrice || maxPrice || sort !== "newest"
 
   // Build the filter panel content (reused in sidebar and mobile sheet)
   const FilterPanel = (
     <div className="space-y-6">
       {/* Categories */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground/70">
+        <h3 className="text-foreground/70 mb-3 text-sm font-semibold tracking-wider uppercase">
           Category
         </h3>
         <div className="flex flex-col gap-1">
@@ -130,9 +114,7 @@ export function CatalogView() {
               setFiltersOpen(false)
             }}
             className={`rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-              !catalogCategory
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-secondary"
+              !catalogCategory ? "bg-primary text-primary-foreground" : "hover:bg-secondary"
             }`}
           >
             All categories
@@ -151,9 +133,7 @@ export function CatalogView() {
               }`}
             >
               {c.name}
-              <span className="ml-1 text-xs opacity-70">
-                ({c._count?.products || 0})
-              </span>
+              <span className="ml-1 text-xs opacity-70">({c._count?.products || 0})</span>
             </button>
           ))}
         </div>
@@ -161,7 +141,7 @@ export function CatalogView() {
 
       {/* Price range */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground/70">
+        <h3 className="text-foreground/70 mb-3 text-sm font-semibold tracking-wider uppercase">
           Price range (RWF)
         </h3>
         <div className="flex items-center gap-2">
@@ -183,9 +163,7 @@ export function CatalogView() {
             min="0"
           />
         </div>
-        <p className="mt-1.5 text-xs text-muted-foreground">
-          Filter products by price.
-        </p>
+        <p className="text-muted-foreground mt-1.5 text-xs">Filter products by price.</p>
       </div>
 
       {/* Clear */}
@@ -203,17 +181,17 @@ export function CatalogView() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
           {catalogCategory
-            ? categories.find((c) => c.slug === catalogCategory)?.name ||
-              "Catalog"
+            ? categories.find((c) => c.slug === catalogCategory)?.name || "Catalog"
             : "All products"}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-1 text-sm">
           {loading
             ? "Loading products..."
             : `${products.length} product${products.length !== 1 ? "s" : ""} found`}
           {catalogSearch && (
             <>
-              {" "}for <span className="font-medium">&ldquo;{catalogSearch}&rdquo;</span>
+              {" "}
+              for <span className="font-medium">&ldquo;{catalogSearch}&rdquo;</span>
             </>
           )}
         </p>
@@ -221,17 +199,14 @@ export function CatalogView() {
 
       {/* Search bar (above grid on mobile, in toolbar on desktop) */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <form
-          onSubmit={handleSearchSubmit}
-          className="relative flex-1 min-w-[200px]"
-        >
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <form onSubmit={handleSearchSubmit} className="relative min-w-[200px] flex-1">
+          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             type="search"
             placeholder="Search products..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            className="h-10 pl-9 pr-9"
+            className="h-10 pr-9 pl-9"
           />
           {searchInput && (
             <button
@@ -240,7 +215,7 @@ export function CatalogView() {
                 setSearchInput("")
                 clearCatalogSearch()
               }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />
@@ -268,7 +243,7 @@ export function CatalogView() {
               <SlidersHorizontal className="mr-1.5 h-4 w-4" />
               Filters
               {hasActiveFilters && (
-                <span className="ml-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                <span className="bg-primary text-primary-foreground ml-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold">
                   !
                 </span>
               )}
@@ -287,9 +262,7 @@ export function CatalogView() {
       <div className="flex gap-6">
         {/* Sidebar (desktop) */}
         <aside className="hidden w-64 shrink-0 lg:block">
-          <div className="sticky top-24 rounded-2xl border bg-card p-4">
-            {FilterPanel}
-          </div>
+          <div className="bg-card sticky top-24 rounded-2xl border p-4">{FilterPanel}</div>
         </aside>
 
         {/* Grid */}
@@ -302,9 +275,9 @@ export function CatalogView() {
             </div>
           ) : products.length === 0 ? (
             <div className="grid place-items-center rounded-2xl border border-dashed py-20 text-center">
-              <PackageOpen className="h-12 w-12 text-muted-foreground/50" />
+              <PackageOpen className="text-muted-foreground/50 h-12 w-12" />
               <h3 className="mt-4 text-lg font-semibold">No products found</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-sm">
                 Try adjusting your filters or search.
               </p>
               <Button variant="outline" className="mt-4" onClick={clearAllFilters}>

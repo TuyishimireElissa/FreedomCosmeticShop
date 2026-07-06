@@ -24,7 +24,13 @@
 
 import { useState } from "react"
 import { useStore } from "@/store/useStore"
-import { formatRWF, RWANDAN_PROVINCES, deliveryFeeFor, PAYMENT_METHODS, PaymentMethodKey } from "@/lib/format"
+import {
+  formatRWF,
+  RWANDAN_PROVINCES,
+  deliveryFeeFor,
+  PAYMENT_METHODS,
+  PaymentMethodKey,
+} from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -36,10 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  RadioGroup,
-  RadioGroupItem,
-} from "@/components/ui/radio-group"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowLeft, Loader2, Smartphone, Banknote, ShieldCheck } from "lucide-react"
 
@@ -48,8 +51,7 @@ interface FormErrors {
 }
 
 export function CheckoutView() {
-  const { items, cartSubtotal, goCart, goCatalog, goConfirmation, clearCart } =
-    useStore()
+  const { items, cartSubtotal, goCart, goCatalog, goConfirmation, clearCart } = useStore()
   const { toast } = useToast()
 
   const [form, setForm] = useState({
@@ -181,9 +183,7 @@ export function CheckoutView() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Your cart is empty</h1>
-        <p className="mt-2 text-muted-foreground">
-          Add some products before checking out.
-        </p>
+        <p className="text-muted-foreground mt-2">Add some products before checking out.</p>
         <Button className="mt-6" onClick={() => goCatalog(null)}>
           Browse products
         </Button>
@@ -194,24 +194,19 @@ export function CheckoutView() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-          Checkout
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Checkout</h1>
         <Button variant="ghost" size="sm" onClick={goCart}>
           <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to cart
         </Button>
       </div>
 
-      <form
-        onSubmit={handleSubmit}
-        className="grid gap-6 lg:grid-cols-3"
-      >
+      <form onSubmit={handleSubmit} className="grid gap-6 lg:grid-cols-3">
         {/* Left: form sections */}
         <div className="space-y-6 lg:col-span-2">
           {/* Contact */}
-          <section className="rounded-2xl border bg-card p-5">
+          <section className="bg-card rounded-2xl border p-5">
             <h2 className="text-lg font-semibold">Contact information</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-sm">
               We&apos;ll use this to update you about your delivery.
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -229,9 +224,7 @@ export function CheckoutView() {
                   required
                 />
                 {errors.customerName && (
-                  <p className="mt-1 text-xs text-destructive">
-                    {errors.customerName}
-                  </p>
+                  <p className="text-destructive mt-1 text-xs">{errors.customerName}</p>
                 )}
               </div>
               <div>
@@ -248,9 +241,7 @@ export function CheckoutView() {
                   required
                 />
                 {errors.customerPhone && (
-                  <p className="mt-1 text-xs text-destructive">
-                    {errors.customerPhone}
-                  </p>
+                  <p className="text-destructive mt-1 text-xs">{errors.customerPhone}</p>
                 )}
               </div>
               <div>
@@ -265,18 +256,16 @@ export function CheckoutView() {
                   autoComplete="email"
                 />
                 {errors.customerEmail && (
-                  <p className="mt-1 text-xs text-destructive">
-                    {errors.customerEmail}
-                  </p>
+                  <p className="text-destructive mt-1 text-xs">{errors.customerEmail}</p>
                 )}
               </div>
             </div>
           </section>
 
           {/* Delivery */}
-          <section className="rounded-2xl border bg-card p-5">
+          <section className="bg-card rounded-2xl border p-5">
             <h2 className="text-lg font-semibold">Delivery address</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mt-1 text-sm">
               Where should we deliver your order?
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -293,9 +282,7 @@ export function CheckoutView() {
                   required
                 />
                 {errors.address && (
-                  <p className="mt-1 text-xs text-destructive">
-                    {errors.address}
-                  </p>
+                  <p className="text-destructive mt-1 text-xs">{errors.address}</p>
                 )}
               </div>
               <div>
@@ -310,16 +297,11 @@ export function CheckoutView() {
                   className={errors.city ? "border-destructive" : ""}
                   required
                 />
-                {errors.city && (
-                  <p className="mt-1 text-xs text-destructive">{errors.city}</p>
-                )}
+                {errors.city && <p className="text-destructive mt-1 text-xs">{errors.city}</p>}
               </div>
               <div>
                 <Label htmlFor="province">Province</Label>
-                <Select
-                  value={form.province}
-                  onValueChange={(v) => setField("province", v)}
-                >
+                <Select value={form.province} onValueChange={(v) => setField("province", v)}>
                   <SelectTrigger id="province">
                     <SelectValue />
                   </SelectTrigger>
@@ -347,71 +329,61 @@ export function CheckoutView() {
           </section>
 
           {/* Payment */}
-          <section className="rounded-2xl border bg-card p-5">
+          <section className="bg-card rounded-2xl border p-5">
             <h2 className="text-lg font-semibold">Payment method</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Choose how you want to pay.
-            </p>
+            <p className="text-muted-foreground mt-1 text-sm">Choose how you want to pay.</p>
             <RadioGroup
               value={form.paymentMethod}
               onValueChange={(v) => setField("paymentMethod", v)}
               className="mt-4 grid gap-3"
             >
-              {(Object.keys(PAYMENT_METHODS) as PaymentMethodKey[]).map(
-                (key) => {
-                  const method = PAYMENT_METHODS[key]
-                  return (
-                    <label
-                      key={key}
-                      htmlFor={`pay-${key}`}
-                      className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
-                        form.paymentMethod === key
-                          ? "border-primary bg-secondary/40"
-                          : "border-border hover:border-primary/40"
-                      }`}
-                    >
-                      <RadioGroupItem
-                        value={key}
-                        id={`pay-${key}`}
-                        className="mt-1"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          {key === "MTN_MOMO" ? (
-                            <Smartphone className="h-5 w-5 text-primary" />
-                          ) : (
-                            <Banknote className="h-5 w-5 text-primary" />
-                          )}
-                          <span className="font-medium">{method.label}</span>
-                        </div>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {method.description}
-                        </p>
-                        {key === "MTN_MOMO" && (
-                          <p className="mt-2 text-xs text-amber-600">
-                            For this demo, no real money will be charged. In
-                            production this triggers a real MTN MoMo prompt.
-                          </p>
+              {(Object.keys(PAYMENT_METHODS) as PaymentMethodKey[]).map((key) => {
+                const method = PAYMENT_METHODS[key]
+                return (
+                  <label
+                    key={key}
+                    htmlFor={`pay-${key}`}
+                    className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
+                      form.paymentMethod === key
+                        ? "border-primary bg-secondary/40"
+                        : "border-border hover:border-primary/40"
+                    }`}
+                  >
+                    <RadioGroupItem value={key} id={`pay-${key}`} className="mt-1" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        {key === "MTN_MOMO" ? (
+                          <Smartphone className="text-primary h-5 w-5" />
+                        ) : (
+                          <Banknote className="text-primary h-5 w-5" />
                         )}
+                        <span className="font-medium">{method.label}</span>
                       </div>
-                    </label>
-                  )
-                }
-              )}
+                      <p className="text-muted-foreground mt-1 text-sm">{method.description}</p>
+                      {key === "MTN_MOMO" && (
+                        <p className="mt-2 text-xs text-amber-600">
+                          For this demo, no real money will be charged. In production this triggers
+                          a real MTN MoMo prompt.
+                        </p>
+                      )}
+                    </div>
+                  </label>
+                )
+              })}
             </RadioGroup>
           </section>
         </div>
 
         {/* Right: order summary */}
         <aside className="lg:col-span-1">
-          <div className="sticky top-24 rounded-2xl border bg-card p-5 shadow-sm">
+          <div className="bg-card sticky top-24 rounded-2xl border p-5 shadow-sm">
             <h2 className="text-lg font-semibold">Order summary</h2>
 
             {/* Items */}
-            <ul className="mt-4 max-h-64 space-y-3 overflow-y-auto ub-scroll pr-1">
+            <ul className="ub-scroll mt-4 max-h-64 space-y-3 overflow-y-auto pr-1">
               {items.map((item) => (
                 <li key={item.productId} className="flex gap-3">
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-secondary/30">
+                  <div className="bg-secondary/30 relative h-14 w-14 shrink-0 overflow-hidden rounded-lg">
                     {item.image ? (
                       <img
                         src={item.image}
@@ -419,25 +391,23 @@ export function CheckoutView() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">
+                      <div className="text-muted-foreground grid h-full w-full place-items-center text-xs">
                         —
                       </div>
                     )}
-                    <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                    <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 grid h-5 w-5 place-items-center rounded-full text-[10px] font-semibold">
                       {item.quantity}
                     </span>
                   </div>
                   <div className="flex-1">
-                    <p className="line-clamp-2 text-xs font-medium leading-snug sm:text-sm">
+                    <p className="line-clamp-2 text-xs leading-snug font-medium sm:text-sm">
                       {item.name}
                     </p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
+                    <p className="text-muted-foreground mt-0.5 text-xs">
                       {formatRWF(item.price)} × {item.quantity}
                     </p>
                   </div>
-                  <p className="text-sm font-semibold">
-                    {formatRWF(item.price * item.quantity)}
-                  </p>
+                  <p className="text-sm font-semibold">{formatRWF(item.price * item.quantity)}</p>
                 </li>
               ))}
             </ul>
@@ -458,12 +428,7 @@ export function CheckoutView() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              size="lg"
-              className="mt-5 w-full"
-              disabled={submitting}
-            >
+            <Button type="submit" size="lg" className="mt-5 w-full" disabled={submitting}>
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -474,8 +439,8 @@ export function CheckoutView() {
               )}
             </Button>
 
-            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              <ShieldCheck className="h-4 w-4 text-primary" />
+            <div className="text-muted-foreground mt-4 flex items-center justify-center gap-2 text-xs">
+              <ShieldCheck className="text-primary h-4 w-4" />
               Your information is encrypted and secure.
             </div>
           </div>
