@@ -224,9 +224,9 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
 
         {/* Info */}
         <div className="flex flex-col">
-          {product.brand && (
+          {product.brand?.name && (
             <p className="text-primary text-xs font-semibold tracking-wider uppercase">
-              {product.brand}
+              {product.brand.name}
             </p>
           )}
           <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{product.name}</h1>
@@ -246,7 +246,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
               ))}
             </div>
             <span className="font-medium">{product.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground">({product.reviews} reviews)</span>
+            <span className="text-muted-foreground">({product.reviewsCount} reviews)</span>
           </div>
 
           {/* Price */}
@@ -282,6 +282,94 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           {/* Description */}
           <div className="prose prose-sm text-foreground/85 mt-5 max-w-none">
             <p className="leading-relaxed whitespace-pre-line">{product.description}</p>
+          </div>
+
+          {/* Cosmetics-specific details */}
+          <div className="mt-5 space-y-3">
+            {/* Size */}
+            {product.size && (
+              <div className="flex items-center gap-2 text-sm">
+                <span className="text-muted-foreground">Size:</span>
+                <span className="font-medium">{product.size}</span>
+              </div>
+            )}
+
+            {/* Shades */}
+            {product.shades && product.shades.length > 0 && (
+              <div>
+                <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase mb-1.5">
+                  Available shades
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {product.shades.map((shade) => (
+                    <span
+                      key={shade}
+                      className="rounded-full border bg-secondary/40 px-3 py-1 text-xs font-medium"
+                    >
+                      {shade}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Skin type */}
+            {product.skinType && product.skinType.length > 0 && (
+              <div>
+                <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase mb-1.5">
+                  Suitable for
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {product.skinType.map((st) => (
+                    <span
+                      key={st}
+                      className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
+                    >
+                      {st.charAt(0) + st.slice(1).toLowerCase()} skin
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Ingredients */}
+            {product.ingredients && product.ingredients.length > 0 && (
+              <div>
+                <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase mb-1.5">
+                  Key ingredients
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {product.ingredients.map((ing) => (
+                    <span
+                      key={ing}
+                      className="rounded-md border px-2 py-0.5 text-xs text-foreground/80"
+                    >
+                      {ing}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Usage instructions */}
+            {product.usageInstructions && (
+              <div className="rounded-xl bg-secondary/30 p-3 text-sm">
+                <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase mb-1">
+                  How to use
+                </p>
+                <p className="text-foreground/85">{product.usageInstructions}</p>
+              </div>
+            )}
+
+            {/* Warnings */}
+            {product.warnings && (
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm">
+                <p className="text-amber-700 text-xs font-medium tracking-wider uppercase mb-1">
+                  Caution
+                </p>
+                <p className="text-amber-900/80">{product.warnings}</p>
+              </div>
+            )}
           </div>
 
           {/* Quantity + actions */}

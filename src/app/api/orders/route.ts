@@ -1,18 +1,20 @@
 /**
  * POST /api/orders
  *
- * Creates a new order. Body:
+ * Creates a new order + payment record. Body:
  *   {
  *     customerName, customerPhone, customerEmail?, address, city, province,
- *     notes?, paymentMethod: "MTN_MOMO" | "COD",
+ *     district?, sector?, notes?, paymentMethod: "MTN_MOMO" | "COD",
  *     items: [{ productId, quantity }]
  *   }
  *
  * The server re-fetches product prices to prevent client-side tampering.
  * Generates a sequential order number like "UB-2026-00001".
+ * Also creates a Payment record (schema now has separate Payment model).
  *
  * GET /api/orders
  * Returns all orders (for the admin dashboard). Sorted by createdAt desc.
+ * Includes items, payments, and delivery.
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
@@ -35,6 +37,8 @@ const CreateOrderSchema = z.object({
   address: z.string().min(5, "Address is too short").max(300),
   city: z.string().min(2).max(100),
   province: z.string().min(2).max(100),
+  district: z.string().max(100).optional(),
+  sector: z.string().max(100).optional(),
   notes: z.string().max(500).optional(),
   paymentMethod: z.enum(["MTN_MOMO", "COD"]),
   items: z.array(OrderItemSchema).min(1, "Cart cannot be empty"),
@@ -46,11 +50,8 @@ const CreateOrderSchema = z.object({
  */
 async function generateOrderNumber(): Promise<string> {
   const year = new Date().getFullYear()
-  // Count orders this year to derive the sequence
   const countThisYear = await db.order.count({
-    where: {
-      orderNumber: { startsWith: `UB-${year}-` },
-    },
+    where: { orderNumber: { startsWith: `UB-${year}-` } },
   })
   const seq = String(countThisYear + 1).padStart(5, "0")
   return `UB-${year}-${seq}`
@@ -76,11 +77,14 @@ export async function POST(req: Request) {
     // Fetch products from DB to get authoritative prices & stock
     const productIds = data.items.map((i) => i.productId)
     const products = await db.product.findMany({
-      where: { id: { in: productIds }, isActive: true },
+      where: { id: { in: productIds }, isActive: true, isDeleted: false },
     })
 
     if (products.length !== productIds.length) {
-      return NextResponse.json({ error: "One or more products are unavailable" }, { status: 400 })
+      return NextResponse.json(
+        { error: "One or more products are unavailable" },
+        { status: 400 }
+      )
     }
 
     // Validate stock + build line items
@@ -98,13 +102,17 @@ export async function POST(req: Request) {
       }
     })
 
-    const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
+    const subtotal = orderItems.reduce(
+      (sum, i) => sum + i.price * i.quantity,
+      0
+    )
     const deliveryFee = deliveryFeeFor(data.province)
     const total = subtotal + deliveryFee
     const orderNumber = await generateOrderNumber()
 
-    // Create the order in a transaction (also decrement stock)
+    // Create the order + payment + decrement stock in a transaction
     const order = await db.$transaction(async (tx) => {
+      // Create the order
       const created = await tx.order.create({
         data: {
           orderNumber,
@@ -114,18 +122,43 @@ export async function POST(req: Request) {
           address: data.address,
           city: data.city,
           province: data.province,
+          district: data.district || null,
+          sector: data.sector || null,
           notes: data.notes || null,
-          paymentMethod: data.paymentMethod,
-          paymentStatus: data.paymentMethod === "COD" ? "PENDING" : "PENDING",
-          status: "PENDING",
+          // Totals
           subtotal,
+          discountAmount: 0,
           deliveryFee,
           total,
+          // Status
+          status: "PENDING",
+          // Loyalty: 1 point per 1000 RWF spent
+          loyaltyPointsEarned: Math.floor(total / 1000),
+          // Items
           items: {
             create: orderItems,
           },
         },
         include: { items: true },
+      })
+
+      // Create the payment record (schema now has separate Payment model)
+      await tx.payment.create({
+        data: {
+          orderId: created.id,
+          method: data.paymentMethod,
+          amount: total,
+          status: "PENDING",
+          phoneNumber: data.paymentMethod === "MTN_MOMO" ? data.customerPhone : null,
+        },
+      })
+
+      // Create a delivery record
+      await tx.delivery.create({
+        data: {
+          orderId: created.id,
+          status: "PENDING",
+        },
       })
 
       // Decrement stock for each product
@@ -142,7 +175,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ order }, { status: 201 })
   } catch (error) {
     console.error("Failed to create order:", error)
-    const message = error instanceof Error ? error.message : "Failed to create order"
+    const message =
+      error instanceof Error ? error.message : "Failed to create order"
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
@@ -155,13 +189,20 @@ export async function GET(req: Request) {
     const orders = await db.order.findMany({
       where: status && status !== "all" ? { status } : undefined,
       orderBy: { createdAt: "desc" },
-      include: { items: true },
+      include: {
+        items: true,
+        payments: true,
+        delivery: true,
+      },
       take: 200,
     })
 
     return NextResponse.json({ orders })
   } catch (error) {
     console.error("Failed to fetch orders:", error)
-    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Failed to fetch orders" },
+      { status: 500 }
+    )
   }
 }

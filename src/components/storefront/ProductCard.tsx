@@ -99,9 +99,9 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* Body */}
       <div className="flex flex-1 flex-col p-3 sm:p-4">
-        {product.brand && (
+        {product.brand?.name && (
           <p className="text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
-            {product.brand}
+            {product.brand.name}
           </p>
         )}
         <h3 className="mt-0.5 line-clamp-2 text-sm leading-snug font-medium sm:text-[15px]">
@@ -112,7 +112,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
           <span className="text-foreground/80 font-medium">{product.rating.toFixed(1)}</span>
-          <span>({product.reviews})</span>
+          <span>({product.reviewsCount})</span>
         </div>
 
         {/* Price */}
