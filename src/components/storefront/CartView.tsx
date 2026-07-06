@@ -4,36 +4,25 @@
  * CartView — enhanced cart with all Rwanda-specific features.
  *
  * Features:
- *   - Cart items with quantity +/-
+ *   - Cart items with quantity +/- controls
  *   - Price in RWF with formatting
- *   - Remove item with undo (toast + 5s restore)
- *   - Save for later (move to savedItems)
+ *   - Remove item with UNDO (toast with undo button, 5-second window)
+ *   - Save for later (moves to savedItems, can move back)
  *   - Coupon code input (validates via /api/coupons/validate)
  *   - Order summary (subtotal, discount, delivery estimate, total)
- *   - Loyalty points redemption (1 point = 10 RWF)
- *   - WhatsApp share cart (share list with friend)
+ *   - Loyalty points redemption (1 point = 1 RWF)
+ *   - WhatsApp share cart (generates a shareable message)
  *   - Continue shopping button
- *   - Proceed to checkout
+ *   - Proceed to checkout button
+ *   - Empty state with CTA
  */
 
-import { useState, useRef, useCallback } from "react"
-import { useStore, type CartItem } from "@/store/useStore"
-import {
-  formatRWF,
-  deliveryFeeFor,
-  deliveryTimeFor,
-  RWANDAN_PROVINCES,
-} from "@/lib/format"
+import { useState, useEffect } from "react"
+import { useStore } from "@/store/useStore"
+import { formatRWF, deliveryFeeFor } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import {
   Minus,
@@ -42,19 +31,23 @@ import {
   ShoppingBag,
   ArrowLeft,
   ArrowRight,
-  Tag,
-  X,
+  ShoppingCart,
   Heart,
-  MessageCircle,
+  Tag,
   Gift,
-  Check,
+  MessageCircle,
   Loader2,
-  Undo2,
+  X,
 } from "lucide-react"
 
-/** Loyalty point conversion: 1 point = 10 RWF */
-const LOYALTY_POINT_VALUE = 10
-const UNDO_TIMEOUT_MS = 5000
+// Province options for delivery estimate in cart
+const PROVINCES = [
+  "Kigali City",
+  "Northern Province",
+  "Southern Province",
+  "Eastern Province",
+  "Western Province",
+]
 
 export function CartView() {
   const {
@@ -79,76 +72,74 @@ export function CartView() {
   const { toast } = useToast()
 
   const [province, setProvince] = useState("Kigali City")
-  const [couponInput, setCouponInput] = useState(appliedCoupon?.code || "")
+  const [couponCode, setCouponCode] = useState(appliedCoupon?.code || "")
   const [couponLoading, setCouponLoading] = useState(false)
-  const [undoItem, setUndoItem] = useState<CartItem | null>(null)
-  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [undoTimer, setUndoTimer] = useState<ReturnType<typeof setTimeout> | null>(null)
 
   const subtotal = cartSubtotal()
-  const baseDeliveryFee = items.length > 0 ? deliveryFeeFor(province) : 0
+
+  // Calculate discount
   const couponDiscount = appliedCoupon?.discountAmount || 0
-  const freeShipping = appliedCoupon?.freeShipping || false
-  const deliveryFee = freeShipping ? 0 : baseDeliveryFee
-  const loyaltyDiscount = Math.min(redeemPoints * LOYALTY_POINT_VALUE, subtotal - couponDiscount)
-  const total = Math.max(0, subtotal - couponDiscount - loyaltyDiscount + deliveryFee)
+  const loyaltyDiscount = Math.min(redeemPoints, Math.max(0, subtotal - couponDiscount))
+  const totalDiscount = couponDiscount + loyaltyDiscount
+  const deliveryFee = items.length > 0 ? deliveryFeeFor(province) : 0
+  const finalDeliveryFee = appliedCoupon?.freeShipping ? 0 : deliveryFee
+  const total = Math.max(0, subtotal - totalDiscount + finalDeliveryFee)
 
-  // ─── Remove with undo ──────────────────────────────────────────────
-  const handleRemove = useCallback(
-    (item: CartItem) => {
-      removeFromCart(item.productId)
-      setUndoItem(item)
-      toast({
-        title: "Removed from cart",
-        description: `${item.name} — Undo available for 5 seconds.`,
-        action: undoItem ? undefined : {
-          altText: "Undo",
-          onClick: () => {
-            // handled by undo button below
-          },
+  // Cleanup undo timer on unmount
+  useEffect(() => {
+    return () => {
+      if (undoTimer) clearTimeout(undoTimer)
+    }
+  }, [undoTimer])
+
+  // ─── Remove with undo ────────────────────────────────────────────
+  const handleRemove = (item: typeof items[0]) => {
+    removeFromCart(item.productId)
+
+    if (undoTimer) clearTimeout(undoTimer)
+    const timer = setTimeout(() => {
+      if (undoTimer) clearTimeout(undoTimer)
+    }, 5000)
+    setUndoTimer(timer)
+
+    toast({
+      title: "Removed from cart",
+      description: item.name,
+      action: {
+        label: "Undo",
+        onClick: () => {
+          useStore.getState().addToCart({
+            productId: item.productId,
+            slug: item.slug,
+            name: item.name,
+            price: item.price,
+            image: item.image,
+            stock: item.stock,
+          }, item.quantity)
+          if (undoTimer) clearTimeout(undoTimer)
         },
-      })
-
-      if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
-      undoTimerRef.current = setTimeout(() => {
-        setUndoItem(null)
-      }, UNDO_TIMEOUT_MS)
-    },
-    [removeFromCart, toast, undoItem]
-  )
-
-  const handleUndo = () => {
-    if (!undoItem) return
-    useStore.getState().addToCart({
-      productId: undoItem.productId,
-      slug: undoItem.slug,
-      name: undoItem.name,
-      price: undoItem.price,
-      image: undoItem.image,
-      stock: undoItem.stock,
+      },
     })
-    setUndoItem(null)
-    if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
-    toast({ title: "Item restored" })
   }
 
-  // ─── Coupon validation ─────────────────────────────────────────────
+  // ─── Coupon validation ───────────────────────────────────────────
   const handleApplyCoupon = async () => {
-    if (!couponInput.trim()) return
+    if (!couponCode.trim()) return
     setCouponLoading(true)
     try {
       const res = await fetch("/api/coupons/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: couponInput.trim(), subtotal }),
+        body: JSON.stringify({ code: couponCode, subtotal }),
       })
       const data = await res.json()
       if (!res.ok || !data.valid) {
         toast({
-          title: "Coupon invalid",
-          description: data.error || "This coupon code is not valid.",
+          title: "Invalid coupon",
+          description: data.error,
           variant: "destructive",
         })
-        clearCoupon()
         return
       }
       setAppliedCoupon({
@@ -159,43 +150,26 @@ export function CartView() {
         freeShipping: data.freeShipping,
       })
       toast({
-        title: "Coupon applied! 🎉",
+        title: "Coupon applied!",
         description: data.message,
       })
     } catch {
-      toast({
-        title: "Failed to apply coupon",
-        variant: "destructive",
-      })
+      toast({ title: "Failed to validate coupon", variant: "destructive" })
     } finally {
       setCouponLoading(false)
     }
   }
 
-  const handleRemoveCoupon = () => {
-    clearCoupon()
-    setCouponInput("")
-    toast({ title: "Coupon removed" })
-  }
-
-  // ─── WhatsApp share cart ───────────────────────────────────────────
+  // ─── WhatsApp share cart ─────────────────────────────────────────
   const handleShareCart = () => {
-    if (items.length === 0) return
-    const lines = items.map(
-      (i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`
-    )
-    const text = `🛍️ My Ubumwe Beauty cart:\n\n${lines.join("\n")}\n\nTotal: ${formatRWF(
-      subtotal
-    )}\n\nCheck it out at ubumwe.beauty!`
-    const url = `https://wa.me/?text=${encodeURIComponent(text)}`
-    window.open(url, "_blank", "noopener,noreferrer")
+    const message = `🛍️ My Ubumwe Beauty Cart:\n\n${items
+      .map((i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`)
+      .join("\n")}\n\nSubtotal: ${formatRWF(subtotal)}\n\nShop at Ubumwe Beauty! 🌸`
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`
+    window.open(url, "_blank")
   }
 
-  // ─── Loyalty redemption ────────────────────────────────────────────
-  const availablePoints = user ? 100 : 0 // MVP: show 100 for demo; real = user.loyaltyPoints
-  const maxRedeemablePoints = Math.floor(subtotal / LOYALTY_POINT_VALUE)
-
-  // ─── Empty state ───────────────────────────────────────────────────
+  // ─── Empty cart state ────────────────────────────────────────────
   if (items.length === 0 && savedItems.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
@@ -209,8 +183,7 @@ export function CartView() {
           Looks like you haven&apos;t added any products yet. Let&apos;s fix that!
         </p>
         <Button size="lg" className="mt-6" onClick={() => goCatalog(null)}>
-          <ShoppingBag className="mr-2 h-5 w-5" />
-          Start shopping
+          <ShoppingCart className="mr-2 h-5 w-5" /> Start shopping
         </Button>
       </div>
     )
@@ -227,32 +200,13 @@ export function CartView() {
             {savedItems.length > 0 && ` · ${savedItems.length} saved for later`}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={handleShareCart} disabled={items.length === 0}>
-            <MessageCircle className="mr-1.5 h-4 w-4" />
-            <span className="hidden sm:inline">Share on WhatsApp</span>
-            <span className="sm:hidden">Share</span>
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => goCatalog(null)}>
-            <ArrowLeft className="mr-1.5 h-4 w-4" /> Continue shopping
-          </Button>
-        </div>
+        <Button variant="ghost" size="sm" onClick={() => goCatalog(null)}>
+          <ArrowLeft className="mr-1.5 h-4 w-4" /> Continue shopping
+        </Button>
       </div>
 
-      {/* Undo banner */}
-      {undoItem && (
-        <div className="mb-4 flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-          <span className="text-sm text-amber-800">
-            Removed: <strong>{undoItem.name}</strong>
-          </span>
-          <Button variant="outline" size="sm" onClick={handleUndo}>
-            <Undo2 className="mr-1.5 h-3.5 w-3.5" /> Undo
-          </Button>
-        </div>
-      )}
-
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* ─── Left: Cart items + saved items ─────────────────────── */}
+        {/* ─── Cart items ────────────────────────────────────────── */}
         <div className="lg:col-span-2">
           {items.length > 0 ? (
             <ul className="space-y-3">
@@ -349,42 +303,46 @@ export function CartView() {
             </ul>
           ) : (
             <div className="rounded-2xl border border-dashed py-12 text-center">
-              <p className="text-sm text-muted-foreground">Your cart is empty.</p>
-              <Button variant="outline" size="sm" className="mt-3" onClick={() => goCatalog(null)}>
-                Browse products
+              <ShoppingBag className="mx-auto h-10 w-10 text-muted-foreground/50" />
+              <p className="mt-2 text-sm text-muted-foreground">
+                Cart is empty — add products or move saved items back.
+              </p>
+            </div>
+          )}
+
+          {/* WhatsApp share + clear cart */}
+          {items.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={handleShareCart}>
+                <MessageCircle className="mr-1.5 h-4 w-4" /> Share cart on WhatsApp
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground"
+                onClick={() => {
+                  if (window.confirm("Remove all items from your cart?")) {
+                    clearCart()
+                    toast({ title: "Cart cleared" })
+                  }
+                }}
+              >
+                <Trash2 className="mr-1.5 h-4 w-4" /> Clear cart
               </Button>
             </div>
           )}
 
-          {/* Clear cart */}
-          {items.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-4 text-muted-foreground"
-              onClick={() => {
-                if (window.confirm("Remove all items from your cart?")) {
-                  clearCart()
-                  toast({ title: "Cart cleared" })
-                }
-              }}
-            >
-              <Trash2 className="mr-1.5 h-4 w-4" /> Clear cart
-            </Button>
-          )}
-
-          {/* ─── Saved for later ─────────────────────────────────── */}
+          {/* ─── Saved for later ──────────────────────────────────── */}
           {savedItems.length > 0 && (
             <div className="mt-8">
-              <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold">
-                <Heart className="h-5 w-5 text-primary" />
+              <h2 className="mb-3 text-lg font-semibold">
                 Saved for later ({savedItems.length})
               </h2>
               <ul className="space-y-2">
                 {savedItems.map((item) => (
                   <li
                     key={item.productId}
-                    className="flex items-center gap-3 rounded-xl border bg-card p-3"
+                    className="flex items-center gap-3 rounded-xl border bg-secondary/20 p-3"
                   >
                     <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-secondary/30">
                       {item.image && (
@@ -424,7 +382,7 @@ export function CartView() {
           )}
         </div>
 
-        {/* ─── Right: Order summary ──────────────────────────────── */}
+        {/* ─── Order summary sidebar ──────────────────────────────── */}
         <aside className="lg:col-span-1">
           <div className="sticky top-24 space-y-4">
             {/* Coupon */}
@@ -434,23 +392,26 @@ export function CartView() {
               </h2>
               {appliedCoupon ? (
                 <div className="mt-3 flex items-center justify-between rounded-lg bg-emerald-50 px-3 py-2">
-                  <div className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-emerald-600" />
-                    <div>
-                      <p className="text-sm font-medium text-emerald-900">
-                        {appliedCoupon.code}
+                  <div>
+                    <p className="text-sm font-medium text-emerald-700">
+                      {appliedCoupon.code} applied
+                    </p>
+                    {appliedCoupon.discountAmount > 0 && (
+                      <p className="text-xs text-emerald-600">
+                        −{formatRWF(appliedCoupon.discountAmount)}
                       </p>
-                      <p className="text-xs text-emerald-700">
-                        {appliedCoupon.freeShipping
-                          ? "Free shipping"
-                          : `−${formatRWF(appliedCoupon.discountAmount)}`}
-                      </p>
-                    </div>
+                    )}
+                    {appliedCoupon.freeShipping && (
+                      <p className="text-xs text-emerald-600">Free shipping!</p>
+                    )}
                   </div>
                   <button
-                    onClick={handleRemoveCoupon}
-                    className="rounded p-1 text-emerald-700 hover:bg-emerald-100"
-                    aria-label="Remove coupon"
+                    onClick={() => {
+                      clearCoupon()
+                      setCouponCode("")
+                      toast({ title: "Coupon removed" })
+                    }}
+                    className="rounded-md p-1 text-emerald-700 hover:bg-emerald-100"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -459,8 +420,8 @@ export function CartView() {
                 <div className="mt-3 flex gap-2">
                   <Input
                     placeholder="e.g. WELCOME10"
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                     className="h-9"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") handleApplyCoupon()
@@ -470,7 +431,7 @@ export function CartView() {
                     variant="secondary"
                     size="sm"
                     onClick={handleApplyCoupon}
-                    disabled={couponLoading || !couponInput.trim()}
+                    disabled={couponLoading || !couponCode.trim()}
                   >
                     {couponLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -481,124 +442,109 @@ export function CartView() {
                 </div>
               )}
               <p className="mt-2 text-xs text-muted-foreground">
-                Try: <button onClick={() => setCouponInput("WELCOME10")} className="font-mono font-medium text-primary hover:underline">WELCOME10</button> or <button onClick={() => setCouponInput("WEEKEND15")} className="font-mono font-medium text-primary hover:underline">WEEKEND15</button>
+                Try: WELCOME10 (10% off) or WEEKEND15 (15% off)
               </p>
             </div>
 
-            {/* Loyalty redemption */}
-            <div className="rounded-2xl border bg-card p-4 shadow-sm">
-              <h2 className="flex items-center gap-1.5 text-sm font-semibold">
-                <Gift className="h-4 w-4 text-primary" /> Loyalty points
-              </h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {availablePoints} points available · 1 pt = {formatRWF(LOYALTY_POINT_VALUE)}
-              </p>
-              <div className="mt-3 flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={0}
-                  max={Math.min(availablePoints, maxRedeemablePoints)}
-                  value={redeemPoints}
-                  onChange={(e) =>
-                    setRedeemPoints(
-                      Math.min(
-                        Math.max(0, parseInt(e.target.value) || 0),
-                        availablePoints,
-                        maxRedeemablePoints
-                      )
-                    )
-                  }
-                  className="h-9"
-                  placeholder="0"
-                  disabled={availablePoints === 0}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setRedeemPoints(Math.min(availablePoints, maxRedeemablePoints))}
-                  disabled={availablePoints === 0}
-                >
-                  Use max
-                </Button>
+            {/* Loyalty points */}
+            {user && (
+              <div className="rounded-2xl border bg-card p-4 shadow-sm">
+                <h2 className="flex items-center gap-1.5 text-sm font-semibold">
+                  <Gift className="h-4 w-4 text-primary" /> Loyalty points
+                </h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  You have {0} points (1 pt = RWF 1)
+                </p>
+                <div className="mt-3 flex items-center gap-2">
+                  <Input
+                    type="number"
+                    placeholder="Points to redeem"
+                    value={redeemPoints || ""}
+                    onChange={(e) => setRedeemPoints(Number(e.target.value) || 0)}
+                    className="h-9"
+                    min="0"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setRedeemPoints(0)}
+                    disabled={redeemPoints === 0}
+                  >
+                    Clear
+                  </Button>
+                </div>
+                {redeemPoints > 0 && (
+                  <p className="mt-1 text-xs text-emerald-600">
+                    −{formatRWF(loyaltyDiscount)} applied
+                  </p>
+                )}
               </div>
-              {redeemPoints > 0 && (
-                <p className="mt-2 text-xs font-medium text-emerald-600">
-                  −{formatRWF(redeemPoints * LOYALTY_POINT_VALUE)} applied
-                </p>
-              )}
-              {!user && (
-                <p className="mt-2 text-xs text-muted-foreground">
-                  💡 Log in to earn and redeem points.
-                </p>
-              )}
-            </div>
+            )}
 
             {/* Order summary */}
-            <div className="rounded-2xl border bg-card p-5 shadow-sm">
-              <h2 className="text-lg font-semibold">Order summary</h2>
+            <div className="rounded-2xl border bg-card p-4 shadow-sm">
+              <h2 className="text-sm font-semibold">Order summary</h2>
 
-              {/* Province for delivery estimate */}
-              <div className="mt-4">
-                <Label className="text-xs text-muted-foreground">Delivery province</Label>
-                <Select value={province} onValueChange={setProvince}>
-                  <SelectTrigger className="h-9 mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {RWANDAN_PROVINCES.map((p) => (
-                      <SelectItem key={p} value={p}>
-                        {p}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              {/* Province selector for delivery estimate */}
+              <div className="mt-3">
+                <Label className="mb-1 block text-xs text-muted-foreground">
+                  Delivery province (estimate)
+                </Label>
+                <select
+                  value={province}
+                  onChange={(e) => setProvince(e.target.value)}
+                  className="h-9 w-full rounded-lg border bg-background px-3 text-sm"
+                >
+                  {PROVINCES.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <div className="mt-4 space-y-2 text-sm">
+              {/* Totals */}
+              <div className="mt-3 space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal ({items.length} items)</span>
+                  <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">{formatRWF(subtotal)}</span>
                 </div>
-
                 {couponDiscount > 0 && (
                   <div className="flex justify-between text-emerald-600">
                     <span>Coupon discount</span>
-                    <span>−{formatRWF(couponDiscount)}</span>
+                    <span className="font-medium">−{formatRWF(couponDiscount)}</span>
                   </div>
                 )}
-
                 {loyaltyDiscount > 0 && (
                   <div className="flex justify-between text-emerald-600">
-                    <span>Loyalty ({redeemPoints} pts)</span>
-                    <span>−{formatRWF(loyaltyDiscount)}</span>
+                    <span>Loyalty points</span>
+                    <span className="font-medium">−{formatRWF(loyaltyDiscount)}</span>
                   </div>
                 )}
-
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Delivery fee</span>
-                  {freeShipping ? (
+                  {finalDeliveryFee === 0 && appliedCoupon?.freeShipping ? (
                     <span className="font-medium text-emerald-600">FREE</span>
                   ) : (
-                    <span className="font-medium">{formatRWF(deliveryFee)}</span>
+                    <span className="font-medium">{formatRWF(finalDeliveryFee)}</span>
                   )}
                 </div>
-
                 <div className="border-t pt-2">
                   <div className="flex items-baseline justify-between">
                     <span className="font-semibold">Total</span>
                     <span className="text-xl font-bold">{formatRWF(total)}</span>
                   </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    ETA: {deliveryTimeFor(province)}
-                  </p>
                 </div>
               </div>
 
-              <Button size="lg" className="mt-5 w-full" onClick={goCheckout} disabled={items.length === 0}>
-                Proceed to checkout
-                <ArrowRight className="ml-2 h-4 w-4" />
+              <Button
+                size="lg"
+                className="mt-4 w-full"
+                onClick={goCheckout}
+                disabled={items.length === 0}
+              >
+                Proceed to checkout <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-
               <Button
                 variant="outline"
                 size="sm"
@@ -607,14 +553,6 @@ export function CartView() {
               >
                 Continue shopping
               </Button>
-
-              <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                <span>🔒 Secure checkout</span>
-                <span>·</span>
-                <span>📱 MTN MoMo</span>
-                <span>·</span>
-                <span>💵 COD</span>
-              </div>
             </div>
           </div>
         </aside>

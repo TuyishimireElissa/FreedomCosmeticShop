@@ -4,32 +4,32 @@
  * TrackOrderView — track an order by order number.
  *
  * Features:
- *   - Input for order number (UB-2026-00001)
- *   - Loads order + timeline via /api/orders/[id]/track
- *   - Shows status timeline with timestamps
- *   - Shows items, delivery address, payment status
- *   - "Track another order" button
- *   - Recent order numbers from localStorage
+ *   - Input for order number (e.g., UB-2026-00001)
+ *   - Shows order status timeline
+ *   - Shows items, totals, delivery info
+ *   - Shows payment status
+ *   - Estimated delivery time
+ *   - WhatsApp share order
  */
 
-import { useState, useEffect, type FormEvent } from "react"
+import { useState } from "react"
 import { useStore } from "@/store/useStore"
 import { formatRWF, PAYMENT_METHODS, PaymentMethodKey, deliveryTimeFor } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
-  CheckCircle2,
   Package,
-  Truck,
-  Home as HomeIcon,
-  MapPinned,
   Search,
-  ArrowLeft,
+  Truck,
+  CheckCircle2,
+  Home as HomeIcon,
   Clock,
   Phone,
   MapPin,
+  Share2,
+  ArrowLeft,
+  AlertCircle,
 } from "lucide-react"
 
 interface TrackedOrder {
@@ -47,13 +47,6 @@ interface TrackedOrder {
   subtotal: number
   deliveryFee: number
   discountAmount: number
-  items: Array<{
-    id: string
-    name: string
-    price: number
-    quantity: number
-    image: string | null
-  }>
   paymentMethod: string
   paymentStatus: string
   deliveryStatus: string
@@ -61,6 +54,13 @@ interface TrackedOrder {
   estimatedArrival: string | null
   createdAt: string
   updatedAt: string
+  items: Array<{
+    id: string
+    name: string
+    price: number
+    quantity: number
+    image: string | null
+  }>
 }
 
 interface TimelineStep {
@@ -70,81 +70,49 @@ interface TimelineStep {
   completed: boolean
 }
 
-const TRACK_HISTORY_KEY = "ubumwe-track-history"
-const MAX_HISTORY = 5
-
-const STATUS_ICONS: Record<string, React.ElementType> = {
-  PENDING: CheckCircle2,
-  CONFIRMED: Package,
-  PROCESSING: Package,
-  SHIPPED: Truck,
-  DELIVERED: HomeIcon,
-}
-
 export function TrackOrderView() {
-  const { goHome, goCatalog } = useStore()
+  const { goHome } = useStore()
   const [orderNumber, setOrderNumber] = useState("")
   const [order, setOrder] = useState<TrackedOrder | null>(null)
   const [timeline, setTimeline] = useState<TimelineStep[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [history, setHistory] = useState<string[]>([])
+  const [searched, setSearched] = useState(false)
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(TRACK_HISTORY_KEY)
-      setHistory(stored ? JSON.parse(stored) : [])
-    } catch {
-      setHistory([])
-    }
-  }, [])
-
-  const saveToHistory = (num: string) => {
-    const updated = [num, ...history.filter((h) => h !== num)].slice(0, MAX_HISTORY)
-    setHistory(updated)
-    localStorage.setItem(TRACK_HISTORY_KEY, JSON.stringify(updated))
-  }
-
-  const handleTrack = async (e: FormEvent) => {
+  const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!orderNumber.trim()) return
+
     setLoading(true)
     setError(null)
-    setOrder(null)
+    setSearched(true)
 
     try {
       const res = await fetch(`/api/orders/${encodeURIComponent(orderNumber.trim())}/track`)
-      const data = await res.json()
-
       if (!res.ok) {
-        setError(data.error || "Order not found")
-        return
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || "Order not found")
       }
-
+      const data = await res.json()
       setOrder(data.order)
       setTimeline(data.timeline || [])
-      saveToHistory(data.order.orderNumber)
-    } catch {
-      setError("Network error. Please try again.")
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to track order")
+      setOrder(null)
+      setTimeline([])
     } finally {
       setLoading(false)
     }
   }
 
-  const handleTrackFromHistory = (num: string) => {
-    setOrderNumber(num)
-    // Auto-submit
-    setTimeout(() => {
-      const form = document.getElementById("track-form") as HTMLFormElement | null
-      form?.requestSubmit()
-    }, 100)
-  }
-
-  const handleReset = () => {
-    setOrder(null)
-    setTimeline([])
-    setOrderNumber("")
-    setError(null)
+  // ─── WhatsApp share ───────────────────────────────────────────────
+  const handleShare = () => {
+    if (!order) return
+    const items = order.items
+      .map((i) => `• ${i.name} × ${i.quantity}`)
+      .join("\n")
+    const msg = `📦 Order ${order.orderNumber} status: ${order.status}\n\n${items}\n\nTotal: ${formatRWF(order.total)}\nTrack at ubumwe.beauty 🌸`
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank")
   }
 
   return (
@@ -153,11 +121,10 @@ export function TrackOrderView() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            <MapPinned className="h-6 w-6 text-primary" />
-            Track your order
+            <Package className="h-7 w-7 text-primary" /> Track your order
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Enter your order number to see its status.
+            Enter your order number to see the latest status.
           </p>
         </div>
         <Button variant="ghost" size="sm" onClick={goHome}>
@@ -166,149 +133,138 @@ export function TrackOrderView() {
       </div>
 
       {/* Search form */}
-      {!order && (
-        <div className="rounded-2xl border bg-card p-5 sm:p-6">
-          <form id="track-form" onSubmit={handleTrack} className="space-y-4">
-            <div>
-              <Label htmlFor="order-number">Order number</Label>
-              <div className="relative mt-1">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="order-number"
-                  value={orderNumber}
-                  onChange={(e) => setOrderNumber(e.target.value.toUpperCase())}
-                  placeholder="e.g. UB-2026-00001"
-                  className="pl-9 font-mono"
-                  autoComplete="off"
-                />
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Your order number was sent via SMS and is in your confirmation email.
-              </p>
-            </div>
-
-            {error && (
-              <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-                {error}
-              </div>
-            )}
-
-            <Button type="submit" size="lg" className="w-full" disabled={loading || !orderNumber.trim()}>
-              {loading ? <Skeleton className="h-5 w-20" /> : "Track order"}
-            </Button>
-          </form>
-
-          {/* Recent searches */}
-          {history.length > 0 && (
-            <div className="mt-4 border-t pt-4">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Recent orders
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {history.map((num) => (
-                  <button
-                    key={num}
-                    onClick={() => handleTrackFromHistory(num)}
-                    className="rounded-full bg-secondary px-3 py-1 font-mono text-xs font-medium hover:bg-secondary/70"
-                  >
-                    {num}
-                  </button>
-                ))}
-                <button
-                  onClick={() => {
-                    localStorage.removeItem(TRACK_HISTORY_KEY)
-                    setHistory([])
-                  }}
-                  className="rounded-full px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
-                >
-                  Clear
-                </button>
-              </div>
-            </div>
-          )}
+      <form onSubmit={handleTrack} className="mb-6">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="e.g. UB-2026-00001"
+              value={orderNumber}
+              onChange={(e) => setOrderNumber(e.target.value.toUpperCase())}
+              className="h-12 pl-9 font-mono"
+              autoComplete="off"
+            />
+          </div>
+          <Button type="submit" size="lg" disabled={loading || !orderNumber.trim()}>
+            {loading ? "Tracking..." : "Track"}
+          </Button>
         </div>
-      )}
+        <p className="mt-2 text-xs text-muted-foreground">
+          Your order number was sent via SMS when you placed your order.
+        </p>
+      </form>
 
       {/* Loading */}
-      {loading && !order && (
-        <div className="mt-6 space-y-3">
-          <Skeleton className="h-24 rounded-2xl" />
-          <Skeleton className="h-48 rounded-2xl" />
+      {loading && (
+        <div className="space-y-3">
+          <Skeleton className="h-32 w-full rounded-2xl" />
+          <Skeleton className="h-48 w-full rounded-2xl" />
         </div>
       )}
 
-      {/* Order result */}
-      {order && (
+      {/* Error */}
+      {error && !loading && (
+        <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center">
+          <AlertCircle className="mx-auto h-10 w-10 text-destructive/50" />
+          <h3 className="mt-3 font-semibold text-destructive">Order not found</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{error}</p>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Double-check your order number — it looks like UB-YYYY-NNNNN.
+          </p>
+        </div>
+      )}
+
+      {/* Order details */}
+      {order && !loading && (
         <div className="space-y-4">
-          {/* Status header */}
-          <div className="rounded-2xl border bg-card p-5">
-            <div className="flex items-start justify-between">
+          {/* Status banner */}
+          <div
+            className={`rounded-2xl border p-5 ${
+              order.status === "DELIVERED"
+                ? "border-emerald-300 bg-emerald-50"
+                : order.status === "CANCELLED"
+                ? "border-destructive/30 bg-destructive/5"
+                : "border-primary/30 bg-primary/5"
+            }`}
+          >
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                  Order number
-                </p>
+                <p className="text-sm text-muted-foreground">Order</p>
                 <p className="font-mono text-lg font-bold">{order.orderNumber}</p>
               </div>
               <div className="text-right">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground">Status</p>
-                <span
-                  className={`mt-1 inline-block rounded-full px-3 py-1 text-xs font-medium ${
+                <p className="text-sm text-muted-foreground">Status</p>
+                <p
+                  className={`text-lg font-bold ${
                     order.status === "DELIVERED"
-                      ? "bg-emerald-100 text-emerald-700"
+                      ? "text-emerald-700"
                       : order.status === "CANCELLED"
-                      ? "bg-red-100 text-red-700"
-                      : "bg-amber-100 text-amber-700"
+                      ? "text-destructive"
+                      : "text-primary"
                   }`}
                 >
                   {order.status}
-                </span>
+                </p>
               </div>
             </div>
-
-            {order.trackingCode && (
-              <div className="mt-3 rounded-lg bg-secondary/40 px-3 py-2 text-sm">
-                <span className="text-muted-foreground">Tracking code: </span>
-                <span className="font-mono font-medium">{order.trackingCode}</span>
+            <div className="mt-3 flex items-center gap-2 text-sm">
+              <Clock className="h-4 w-4 text-primary" />
+              <span className="text-muted-foreground">Placed on</span>
+              <span className="font-medium">
+                {new Date(order.createdAt).toLocaleString("en-RW", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
+            {order.status !== "CANCELLED" && order.status !== "DELIVERED" && (
+              <div className="mt-2 flex items-center gap-2 text-sm">
+                <Truck className="h-4 w-4 text-primary" />
+                <span className="text-muted-foreground">Estimated delivery:</span>
+                <span className="font-medium">{deliveryTimeFor(order.province)}</span>
               </div>
             )}
-
-            {order.estimatedArrival && (
-              <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Clock className="h-3.5 w-3.5 text-primary" />
-                Estimated arrival:{" "}
-                <span className="font-medium text-foreground">
-                  {new Date(order.estimatedArrival).toLocaleDateString("en-RW", {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                  })}
-                </span>
+            {order.trackingCode && (
+              <div className="mt-2 text-sm">
+                <span className="text-muted-foreground">Tracking code: </span>
+                <span className="font-mono font-medium">{order.trackingCode}</span>
               </div>
             )}
           </div>
 
           {/* Timeline */}
-          {order.status !== "CANCELLED" && (
+          {order.status !== "CANCELLED" && timeline.length > 0 && (
             <div className="rounded-2xl border bg-card p-5">
               <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                Delivery timeline
+                Order timeline
               </h2>
-              <ol className="relative space-y-4">
+              <ol className="space-y-4">
                 {timeline.map((step, i) => {
-                  const Icon = STATUS_ICONS[step.status] || CheckCircle2
+                  const StepIcon =
+                    step.status === "DELIVERED"
+                      ? HomeIcon
+                      : step.status === "SHIPPED"
+                      ? Truck
+                      : step.status === "PENDING"
+                      ? CheckCircle2
+                      : Package
                   return (
-                    <li key={i} className="flex gap-3">
+                    <li key={step.status} className="flex items-start gap-3">
                       <div
-                        className={`grid h-9 w-9 shrink-0 place-items-center rounded-full ${
+                        className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${
                           step.completed
                             ? "bg-primary text-primary-foreground"
                             : "bg-secondary text-muted-foreground"
                         }`}
                       >
-                        <Icon className="h-4 w-4" />
+                        <StepIcon className="h-4 w-4" />
                       </div>
-                      <div className="flex-1 pt-1">
-                        <p className={`text-sm font-medium ${step.completed ? "text-foreground" : "text-muted-foreground"}`}>
+                      <div className="flex-1">
+                        <p className={`text-sm font-medium ${step.completed ? "" : "text-muted-foreground"}`}>
                           {step.label}
                         </p>
                         {step.timestamp && (
@@ -322,6 +278,11 @@ export function TrackOrderView() {
                           </p>
                         )}
                       </div>
+                      {i === timeline.length - 1 && step.completed && (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                          Current
+                        </span>
+                      )}
                     </li>
                   )
                 })}
@@ -329,86 +290,21 @@ export function TrackOrderView() {
             </div>
           )}
 
-          {/* Items + delivery */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            {/* Delivery */}
-            <div className="rounded-2xl border bg-card p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                Delivery to
-              </h2>
-              <p className="mt-2 font-medium">{order.customerName}</p>
-              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Phone className="h-3.5 w-3.5" /> {order.customerPhone}
-              </p>
-              <p className="mt-1 flex items-start gap-1.5 text-sm">
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-                <span>
-                  {order.address}
-                  <br />
-                  {order.city}, {order.province}
-                </span>
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                ETA: {deliveryTimeFor(order.province)}
-              </p>
-            </div>
-
-            {/* Payment */}
-            <div className="rounded-2xl border bg-card p-5">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                Payment
-              </h2>
-              <p className="mt-2 font-medium">
-                {PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod}
-              </p>
-              <p className="mt-1 text-sm">
-                Status:{" "}
-                <span
-                  className={
-                    order.paymentStatus === "PAID"
-                      ? "font-medium text-emerald-600"
-                      : "font-medium text-amber-600"
-                  }
-                >
-                  {order.paymentStatus}
-                </span>
-              </p>
-              <div className="mt-3 space-y-1 border-t pt-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>{formatRWF(order.subtotal)}</span>
-                </div>
-                {order.discountAmount > 0 && (
-                  <div className="flex justify-between text-emerald-600">
-                    <span>Discount</span>
-                    <span>−{formatRWF(order.discountAmount)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Delivery</span>
-                  <span>{formatRWF(order.deliveryFee)}</span>
-                </div>
-                <div className="flex justify-between border-t pt-1 font-semibold">
-                  <span>Total</span>
-                  <span>{formatRWF(order.total)}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Items */}
+          {/* Items + totals */}
           <div className="rounded-2xl border bg-card p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               Items ({order.items.length})
             </h2>
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-3 space-y-3">
               {order.items.map((item) => (
                 <li key={item.id} className="flex gap-3">
-                  <div className="h-12 w-12 shrink-0 overflow-hidden rounded bg-secondary/30">
-                    {item.image && <img src={item.image} alt={item.name} className="h-full w-full object-cover" />}
+                  <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-secondary/30">
+                    {item.image && (
+                      <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                    )}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium">{item.name}</p>
+                    <p className="text-sm font-medium leading-snug">{item.name}</p>
                     <p className="text-xs text-muted-foreground">
                       {formatRWF(item.price)} × {item.quantity}
                     </p>
@@ -417,17 +313,72 @@ export function TrackOrderView() {
                 </li>
               ))}
             </ul>
+            <div className="mt-4 space-y-2 border-t pt-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span>{formatRWF(order.subtotal)}</span>
+              </div>
+              {order.discountAmount > 0 && (
+                <div className="flex justify-between text-emerald-600">
+                  <span>Discount</span>
+                  <span>−{formatRWF(order.discountAmount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Delivery</span>
+                <span>{formatRWF(order.deliveryFee)}</span>
+              </div>
+              <div className="flex items-baseline justify-between border-t pt-2">
+                <span className="font-semibold">Total</span>
+                <span className="text-xl font-bold">{formatRWF(order.total)}</span>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-2 text-sm">
+              <span className="text-muted-foreground">Payment</span>
+              <span className="font-medium">
+                {PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod}{" "}
+                · <span className={order.paymentStatus === "PAID" ? "text-emerald-600" : "text-amber-600"}>{order.paymentStatus}</span>
+              </span>
+            </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={handleReset}>
-              Track another order
-            </Button>
-            <Button className="flex-1" onClick={goCatalog}>
-              Continue shopping
-            </Button>
+          {/* Delivery info */}
+          <div className="rounded-2xl border bg-card p-5">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Delivery to
+            </h2>
+            <p className="mt-2 font-medium">{order.customerName}</p>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+              <Phone className="h-3.5 w-3.5" /> {order.customerPhone}
+            </p>
+            <p className="mt-1 flex items-start gap-1.5 text-sm">
+              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+              <span>
+                {order.address}
+                <br />
+                {order.city}
+                {order.district ? `, ${order.district}` : ""}
+                <br />
+                {order.province}
+              </span>
+            </p>
           </div>
+
+          {/* Share */}
+          <Button variant="outline" className="w-full" onClick={handleShare}>
+            <Share2 className="mr-2 h-4 w-4" /> Share order on WhatsApp
+          </Button>
+        </div>
+      )}
+
+      {/* Empty state (before search) */}
+      {!searched && !order && !loading && (
+        <div className="rounded-2xl border border-dashed py-16 text-center">
+          <Package className="mx-auto h-12 w-12 text-muted-foreground/50" />
+          <h3 className="mt-3 font-semibold">Enter your order number above</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            You&apos;ll see the full status timeline, items, and delivery info.
+          </p>
         </div>
       )}
     </div>

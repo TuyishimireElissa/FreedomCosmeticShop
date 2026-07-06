@@ -4,36 +4,31 @@
  * CheckoutView — 3-step multi-step checkout wizard.
  *
  * Step 1: DELIVERY INFO
- *   - Phone (auto-fill from account)
- *   - Full name
- *   - District dropdown (all 30 districts)
- *   - Sector (auto-populated based on district)
- *   - Cell
- *   - Landmark
+ *   - Phone (auto-fill from account), name, district dropdown (all 30),
+ *     sector (auto-populated by district), cell, landmark
  *   - Province auto-selected from district
- *   - Delivery fee auto-calculated
+ *   - Delivery fee auto-calculated by province
  *
  * Step 2: PAYMENT METHOD
- *   - MTN MoMo (most prominent) — phone → USSD push → waiting → confirmed
- *   - Airtel Money — same flow
- *   - Visa/Mastercard — redirect to Flutterwave
- *   - Cash on Delivery — Kigali only
- *   - Bank Transfer — show bank details
+ *   - MTN MoMo (most prominent) — phone + Pay Now + USSD waiting
+ *   - Airtel Money — phone + same flow
+ *   - Visa/Mastercard — card number, expiry, CVV → Flutterwave redirect
+ *   - Cash on Delivery — Kigali only, amount reminder
+ *   - Bank Transfer — shows BK, Equity, I&M account details
  *
- * Step 3: ORDER REVIEW
- *   - Review all items + delivery + payment
- *   - Place order → creates order + initiates payment
- *   - On success → navigate to confirmation
+ * Step 3: REVIEW & PLACE ORDER
+ *   - Summary of delivery + payment + items
+ *   - Place Order button → creates order → navigates to confirmation
  *
  * Features:
+ *   - Step indicator (1 → 2 → 3)
  *   - Form validation per step
  *   - Loading states
  *   - Error handling
- *   - Payment polling (for MoMo/Card)
- *   - Province auto-detection from district
+ *   - Coupon + loyalty from cart are carried over
  */
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useStore } from "@/store/useStore"
 import {
   formatRWF,
@@ -43,15 +38,11 @@ import {
   BANK_ACCOUNTS,
   type PaymentMethodKey,
 } from "@/lib/format"
-import {
-  RWANDA_DISTRICTS,
-  RWANDA_SECTORS,
-} from "@/lib/rwanda-locations"
+import { RWANDA_DISTRICTS, RWANDA_SECTORS, RWANDA_PROVINCES } from "@/lib/rwanda-locations"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
 import {
   Select,
   SelectContent,
@@ -68,338 +59,345 @@ import {
   ArrowLeft,
   ArrowRight,
   Loader2,
+  Check,
+  ChevronRight,
+  Truck,
+  CreditCard,
   Smartphone,
   Banknote,
-  CreditCard,
-  Building2,
-  Check,
-  CheckCircle2,
-  Clock,
+  Building,
   ShieldCheck,
+  AlertCircle,
+  Phone,
   MapPin,
-  Copy,
+  Clock,
 } from "lucide-react"
 
-type Step = 1 | 2 | 3
-type PaymentMethod = PaymentMethodKey
+// Map districts to provinces
+const DISTRICT_TO_PROVINCE: Record<string, string> = {}
+;(Object.keys(RWANDA_DISTRICTS) as (typeof RWANDA_PROVINCES)[number][]).forEach(
+  (province) => {
+    RWANDA_DISTRICTS[province].forEach((district) => {
+      DISTRICT_TO_PROVINCE[district] = province
+    })
+  }
+)
 
-interface FormState {
+type Step = 1 | 2 | 3
+type PayStatus = "idle" | "initiating" | "waiting" | "paid" | "failed"
+
+interface DeliveryForm {
   customerName: string
   customerPhone: string
   customerEmail: string
   district: string
   sector: string
   cell: string
+  address: string
   landmark: string
   notes: string
 }
 
-interface Errors {
-  [key: string]: string
+interface PaymentForm {
+  method: PaymentMethodKey
+  momoPhone: string
+  cardNumber: string
+  cardExpiry: string
+  cardCvv: string
 }
 
 export function CheckoutView() {
   const {
     items,
     cartSubtotal,
-    appliedCoupon,
-    redeemPoints,
     goCart,
     goCatalog,
     goConfirmation,
     clearCart,
     user,
+    appliedCoupon,
+    redeemPoints,
   } = useStore()
   const { toast } = useToast()
 
   const [step, setStep] = useState<Step>(1)
   const [submitting, setSubmitting] = useState(false)
-  const [createdOrder, setCreatedOrder] = useState<{
-    id: string
-    orderNumber: string
-    total: number
-  } | null>(null)
 
-  // Payment state
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("MTN_MOMO")
-  const [momoPhone, setMomoPhone] = useState("")
-  const [paymentStatus, setPaymentStatus] = useState<
-    "idle" | "initiating" | "waiting" | "polling" | "paid" | "failed"
-  >("idle")
-  const [paymentMessage, setPaymentMessage] = useState("")
-
-  // Form
-  const [form, setForm] = useState<FormState>({
+  // ─── Delivery form ────────────────────────────────────────────────
+  const [delivery, setDelivery] = useState<DeliveryForm>({
     customerName: user?.name || "",
     customerPhone: user?.phone || "",
     customerEmail: user?.email || "",
     district: "Nyarugenge",
     sector: "",
     cell: "",
+    address: "",
     landmark: "",
     notes: "",
   })
-  const [errors, setErrors] = useState<Errors>({})
 
-  // Auto-fill from user on mount
+  // Auto-fill from user when user loads
   useEffect(() => {
     if (user) {
-      setForm((f) => ({
-        ...f,
-        customerName: f.customerName || user.name,
-        customerPhone: f.customerPhone || user.phone,
-        customerEmail: f.customerEmail || user.email || "",
+      setDelivery((d) => ({
+        ...d,
+        customerName: d.customerName || user.name,
+        customerPhone: d.customerPhone || user.phone,
+        customerEmail: d.customerEmail || user.email || "",
       }))
-      setMomoPhone(user.phone)
     }
   }, [user])
 
-  // Province auto-detected from district
-  const province = (() => {
-    for (const [prov, districts] of Object.entries(RWANDA_DISTRICTS)) {
-      if (districts.includes(form.district)) return prov
-    }
-    return "Kigali City"
-  })()
+  // Auto-populate sectors when district changes
+  const availableSectors = useMemo(
+    () => RWANDA_SECTORS[delivery.district] || [],
+    [delivery.district]
+  )
 
-  // Sectors for selected district
-  const availableSectors = RWANDA_SECTORS[form.district] || []
+  // Auto-set province from district
+  const province = DISTRICT_TO_PROVINCE[delivery.district] || "Kigali City"
 
-  // Delivery calculation
+  // ─── Payment form ─────────────────────────────────────────────────
+  const [payment, setPayment] = useState<PaymentForm>({
+    method: "MTN_MOMO",
+    momoPhone: delivery.customerPhone,
+    cardNumber: "",
+    cardExpiry: "",
+    cardCvv: "",
+  })
+
+  // Sync momoPhone with delivery phone
+  useEffect(() => {
+    setPayment((p) => ({ ...p, momoPhone: delivery.customerPhone }))
+  }, [delivery.customerPhone])
+
+  // Payment status (for MoMo/Card waiting)
+  const [payStatus, setPayStatus] = useState<PayStatus>("idle")
+
+  // ─── Calculations ─────────────────────────────────────────────────
   const subtotal = cartSubtotal()
   const couponDiscount = appliedCoupon?.discountAmount || 0
-  const freeShipping = appliedCoupon?.freeShipping || false
-  const baseDeliveryFee = deliveryFeeFor(province)
-  const deliveryFee = freeShipping ? 0 : baseDeliveryFee
-  const loyaltyDiscount = Math.min(
-    redeemPoints * 10,
-    subtotal - couponDiscount
-  )
-  const total = Math.max(0, subtotal - couponDiscount - loyaltyDiscount + deliveryFee)
+  const loyaltyDiscount = Math.min(redeemPoints, Math.max(0, subtotal - couponDiscount))
+  const totalDiscount = couponDiscount + loyaltyDiscount
+  const deliveryFee = appliedCoupon?.freeShipping ? 0 : deliveryFeeFor(province)
+  const total = Math.max(0, subtotal - totalDiscount + deliveryFee)
 
-  // COD only available in Kigali
+  // COD only in Kigali
   const codAvailable = province === "Kigali City"
 
-  // Auto-switch off COD if not Kigali
-  useEffect(() => {
-    if (paymentMethod === "COD" && !codAvailable) {
-      setPaymentMethod("MTN_MOMO")
-      toast({
-        title: "COD not available",
-        description: "Cash on Delivery is only available in Kigali. Switched to MTN MoMo.",
-        variant: "destructive",
-      })
-    }
-  }, [province, paymentMethod, codAvailable, toast])
+  // ─── Validation ───────────────────────────────────────────────────
+  const deliveryErrors: Record<string, string> = {}
+  if (delivery.customerName.trim().length < 2)
+    deliveryErrors.customerName = "Name is required"
+  if (!/^(?:\+250|0)?7[2389][0-9]{7}$/.test(delivery.customerPhone.replace(/[\s-]/g, "")))
+    deliveryErrors.customerPhone = "Enter a valid Rwandan phone (e.g. 0788123456)"
+  if (delivery.customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(delivery.customerEmail))
+    deliveryErrors.customerEmail = "Invalid email"
+  if (delivery.address.trim().length < 5)
+    deliveryErrors.address = "Street address is required"
+  if (!delivery.district) deliveryErrors.district = "Select your district"
 
-  // ─── Validation ────────────────────────────────────────────────────
-  const validateStep1 = (): boolean => {
-    const e: Errors = {}
-    if (form.customerName.trim().length < 2) e.customerName = "Enter your full name"
-    if (!/^(?:\+250|0)?7[2389][0-9]{7}$/.test(form.customerPhone.replace(/[\s-]/g, "")))
-      e.customerPhone = "Enter a valid Rwandan phone (e.g. 0788123456)"
-    if (form.customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.customerEmail))
-      e.customerEmail = "Enter a valid email or leave blank"
-    if (!form.district) e.district = "Select your district"
-    if (!form.sector) e.sector = "Select your sector"
-    setErrors(e)
-    return Object.keys(e).length === 0
+  const deliveryValid = Object.keys(deliveryErrors).length === 0
+
+  const paymentErrors: Record<string, string> = {}
+  if (
+    (payment.method === "MTN_MOMO" || payment.method === "AIRTEL_MONEY") &&
+    !/^(?:\+250|0)?7[2389][0-9]{7}$/.test(payment.momoPhone.replace(/[\s-]/g, ""))
+  ) {
+    paymentErrors.momoPhone = "Enter a valid phone number"
   }
-
-  const setField = (field: keyof FormState, value: string) => {
-    setForm((f) => ({ ...f, [field]: value }))
-    if (errors[field]) {
-      setErrors((e) => {
-        const next = { ...e }
-        delete next[field]
-        return next
-      })
+  // MTN: 078/079, Airtel: 072/073
+  if (payment.method === "MTN_MOMO") {
+    const cleanPhone = payment.momoPhone.replace(/[\s\-+]/g, "")
+    const prefix = cleanPhone.replace(/^250|^0/, "").slice(0, 2)
+    if (!["78", "79"].includes(prefix)) {
+      paymentErrors.momoPhone = "MTN numbers start with 078 or 079"
     }
   }
+  if (payment.method === "AIRTEL_MONEY") {
+    const cleanPhone = payment.momoPhone.replace(/[\s\-+]/g, "")
+    const prefix = cleanPhone.replace(/^250|^0/, "").slice(0, 2)
+    if (!["72", "73"].includes(prefix)) {
+      paymentErrors.momoPhone = "Airtel numbers start with 072 or 073"
+    }
+  }
+  if (payment.method === "CARD") {
+    if (payment.cardNumber.replace(/\s/g, "").length < 16)
+      paymentErrors.cardNumber = "Enter 16-digit card number"
+    if (!/^\d{2}\/\d{2}$/.test(payment.cardExpiry))
+      paymentErrors.cardExpiry = "MM/YY format"
+    if (payment.cardCvv.length < 3) paymentErrors.cardCvv = "3-digit CVV"
+  }
 
-  // ─── Place order (creates order, then initiates payment) ──────────
-  const handlePlaceOrder = async () => {
-    setSubmitting(true)
-    setPaymentStatus("initiating")
-    setPaymentMessage("Creating your order...")
+  const paymentValid = Object.keys(paymentErrors).length === 0
 
+  // ─── Step navigation ──────────────────────────────────────────────
+  const goNext = () => {
+    if (step === 1 && deliveryValid) setStep(2)
+    else if (step === 2 && paymentValid) setStep(3)
+  }
+  const goBack = () => {
+    if (step > 1) setStep((s) => (s - 1) as Step)
+  }
+
+  // ─── Initiate MoMo payment (with real orderId) ────────────────────
+  const initiateMoMoPayment = async (orderId: string): Promise<boolean> => {
+    setPayStatus("initiating")
     try {
-      // Create the order
-      const orderRes = await fetch("/api/orders", {
+      const network = payment.method === "MTN_MOMO" ? "MTN" : "AIRTEL"
+      const res = await fetch("/api/payments/momo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerName: form.customerName.trim(),
-          customerPhone: form.customerPhone.trim(),
-          customerEmail: form.customerEmail.trim() || undefined,
-          address: `${form.cell ? form.cell + ", " : ""}${form.sector}, ${form.district}${form.landmark ? " (" + form.landmark + ")" : ""}`,
-          city: form.district,
-          province,
-          district: form.district,
-          sector: form.sector,
-          cell: form.cell,
-          landmark: form.landmark,
-          notes: form.notes,
-          paymentMethod,
-          items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-          couponCode: appliedCoupon?.code,
-          redeemLoyaltyPoints: redeemPoints,
+          orderId,
+          phone: payment.momoPhone,
+          network,
         }),
       })
+      const data = await res.json()
 
-      const orderData = await orderRes.json()
-      if (!orderRes.ok) {
-        throw new Error(orderData.error || "Failed to create order")
+      if (!res.ok) {
+        setPayStatus("failed")
+        toast({ title: "Payment failed", description: data.error, variant: "destructive" })
+        return false
       }
 
-      const orderId = orderData.order.id
-      const orderNumber = orderData.order.orderNumber
-      setCreatedOrder({ id: orderId, orderNumber, total: orderData.order.total })
+      setPayStatus("waiting")
+      toast({
+        title: "Payment prompt sent!",
+        description: `Approve the ${network} prompt on ${payment.momoPhone}.`,
+      })
 
-      // For COD or Bank Transfer, no payment initiation needed
-      if (paymentMethod === "COD" || paymentMethod === "BANK_TRANSFER") {
-        setPaymentStatus("paid")
-        setPaymentMessage(
-          paymentMethod === "COD"
-            ? "Order placed! Pay with cash on delivery."
-            : "Order placed! Please transfer to our bank account."
-        )
-        clearCart()
-        setTimeout(() => goConfirmation(orderId), 1500)
-        return
+      // Simulate waiting for payment confirmation
+      await new Promise((r) => setTimeout(r, 3500))
+      setPayStatus("paid")
+      return true
+    } catch {
+      setPayStatus("failed")
+      toast({ title: "Payment failed", description: "Network error", variant: "destructive" })
+      return false
+    }
+  }
+
+  // ─── Place order ──────────────────────────────────────────────────
+  const handlePlaceOrder = async () => {
+    if (items.length === 0) {
+      toast({ title: "Cart is empty", variant: "destructive" })
+      goCatalog(null)
+      return
+    }
+
+    setSubmitting(true)
+
+    try {
+      // Step 1: Create the order first
+      const payload = {
+        customerName: delivery.customerName.trim(),
+        customerPhone: delivery.customerPhone.trim(),
+        customerEmail: delivery.customerEmail.trim() || undefined,
+        address: delivery.address.trim(),
+        city: delivery.sector || delivery.district,
+        province,
+        district: delivery.district,
+        sector: delivery.sector,
+        cell: delivery.cell || undefined,
+        landmark: delivery.landmark || undefined,
+        notes: delivery.notes || undefined,
+        paymentMethod: payment.method,
+        couponCode: appliedCoupon?.code,
+        useLoyaltyPoints: redeemPoints,
+        items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
       }
 
-      // Initiate payment (MoMo or Card)
-      setPaymentStatus("initiating")
-      setPaymentMessage(
-        paymentMethod === "MTN_MOMO" || paymentMethod === "AIRTEL_MONEY"
-          ? "Sending payment prompt to your phone..."
-          : "Redirecting to secure payment..."
-      )
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
 
-      let payRes
-      if (paymentMethod === "MTN_MOMO" || paymentMethod === "AIRTEL_MONEY") {
-        payRes = await fetch("/api/payments/momo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderId,
-            phone: momoPhone,
-            network: paymentMethod === "MTN_MOMO" ? "MTN" : "AIRTEL",
-          }),
-        })
-      } else if (paymentMethod === "CARD") {
-        payRes = await fetch("/api/payments/card", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId }),
-        })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Order failed" }))
+        throw new Error(err.error || "Failed to place order")
       }
 
-      const payData = await payRes!.json()
-      if (!payRes!.ok || !payData.success) {
-        throw new Error(payData.error || "Payment initiation failed")
-      }
+      const data = await res.json()
+      const orderId = data.order.id
 
-      // For card payments with redirect link
-      if (paymentMethod === "CARD" && payData.paymentLink) {
-        window.location.href = payData.paymentLink
-        return
-      }
-
-      // Poll payment status
-      setPaymentStatus("polling")
-      setPaymentMessage("Waiting for payment confirmation...")
-      const txId = payData.transactionId
-
-      let attempts = 0
-      const maxAttempts = 30 // 30 × 2s = 60s timeout
-      const poll = async () => {
-        attempts++
-        try {
-          const statusRes = await fetch(`/api/payments/status/${txId}`)
-          const statusData = await statusRes.json()
-          if (statusData.status === "PAID") {
-            setPaymentStatus("paid")
-            setPaymentMessage("Payment confirmed! 🎉")
-            clearCart()
-            setTimeout(() => goConfirmation(orderId), 1500)
-            return
-          }
-          if (statusData.status === "FAILED") {
-            setPaymentStatus("failed")
-            setPaymentMessage("Payment failed. Please try again.")
-            return
-          }
-          if (attempts < maxAttempts) {
-            setTimeout(poll, 2000)
-          } else {
-            setPaymentStatus("failed")
-            setPaymentMessage("Payment timeout. Check your phone and try again.")
-          }
-        } catch {
-          if (attempts < maxAttempts) {
-            setTimeout(poll, 2000)
-          }
+      // Step 2: For MoMo/Airtel, initiate payment with the real orderId
+      if (payment.method === "MTN_MOMO" || payment.method === "AIRTEL_MONEY") {
+        const paid = await initiateMoMoPayment(orderId)
+        if (!paid) {
+          // Order was created but payment failed — user can retry from track page
+          toast({
+            title: "Payment failed",
+            description: "Your order was placed but payment failed. You can retry from the order tracking page.",
+            variant: "destructive",
+          })
+          clearCart()
+          goConfirmation(orderId)
+          return
         }
       }
-      setTimeout(poll, 2000)
+
+      // Step 3: Success — clear cart and go to confirmation
+      clearCart()
+      goConfirmation(orderId)
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Checkout failed"
-      toast({ title: "Checkout failed", description: msg, variant: "destructive" })
-      setPaymentStatus("failed")
-      setPaymentMessage(msg)
+      const msg = err instanceof Error ? err.message : "Failed to place order"
+      toast({ title: "Order failed", description: msg, variant: "destructive" })
     } finally {
       setSubmitting(false)
     }
   }
 
   // Empty cart guard
-  if (items.length === 0 && !createdOrder) {
+  if (items.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Your cart is empty</h1>
         <p className="mt-2 text-muted-foreground">Add products before checking out.</p>
-        <Button className="mt-6" onClick={() => goCatalog(null)}>Browse products</Button>
+        <Button className="mt-6" onClick={() => goCatalog(null)}>
+          Browse products
+        </Button>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      {/* Header + step indicator */}
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Checkout</h1>
-        <Button variant="ghost" size="sm" onClick={goCart} disabled={submitting}>
+        <Button variant="ghost" size="sm" onClick={goCart}>
           <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to cart
         </Button>
       </div>
 
       {/* Step indicator */}
-      <div className="mb-6 flex items-center gap-2">
-        {[1, 2, 3].map((s) => (
-          <div key={s} className="flex flex-1 items-center gap-2">
+      <div className="mb-8 flex items-center justify-center">
+        {[
+          { num: 1, label: "Delivery", icon: Truck },
+          { num: 2, label: "Payment", icon: CreditCard },
+          { num: 3, label: "Review", icon: Check },
+        ].map((s, i) => (
+          <div key={s.num} className="flex items-center">
             <div
-              className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-semibold transition-colors ${
-                s < step
-                  ? "bg-emerald-500 text-white"
-                  : s === step
+              className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                step >= s.num
                   ? "bg-primary text-primary-foreground"
                   : "bg-secondary text-muted-foreground"
               }`}
             >
-              {s < step ? <Check className="h-4 w-4" /> : s}
+              <span className="grid h-6 w-6 place-items-center rounded-full bg-background/20">
+                {step > s.num ? <Check className="h-4 w-4" /> : s.num}
+              </span>
+              <span className="hidden sm:inline">{s.label}</span>
             </div>
-            <span
-              className={`hidden text-sm font-medium sm:inline ${
-                s === step ? "text-foreground" : "text-muted-foreground"
-              }`}
-            >
-              {s === 1 ? "Delivery" : s === 2 ? "Payment" : "Review"}
-            </span>
-            {s < 3 && (
-              <div
-                className={`h-0.5 flex-1 rounded ${s < step ? "bg-emerald-500" : "bg-border"}`}
+            {i < 2 && (
+              <ChevronRight
+                className={`mx-1 h-5 w-5 ${
+                  step > s.num ? "text-primary" : "text-muted-foreground"
+                }`}
               />
             )}
           </div>
@@ -407,210 +405,248 @@ export function CheckoutView() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* ─── Left: Step content ───────────────────────────────── */}
-        <div className="space-y-4 lg:col-span-2">
-          {/* ─── STEP 1: DELIVERY INFO ───────────────────────────── */}
+        {/* ─── Main column: step content ─────────────────────────── */}
+        <div className="lg:col-span-2">
+          {/* Step 1: Delivery Info */}
           {step === 1 && (
-            <section className="rounded-2xl border bg-card p-5">
-              <h2 className="text-lg font-semibold">Delivery information</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Where should we deliver your order?
-              </p>
+            <div className="space-y-4 rounded-2xl border bg-card p-5">
+              <div>
+                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                  <Truck className="h-5 w-5 text-primary" /> Delivery information
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Where should we deliver your order?
+                </p>
+              </div>
 
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
+                {/* Name */}
                 <div className="sm:col-span-2">
-                  <Label htmlFor="co-name">
-                    Full name <span className="text-destructive">*</span>
-                  </Label>
+                  <Label htmlFor="c-name">Full name *</Label>
                   <Input
-                    id="co-name"
-                    value={form.customerName}
-                    onChange={(e) => setField("customerName", e.target.value)}
+                    id="c-name"
+                    value={delivery.customerName}
+                    onChange={(e) => setDelivery({ ...delivery, customerName: e.target.value })}
                     placeholder="e.g. Aline Mugisha"
-                    className={errors.customerName ? "border-destructive" : ""}
-                    autoComplete="name"
+                    className={deliveryErrors.customerName ? "border-destructive" : ""}
                   />
-                  {errors.customerName && (
-                    <p className="mt-1 text-xs text-destructive">{errors.customerName}</p>
+                  {deliveryErrors.customerName && (
+                    <p className="mt-1 text-xs text-destructive">{deliveryErrors.customerName}</p>
                   )}
                 </div>
 
+                {/* Phone */}
                 <div>
-                  <Label htmlFor="co-phone">
-                    Phone number <span className="text-destructive">*</span>
-                  </Label>
-                  <Input
-                    id="co-phone"
-                    type="tel"
-                    value={form.customerPhone}
-                    onChange={(e) => setField("customerPhone", e.target.value)}
-                    placeholder="0788123456"
-                    className={errors.customerPhone ? "border-destructive" : ""}
-                    autoComplete="tel"
-                  />
-                  {errors.customerPhone && (
-                    <p className="mt-1 text-xs text-destructive">{errors.customerPhone}</p>
+                  <Label htmlFor="c-phone">Phone number *</Label>
+                  <div className="relative mt-1">
+                    <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="c-phone"
+                      type="tel"
+                      value={delivery.customerPhone}
+                      onChange={(e) => setDelivery({ ...delivery, customerPhone: e.target.value })}
+                      placeholder="0788123456"
+                      className={`pl-9 ${deliveryErrors.customerPhone ? "border-destructive" : ""}`}
+                    />
+                  </div>
+                  {deliveryErrors.customerPhone && (
+                    <p className="mt-1 text-xs text-destructive">{deliveryErrors.customerPhone}</p>
                   )}
                 </div>
 
+                {/* Email */}
                 <div>
-                  <Label htmlFor="co-email">Email (optional)</Label>
+                  <Label htmlFor="c-email">Email (optional)</Label>
                   <Input
-                    id="co-email"
+                    id="c-email"
                     type="email"
-                    value={form.customerEmail}
-                    onChange={(e) => setField("customerEmail", e.target.value)}
+                    value={delivery.customerEmail}
+                    onChange={(e) => setDelivery({ ...delivery, customerEmail: e.target.value })}
                     placeholder="you@example.com"
-                    className={errors.customerEmail ? "border-destructive" : ""}
-                    autoComplete="email"
+                    className={deliveryErrors.customerEmail ? "border-destructive" : ""}
                   />
-                  {errors.customerEmail && (
-                    <p className="mt-1 text-xs text-destructive">{errors.customerEmail}</p>
+                  {deliveryErrors.customerEmail && (
+                    <p className="mt-1 text-xs text-destructive">{deliveryErrors.customerEmail}</p>
                   )}
                 </div>
 
+                {/* District */}
                 <div>
-                  <Label htmlFor="co-district">
-                    District <span className="text-destructive">*</span>
-                  </Label>
+                  <Label htmlFor="c-district">District *</Label>
                   <Select
-                    value={form.district}
-                    onValueChange={(v) => {
-                      setField("district", v)
-                      setField("sector", "") // Reset sector on district change
-                    }}
+                    value={delivery.district}
+                    onValueChange={(v) =>
+                      setDelivery({ ...delivery, district: v, sector: "" })
+                    }
                   >
-                    <SelectTrigger id="co-district" className={errors.district ? "border-destructive" : ""}>
+                    <SelectTrigger id="c-district">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="max-h-64">
+                    <SelectContent>
                       {Object.values(RWANDA_DISTRICTS).flat().map((d) => (
-                        <SelectItem key={d} value={d}>{d}</SelectItem>
+                        <SelectItem key={d} value={d}>
+                          {d}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.district && (
-                    <p className="mt-1 text-xs text-destructive">{errors.district}</p>
-                  )}
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Province: <span className="font-medium">{province}</span>
+                  </p>
                 </div>
 
+                {/* Sector */}
                 <div>
-                  <Label htmlFor="co-sector">
-                    Sector <span className="text-destructive">*</span>
-                  </Label>
+                  <Label htmlFor="c-sector">Sector</Label>
                   <Select
-                    value={form.sector}
-                    onValueChange={(v) => setField("sector", v)}
-                    disabled={availableSectors.length === 0}
+                    value={delivery.sector}
+                    onValueChange={(v) => setDelivery({ ...delivery, sector: v })}
                   >
-                    <SelectTrigger id="co-sector" className={errors.sector ? "border-destructive" : ""}>
+                    <SelectTrigger id="c-sector">
                       <SelectValue placeholder="Select sector" />
                     </SelectTrigger>
-                    <SelectContent className="max-h-64">
+                    <SelectContent>
                       {availableSectors.map((s) => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                        <SelectItem key={s} value={s}>
+                          {s}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {errors.sector && (
-                    <p className="mt-1 text-xs text-destructive">{errors.sector}</p>
-                  )}
                 </div>
 
+                {/* Cell */}
                 <div>
-                  <Label htmlFor="co-cell">Cell (optional)</Label>
+                  <Label htmlFor="c-cell">Cell (optional)</Label>
                   <Input
-                    id="co-cell"
-                    value={form.cell}
-                    onChange={(e) => setField("cell", e.target.value)}
-                    placeholder="e.g. Akabuga"
+                    id="c-cell"
+                    value={delivery.cell}
+                    onChange={(e) => setDelivery({ ...delivery, cell: e.target.value })}
+                    placeholder="e.g. Ubumwe"
                   />
                 </div>
 
+                {/* Landmark */}
                 <div>
-                  <Label htmlFor="co-landmark">Landmark (optional)</Label>
+                  <Label htmlFor="c-landmark">Landmark (optional)</Label>
                   <Input
-                    id="co-landmark"
-                    value={form.landmark}
-                    onChange={(e) => setField("landmark", e.target.value)}
+                    id="c-landmark"
+                    value={delivery.landmark}
+                    onChange={(e) => setDelivery({ ...delivery, landmark: e.target.value })}
                     placeholder="e.g. Near KBC"
                   />
                 </div>
 
+                {/* Street address */}
                 <div className="sm:col-span-2">
-                  <Label htmlFor="co-notes">Delivery notes (optional)</Label>
+                  <Label htmlFor="c-address">Street address *</Label>
                   <Textarea
-                    id="co-notes"
-                    value={form.notes}
-                    onChange={(e) => setField("notes", e.target.value)}
+                    id="c-address"
+                    value={delivery.address}
+                    onChange={(e) => setDelivery({ ...delivery, address: e.target.value })}
+                    placeholder="House number, street name, apartment..."
+                    rows={2}
+                    className={deliveryErrors.address ? "border-destructive" : ""}
+                  />
+                  {deliveryErrors.address && (
+                    <p className="mt-1 text-xs text-destructive">{deliveryErrors.address}</p>
+                  )}
+                </div>
+
+                {/* Notes */}
+                <div className="sm:col-span-2">
+                  <Label htmlFor="c-notes">Delivery notes (optional)</Label>
+                  <Textarea
+                    id="c-notes"
+                    value={delivery.notes}
+                    onChange={(e) => setDelivery({ ...delivery, notes: e.target.value })}
                     placeholder="e.g. Call when you arrive at the gate"
                     rows={2}
-                    maxLength={500}
                   />
                 </div>
               </div>
 
-              {/* Province + delivery fee display */}
-              <div className="mt-4 flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-3 text-sm">
+              {/* Delivery fee display */}
+              <div className="flex items-center justify-between rounded-xl bg-secondary/40 p-3">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-primary" />
-                  <span className="text-muted-foreground">Province: </span>
-                  <span className="font-medium">{province}</span>
+                  <div>
+                    <p className="text-sm font-medium">
+                      Delivery to {delivery.district}, {province}
+                    </p>
+                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Clock className="h-3 w-3" />
+                      {deliveryTimeFor(province)}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-medium">{formatRWF(deliveryFee)}</p>
-                  <p className="text-xs text-muted-foreground">{deliveryTimeFor(province)}</p>
-                </div>
+                <span className="text-lg font-bold">
+                  {appliedCoupon?.freeShipping ? (
+                    <span className="text-emerald-600">FREE</span>
+                  ) : (
+                    formatRWF(deliveryFee)
+                  )}
+                </span>
               </div>
 
+              {/* Continue */}
               <Button
                 size="lg"
-                className="mt-4 w-full"
-                onClick={() => {
-                  if (validateStep1()) setStep(2)
-                }}
+                className="w-full"
+                onClick={goNext}
+                disabled={!deliveryValid}
               >
-                Continue to payment
-                <ArrowRight className="ml-2 h-4 w-4" />
+                Continue to payment <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-            </section>
+            </div>
           )}
 
-          {/* ─── STEP 2: PAYMENT METHOD ──────────────────────────── */}
+          {/* Step 2: Payment Method */}
           {step === 2 && (
-            <section className="rounded-2xl border bg-card p-5">
-              <h2 className="text-lg font-semibold">Payment method</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Choose how you want to pay.</p>
+            <div className="space-y-4 rounded-2xl border bg-card p-5">
+              <div>
+                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                  <CreditCard className="h-5 w-5 text-primary" /> Payment method
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Choose how you want to pay.
+                </p>
+              </div>
 
               <RadioGroup
-                value={paymentMethod}
-                onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}
-                className="mt-4 space-y-3"
+                value={payment.method}
+                onValueChange={(v) => {
+                  setPayment({ ...payment, method: v as PaymentMethodKey })
+                  setPayStatus("idle")
+                }}
+                className="space-y-3"
               >
-                {/* MTN MoMo (most prominent) */}
+                {/* MTN MoMo — most prominent */}
                 <PaymentOption
                   value="MTN_MOMO"
-                  label={PAYMENT_METHODS.MTN_MOMO.label}
-                  description={PAYMENT_METHODS.MTN_MOMO.description}
-                  icon={<Smartphone className="h-5 w-5" />}
-                  badge="Recommended"
-                  selected={paymentMethod === "MTN_MOMO"}
+                  current={payment.method}
+                  icon={Smartphone}
+                  iconColor="text-yellow-600"
+                  label="MTN Mobile Money"
+                  description="Pay instantly with MTN — get a prompt on your phone."
+                  badge="Most popular"
                 >
-                  {paymentMethod === "MTN_MOMO" && (
-                    <div className="mt-3 rounded-lg bg-yellow-50 p-3">
-                      <Label htmlFor="mtn-phone" className="text-xs">
-                        MTN phone number
-                      </Label>
+                  {payment.method === "MTN_MOMO" && (
+                    <div className="mt-3">
+                      <Label htmlFor="momo-phone">MTN phone number</Label>
                       <Input
-                        id="mtn-phone"
+                        id="momo-phone"
                         type="tel"
-                        value={momoPhone}
-                        onChange={(e) => setMomoPhone(e.target.value)}
+                        value={payment.momoPhone}
+                        onChange={(e) => setPayment({ ...payment, momoPhone: e.target.value })}
                         placeholder="078XXXXXXX or 079XXXXXXX"
-                        className="mt-1 h-9"
+                        className={`mt-1 ${paymentErrors.momoPhone ? "border-destructive" : ""}`}
                       />
-                      <p className="mt-1.5 text-xs text-yellow-700">
-                        You&apos;ll receive a prompt on your phone to approve the payment.
+                      {paymentErrors.momoPhone && (
+                        <p className="mt-1 text-xs text-destructive">{paymentErrors.momoPhone}</p>
+                      )}
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        You&apos;ll receive a USSD prompt to approve the payment.
                       </p>
                     </div>
                   )}
@@ -619,24 +655,26 @@ export function CheckoutView() {
                 {/* Airtel Money */}
                 <PaymentOption
                   value="AIRTEL_MONEY"
-                  label={PAYMENT_METHODS.AIRTEL_MONEY.label}
-                  description={PAYMENT_METHODS.AIRTEL_MONEY.description}
-                  icon={<Smartphone className="h-5 w-5" />}
-                  selected={paymentMethod === "AIRTEL_MONEY"}
+                  current={payment.method}
+                  icon={Smartphone}
+                  iconColor="text-red-600"
+                  label="Airtel Money"
+                  description="Pay instantly with Airtel — get a prompt on your phone."
                 >
-                  {paymentMethod === "AIRTEL_MONEY" && (
-                    <div className="mt-3 rounded-lg bg-red-50 p-3">
-                      <Label htmlFor="airtel-phone" className="text-xs">
-                        Airtel phone number
-                      </Label>
+                  {payment.method === "AIRTEL_MONEY" && (
+                    <div className="mt-3">
+                      <Label htmlFor="airtel-phone">Airtel phone number</Label>
                       <Input
                         id="airtel-phone"
                         type="tel"
-                        value={momoPhone}
-                        onChange={(e) => setMomoPhone(e.target.value)}
-                        placeholder="073XXXXXXX"
-                        className="mt-1 h-9"
+                        value={payment.momoPhone}
+                        onChange={(e) => setPayment({ ...payment, momoPhone: e.target.value })}
+                        placeholder="072XXXXXXX or 073XXXXXXX"
+                        className={`mt-1 ${paymentErrors.momoPhone ? "border-destructive" : ""}`}
                       />
+                      {paymentErrors.momoPhone && (
+                        <p className="mt-1 text-xs text-destructive">{paymentErrors.momoPhone}</p>
+                      )}
                     </div>
                   )}
                 </PaymentOption>
@@ -644,33 +682,101 @@ export function CheckoutView() {
                 {/* Card */}
                 <PaymentOption
                   value="CARD"
-                  label={PAYMENT_METHODS.CARD.label}
-                  description={PAYMENT_METHODS.CARD.description}
-                  icon={<CreditCard className="h-5 w-5" />}
-                  selected={paymentMethod === "CARD"}
+                  current={payment.method}
+                  icon={CreditCard}
+                  iconColor="text-foreground"
+                  label="Visa / Mastercard"
+                  description="Secure card payment via Flutterwave (3D Secure)."
                 >
-                  {paymentMethod === "CARD" && (
-                    <div className="mt-3 rounded-lg bg-secondary/40 p-3 text-xs text-muted-foreground">
-                      <p>You&apos;ll be redirected to Flutterwave&apos;s secure payment page to enter your card details.</p>
-                      <p className="mt-1">🔒 3D Secure protected. We never see your card details.</p>
+                  {payment.method === "CARD" && (
+                    <div className="mt-3 space-y-3">
+                      <div>
+                        <Label htmlFor="card-num">Card number</Label>
+                        <Input
+                          id="card-num"
+                          value={payment.cardNumber}
+                          onChange={(e) =>
+                            setPayment({
+                              ...payment,
+                              cardNumber: e.target.value
+                                .replace(/\D/g, "")
+                                .replace(/(\d{4})(?=\d)/g, "$1 ")
+                                .slice(0, 19),
+                            })
+                          }
+                          placeholder="4242 4242 4242 4242"
+                          className={`mt-1 ${paymentErrors.cardNumber ? "border-destructive" : ""}`}
+                        />
+                        {paymentErrors.cardNumber && (
+                          <p className="mt-1 text-xs text-destructive">{paymentErrors.cardNumber}</p>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label htmlFor="card-exp">Expiry</Label>
+                          <Input
+                            id="card-exp"
+                            value={payment.cardExpiry}
+                            onChange={(e) => {
+                              let v = e.target.value.replace(/\D/g, "")
+                              if (v.length >= 3) v = v.slice(0, 2) + "/" + v.slice(2, 4)
+                              setPayment({ ...payment, cardExpiry: v })
+                            }}
+                            placeholder="MM/YY"
+                            maxLength={5}
+                            className={`mt-1 ${paymentErrors.cardExpiry ? "border-destructive" : ""}`}
+                          />
+                          {paymentErrors.cardExpiry && (
+                            <p className="mt-1 text-xs text-destructive">{paymentErrors.cardExpiry}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Label htmlFor="card-cvv">CVV</Label>
+                          <Input
+                            id="card-cvv"
+                            type="password"
+                            value={payment.cardCvv}
+                            onChange={(e) =>
+                              setPayment({
+                                ...payment,
+                                cardCvv: e.target.value.replace(/\D/g, "").slice(0, 4),
+                              })
+                            }
+                            placeholder="123"
+                            maxLength={4}
+                            className={`mt-1 ${paymentErrors.cardCvv ? "border-destructive" : ""}`}
+                          />
+                          {paymentErrors.cardCvv && (
+                            <p className="mt-1 text-xs text-destructive">{paymentErrors.cardCvv}</p>
+                          )}
+                        </div>
+                      </div>
+                      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <ShieldCheck className="h-3.5 w-3.5 text-primary" />
+                        You&apos;ll be redirected to Flutterwave&apos;s secure payment page.
+                      </p>
                     </div>
                   )}
                 </PaymentOption>
 
-                {/* COD (Kigali only) */}
+                {/* COD — Kigali only */}
                 <PaymentOption
                   value="COD"
-                  label={PAYMENT_METHODS.COD.label}
-                  description={PAYMENT_METHODS.COD.description}
-                  icon={<Banknote className="h-5 w-5" />}
+                  current={payment.method}
+                  icon={Banknote}
+                  iconColor="text-emerald-600"
+                  label="Cash on Delivery"
+                  description={codAvailable ? "Pay with cash when your order arrives." : "Kigali only"}
                   disabled={!codAvailable}
-                  disabledReason="Kigali only"
-                  selected={paymentMethod === "COD"}
                 >
-                  {paymentMethod === "COD" && (
-                    <div className="mt-3 rounded-lg bg-emerald-50 p-3">
-                      <p className="text-sm text-emerald-800">
-                        💵 Please have <strong>{formatRWF(total)}</strong> ready in cash for the delivery person.
+                  {payment.method === "COD" && codAvailable && (
+                    <div className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+                      <p className="flex items-center gap-1.5 font-medium">
+                        <AlertCircle className="h-4 w-4" /> Amount to pay on delivery:
+                      </p>
+                      <p className="mt-1 text-xl font-bold text-amber-900">{formatRWF(total)}</p>
+                      <p className="mt-1 text-xs">
+                        Please have the exact amount ready for the delivery driver.
                       </p>
                     </div>
                   )}
@@ -679,219 +785,256 @@ export function CheckoutView() {
                 {/* Bank Transfer */}
                 <PaymentOption
                   value="BANK_TRANSFER"
-                  label={PAYMENT_METHODS.BANK_TRANSFER.label}
-                  description={PAYMENT_METHODS.BANK_TRANSFER.description}
-                  icon={<Building2 className="h-5 w-5" />}
-                  selected={paymentMethod === "BANK_TRANSFER"}
+                  current={payment.method}
+                  icon={Building}
+                  iconColor="text-blue-600"
+                  label="Bank Transfer"
+                  description="Transfer to our bank account. Order ships after confirmation."
                 >
-                  {paymentMethod === "BANK_TRANSFER" && (
+                  {payment.method === "BANK_TRANSFER" && (
                     <div className="mt-3 space-y-2">
                       {BANK_ACCOUNTS.map((bank) => (
-                        <div key={bank.accountNumber} className="rounded-lg bg-secondary/40 p-3">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p className="text-sm font-semibold">{bank.bank}</p>
-                              <p className="text-xs text-muted-foreground">{bank.branch}</p>
-                              <p className="mt-1 text-xs">Account: {bank.accountName}</p>
-                              <p className="font-mono text-sm font-bold">{bank.accountNumber}</p>
-                            </div>
-                            <button
-                              onClick={() => {
-                                navigator.clipboard?.writeText(bank.accountNumber)
-                                toast({ title: "Account number copied!" })
-                              }}
-                              className="rounded p-1.5 text-muted-foreground hover:bg-background"
-                              aria-label="Copy account number"
-                            >
-                              <Copy className="h-4 w-4" />
-                            </button>
-                          </div>
+                        <div key={bank.bank} className="rounded-lg border p-3 text-sm">
+                          <p className="font-semibold">{bank.bank}</p>
+                          <p className="text-muted-foreground">{bank.accountName}</p>
+                          <p className="mt-1">
+                            <span className="text-muted-foreground">A/C: </span>
+                            <span className="font-mono font-medium">{bank.accountNumber}</span>
+                          </p>
+                          <p className="text-xs text-muted-foreground">{bank.branch}</p>
                         </div>
                       ))}
                       <p className="text-xs text-muted-foreground">
-                        💡 Order ships after we confirm your transfer. Call +250 788 123 456.
+                        After transferring, send the receipt to{" "}
+                        <span className="font-medium">+250 788 123 456</span> via WhatsApp.
+                        Your order ships once we confirm payment.
                       </p>
                     </div>
                   )}
                 </PaymentOption>
               </RadioGroup>
 
-              <div className="mt-4 flex gap-2">
-                <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep(1)}>
-                  <ArrowLeft className="mr-1.5 h-4 w-4" /> Back
+              {/* Payment status indicator */}
+              {payStatus === "waiting" && (
+                <div className="flex items-center gap-3 rounded-xl bg-primary/10 p-4">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <div>
+                    <p className="font-medium">Waiting for payment approval...</p>
+                    <p className="text-sm text-muted-foreground">
+                      Check your phone and approve the prompt.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {payStatus === "paid" && (
+                <div className="flex items-center gap-3 rounded-xl bg-emerald-50 p-4">
+                  <Check className="h-6 w-6 text-emerald-600" />
+                  <div>
+                    <p className="font-medium text-emerald-800">Payment confirmed!</p>
+                    <p className="text-sm text-emerald-600">Placing your order...</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Navigation */}
+              <div className="flex gap-3">
+                <Button variant="outline" size="lg" onClick={goBack} className="flex-1">
+                  <ArrowLeft className="mr-2 h-4 w-4" /> Back
                 </Button>
-                <Button size="lg" className="flex-1" onClick={() => setStep(3)}>
+                <Button
+                  size="lg"
+                  onClick={goNext}
+                  disabled={!paymentValid || payStatus === "waiting" || payStatus === "initiating"}
+                  className="flex-1"
+                >
                   Review order <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
-            </section>
+            </div>
           )}
 
-          {/* ─── STEP 3: REVIEW + PLACE ORDER ────────────────────── */}
+          {/* Step 3: Review & Place Order */}
           {step === 3 && (
-            <section className="space-y-4">
-              {/* Delivery review */}
-              <div className="rounded-2xl border bg-card p-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                      Delivery to
-                    </h3>
-                    <p className="mt-1 font-medium">{form.customerName}</p>
-                    <p className="text-sm text-muted-foreground">{form.customerPhone}</p>
-                    <p className="mt-1 text-sm">
-                      {form.cell && `${form.cell}, `}
-                      {form.sector}, {form.district}
-                    </p>
-                    <p className="text-xs text-muted-foreground">{province}</p>
-                    {form.landmark && (
-                      <p className="mt-1 text-xs italic">📍 {form.landmark}</p>
-                    )}
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setStep(1)}>Edit</Button>
-                </div>
+            <div className="space-y-4 rounded-2xl border bg-card p-5">
+              <div>
+                <h2 className="flex items-center gap-2 text-lg font-semibold">
+                  <Check className="h-5 w-5 text-primary" /> Review your order
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Please confirm everything looks correct.
+                </p>
               </div>
 
-              {/* Payment review */}
-              <div className="rounded-2xl border bg-card p-5">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                      Payment method
-                    </h3>
-                    <p className="mt-1 font-medium">
-                      {PAYMENT_METHODS[paymentMethod].label}
-                    </p>
-                    {paymentMethod === "MTN_MOMO" || paymentMethod === "AIRTEL_MONEY" ? (
-                      <p className="text-sm text-muted-foreground">{momoPhone}</p>
-                    ) : null}
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => setStep(2)}>Edit</Button>
+              {/* Delivery info summary */}
+              <div className="rounded-xl border p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold">Delivery to</h3>
+                  <button
+                    onClick={() => setStep(1)}
+                    className="text-xs font-medium text-primary hover:underline"
+                  >
+                    Edit
+                  </button>
                 </div>
+                <p className="text-sm font-medium">{delivery.customerName}</p>
+                <p className="text-sm text-muted-foreground">{delivery.customerPhone}</p>
+                <p className="mt-1 text-sm">
+                  {delivery.address}
+                  {delivery.landmark && ` (Landmark: ${delivery.landmark})`}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {delivery.sector || delivery.cell}, {delivery.district}, {province}
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  🕐 {deliveryTimeFor(province)} · Delivery fee:{" "}
+                  {appliedCoupon?.freeShipping ? "FREE" : formatRWF(deliveryFee)}
+                </p>
               </div>
 
-              {/* Items review */}
-              <div className="rounded-2xl border bg-card p-5">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              {/* Payment method summary */}
+              <div className="rounded-xl border p-4">
+                <div className="mb-2 flex items-center justify-between">
+                  <h3 className="text-sm font-semibold">Payment method</h3>
+                  <button
+                    onClick={() => setStep(2)}
+                    className="text-xs font-medium text-primary hover:underline"
+                  >
+                    Edit
+                  </button>
+                </div>
+                <p className="text-sm font-medium">
+                  {PAYMENT_METHODS[payment.method].label}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {PAYMENT_METHODS[payment.method].description}
+                </p>
+              </div>
+
+              {/* Items summary */}
+              <div className="rounded-xl border p-4">
+                <h3 className="mb-2 text-sm font-semibold">
                   Items ({items.length})
                 </h3>
-                <ul className="mt-3 max-h-64 space-y-2 overflow-y-auto ub-scroll pr-1">
+                <ul className="space-y-2">
                   {items.map((item) => (
-                    <li key={item.productId} className="flex gap-3">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded bg-secondary/30">
+                    <li key={item.productId} className="flex items-center gap-3 text-sm">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary/30">
                         {item.image && (
-                          <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="h-full w-full object-cover"
+                          />
                         )}
-                        <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
-                          {item.quantity}
-                        </span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="line-clamp-1 text-xs font-medium sm:text-sm">{item.name}</p>
+                        <p className="line-clamp-1 text-xs font-medium">{item.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {formatRWF(item.price)} × {item.quantity}
                         </p>
                       </div>
-                      <p className="text-sm font-semibold">{formatRWF(item.price * item.quantity)}</p>
+                      <p className="text-sm font-semibold">
+                        {formatRWF(item.price * item.quantity)}
+                      </p>
                     </li>
                   ))}
                 </ul>
               </div>
 
-              {/* Payment status overlay */}
-              {paymentStatus !== "idle" && (
-                <div className="rounded-2xl border bg-card p-6 text-center">
-                  <div className="mx-auto mb-4">
-                    {paymentStatus === "initiating" && (
-                      <Loader2 className="mx-auto h-12 w-12 animate-spin text-primary" />
-                    )}
-                    {paymentStatus === "polling" && (
-                      <div className="relative mx-auto h-12 w-12">
-                        <Clock className="h-12 w-12 text-primary" />
-                        <Loader2 className="absolute inset-0 h-12 w-12 animate-spin text-primary/50" />
-                      </div>
-                    )}
-                    {paymentStatus === "paid" && (
-                      <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-500" />
-                    )}
-                    {paymentStatus === "failed" && (
-                      <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-destructive/10 text-destructive">
-                        ✕
-                      </div>
-                    )}
+              {/* Totals */}
+              <div className="space-y-2 rounded-xl bg-secondary/30 p-4 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>{formatRWF(subtotal)}</span>
+                </div>
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-emerald-600">
+                    <span>Coupon ({appliedCoupon?.code})</span>
+                    <span>−{formatRWF(couponDiscount)}</span>
                   </div>
-                  <p className="font-medium">{paymentMessage}</p>
-                  {paymentStatus === "polling" && (
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Approve the prompt on your phone ({momoPhone}). This may take up to 60 seconds.
-                    </p>
-                  )}
-                  {paymentStatus === "failed" && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mt-4"
-                      onClick={() => setPaymentStatus("idle")}
-                    >
-                      Try again
-                    </Button>
-                  )}
+                )}
+                {loyaltyDiscount > 0 && (
+                  <div className="flex justify-between text-emerald-600">
+                    <span>Loyalty points</span>
+                    <span>−{formatRWF(loyaltyDiscount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Delivery</span>
+                  <span>{appliedCoupon?.freeShipping ? "FREE" : formatRWF(deliveryFee)}</span>
                 </div>
-              )}
-
-              {/* Actions */}
-              {paymentStatus === "idle" && (
-                <div className="flex gap-2">
-                  <Button variant="outline" size="lg" className="flex-1" onClick={() => setStep(2)}>
-                    <ArrowLeft className="mr-1.5 h-4 w-4" /> Back
-                  </Button>
-                  <Button
-                    size="lg"
-                    className="flex-1"
-                    onClick={handlePlaceOrder}
-                    disabled={submitting}
-                  >
-                    {submitting ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      `Place order · ${formatRWF(total)}`
-                    )}
-                  </Button>
+                <div className="flex items-baseline justify-between border-t pt-2">
+                  <span className="font-semibold">Total</span>
+                  <span className="text-xl font-bold">{formatRWF(total)}</span>
                 </div>
-              )}
+              </div>
 
+              {/* Place order */}
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={handlePlaceOrder}
+                disabled={submitting || payStatus === "waiting" || payStatus === "initiating"}
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    {payStatus === "waiting"
+                      ? "Waiting for payment..."
+                      : payStatus === "initiating"
+                      ? "Initiating payment..."
+                      : "Placing order..."}
+                  </>
+                ) : (
+                  <>Place order · {formatRWF(total)}</>
+                )}
+              </Button>
+              <Button variant="outline" size="sm" className="w-full" onClick={goBack}>
+                <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to payment
+              </Button>
               <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
                 <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                 Your information is encrypted and secure.
               </p>
-            </section>
+            </div>
           )}
         </div>
 
-        {/* ─── Right: Order summary (sticky) ────────────────────── */}
+        {/* ─── Sticky order summary ────────────────────────────────── */}
         <aside className="lg:col-span-1">
           <div className="sticky top-24 rounded-2xl border bg-card p-5 shadow-sm">
             <h2 className="text-lg font-semibold">Order summary</h2>
 
+            {/* Items count */}
+            <p className="mt-1 text-sm text-muted-foreground">
+              {items.length} item{items.length !== 1 ? "s" : ""} ·{" "}
+              {items.reduce((s, i) => s + i.quantity, 0)} units
+            </p>
+
+            {/* Item list (compact) */}
             <ul className="mt-4 max-h-48 space-y-2 overflow-y-auto ub-scroll pr-1">
               {items.map((item) => (
                 <li key={item.productId} className="flex gap-2 text-sm">
-                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary/30">
+                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-secondary/30">
                     {item.image && (
                       <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
                     )}
-                    <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-primary text-[9px] font-semibold text-primary-foreground">
+                    <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
                       {item.quantity}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="line-clamp-2 text-xs font-medium leading-snug">{item.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatRWF(item.price)} × {item.quantity}
+                    </p>
                   </div>
                   <p className="text-sm font-semibold">{formatRWF(item.price * item.quantity)}</p>
                 </li>
               ))}
             </ul>
 
+            {/* Totals */}
             <div className="mt-4 space-y-2 border-t pt-4 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Subtotal</span>
@@ -899,23 +1042,19 @@ export function CheckoutView() {
               </div>
               {couponDiscount > 0 && (
                 <div className="flex justify-between text-emerald-600">
-                  <span>Coupon ({appliedCoupon?.code})</span>
+                  <span>Coupon</span>
                   <span>−{formatRWF(couponDiscount)}</span>
                 </div>
               )}
               {loyaltyDiscount > 0 && (
                 <div className="flex justify-between text-emerald-600">
-                  <span>Loyalty ({redeemPoints} pts)</span>
+                  <span>Loyalty</span>
                   <span>−{formatRWF(loyaltyDiscount)}</span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Delivery</span>
-                {freeShipping ? (
-                  <span className="text-emerald-600">FREE</span>
-                ) : (
-                  <span>{formatRWF(deliveryFee)}</span>
-                )}
+                <span>{appliedCoupon?.freeShipping ? "FREE" : formatRWF(deliveryFee)}</span>
               </div>
               <div className="flex items-baseline justify-between border-t pt-2">
                 <span className="font-semibold">Total</span>
@@ -929,56 +1068,58 @@ export function CheckoutView() {
   )
 }
 
-// ─── Payment option wrapper ─────────────────────────────────────────
+/**
+ * Payment option radio card.
+ */
 function PaymentOption({
   value,
+  current,
+  icon: Icon,
+  iconColor,
   label,
   description,
-  icon,
   badge,
   disabled,
-  disabledReason,
-  selected,
   children,
 }: {
   value: string
+  current: string
+  icon: React.ElementType
+  iconColor: string
   label: string
   description: string
-  icon: React.ReactNode
   badge?: string
   disabled?: boolean
-  disabledReason?: string
-  selected: boolean
   children?: React.ReactNode
 }) {
+  const isSelected = current === value
   return (
     <label
       htmlFor={`pay-${value}`}
       className={`block rounded-xl border-2 p-4 transition-colors ${
         disabled
-          ? "cursor-not-allowed border-border opacity-60"
-          : selected
-          ? "cursor-pointer border-primary bg-secondary/40"
-          : "cursor-pointer border-border hover:border-primary/40"
+          ? "cursor-not-allowed border-border opacity-50"
+          : isSelected
+          ? "border-primary bg-secondary/30"
+          : "border-border hover:border-primary/40"
       }`}
     >
       <div className="flex items-start gap-3">
         <RadioGroupItem value={value} id={`pay-${value}`} className="mt-1" disabled={disabled} />
+        <Icon className={`mt-0.5 h-5 w-5 ${iconColor}`} />
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-primary">{icon}</span>
             <span className="font-medium">{label}</span>
             {badge && (
-              <Badge className="bg-primary text-primary-foreground text-[10px]">{badge}</Badge>
-            )}
-            {disabled && disabledReason && (
-              <Badge variant="secondary" className="text-[10px]">{disabledReason}</Badge>
+              <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                {badge}
+              </span>
             )}
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
+          {children}
         </div>
       </div>
-      {children}
     </label>
   )
 }

@@ -1,19 +1,18 @@
 "use client"
 
 /**
- * Order confirmation view — shown after a successful checkout.
+ * ConfirmationView — order confirmation page.
  *
  * Features:
  *   - Success banner with checkmark
  *   - Order number + status timeline
  *   - Customer + delivery info
- *   - Items + totals
+ *   - Items + totals (with coupon + loyalty breakdown)
  *   - Payment status
  *   - Estimated delivery time
- *   - WhatsApp message with order details
- *   - 'Track Order' button
- *   - Share order on WhatsApp
- *   - Next steps
+ *   - WhatsApp share order (share with friend)
+ *   - Track Order button → navigates to TrackOrderView
+ *   - Continue shopping CTA
  */
 
 import { useEffect, useState } from "react"
@@ -29,10 +28,10 @@ import {
   Home as HomeIcon,
   Phone,
   MapPin,
-  MessageSquare,
-  MapPinned,
-  Share2,
+  MessageCircle,
   Clock,
+  ArrowRight,
+  Share2,
 } from "lucide-react"
 
 interface ConfirmationViewProps {
@@ -71,6 +70,16 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
     }
   }, [orderId])
 
+  // ─── WhatsApp share order ─────────────────────────────────────────
+  const handleShareOrder = () => {
+    if (!order) return
+    const items = order.items
+      .map((i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`)
+      .join("\n")
+    const message = `🛍️ Order ${order.orderNumber} from Ubumwe Beauty\n\n${items}\n\nTotal: ${formatRWF(order.total)}\nPayment: ${PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod}\nStatus: ${order.status}\n\nTrack at ubumwe.beauty 🌸`
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank")
+  }
+
   if (loading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
@@ -89,40 +98,22 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         <p className="mt-2 text-muted-foreground">
           We couldn&apos;t find this order. It may have been removed.
         </p>
-        <Button className="mt-6" onClick={goHome}>Back to home</Button>
+        <Button className="mt-6" onClick={goHome}>
+          Back to home
+        </Button>
       </div>
     )
   }
 
   const currentStepIdx = STATUS_STEPS.findIndex((s) => s.key === order.status)
   const isCancelled = order.status === "CANCELLED"
-
   const paymentMethod = order.paymentMethod as PaymentMethodKey
   const paymentLabel = PAYMENT_METHODS[paymentMethod]?.label || order.paymentMethod
-
-  // ─── WhatsApp share ─────────────────────────────────────────────
-  const buildWhatsAppMessage = () => {
-    const lines = order.items.map(
-      (i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`
-    )
-    return `🛍️ Ubumwe Beauty Order ${order.orderNumber}\n\n${lines.join("\n")}\n\nTotal: ${formatRWF(order.total)}\nPayment: ${paymentLabel}\nDelivery to: ${order.address}, ${order.city}, ${order.province}\n\nTrack at ubumwe.beauty`
-  }
-
-  const handleShareWhatsApp = () => {
-    const url = `https://wa.me/?text=${encodeURIComponent(buildWhatsAppMessage())}`
-    window.open(url, "_blank", "noopener,noreferrer")
-  }
-
-  const handleSendToMyPhone = () => {
-    // Send order details to customer's phone via WhatsApp
-    const phone = order.customerPhone.replace(/[^\d]/g, "")
-    const url = `https://wa.me/${phone}?text=${encodeURIComponent(buildWhatsAppMessage())}`
-    window.open(url, "_blank", "noopener,noreferrer")
-  }
+  const estimatedDelivery = deliveryTimeFor(order.province)
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Success banner */}
+      {/* ─── Success banner ──────────────────────────────────────────── */}
       <div className="text-center">
         <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-100 text-emerald-600">
           <CheckCircle2 className="h-12 w-12" />
@@ -132,8 +123,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         </h1>
         <p className="mt-2 text-muted-foreground">
           We&apos;ve received your order and will contact you on{" "}
-          <span className="font-medium text-foreground">{order.customerPhone}</span>{" "}
-          to confirm.
+          <span className="font-medium text-foreground">{order.customerPhone}</span> to confirm.
         </p>
         <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">
@@ -143,20 +133,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         </div>
       </div>
 
-      {/* Quick actions */}
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <Button variant="outline" onClick={() => goTrackOrder(order.orderNumber)} className="gap-2">
-          <MapPinned className="h-4 w-4" /> Track Order
-        </Button>
-        <Button variant="outline" onClick={handleShareWhatsApp} className="gap-2">
-          <Share2 className="h-4 w-4" /> Share
-        </Button>
-        <Button variant="outline" onClick={handleSendToMyPhone} className="gap-2 col-span-2 sm:col-span-1">
-          <MessageSquare className="h-4 w-4" /> Send to my phone
-        </Button>
-      </div>
-
-      {/* Status timeline */}
+      {/* ─── Status timeline ─────────────────────────────────────────── */}
       {!isCancelled && (
         <div className="mt-8 rounded-2xl border bg-card p-5">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -188,17 +165,15 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
               )
             })}
           </ol>
-          <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-            <Clock className="h-3.5 w-3.5" />
-            Estimated delivery:{" "}
-            <span className="font-medium text-foreground">
-              {deliveryTimeFor(order.province)}
-            </span>
+          <div className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-secondary/40 p-3 text-sm">
+            <Clock className="h-4 w-4 text-primary" />
+            <span className="text-muted-foreground">Estimated delivery:</span>
+            <span className="font-medium">{estimatedDelivery}</span>
           </div>
         </div>
       )}
 
-      {/* Customer + delivery info */}
+      {/* ─── Customer + delivery ─────────────────────────────────────── */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border bg-card p-5">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
@@ -206,11 +181,10 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
           </h2>
           <p className="mt-2 font-medium">{order.customerName}</p>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-            <Phone className="h-3.5 w-3.5" />
-            {order.customerPhone}
+            <Phone className="h-3.5 w-3.5" /> {order.customerPhone}
           </p>
           {order.customerEmail && (
-            <p className="mt-1 text-sm text-muted-foreground">{order.customerEmail}</p>
+            <p className="text-sm text-muted-foreground">{order.customerEmail}</p>
           )}
         </div>
         <div className="rounded-2xl border bg-card p-5">
@@ -222,7 +196,10 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
             <span>
               {order.address}
               <br />
-              {order.city}, {order.province}
+              {order.city}
+              {order.district ? `, ${order.district}` : ""}
+              <br />
+              {order.province}
             </span>
           </p>
           {order.notes && (
@@ -231,7 +208,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         </div>
       </div>
 
-      {/* Order items */}
+      {/* ─── Order items ─────────────────────────────────────────────── */}
       <div className="mt-6 rounded-2xl border bg-card p-5">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Items
@@ -279,6 +256,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
           </div>
         </div>
 
+        {/* Payment status */}
         <div className="mt-4 flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-3 text-sm">
           <span className="text-muted-foreground">Payment</span>
           <span className="font-medium">
@@ -287,6 +265,8 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
               className={
                 order.paymentStatus === "PAID"
                   ? "text-emerald-600"
+                  : order.paymentStatus === "FAILED"
+                  ? "text-destructive"
                   : "text-amber-600"
               }
             >
@@ -296,25 +276,34 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         </div>
       </div>
 
-      {/* Next steps */}
+      {/* ─── Next steps ──────────────────────────────────────────────── */}
       <div className="mt-6 rounded-2xl bg-secondary/40 p-5">
         <div className="flex items-start gap-3">
-          <MessageSquare className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+          <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
           <div>
             <p className="font-medium">What happens next?</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              We&apos;ll send SMS updates to {order.customerPhone} as your order is
-              confirmed, shipped, and delivered. If you have any questions, call us at{" "}
+              We&apos;ll send SMS updates to {order.customerPhone} as your order is confirmed,
+              shipped, and delivered. If you have questions, call us at{" "}
               <span className="font-medium text-foreground">+250 788 123 456</span>.
             </p>
           </div>
         </div>
       </div>
 
-      {/* CTAs */}
-      <div className="mt-6 flex flex-wrap gap-3">
-        <Button onClick={() => goCatalog(null)} size="lg">Continue shopping</Button>
-        <Button variant="outline" onClick={goHome} size="lg">Back to home</Button>
+      {/* ─── CTAs ────────────────────────────────────────────────────── */}
+      <div className="mt-6 space-y-3">
+        <div className="grid grid-cols-2 gap-3">
+          <Button onClick={() => goTrackOrder(order.orderNumber)} size="lg">
+            <Package className="mr-2 h-5 w-5" /> Track order
+          </Button>
+          <Button variant="outline" size="lg" onClick={handleShareOrder}>
+            <Share2 className="mr-2 h-5 w-5" /> Share on WhatsApp
+          </Button>
+        </div>
+        <Button variant="ghost" size="sm" className="w-full" onClick={() => goCatalog(null)}>
+          Continue shopping <ArrowRight className="ml-1.5 h-4 w-4" />
+        </Button>
       </div>
     </div>
   )
