@@ -35,6 +35,17 @@ export function Header() {
   const { toast } = useToast()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Prevent hydration mismatch: cart count is 0 on server but may be >0 on client
+  // (persisted in localStorage). Only show the real count after mount.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true)
+  }, [])
+
+  // Use 0 until mounted to match server-rendered HTML
+  const count = mounted ? cartCount() : 0
 
   // Detect scroll to add a subtle shadow / blur
   useEffect(() => {
@@ -252,15 +263,15 @@ export function Header() {
             size="icon"
             className="relative"
             onClick={goCart}
-            aria-label={`Cart with ${cartCount()} items`}
+            aria-label={`Cart with ${count} items`}
           >
             <ShoppingBag className="h-5 w-5" />
-            {cartCount() > 0 && (
+            {count > 0 && (
               <Badge
                 variant="default"
                 className="absolute -top-1 -right-1 h-5 min-w-5 justify-center rounded-full px-1.5 text-[10px] font-semibold"
               >
-                {cartCount() > 99 ? "99+" : cartCount()}
+                {count > 99 ? "99+" : count}
               </Badge>
             )}
           </Button>
