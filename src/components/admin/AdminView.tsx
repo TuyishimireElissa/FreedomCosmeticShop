@@ -52,7 +52,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { useStore } from "@/store/useStore"
 import { useAdminNotifications } from "@/hooks/useAdminNotifications"
@@ -62,6 +61,8 @@ import { AdminCustomers } from "./AdminCustomers"
 import { AdminDeliveries } from "./AdminDeliveries"
 import { AdminAnalytics } from "./AdminAnalytics"
 import { AdminSettings } from "./AdminSettings"
+import { RealTimeNotifications } from "./RealTimeNotifications"
+import { InvoicePrinter } from "./InvoicePrinter"
 import {
   Shield,
   Package,
@@ -215,89 +216,7 @@ export function AdminView() {
     }
   }
 
-  // ─── Print invoice ────────────────────────────────────────────────
-  const handlePrintInvoice = (order: Order) => {
-    const printWindow = window.open("", "_blank", "width=600,height=800")
-    if (!printWindow) return
-
-    const itemsHtml = order.items
-      .map(
-        (item) => `
-        <tr>
-          <td>${item.name}</td>
-          <td style="text-align:center">${item.quantity}</td>
-          <td style="text-align:right">RWF ${item.price.toLocaleString()}</td>
-          <td style="text-align:right">RWF ${(item.price * item.quantity).toLocaleString()}</td>
-        </tr>
-      `
-      )
-      .join("")
-
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Invoice — ${order.orderNumber}</title>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 40px; color: #1a1a1a; }
-          h1 { color: #b76e79; margin-bottom: 0; }
-          .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
-          .header div p { margin: 2px 0; font-size: 14px; }
-          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          th, td { padding: 10px; border-bottom: 1px solid #ddd; font-size: 14px; }
-          th { background: #fce4ec; text-align: left; }
-          .totals { margin-left: auto; width: 300px; }
-          .totals div { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
-          .totals .total { font-weight: bold; font-size: 18px; border-top: 2px solid #b76e79; padding-top: 10px; }
-          .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div>
-            <h1>Ubumwe Beauty</h1>
-            <p>Beauty that unites us</p>
-            <p>KN 4 Ave, Kigali Heights, Kigali, Rwanda</p>
-            <p>+250 788 123 456 · hello@ubumwe.beauty</p>
-          </div>
-          <div style="text-align: right">
-            <h2>Invoice</h2>
-            <p><strong>Order:</strong> ${order.orderNumber}</p>
-            <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString("en-RW")}</p>
-            <p><strong>Status:</strong> ${order.status}</p>
-          </div>
-        </div>
-        <div>
-          <h3>Bill To:</h3>
-          <p>${order.customerName}</p>
-          <p>${order.customerPhone}</p>
-          ${order.customerEmail ? `<p>${order.customerEmail}</p>` : ""}
-          <p>${order.address}</p>
-          <p>${order.city}, ${order.province}</p>
-        </div>
-        <table>
-          <thead>
-            <tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Price</th><th style="text-align:right">Total</th></tr>
-          </thead>
-          <tbody>${itemsHtml}</tbody>
-        </table>
-        <div class="totals">
-          <div><span>Subtotal:</span><span>RWF ${order.subtotal.toLocaleString()}</span></div>
-          ${order.discountAmount > 0 ? `<div><span>Discount:</span><span>-RWF ${order.discountAmount.toLocaleString()}</span></div>` : ""}
-          <div><span>Delivery:</span><span>RWF ${order.deliveryFee.toLocaleString()}</span></div>
-          <div class="total"><span>Total:</span><span>RWF ${order.total.toLocaleString()}</span></div>
-        </div>
-        <div class="footer">
-          <p>Thank you for shopping with Ubumwe Beauty!</p>
-          <p>Pay with MTN MoMo, Airtel Money, Visa/Mastercard, or Cash on Delivery</p>
-        </div>
-      </body>
-      </html>
-    `)
-    printWindow.document.close()
-    printWindow.print()
-  }
-
+  // ─── Reseed ──────────────────────────────────────────────────────
   const handleReseed = async () => {
     if (!window.confirm("Reset catalog to demo data? Orders will be preserved.")) return
     try {
@@ -402,6 +321,10 @@ export function AdminView() {
           <Button variant="outline" size="sm" onClick={handleReseed}>
             <Trash2 className="mr-1.5 h-4 w-4" /> Reset
           </Button>
+
+          {/* Real-time notifications */}
+          <RealTimeNotifications />
+
           <Button variant="ghost" size="sm" onClick={goHome}>
             Exit
           </Button>
@@ -619,14 +542,7 @@ export function AdminView() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex justify-end gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8"
-                              onClick={() => handlePrintInvoice(o)}
-                            >
-                              Print
-                            </Button>
+                            <InvoicePrinter order={o} />
                           </div>
                         </td>
                       </tr>
@@ -793,14 +709,7 @@ export function AdminView() {
                   </div>
                 </div>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => handlePrintInvoice(selectedOrder)}
-                >
-                  Print invoice
-                </Button>
+                <InvoicePrinter order={selectedOrder} />
               </div>
             </>
           )}

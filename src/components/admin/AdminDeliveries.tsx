@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Badge } from "@/components/ui/badge"
 import {
   Select,
   SelectContent,
@@ -120,9 +119,9 @@ export function AdminDeliveries() {
       if (res.status === 401 || res.status === 403) return
       const data = await res.json()
       setDeliveries(data.deliveries || [])
-      setStats(data.stats || stats)
-    } catch (e) {
-      console.error(e)
+      setStats(data.stats || { total: 0, pending: 0, assigned: 0, inTransit: 0, delivered: 0, failed: 0 })
+    } catch {
+      // Network error
     } finally {
       setLoading(false)
     }

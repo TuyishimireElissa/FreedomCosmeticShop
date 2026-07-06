@@ -30,13 +30,10 @@ import {
 } from "@/components/ui/select"
 import {
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Package,
   Users,
   AlertTriangle,
-  Clock,
-  ArrowRight,
 } from "lucide-react"
 import {
   AreaChart,
@@ -51,10 +48,10 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts"
 import { useStore } from "@/store/useStore"
-import { useToast } from "@/hooks/use-toast"
+
+// Removed unused imports: TrendingDown, ArrowRight, Clock, Legend, toast
 
 interface AnalyticsData {
   revenue: {
@@ -118,7 +115,6 @@ const PAYMENT_COLORS: Record<string, string> = {
 
 export function AdminAnalytics() {
   const { goTrackOrder } = useStore()
-  const { toast } = useToast()
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [range, setRange] = useState("month")

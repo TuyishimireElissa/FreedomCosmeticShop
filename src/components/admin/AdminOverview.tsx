@@ -30,22 +30,18 @@ import {
   Cell,
   BarChart,
   Bar,
-  Legend,
 } from "recharts"
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { formatRWF } from "@/lib/format"
 import { useStore } from "@/store/useStore"
 import {
   TrendingUp,
-  TrendingDown,
   Users,
   Package,
   ShoppingCart,
   DollarSign,
   AlertTriangle,
-  ArrowRight,
 } from "lucide-react"
 
 interface AnalyticsData {

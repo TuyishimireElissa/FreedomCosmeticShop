@@ -14,7 +14,6 @@ import { formatRWF, DELIVERY_FEES, DELIVERY_TIMES } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -56,8 +55,6 @@ import {
   Image as ImageIcon,
   Truck,
   Loader2,
-  Check,
-  X,
 } from "lucide-react"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -152,8 +149,8 @@ function CouponsManager() {
       if (res.status === 401 || res.status === 403) return
       const data = await res.json()
       setCoupons(data.coupons || [])
-    } catch (e) {
-      console.error(e)
+    } catch {
+      console.error("Failed to load")
     } finally {
       setLoading(false)
     }
@@ -241,7 +238,7 @@ function CouponsManager() {
       })
       setShowForm(false)
       load()
-    } catch (e) {
+    } catch {
       toast({
         title: "Save failed",
         description: e instanceof Error ? e.message : "Unknown error",
@@ -262,7 +259,7 @@ function CouponsManager() {
       toast({ title: "Coupon deleted", description: deleteTarget.code })
       setDeleteTarget(null)
       load()
-    } catch (e) {
+    } catch {
       toast({
         title: "Delete failed",
         description: e instanceof Error ? e.message : "Unknown error",
@@ -548,8 +545,8 @@ function BannersManager() {
       if (res.status === 401 || res.status === 403) return
       const data = await res.json()
       setBanners(data.banners || [])
-    } catch (e) {
-      console.error(e)
+    } catch {
+      console.error("Failed to load")
     } finally {
       setLoading(false)
     }
@@ -619,7 +616,7 @@ function BannersManager() {
       toast({ title: editing ? "Banner updated" : "Banner created" })
       setShowForm(false)
       load()
-    } catch (e) {
+    } catch {
       toast({ title: "Save failed", variant: "destructive" })
     } finally {
       setSaving(false)
