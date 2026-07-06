@@ -4,11 +4,12 @@
  * Poll the status of a payment by payment ID (internal).
  *
  * Returns:
- *   - 200: { status: "PENDING" | "PAID" | "FAILED", payment: {...} }
+ *   - 200: { status, payment, order }
  *   - 404: { error: "Payment not found" }
  *
- * The client polls this endpoint every 2 seconds after initiating MoMo/Card payment.
+ * The client polls this endpoint every 5 seconds after initiating MoMo/Card payment.
  * In production, the status is updated by PayPack/Flutterwave webhooks.
+ * In simulation mode, the status is updated automatically after 3 seconds.
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
@@ -22,16 +23,18 @@ export async function GET(
 
     const payment = await db.payment.findUnique({
       where: { id: txId },
-      select: {
-        id: true,
-        status: true,
-        method: true,
-        amount: true,
-        providerTransactionId: true,
-        failureReason: true,
-        initiatedAt: true,
-        completedAt: true,
-        orderId: true,
+      include: {
+        order: {
+          select: {
+            id: true,
+            orderNumber: true,
+            status: true,
+            total: true,
+            customerName: true,
+            customerPhone: true,
+            province: true,
+          },
+        },
       },
     })
 
@@ -40,8 +43,20 @@ export async function GET(
     }
 
     return NextResponse.json({
-      status: payment.status,
-      payment,
+      status: payment.status, // PENDING | PAID | FAILED
+      payment: {
+        id: payment.id,
+        method: payment.method,
+        amount: payment.amount,
+        status: payment.status,
+        providerTransactionId: payment.providerTransactionId,
+        failureReason: payment.failureReason,
+        initiatedAt: payment.initiatedAt,
+        completedAt: payment.completedAt,
+        cardLast4: payment.cardLast4,
+        cardBrand: payment.cardBrand,
+      },
+      order: payment.order,
     })
   } catch (error) {
     console.error("Payment status error:", error)

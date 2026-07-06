@@ -30,6 +30,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useStore } from "@/store/useStore"
+import { usePaymentPolling } from "@/hooks/usePaymentPolling"
 import {
   formatRWF,
   deliveryFeeFor,
@@ -173,6 +174,29 @@ export function CheckoutView() {
 
   // Payment status (for MoMo/Card waiting)
   const [payStatus, setPayStatus] = useState<PayStatus>("idle")
+  const polling = usePaymentPolling()
+
+  // React to polling status changes
+  useEffect(() => {
+    if (polling.status === "paid") {
+      setPayStatus("paid")
+      toast({ title: "Payment confirmed!", description: "Placing your order..." })
+    } else if (polling.status === "failed") {
+      setPayStatus("failed")
+      toast({
+        title: "Payment failed",
+        description: polling.error || "Please try again.",
+        variant: "destructive",
+      })
+    } else if (polling.status === "timeout") {
+      setPayStatus("failed")
+      toast({
+        title: "Payment timeout",
+        description: "We didn't receive payment confirmation. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }, [polling.status, polling.error, toast])
 
   // ─── Calculations ─────────────────────────────────────────────────
   const subtotal = cartSubtotal()
@@ -268,10 +292,51 @@ export function CheckoutView() {
         description: `Approve the ${network} prompt on ${payment.momoPhone}.`,
       })
 
-      // Simulate waiting for payment confirmation
-      await new Promise((r) => setTimeout(r, 3500))
-      setPayStatus("paid")
-      return true
+      // Start polling for UI feedback (progress bar, elapsed time)
+      polling.start(data.transactionId)
+
+      // Poll the API directly until we get a final status
+      // (avoiding stale closure issues with React state)
+      const paymentId = data.transactionId
+      const startTime = Date.now()
+      const maxWaitMs = 5 * 60 * 1000 // 5 minutes
+
+      while (Date.now() - startTime < maxWaitMs) {
+        await new Promise((r) => setTimeout(r, 3000)) // Poll every 3 seconds
+
+        try {
+          const statusRes = await fetch(`/api/payments/status/${paymentId}`)
+          if (!statusRes.ok) continue
+          const statusData = await statusRes.json()
+
+          if (statusData.status === "PAID") {
+            setPayStatus("paid")
+            toast({ title: "Payment confirmed!", description: "Placing your order..." })
+            return true
+          }
+          if (statusData.status === "FAILED") {
+            setPayStatus("failed")
+            toast({
+              title: "Payment failed",
+              description: statusData.payment?.failureReason || "Please try again.",
+              variant: "destructive",
+            })
+            return false
+          }
+          // PENDING — keep polling
+        } catch {
+          // Network error — keep polling
+        }
+      }
+
+      // Timeout
+      setPayStatus("failed")
+      toast({
+        title: "Payment timeout",
+        description: "We didn't receive payment confirmation. Please try again.",
+        variant: "destructive",
+      })
+      return false
     } catch {
       setPayStatus("failed")
       toast({ title: "Payment failed", description: "Network error", variant: "destructive" })
@@ -816,14 +881,34 @@ export function CheckoutView() {
 
               {/* Payment status indicator */}
               {payStatus === "waiting" && (
-                <div className="flex items-center gap-3 rounded-xl bg-primary/10 p-4">
-                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                  <div>
-                    <p className="font-medium">Waiting for payment approval...</p>
-                    <p className="text-sm text-muted-foreground">
-                      Check your phone and approve the prompt.
-                    </p>
+                <div className="rounded-xl bg-primary/10 p-4">
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    <div className="flex-1">
+                      <p className="font-medium">Waiting for payment approval...</p>
+                      <p className="text-sm text-muted-foreground">
+                        Check your phone and approve the prompt.
+                      </p>
+                    </div>
+                    <div className="text-right text-xs text-muted-foreground">
+                      <p className="font-mono font-medium text-primary">
+                        {Math.floor(polling.elapsed / 60)}:{String(polling.elapsed % 60).padStart(2, "0")}
+                      </p>
+                      <p>elapsed</p>
+                    </div>
                   </div>
+                  {/* Progress bar */}
+                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-primary/20">
+                    <div
+                      className="h-full bg-primary transition-all"
+                      style={{
+                        width: `${Math.min(100, (polling.elapsed / 300) * 100)}%`,
+                      }}
+                    />
+                  </div>
+                  <p className="mt-1.5 text-center text-xs text-muted-foreground">
+                    Auto-timeout in {Math.floor(polling.remaining / 60)}:{String(polling.remaining % 60).padStart(2, "0")}
+                  </p>
                 </div>
               )}
               {payStatus === "paid" && (

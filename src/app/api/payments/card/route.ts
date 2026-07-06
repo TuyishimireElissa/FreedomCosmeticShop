@@ -7,8 +7,8 @@
  *
  * Flow:
  *   1. Fetch the order (verify it exists + is PENDING)
- *   2. Initiate Flutterwave Standard Payment (returns a payment link)
- *   3. Create Payment record
+ *   2. Call Flutterwave initializePayment() to get a payment link
+ *   3. Create/update Payment record with tx_ref
  *   4. Return the payment link for client-side redirect
  *
  * The customer is redirected to Flutterwave's secure payment page.
@@ -17,16 +17,11 @@
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { env, features } from "@/lib/env"
-
-interface FlutterwaveInitiateResponse {
-  status: string
-  message: string
-  data: {
-    link: string
-    reference?: string
-  }
-}
+import {
+  initializePayment,
+  generateTxRef,
+  FlutterwaveError,
+} from "@/server/services/flutterwave"
 
 export async function POST(req: Request) {
   try {
@@ -54,32 +49,47 @@ export async function POST(req: Request) {
       )
     }
 
-    // ─── Simulation mode (MVP) ────────────────────────────────────────
-    if (!features.realPayments || !env.FLW_SECRET_KEY) {
-      console.log(`[MOCK CARD] ${order.total} RWF for ${order.orderNumber}`)
+    // Generate unique transaction reference
+    const txRef = generateTxRef(order.orderNumber)
 
-      const payment = await db.payment.create({
+    // Create or find payment record
+    let payment = order.payments.find((p) => p.method === "CARD" && p.status === "PENDING")
+
+    if (payment) {
+      payment = await db.payment.update({
+        where: { id: payment.id },
+        data: { providerTransactionId: txRef },
+      })
+    } else {
+      payment = await db.payment.create({
         data: {
           orderId: order.id,
           method: "CARD",
           amount: order.total,
           status: "PENDING",
-          providerTransactionId: `mock-card-${Date.now()}`,
-          providerReference: order.orderNumber,
+          providerTransactionId: txRef,
         },
       })
+    }
+
+    // ─── Simulation mode ──────────────────────────────────────────────
+    const isSimulation = process.env.ENABLE_REAL_PAYMENTS !== "true"
+
+    if (isSimulation) {
+      console.log(`[MOCK CARD] ${order.total} RWF for ${order.orderNumber} — txRef: ${txRef}`)
 
       // Simulate payment success after 3 seconds
       setTimeout(async () => {
         try {
-          await db.payment.update({
-            where: { id: payment.id },
-            data: {
-              status: "PAID",
-              completedAt: new Date(),
-            },
+          const { handlePaymentSuccess } = await import("@/server/services/payment-events")
+          await handlePaymentSuccess({
+            paymentId: payment!.id,
+            orderId: order.id,
+            providerTransactionId: txRef,
+            cardLast4: "4242",
+            cardBrand: "visa",
           })
-          console.log(`[MOCK CARD] Payment ${payment.id} marked as PAID`)
+          console.log(`[MOCK CARD] Payment ${payment!.id} marked as PAID`)
         } catch (e) {
           console.error("Failed to update mock payment:", e)
         }
@@ -88,83 +98,48 @@ export async function POST(req: Request) {
       return NextResponse.json({
         success: true,
         transactionId: payment.id,
+        txRef,
         status: "PENDING",
         message: "Card payment initiated (simulated — will auto-confirm in 3 seconds).",
         simulated: true,
-        // In real mode, this would be the Flutterwave payment link
         paymentLink: null,
       })
     }
 
     // ─── Real Flutterwave integration ─────────────────────────────────
-    const baseUrl = env.APP_URL || "http://localhost:3000"
-    const txRef = `${order.orderNumber}-${Date.now()}`
-
     try {
-      const flwRes = await fetch("https://api.flutterwave.com/v3/payments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${env.FLW_SECRET_KEY}`,
+      const result = await initializePayment({
+        amount: order.total,
+        txRef,
+        customer: {
+          name: order.customerName,
+          email: order.customerEmail || "customer@ubumwe.beauty",
+          phone: order.customerPhone,
         },
-        body: JSON.stringify({
-          tx_ref: txRef,
-          amount: order.total,
-          currency: "RWF",
-          redirect_url: `${baseUrl}/checkout?tx_ref=${txRef}`,
-          customer: {
-            name: order.customerName,
-            phone_number: order.customerPhone,
-            email: order.customerEmail || "customer@ubumwe.beauty",
-          },
-          customizations: {
-            title: "Ubumwe Beauty",
-            description: `Order ${order.orderNumber}`,
-            logo: `${baseUrl}/logo.svg`,
-          },
-          payment_options: "card",
-        }),
-      })
-
-      if (!flwRes.ok) {
-        const err = await flwRes.text()
-        throw new Error(`Flutterwave error: ${err}`)
-      }
-
-      const flwData = (await flwRes.json()) as FlutterwaveInitiateResponse
-
-      if (flwData.status !== "success" || !flwData.data?.link) {
-        throw new Error(flwData.message || "Flutterwave initiation failed")
-      }
-
-      // Create payment record
-      const payment = await db.payment.create({
-        data: {
-          orderId: order.id,
-          method: "CARD",
-          amount: order.total,
-          status: "PENDING",
-          providerTransactionId: txRef,
-          providerReference: flwData.data.reference || txRef,
-        },
+        redirectUrl: `${process.env.APP_URL || "http://localhost:3000"}/checkout?tx_ref=${txRef}`,
       })
 
       return NextResponse.json({
         success: true,
         transactionId: payment.id,
+        txRef,
         status: "PENDING",
-        paymentLink: flwData.data.link,
+        paymentLink: result.paymentLink,
         message: "Redirecting to secure payment page...",
+        simulated: false,
       })
     } catch (err) {
-      console.error("Flutterwave error:", err)
+      console.error("Flutterwave init error:", err)
+
+      if (err instanceof FlutterwaveError) {
+        return NextResponse.json(
+          { error: err.message },
+          { status: err.statusCode }
+        )
+      }
+
       return NextResponse.json(
-        {
-          error:
-            err instanceof Error
-              ? err.message
-              : "Card payment initiation failed.",
-        },
+        { error: "Card payment initiation failed." },
         { status: 500 }
       )
     }

@@ -8,8 +8,8 @@
  *
  * Flow:
  *   1. Fetch the order (verify it exists + is PENDING)
- *   2. Initiate payment via PayPack API (or simulate in dev)
- *   3. Create/update Payment record with providerTransactionId
+ *   2. Call PayPack cashin() to send USSD prompt to customer
+ *   3. Update Payment record with providerTransactionId
  *   4. Return transaction ID for client-side polling
  *
  * The client polls /api/payments/status/[txId] until status is PAID or FAILED.
@@ -17,45 +17,7 @@
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { env, features } from "@/lib/env"
-import { normalizeRwandaPhone } from "@/lib/phone"
-
-interface PaypackTokenResponse {
-  access: string
-  expires_in?: number
-  token_type?: string
-}
-
-interface PaypackPaymentResponse {
-  id: string
-  ref: string
-  status: "pending" | "success" | "failed"
-  message?: string
-  // ... other fields
-}
-
-/**
- * Get PayPack access token.
- * Expires after 1 hour — we fetch fresh on each request for simplicity.
- */
-async function getPaypackToken(): Promise<string> {
-  const res = await fetch("https://api.paypack.co.rw/api/auth/clients/credentials", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      client_id: env.PAYPACK_CLIENT_ID,
-      client_secret: env.PAYPACK_CLIENT_SECRET,
-    }),
-  })
-
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`PayPack auth failed: ${err}`)
-  }
-
-  const data = (await res.json()) as PaypackTokenResponse
-  return data.access
-}
+import { cashin, normalizePhoneForPaypack, PaypackError } from "@/server/services/paypack"
 
 export async function POST(req: Request) {
   try {
@@ -76,7 +38,7 @@ export async function POST(req: Request) {
     // Normalize phone
     let normalizedPhone: string
     try {
-      normalizedPhone = normalizeRwandaPhone(phone)
+      normalizedPhone = normalizePhoneForPaypack(phone)
     } catch {
       return NextResponse.json(
         { error: "Invalid phone number. Use format 0788123456" },
@@ -102,33 +64,52 @@ export async function POST(req: Request) {
     }
 
     // ─── Simulation mode (MVP) ────────────────────────────────────────
-    if (!features.realPayments || !env.PAYPACK_CLIENT_ID) {
-      console.log(`[MOCK MoMo] ${network} ${order.total} RWF from ${normalizedPhone} for ${order.orderNumber}`)
+    // When real payments are disabled, we still create the payment record
+    // and simulate a successful payment after 3 seconds.
+    const isSimulation = process.env.ENABLE_REAL_PAYMENTS !== "true"
 
-      // Create/update payment record
-      const payment = await db.payment.create({
+    // Create or update payment record
+    let payment = order.payments.find(
+      (p) => p.method === (network === "MTN" ? "MTN_MOMO" : "AIRTEL_MONEY") && p.status === "PENDING"
+    )
+
+    if (payment) {
+      // Update existing payment
+      payment = await db.payment.update({
+        where: { id: payment.id },
+        data: {
+          phoneNumber: normalizedPhone,
+        },
+      })
+    } else {
+      // Create new payment
+      payment = await db.payment.create({
         data: {
           orderId: order.id,
           method: network === "MTN" ? "MTN_MOMO" : "AIRTEL_MONEY",
           amount: order.total,
           status: "PENDING",
           phoneNumber: normalizedPhone,
-          providerTransactionId: `mock-${Date.now()}`,
-          providerReference: order.orderNumber,
         },
       })
+    }
+
+    if (isSimulation) {
+      console.log(
+        `[MOCK MoMo] ${network} ${order.total} RWF from ${normalizedPhone} for ${order.orderNumber}`
+      )
 
       // Simulate payment success after 3 seconds
       setTimeout(async () => {
         try {
-          await db.payment.update({
-            where: { id: payment.id },
-            data: {
-              status: "PAID",
-              completedAt: new Date(),
-            },
+          // Mark as paid + trigger post-payment actions
+          const { handlePaymentSuccess } = await import("@/server/services/payment-events")
+          await handlePaymentSuccess({
+            paymentId: payment!.id,
+            orderId: order.id,
+            providerTransactionId: `mock-${Date.now()}`,
           })
-          console.log(`[MOCK MoMo] Payment ${payment.id} marked as PAID`)
+          console.log(`[MOCK MoMo] Payment ${payment!.id} marked as PAID`)
         } catch (e) {
           console.error("Failed to update mock payment:", e)
         }
@@ -137,69 +118,50 @@ export async function POST(req: Request) {
       return NextResponse.json({
         success: true,
         transactionId: payment.id,
-        providerTransactionId: payment.providerTransactionId,
+        providerTransactionId: `mock-${Date.now()}`,
         status: "PENDING",
-        message: "Payment prompt sent to your phone. (Simulated — will auto-confirm in 3 seconds.)",
+        message: `Payment prompt sent to your phone. (Simulated — will auto-confirm in 3 seconds.)`,
         simulated: true,
       })
     }
 
     // ─── Real PayPack integration ─────────────────────────────────────
     try {
-      const token = await getPaypackToken()
-
-      // PayPack expects the phone in format 250XXXXXXXXX (no +)
-      const paypackPhone = normalizedPhone.replace("+", "")
-
-      const payRes = await fetch("https://api.paypack.co.rw/api/transactions/cash", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          amount: order.total,
-          number: paypackPhone,
-          reference: order.orderNumber,
-        }),
+      const result = await cashin({
+        amount: order.total,
+        phone: normalizedPhone,
+        reference: order.orderNumber,
       })
 
-      if (!payRes.ok) {
-        const err = await payRes.text()
-        throw new Error(`PayPack payment failed: ${err}`)
-      }
-
-      const payData = (await payRes.json()) as PaypackPaymentResponse
-
-      // Create payment record
-      const payment = await db.payment.create({
+      // Update payment with provider transaction ID
+      await db.payment.update({
+        where: { id: payment.id },
         data: {
-          orderId: order.id,
-          method: network === "MTN" ? "MTN_MOMO" : "AIRTEL_MONEY",
-          amount: order.total,
-          status: "PENDING",
-          phoneNumber: normalizedPhone,
-          providerTransactionId: payData.id,
-          providerReference: payData.ref || order.orderNumber,
+          providerTransactionId: result.transactionId,
+          providerReference: result.reference,
         },
       })
 
       return NextResponse.json({
         success: true,
         transactionId: payment.id,
-        providerTransactionId: payData.id,
-        status: payData.status.toUpperCase(),
-        message: "Payment prompt sent to your phone. Approve it to complete the transaction.",
+        providerTransactionId: result.transactionId,
+        status: result.status.toUpperCase(),
+        message: result.message,
+        simulated: result.simulated,
       })
     } catch (err) {
-      console.error("PayPack error:", err)
+      console.error("PayPack cashin error:", err)
+
+      if (err instanceof PaypackError) {
+        return NextResponse.json(
+          { error: err.message },
+          { status: err.statusCode }
+        )
+      }
+
       return NextResponse.json(
-        {
-          error:
-            err instanceof Error
-              ? err.message
-              : "Payment initiation failed. Please try again.",
-        },
+        { error: "Payment initiation failed. Please try again." },
         { status: 500 }
       )
     }
