@@ -18,7 +18,7 @@
  */
 
 /** Regex for a valid Rwandan phone in any common format */
-export const RWANDA_PHONE_REGEX = /^(?:\+250|0)?7[2389][0-9]{7}$/
+export const RWANDA_PHONE_REGEX = /^(?:\+250|250|0)?7[2389][0-9]{7}$/
 
 /**
  * Normalize any Rwandan phone format to canonical +250XXXXXXXXX.
@@ -41,8 +41,8 @@ export function normalizeRwandaPhone(input: string): string {
     )
   }
 
-  // Remove leading +250 or 0, then prepend +250
-  const digits = cleaned.replace(/^\+250|^0/, "")
+  // Remove leading +250, 250, or 0, then prepend +250
+  const digits = cleaned.replace(/^\+250|^250|^0/, "")
   return `+250${digits}`
 }
 

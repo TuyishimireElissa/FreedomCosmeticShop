@@ -147,3 +147,14 @@ export function isValidRwandaLocation(
   }
   return true
 }
+
+/**
+ * District → Province mapping (reverse lookup).
+ * Used for auto-selecting province from district in checkout.
+ */
+export const DISTRICT_TO_PROVINCE_MAP: Record<string, string> = {}
+;(Object.keys(RWANDA_DISTRICTS) as RwandaProvince[]).forEach((province) => {
+  RWANDA_DISTRICTS[province].forEach((district) => {
+    DISTRICT_TO_PROVINCE_MAP[district] = province
+  })
+})
