@@ -19,11 +19,19 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Search, ShoppingBag, Menu, Sparkles, Shield } from "lucide-react"
+import { Search, ShoppingBag, Menu, Sparkles, Shield, User as UserIcon, LogOut, Package } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 
 export function Header() {
-  const { goHome, goCatalog, goCart, goAdmin, setCatalogSearch, cartCount } = useStore()
+  const { goHome, goCatalog, goCart, goAdmin, goLogin, goAccount, setCatalogSearch, cartCount, user, authLoading, logout } = useStore()
   const { toast } = useToast()
   const [searchInput, setSearchInput] = useState("")
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -99,16 +107,41 @@ export function Header() {
                 </button>
               ))}
               <div className="bg-border my-2 h-px" />
-              <button
-                onClick={() => {
-                  goAdmin()
-                  setMobileOpen(false)
-                }}
-                className="text-muted-foreground hover:bg-secondary flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium"
-              >
-                <Shield className="h-4 w-4" />
-                Admin
-              </button>
+              {user ? (
+                <>
+                  <button
+                    onClick={() => {
+                      goAccount()
+                      setMobileOpen(false)
+                    }}
+                    className="hover:bg-secondary flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium"
+                  >
+                    <UserIcon className="h-4 w-4" />
+                    My Account
+                  </button>
+                  <button
+                    onClick={() => {
+                      goAdmin()
+                      setMobileOpen(false)
+                    }}
+                    className="text-muted-foreground hover:bg-secondary flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium"
+                  >
+                    <Shield className="h-4 w-4" />
+                    Admin
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    goLogin()
+                    setMobileOpen(false)
+                  }}
+                  className="hover:bg-secondary flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium"
+                >
+                  <UserIcon className="h-4 w-4" />
+                  Login / Register
+                </button>
+              )}
             </nav>
           </SheetContent>
         </Sheet>
@@ -183,6 +216,59 @@ export function Header() {
             <Shield className="mr-1.5 h-4 w-4" />
             Admin
           </Button>
+
+          {/* Account / Login */}
+          {authLoading ? (
+            <div className="h-9 w-20 animate-pulse rounded-lg bg-secondary" />
+          ) : user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <span className="grid h-6 w-6 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+                    {user.name.charAt(0).toUpperCase()}
+                  </span>
+                  <span className="hidden max-w-[100px] truncate sm:inline">
+                    {user.name.split(" ")[0]}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <p className="text-sm font-medium">{user.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">{user.phone}</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={goAccount}>
+                  <UserIcon className="mr-2 h-4 w-4" /> My Account
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => goCatalog(null)}>
+                  <Package className="mr-2 h-4 w-4" /> Continue Shopping
+                </DropdownMenuItem>
+                {user.role === "ADMIN" && (
+                  <DropdownMenuItem onClick={goAdmin}>
+                    <Shield className="mr-2 h-4 w-4" /> Admin Dashboard
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={async () => {
+                    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
+                    logout()
+                    toast({ title: "Logged out" })
+                    goHome()
+                  }}
+                >
+                  <LogOut className="mr-2 h-4 w-4" /> Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="ghost" size="sm" onClick={goLogin}>
+              <UserIcon className="mr-1.5 h-4 w-4" />
+              Login
+            </Button>
+          )}
 
           {/* Cart */}
           <Button

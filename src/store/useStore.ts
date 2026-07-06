@@ -6,6 +6,7 @@
  *   - The active view + parameters (current product slug, order ID, etc.)
  *   - The shopping cart (persisted to localStorage)
  *   - The search query and admin filters
+ *   - The authenticated user (not persisted — fetched via /api/auth/me on mount)
  */
 
 import { create } from "zustand"
@@ -14,7 +15,25 @@ import { persist, createJSONStorage } from "zustand/middleware"
 /* ---------- Types ---------- */
 
 export type ViewKey =
-  "home" | "catalog" | "product" | "cart" | "checkout" | "confirmation" | "admin"
+  | "home"
+  | "catalog"
+  | "product"
+  | "cart"
+  | "checkout"
+  | "confirmation"
+  | "admin"
+  | "login"
+  | "register"
+  | "account"
+
+/** Auth user type — matches the API response */
+export interface AuthUser {
+  id: string
+  name: string
+  phone: string
+  email: string | null
+  role: string
+}
 
 export interface CartItem {
   productId: string
@@ -29,6 +48,7 @@ export interface CartItem {
 interface StoreState {
   /* View navigation */
   view: ViewKey
+  setView: (view: ViewKey) => void
   /** Active product slug (for product detail view) */
   activeProductSlug: string | null
   /** Last completed order ID (for confirmation view) */
@@ -36,6 +56,10 @@ interface StoreState {
   /** Catalog filters */
   catalogCategory: string | null // category slug or null for "all"
   catalogSearch: string
+
+  /* Auth */
+  user: AuthUser | null
+  authLoading: boolean
 
   /* Cart */
   items: CartItem[]
@@ -49,10 +73,18 @@ interface StoreState {
   goCheckout: () => void
   goConfirmation: (orderId: string) => void
   goAdmin: () => void
+  goLogin: () => void
+  goRegister: () => void
+  goAccount: () => void
 
   /* Actions: catalog */
   setCatalogSearch: (q: string) => void
   clearCatalogSearch: () => void
+
+  /* Actions: auth */
+  fetchUser: () => Promise<void>
+  setUser: (user: AuthUser | null) => void
+  logout: () => void
 
   /* Actions: cart */
   addToCart: (item: Omit<CartItem, "quantity">, qty?: number) => void
@@ -77,10 +109,16 @@ export const useStore = create<StoreState>()(
       lastOrderId: null,
       catalogCategory: null,
       catalogSearch: "",
+      user: null,
+      authLoading: true,
       items: [],
       isCartOpen: false,
 
       /* ---------- Navigation ---------- */
+      setView: (view) => {
+        set({ view })
+        if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
+      },
       goHome: () => {
         set({ view: "home" })
         if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
@@ -109,10 +147,47 @@ export const useStore = create<StoreState>()(
         set({ view: "admin" })
         if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
       },
+      goLogin: () => {
+        set({ view: "login" })
+        if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
+      },
+      goRegister: () => {
+        set({ view: "register" })
+        if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
+      },
+      goAccount: () => {
+        set({ view: "account" })
+        if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
+      },
 
       /* ---------- Catalog ---------- */
       setCatalogSearch: (q) => set({ catalogSearch: q }),
       clearCatalogSearch: () => set({ catalogSearch: "" }),
+
+      /* ---------- Auth ---------- */
+      fetchUser: async () => {
+        set({ authLoading: true })
+        try {
+          const res = await fetch("/api/auth/me")
+          if (res.ok) {
+            const data = await res.json()
+            set({ user: data.user, authLoading: false })
+          } else {
+            // Try to refresh the token
+            const refreshRes = await fetch("/api/auth/refresh", { method: "POST" })
+            if (refreshRes.ok) {
+              const refreshData = await refreshRes.json()
+              set({ user: refreshData.user, authLoading: false })
+            } else {
+              set({ user: null, authLoading: false })
+            }
+          }
+        } catch {
+          set({ user: null, authLoading: false })
+        }
+      },
+      setUser: (user) => set({ user }),
+      logout: () => set({ user: null }),
 
       /* ---------- Cart ---------- */
       addToCart: (item, qty = 1) => {
@@ -156,7 +231,7 @@ export const useStore = create<StoreState>()(
     {
       name: "ubumwe-store",
       storage: createJSONStorage(() => localStorage),
-      // Only persist the cart items — not transient view state
+      // Only persist the cart items — not transient view state or auth
       partialize: (state) => ({ items: state.items }) as StoreState,
     }
   )
