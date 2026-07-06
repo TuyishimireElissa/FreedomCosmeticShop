@@ -32,28 +32,109 @@ export const RWANDAN_PROVINCES = [
 
 /**
  * Standard delivery fee per province (in RWF).
- * Kigali = 1,500; other provinces = 3,000.
+ *
+ * Pricing per the checkout spec:
+ *   - Kigali City (all 3 districts): 1,000 RWF (same-day delivery available)
+ *   - Northern Province: 3,000 RWF
+ *   - Southern Province: 3,000 RWF
+ *   - Eastern Province: 3,500 RWF
+ *   - Western Province: 4,000 RWF
  */
+export const DELIVERY_FEES: Record<string, number> = {
+  "Kigali City": 1000,
+  "Northern Province": 3000,
+  "Southern Province": 3000,
+  "Eastern Province": 3500,
+  "Western Province": 4000,
+}
+
 export function deliveryFeeFor(province: string): number {
-  if (!province) return 0
-  if (province === "Kigali City") return 1500
-  return 3000
+  return DELIVERY_FEES[province] ?? 3000
 }
 
 /**
- * Payment method labels
+ * Estimated delivery time per province.
+ */
+export const DELIVERY_TIMES: Record<string, string> = {
+  "Kigali City": "Same day (if ordered before 2pm) or next day",
+  "Northern Province": "2-4 business days",
+  "Southern Province": "2-4 business days",
+  "Eastern Province": "3-5 business days",
+  "Western Province": "3-5 business days",
+}
+
+export function deliveryTimeFor(province: string): string {
+  return DELIVERY_TIMES[province] || "3-5 business days"
+}
+
+/**
+ * Payment method labels (extended for multi-step checkout).
  */
 export const PAYMENT_METHODS = {
   MTN_MOMO: {
-    label: "MTN MoMo",
-    description: "Pay with MTN Mobile Money — you'll get a prompt on your phone.",
+    label: "MTN Mobile Money",
+    shortLabel: "MTN MoMo",
+    description: "Pay instantly with your MTN phone. You'll get a prompt to approve.",
     icon: "📱",
+    color: "#FFCC00",
+    textColor: "#000000",
+  },
+  AIRTEL_MONEY: {
+    label: "Airtel Money",
+    shortLabel: "Airtel",
+    description: "Pay instantly with your Airtel phone. You'll get a prompt to approve.",
+    icon: "📲",
+    color: "#E40000",
+    textColor: "#FFFFFF",
+  },
+  CARD: {
+    label: "Visa / Mastercard",
+    shortLabel: "Card",
+    description: "Pay securely with your debit or credit card via Flutterwave.",
+    icon: "💳",
+    color: "#1a1a1a",
+    textColor: "#FFFFFF",
   },
   COD: {
     label: "Cash on Delivery",
-    description: "Pay with cash when your order is delivered to your door.",
+    shortLabel: "COD",
+    description: "Pay with cash when your order is delivered. Kigali only.",
     icon: "💵",
+    color: "#10B981",
+    textColor: "#FFFFFF",
+  },
+  BANK_TRANSFER: {
+    label: "Bank Transfer",
+    shortLabel: "Bank",
+    description: "Transfer to our bank account. Order ships after confirmation.",
+    icon: "🏦",
+    color: "#3B82F6",
+    textColor: "#FFFFFF",
   },
 } as const
 
 export type PaymentMethodKey = keyof typeof PAYMENT_METHODS
+
+/**
+ * Bank account details for bank transfer option.
+ */
+export const BANK_ACCOUNTS = [
+  {
+    bank: "Bank of Kigali (BK)",
+    accountName: "Ubumwe Beauty Ltd",
+    accountNumber: "0123456789",
+    branch: "Head Office — Kigali",
+  },
+  {
+    bank: "Equity Bank Rwanda",
+    accountName: "Ubumwe Beauty Ltd",
+    accountNumber: "0102345678",
+    branch: "Kigali Branch",
+  },
+  {
+    bank: "I&M Bank Rwanda",
+    accountName: "Ubumwe Beauty Ltd",
+    accountNumber: "0203456789",
+    branch: "KN 4 Ave Branch",
+  },
+] as const
