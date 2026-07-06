@@ -1,12 +1,21 @@
 "use client"
 
 /**
- * Admin dashboard — tabbed interface.
+ * AdminView — full admin dashboard with 7 tabs.
  *
  * Tabs:
- *   1. Orders — order management (existing functionality)
- *   2. Products — product CRUD (AdminProductManager)
- *   3. Analytics — stats dashboard (top products, revenue, low stock alerts)
+ *   1. Overview    — revenue, charts, recent orders, top products
+ *   2. Orders      — order management (existing, enhanced)
+ *   3. Products    — product CRUD (existing AdminProductManager)
+ *   4. Customers   — customer list, analytics, block/unblock
+ *   5. Deliveries  — assign riders, track, performance
+ *   6. Analytics   — charts, date range, export to CSV
+ *   7. Settings    — coupons, banners, delivery fees
+ *
+ * Features:
+ *   - Real-time new order notifications (sound + toast)
+ *   - Notification bell with unread count
+ *   - Responsive tab layout
  */
 
 import { useEffect, useState, useCallback } from "react"
@@ -35,27 +44,42 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { useStore } from "@/store/useStore"
+import { useAdminNotifications } from "@/hooks/useAdminNotifications"
+import { AdminOverview } from "./AdminOverview"
 import { AdminProductManager } from "./AdminProductManager"
+import { AdminCustomers } from "./AdminCustomers"
+import { AdminDeliveries } from "./AdminDeliveries"
+import { AdminAnalytics } from "./AdminAnalytics"
+import { AdminSettings } from "./AdminSettings"
 import {
-  Search,
-  RefreshCw,
   Shield,
   Package,
-  TrendingUp,
-  Clock,
+  Users,
+  Truck,
+  BarChart3,
+  Settings as SettingsIcon,
+  LayoutDashboard,
+  Bell,
+  RefreshCw,
+  Trash2,
   CheckCircle2,
   XCircle,
-  Trash2,
-  AlertTriangle,
-  Users,
-  DollarSign,
-  Box,
-  Star,
+  Search,
+  ShoppingCart,
+  Clock,
+  TrendingUp,
 } from "lucide-react"
-
-// ... (order management code from existing AdminView, kept below)
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All statuses" },
@@ -85,33 +109,13 @@ const STATUS_COLORS: Record<string, string> = {
   CANCELLED: "bg-red-100 text-red-700",
 }
 
-interface AdminStats {
-  products: { total: number; active: number; lowStock: number; outOfStock: number }
-  orders: { total: number; pending: number; delivered: number; revenue: number }
-  customers: { total: number }
-  topProducts: Array<{
-    id: string
-    name: string
-    slug: string
-    price: number
-    image: string | null
-    totalSold: number
-  }>
-  recentOrders: Array<{
-    id: string
-    orderNumber: string
-    customerName: string
-    total: number
-    status: string
-    createdAt: string
-    itemCount: number
-  }>
-}
-
 export function AdminView() {
   const { goHome, user } = useStore()
   const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState("orders")
+  const [activeTab, setActiveTab] = useState("overview")
+
+  // Real-time notifications
+  const { notifications, enabled, setEnabled, dismiss, clearAll } = useAdminNotifications()
 
   // ─── Orders state ─────────────────────────────────────────────────
   const [orders, setOrders] = useState<Order[]>([])
@@ -122,9 +126,9 @@ export function AdminView() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
 
-  // ─── Analytics state ──────────────────────────────────────────────
-  const [stats, setStats] = useState<AdminStats | null>(null)
-  const [statsLoading, setStatsLoading] = useState(true)
+  // ─── Bulk update state ────────────────────────────────────────────
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkStatus, setBulkStatus] = useState<string>("")
 
   const loadOrders = useCallback(async () => {
     setRefreshing(true)
@@ -153,31 +157,8 @@ export function AdminView() {
   }, [statusFilter, search])
 
   useEffect(() => {
-    loadOrders()
-  }, [loadOrders])
-
-  useEffect(() => {
-    const id = setInterval(loadOrders, 30000)
-    return () => clearInterval(id)
-  }, [loadOrders])
-
-  const loadStats = useCallback(async () => {
-    setStatsLoading(true)
-    try {
-      const res = await fetch("/api/admin/stats")
-      if (res.status === 401 || res.status === 403) return
-      const data = await res.json()
-      setStats(data)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setStatsLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (activeTab === "analytics") loadStats()
-  }, [activeTab, loadStats])
+    if (activeTab === "orders") loadOrders()
+  }, [loadOrders, activeTab])
 
   const handleRowClick = (order: Order) => {
     setSelectedOrder(order)
@@ -200,10 +181,7 @@ export function AdminView() {
       const updated = data.order as Order
       setSelectedOrder(updated)
       setOrders((prev) => prev.map((o) => (o.id === updated.id ? updated : o)))
-      toast({
-        title: "Order updated",
-        description: `${updated.orderNumber} → ${value}`,
-      })
+      toast({ title: "Order updated", description: `${updated.orderNumber} → ${value}` })
     } catch (e) {
       toast({
         title: "Update failed",
@@ -213,13 +191,119 @@ export function AdminView() {
     }
   }
 
+  // ─── Bulk status update ───────────────────────────────────────────
+  const handleBulkUpdate = async () => {
+    if (selectedIds.size === 0 || !bulkStatus) return
+    try {
+      const promises = Array.from(selectedIds).map((id) =>
+        fetch(`/api/orders/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: bulkStatus }),
+        })
+      )
+      await Promise.all(promises)
+      toast({
+        title: "Bulk update complete",
+        description: `${selectedIds.size} orders → ${bulkStatus}`,
+      })
+      setSelectedIds(new Set())
+      setBulkStatus("")
+      loadOrders()
+    } catch {
+      toast({ title: "Bulk update failed", variant: "destructive" })
+    }
+  }
+
+  // ─── Print invoice ────────────────────────────────────────────────
+  const handlePrintInvoice = (order: Order) => {
+    const printWindow = window.open("", "_blank", "width=600,height=800")
+    if (!printWindow) return
+
+    const itemsHtml = order.items
+      .map(
+        (item) => `
+        <tr>
+          <td>${item.name}</td>
+          <td style="text-align:center">${item.quantity}</td>
+          <td style="text-align:right">RWF ${item.price.toLocaleString()}</td>
+          <td style="text-align:right">RWF ${(item.price * item.quantity).toLocaleString()}</td>
+        </tr>
+      `
+      )
+      .join("")
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Invoice — ${order.orderNumber}</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 40px; color: #1a1a1a; }
+          h1 { color: #b76e79; margin-bottom: 0; }
+          .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+          .header div p { margin: 2px 0; font-size: 14px; }
+          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          th, td { padding: 10px; border-bottom: 1px solid #ddd; font-size: 14px; }
+          th { background: #fce4ec; text-align: left; }
+          .totals { margin-left: auto; width: 300px; }
+          .totals div { display: flex; justify-content: space-between; padding: 5px 0; font-size: 14px; }
+          .totals .total { font-weight: bold; font-size: 18px; border-top: 2px solid #b76e79; padding-top: 10px; }
+          .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div>
+            <h1>Ubumwe Beauty</h1>
+            <p>Beauty that unites us</p>
+            <p>KN 4 Ave, Kigali Heights, Kigali, Rwanda</p>
+            <p>+250 788 123 456 · hello@ubumwe.beauty</p>
+          </div>
+          <div style="text-align: right">
+            <h2>Invoice</h2>
+            <p><strong>Order:</strong> ${order.orderNumber}</p>
+            <p><strong>Date:</strong> ${new Date(order.createdAt).toLocaleDateString("en-RW")}</p>
+            <p><strong>Status:</strong> ${order.status}</p>
+          </div>
+        </div>
+        <div>
+          <h3>Bill To:</h3>
+          <p>${order.customerName}</p>
+          <p>${order.customerPhone}</p>
+          ${order.customerEmail ? `<p>${order.customerEmail}</p>` : ""}
+          <p>${order.address}</p>
+          <p>${order.city}, ${order.province}</p>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Price</th><th style="text-align:right">Total</th></tr>
+          </thead>
+          <tbody>${itemsHtml}</tbody>
+        </table>
+        <div class="totals">
+          <div><span>Subtotal:</span><span>RWF ${order.subtotal.toLocaleString()}</span></div>
+          ${order.discountAmount > 0 ? `<div><span>Discount:</span><span>-RWF ${order.discountAmount.toLocaleString()}</span></div>` : ""}
+          <div><span>Delivery:</span><span>RWF ${order.deliveryFee.toLocaleString()}</span></div>
+          <div class="total"><span>Total:</span><span>RWF ${order.total.toLocaleString()}</span></div>
+        </div>
+        <div class="footer">
+          <p>Thank you for shopping with Ubumwe Beauty!</p>
+          <p>Pay with MTN MoMo, Airtel Money, Visa/Mastercard, or Cash on Delivery</p>
+        </div>
+      </body>
+      </html>
+    `)
+    printWindow.document.close()
+    printWindow.print()
+  }
+
   const handleReseed = async () => {
     if (!window.confirm("Reset catalog to demo data? Orders will be preserved.")) return
     try {
       const res = await fetch("/api/seed", { method: "POST" })
       if (!res.ok) throw new Error("Seed failed")
       toast({ title: "Database re-seeded" })
-      loadStats()
     } catch (e) {
       toast({
         title: "Seed failed",
@@ -254,24 +338,115 @@ export function AdminView() {
           </p>
         </div>
         <div className="flex gap-2">
+          {/* Notifications bell */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="relative">
+                <Bell className="h-4 w-4" />
+                {notifications.length > 0 && (
+                  <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                    {notifications.length}
+                  </span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80">
+              <DropdownMenuLabel className="flex items-center justify-between">
+                <span>Notifications</span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setEnabled(!enabled)}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    {enabled ? "Pause" : "Resume"}
+                  </button>
+                  {notifications.length > 0 && (
+                    <button onClick={clearAll} className="text-xs text-muted-foreground hover:underline">
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {notifications.length === 0 ? (
+                <div className="py-6 text-center text-sm text-muted-foreground">
+                  No new notifications
+                </div>
+              ) : (
+                notifications.map((n) => (
+                  <DropdownMenuItem
+                    key={n.id}
+                    className="flex flex-col items-start gap-1 py-2"
+                  >
+                    <div className="flex w-full items-start justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-medium">{n.title}</p>
+                        <p className="text-xs text-muted-foreground">{n.message}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {new Date(n.timestamp).toLocaleTimeString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => dismiss(n.id)}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </DropdownMenuItem>
+                ))
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Button variant="outline" size="sm" onClick={handleReseed}>
-            <Trash2 className="mr-1.5 h-4 w-4" /> Reset demo
+            <Trash2 className="mr-1.5 h-4 w-4" /> Reset
           </Button>
           <Button variant="ghost" size="sm" onClick={goHome}>
-            Exit admin
+            Exit
           </Button>
         </div>
       </div>
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6 grid w-full max-w-md grid-cols-3">
-          <TabsTrigger value="orders">Orders</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsList className="mb-6 grid w-full grid-cols-4 sm:grid-cols-7">
+          <TabsTrigger value="overview" className="gap-1">
+            <LayoutDashboard className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Overview</span>
+          </TabsTrigger>
+          <TabsTrigger value="orders" className="gap-1">
+            <ShoppingCart className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Orders</span>
+          </TabsTrigger>
+          <TabsTrigger value="products" className="gap-1">
+            <Package className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Products</span>
+          </TabsTrigger>
+          <TabsTrigger value="customers" className="gap-1">
+            <Users className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Customers</span>
+          </TabsTrigger>
+          <TabsTrigger value="deliveries" className="gap-1">
+            <Truck className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Delivery</span>
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="gap-1">
+            <BarChart3 className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Analytics</span>
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="gap-1">
+            <SettingsIcon className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Settings</span>
+          </TabsTrigger>
         </TabsList>
 
-        {/* ─── Orders tab ─────────────────────────────────────────── */}
+        {/* Overview */}
+        <TabsContent value="overview">
+          <AdminOverview />
+        </TabsContent>
+
+        {/* Orders */}
         <TabsContent value="orders">
           {/* Quick stats */}
           <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -293,7 +468,7 @@ export function AdminView() {
             ))}
           </div>
 
-          {/* Filters */}
+          {/* Filters + bulk update */}
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <form className="relative min-w-[200px] flex-1" onSubmit={(e) => e.preventDefault()}>
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -321,6 +496,33 @@ export function AdminView() {
             </Button>
           </div>
 
+          {/* Bulk update bar */}
+          {selectedIds.size > 0 && (
+            <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl bg-primary/10 p-3">
+              <span className="text-sm font-medium">
+                {selectedIds.size} selected
+              </span>
+              <Select value={bulkStatus} onValueChange={setBulkStatus}>
+                <SelectTrigger className="h-8 w-[160px]">
+                  <SelectValue placeholder="Set status..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.keys(STATUS_NEXT).map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button size="sm" onClick={handleBulkUpdate} disabled={!bulkStatus}>
+                Apply
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
+                Clear
+              </Button>
+            </div>
+          )}
+
           {/* Orders table */}
           <div className="overflow-hidden rounded-2xl border bg-card">
             {ordersLoading ? (
@@ -335,217 +537,130 @@ export function AdminView() {
                 <h3 className="mt-3 font-semibold">No orders found</h3>
               </div>
             ) : (
-              <>
-                <div className="hidden overflow-x-auto md:block">
-                  <table className="w-full text-sm">
-                    <thead className="border-b bg-secondary/30 text-xs uppercase tracking-wider text-muted-foreground">
-                      <tr>
-                        <th className="px-4 py-3 text-left font-medium">Order #</th>
-                        <th className="px-4 py-3 text-left font-medium">Customer</th>
-                        <th className="px-4 py-3 text-left font-medium">Date</th>
-                        <th className="px-4 py-3 text-right font-medium">Total</th>
-                        <th className="px-4 py-3 text-left font-medium">Payment</th>
-                        <th className="px-4 py-3 text-left font-medium">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {orders.map((o) => (
-                        <tr
-                          key={o.id}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="border-b bg-secondary/30 text-xs uppercase tracking-wider text-muted-foreground">
+                    <tr>
+                      <th className="px-3 py-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.size === orders.length && orders.length > 0}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedIds(new Set(orders.map((o) => o.id)))
+                            } else {
+                              setSelectedIds(new Set())
+                            }
+                          }}
+                          className="h-4 w-4 rounded"
+                        />
+                      </th>
+                      <th className="px-4 py-3 text-left font-medium">Order #</th>
+                      <th className="px-4 py-3 text-left font-medium">Customer</th>
+                      <th className="px-4 py-3 text-left font-medium">Date</th>
+                      <th className="px-4 py-3 text-right font-medium">Total</th>
+                      <th className="px-4 py-3 text-left font-medium">Payment</th>
+                      <th className="px-4 py-3 text-left font-medium">Status</th>
+                      <th className="px-4 py-3 text-right font-medium">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {orders.map((o) => (
+                      <tr
+                        key={o.id}
+                        className="hover:bg-secondary/20"
+                      >
+                        <td className="px-3 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(o.id)}
+                            onChange={(e) => {
+                              const next = new Set(selectedIds)
+                              if (e.target.checked) next.add(o.id)
+                              else next.delete(o.id)
+                              setSelectedIds(next)
+                            }}
+                            className="h-4 w-4 rounded"
+                          />
+                        </td>
+                        <td
+                          className="cursor-pointer px-4 py-3 font-mono text-xs font-medium"
                           onClick={() => handleRowClick(o)}
-                          className="cursor-pointer hover:bg-secondary/30"
                         >
-                          <td className="px-4 py-3 font-mono text-xs font-medium">{o.orderNumber}</td>
-                          <td className="px-4 py-3">
-                            <p className="font-medium">{o.customerName}</p>
-                            <p className="text-xs text-muted-foreground">{o.customerPhone}</p>
-                          </td>
-                          <td className="px-4 py-3 text-xs text-muted-foreground">
-                            {new Date(o.createdAt).toLocaleDateString("en-RW", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </td>
-                          <td className="px-4 py-3 text-right font-medium">{formatRWF(o.total)}</td>
-                          <td className="px-4 py-3 text-xs">
-                            {PAYMENT_METHODS[o.paymentMethod as PaymentMethodKey]?.label || o.paymentMethod}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[o.status] || ""}`}>
-                              {o.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="divide-y md:hidden">
-                  {orders.map((o) => (
-                    <button
-                      key={o.id}
-                      onClick={() => handleRowClick(o)}
-                      className="block w-full p-4 text-left hover:bg-secondary/30"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-xs font-medium">{o.orderNumber}</span>
-                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[o.status] || ""}`}>
-                          {o.status}
-                        </span>
-                      </div>
-                      <p className="mt-1 font-medium">{o.customerName}</p>
-                      <p className="text-xs text-muted-foreground">{o.customerPhone}</p>
-                      <p className="mt-1 text-sm font-semibold">{formatRWF(o.total)}</p>
-                    </button>
-                  ))}
-                </div>
-              </>
+                          {o.orderNumber}
+                        </td>
+                        <td
+                          className="cursor-pointer px-4 py-3"
+                          onClick={() => handleRowClick(o)}
+                        >
+                          <p className="font-medium">{o.customerName}</p>
+                          <p className="text-xs text-muted-foreground">{o.customerPhone}</p>
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
+                          {new Date(o.createdAt).toLocaleDateString("en-RW", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </td>
+                        <td
+                          className="cursor-pointer px-4 py-3 text-right font-medium"
+                          onClick={() => handleRowClick(o)}
+                        >
+                          {formatRWF(o.total)}
+                        </td>
+                        <td className="px-4 py-3 text-xs">
+                          {PAYMENT_METHODS[o.paymentMethod as PaymentMethodKey]?.label || o.paymentMethod}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[o.status] || ""}`}>
+                            {o.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8"
+                              onClick={() => handlePrintInvoice(o)}
+                            >
+                              Print
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         </TabsContent>
 
-        {/* ─── Products tab ───────────────────────────────────────── */}
+        {/* Products */}
         <TabsContent value="products">
-          <AdminProductManager onStatsUpdate={loadStats} />
+          <AdminProductManager />
         </TabsContent>
 
-        {/* ─── Analytics tab ──────────────────────────────────────── */}
+        {/* Customers */}
+        <TabsContent value="customers">
+          <AdminCustomers />
+        </TabsContent>
+
+        {/* Deliveries */}
+        <TabsContent value="deliveries">
+          <AdminDeliveries />
+        </TabsContent>
+
+        {/* Analytics */}
         <TabsContent value="analytics">
-          {statsLoading ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[0, 1, 2, 3].map((i) => (
-                <Skeleton key={i} className="h-28 rounded-2xl" />
-              ))}
-            </div>
-          ) : stats ? (
-            <div className="space-y-6">
-              {/* Stat cards */}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {[
-                  { label: "Products", value: stats.products.total, icon: Box, sub: `${stats.products.active} active` },
-                  { label: "Orders", value: stats.orders.total, icon: Package, sub: `${stats.orders.pending} pending` },
-                  { label: "Revenue", value: formatRWF(stats.orders.revenue), icon: DollarSign, sub: `${stats.orders.delivered} delivered` },
-                  { label: "Customers", value: stats.customers.total, icon: Users, sub: "registered" },
-                ].map((s, i) => (
-                  <div key={i} className="rounded-2xl border bg-card p-4">
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                        {s.label}
-                      </p>
-                      <s.icon className="h-4 w-4 text-primary" />
-                    </div>
-                    <p className="mt-2 text-2xl font-bold">{s.value}</p>
-                    <p className="text-xs text-muted-foreground">{s.sub}</p>
-                  </div>
-                ))}
-              </div>
+          <AdminAnalytics />
+        </TabsContent>
 
-              {/* Low stock alert */}
-              {stats.products.lowStock > 0 || stats.products.outOfStock > 0 ? (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5 text-amber-600" />
-                    <h3 className="font-semibold text-amber-900">Stock alerts</h3>
-                  </div>
-                  <div className="mt-2 space-y-1 text-sm text-amber-800">
-                    {stats.products.lowStock > 0 && (
-                      <p>• {stats.products.lowStock} products with low stock (≤5 units)</p>
-                    )}
-                    {stats.products.outOfStock > 0 && (
-                      <p>• {stats.products.outOfStock} products out of stock</p>
-                    )}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-3"
-                    onClick={() => setActiveTab("products")}
-                  >
-                    Manage products
-                  </Button>
-                </div>
-              ) : null}
-
-              {/* Top products */}
-              <div className="rounded-2xl border bg-card p-5">
-                <h3 className="flex items-center gap-2 text-lg font-semibold">
-                  <Star className="h-5 w-5 text-amber-400" /> Top selling products
-                </h3>
-                <div className="mt-4 space-y-3">
-                  {stats.topProducts.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      No sales yet. Top products will appear here.
-                    </p>
-                  ) : (
-                    stats.topProducts.map((p, i) => (
-                      <div key={p.id} className="flex items-center gap-3">
-                        <span className="grid h-6 w-6 place-items-center rounded-full bg-secondary text-xs font-bold">
-                          {i + 1}
-                        </span>
-                        <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary/30">
-                          {p.image && (
-                            <img
-                              src={p.image}
-                              alt={p.name}
-                              className="h-full w-full object-cover"
-                            />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="line-clamp-1 text-sm font-medium">{p.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatRWF(p.price)} each
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold">{p.totalSold} sold</p>
-                          <p className="text-xs text-muted-foreground">
-                            {formatRWF(p.price * p.totalSold)}
-                          </p>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Recent orders */}
-              <div className="rounded-2xl border bg-card p-5">
-                <h3 className="text-lg font-semibold">Recent orders</h3>
-                <div className="mt-4 space-y-2">
-                  {stats.recentOrders.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">No orders yet.</p>
-                  ) : (
-                    stats.recentOrders.map((o) => (
-                      <div
-                        key={o.id}
-                        className="flex items-center justify-between border-b py-2 last:border-b-0"
-                      >
-                        <div>
-                          <p className="font-mono text-xs font-medium">{o.orderNumber}</p>
-                          <p className="text-sm">{o.customerName}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold">{formatRWF(o.total)}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {o.status} · {o.itemCount} items
-                          </p>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-dashed py-12 text-center">
-              <p className="text-sm text-muted-foreground">Failed to load analytics.</p>
-              <Button variant="outline" className="mt-3" onClick={loadStats}>
-                Retry
-              </Button>
-            </div>
-          )}
+        {/* Settings */}
+        <TabsContent value="settings">
+          <AdminSettings />
         </TabsContent>
       </Tabs>
 
@@ -574,7 +689,12 @@ export function AdminView() {
                 <div>
                   <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Delivery address</h3>
                   <p className="mt-1 text-sm">
-                    {selectedOrder.address}, {selectedOrder.city}, {selectedOrder.province}
+                    {selectedOrder.address}
+                    <br />
+                    {selectedOrder.city}
+                    {selectedOrder.district ? `, ${selectedOrder.district}` : ""}
+                    <br />
+                    {selectedOrder.province}
                   </p>
                   {selectedOrder.notes && (
                     <p className="mt-1 text-xs italic text-muted-foreground">&ldquo;{selectedOrder.notes}&rdquo;</p>
@@ -672,6 +792,15 @@ export function AdminView() {
                     </Select>
                   </div>
                 </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => handlePrintInvoice(selectedOrder)}
+                >
+                  Print invoice
+                </Button>
               </div>
             </>
           )}
