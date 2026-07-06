@@ -120,6 +120,14 @@ export function Footer() {
                 </span>
               </li>
               <li>
+                <button
+                  onClick={() => useStore.getState().goTrackOrder()}
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  Track your order
+                </button>
+              </li>
+              <li>
                 <span className="text-muted-foreground">Returns within 7 days</span>
               </li>
               <li>

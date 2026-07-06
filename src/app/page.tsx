@@ -26,6 +26,7 @@ import { AdminView } from "@/components/admin/AdminView"
 import { LoginView } from "@/components/auth/LoginView"
 import { RegisterView } from "@/components/auth/RegisterView"
 import { AccountView } from "@/components/auth/AccountView"
+import { TrackOrderView } from "@/components/storefront/TrackOrderView"
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton"
 
 export default function Home() {
@@ -51,6 +52,7 @@ export default function Home() {
         {view === "confirmation" && lastOrderId && (
           <ConfirmationView orderId={lastOrderId} />
         )}
+        {view === "trackOrder" && <TrackOrderView />}
         {view === "admin" && <AdminView />}
         {view === "login" && <LoginView />}
         {view === "register" && <RegisterView />}

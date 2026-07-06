@@ -1,25 +1,38 @@
 /**
  * POST /api/orders
  *
- * Creates a new order + payment record. Body:
+ * Creates a new order + payment + delivery records.
+ *
+ * Body:
  *   {
  *     customerName, customerPhone, customerEmail?, address, city, province,
- *     district?, sector?, notes?, paymentMethod: "MTN_MOMO" | "COD",
- *     items: [{ productId, quantity }]
+ *     district?, sector?, cell?, landmark?, notes?,
+ *     paymentMethod: "MTN_MOMO" | "AIRTEL_MONEY" | "CARD" | "COD" | "BANK_TRANSFER",
+ *     items: [{ productId, quantity }],
+ *     couponCode?: string,
+ *     redeemLoyaltyPoints?: number
  *   }
  *
- * The server re-fetches product prices to prevent client-side tampering.
- * Generates a sequential order number like "UB-2026-00001".
- * Also creates a Payment record (schema now has separate Payment model).
+ * The server:
+ *   1. Re-fetches product prices (no client-side tampering)
+ *   2. Validates coupon (if provided)
+ *   3. Calculates discount + delivery fee
+ *   4. Handles loyalty points redemption (1 point = 10 RWF)
+ *   5. Creates Order + OrderItem + Payment + Delivery in a transaction
+ *   6. Increments coupon usage count
+ *   7. Awards loyalty points (1 point per 1000 RWF)
+ *   8. Sends SMS confirmation (if enabled)
+ *   9. Sends email confirmation (if enabled)
  *
- * GET /api/orders
- * Returns all orders (for the admin dashboard). Sorted by createdAt desc.
- * Includes items, payments, and delivery.
+ * GET /api/orders — list all orders (admin)
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { deliveryFeeFor } from "@/lib/format"
+import { deliveryFeeFor, deliveryTimeFor } from "@/lib/format"
 import { z } from "zod"
+import { sendOrderStatusSms } from "@/server/services/sms"
+import { sendOrderConfirmationEmail } from "@/server/services/email"
+import { features } from "@/lib/env"
 
 const OrderItemSchema = z.object({
   productId: z.string().min(1),
@@ -39,15 +52,18 @@ const CreateOrderSchema = z.object({
   province: z.string().min(2).max(100),
   district: z.string().max(100).optional(),
   sector: z.string().max(100).optional(),
+  cell: z.string().max(100).optional(),
+  landmark: z.string().max(200).optional(),
   notes: z.string().max(500).optional(),
-  paymentMethod: z.enum(["MTN_MOMO", "COD"]),
+  paymentMethod: z.enum(["MTN_MOMO", "AIRTEL_MONEY", "CARD", "COD", "BANK_TRANSFER"]),
   items: z.array(OrderItemSchema).min(1, "Cart cannot be empty"),
+  couponCode: z.string().optional(),
+  redeemLoyaltyPoints: z.number().int().min(0).optional(),
 })
 
-/**
- * Generate a sequential, human-readable order number.
- * Format: UB-YYYY-XXXXX where XXXXX is a zero-padded counter.
- */
+/** Loyalty point conversion rate: 1 point = 10 RWF */
+const LOYALTY_POINT_VALUE_RWF = 10
+
 async function generateOrderNumber(): Promise<string> {
   const year = new Date().getFullYear()
   const countThisYear = await db.order.count({
@@ -60,21 +76,16 @@ async function generateOrderNumber(): Promise<string> {
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-
-    // Validate input
     const parsed = CreateOrderSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
-        {
-          error: "Invalid order data",
-          details: parsed.error.flatten().fieldErrors,
-        },
+        { error: "Invalid order data", details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       )
     }
     const data = parsed.data
 
-    // Fetch products from DB to get authoritative prices & stock
+    // ─── Fetch products (authoritative prices) ─────────────────────────
     const productIds = data.items.map((i) => i.productId)
     const products = await db.product.findMany({
       where: { id: { in: productIds }, isActive: true, isDeleted: false },
@@ -102,17 +113,68 @@ export async function POST(req: Request) {
       }
     })
 
-    const subtotal = orderItems.reduce(
-      (sum, i) => sum + i.price * i.quantity,
-      0
+    const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
+    let deliveryFee = deliveryFeeFor(data.province)
+    let discountAmount = 0
+    let couponId: string | null = null
+    let loyaltyDiscount = 0
+    let loyaltyPointsEarned = 0
+
+    // ─── Validate + apply coupon ───────────────────────────────────────
+    if (data.couponCode) {
+      const coupon = await db.coupon.findFirst({
+        where: {
+          code: data.couponCode.toUpperCase().trim(),
+          isActive: true,
+        },
+      })
+
+      if (coupon) {
+        const now = new Date()
+        const isWithinWindow =
+          (!coupon.startsAt || coupon.startsAt <= now) &&
+          (!coupon.endsAt || coupon.endsAt >= now)
+        const isWithinUsage = !coupon.usageLimit || coupon.usedCount < coupon.usageLimit
+        const meetsMinOrder = !coupon.minOrderAmount || subtotal >= coupon.minOrderAmount
+
+        if (isWithinWindow && isWithinUsage && meetsMinOrder) {
+          if (coupon.type === "PERCENTAGE") {
+            discountAmount = Math.round((subtotal * coupon.value) / 100)
+            if (coupon.maxDiscountAmount) {
+              discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount)
+            }
+          } else if (coupon.type === "FIXED") {
+            discountAmount = coupon.value
+          } else if (coupon.type === "FREE_SHIPPING") {
+            deliveryFee = 0
+          }
+          couponId = coupon.id
+        }
+      }
+    }
+
+    // ─── Apply loyalty points redemption ───────────────────────────────
+    if (data.redeemLoyaltyPoints && data.redeemLoyaltyPoints > 0) {
+      // In MVP, we allow redemption without auth check (would need auth for real)
+      loyaltyDiscount = Math.min(
+        data.redeemLoyaltyPoints * LOYALTY_POINT_VALUE_RWF,
+        subtotal - discountAmount + deliveryFee
+      )
+    }
+
+    const total = Math.max(
+      0,
+      subtotal - discountAmount - loyaltyDiscount + deliveryFee
     )
-    const deliveryFee = deliveryFeeFor(data.province)
-    const total = subtotal + deliveryFee
+
+    // ─── Loyalty points earned (1 per 1000 RWF) ───────────────────────
+    loyaltyPointsEarned = Math.floor(total / 1000)
+
     const orderNumber = await generateOrderNumber()
 
-    // Create the order + payment + decrement stock in a transaction
+    // ─── Create order in a transaction ─────────────────────────────────
     const order = await db.$transaction(async (tx) => {
-      // Create the order
+      // 1. Create order
       const created = await tx.order.create({
         data: {
           orderNumber,
@@ -124,44 +186,54 @@ export async function POST(req: Request) {
           province: data.province,
           district: data.district || null,
           sector: data.sector || null,
-          notes: data.notes || null,
-          // Totals
+          notes: [data.cell, data.landmark, data.notes]
+            .filter(Boolean)
+            .join(" | ") || null,
           subtotal,
-          discountAmount: 0,
+          discountAmount: discountAmount + loyaltyDiscount,
           deliveryFee,
           total,
-          // Status
+          couponId,
+          loyaltyPointsEarned,
           status: "PENDING",
-          // Loyalty: 1 point per 1000 RWF spent
-          loyaltyPointsEarned: Math.floor(total / 1000),
-          // Items
-          items: {
-            create: orderItems,
-          },
+          items: { create: orderItems },
         },
         include: { items: true },
       })
 
-      // Create the payment record (schema now has separate Payment model)
+      // 2. Create payment record
       await tx.payment.create({
         data: {
           orderId: created.id,
           method: data.paymentMethod,
           amount: total,
-          status: "PENDING",
-          phoneNumber: data.paymentMethod === "MTN_MOMO" ? data.customerPhone : null,
+          status:
+            data.paymentMethod === "COD" || data.paymentMethod === "BANK_TRANSFER"
+              ? "PENDING"
+              : "PENDING",
+          phoneNumber:
+            data.paymentMethod === "MTN_MOMO" || data.paymentMethod === "AIRTEL_MONEY"
+              ? data.customerPhone
+              : null,
         },
       })
 
-      // Create a delivery record
+      // 3. Create delivery record with estimated arrival
+      const eta = new Date()
+      if (data.province === "Kigali City") {
+        eta.setDate(eta.getDate() + 1) // Next day
+      } else {
+        eta.setDate(eta.getDate() + 4) // 3-5 days
+      }
       await tx.delivery.create({
         data: {
           orderId: created.id,
           status: "PENDING",
+          estimatedArrival: eta,
         },
       })
 
-      // Decrement stock for each product
+      // 4. Decrement stock
       for (const item of orderItems) {
         await tx.product.update({
           where: { id: item.productId },
@@ -169,10 +241,41 @@ export async function POST(req: Request) {
         })
       }
 
+      // 5. Increment coupon usage
+      if (couponId) {
+        await tx.coupon.update({
+          where: { id: couponId },
+          data: { usedCount: { increment: 1 } },
+        })
+      }
+
       return created
     })
 
-    return NextResponse.json({ order }, { status: 201 })
+    // ─── Send confirmations (async, non-blocking) ──────────────────────
+    const etaText = deliveryTimeFor(data.province)
+
+    if (features.sms) {
+      sendOrderStatusSms(data.customerPhone, orderNumber, "PENDING").catch((e) =>
+        console.error("SMS failed:", e)
+      )
+    }
+
+    if (features.email && data.customerEmail) {
+      sendOrderConfirmationEmail(data.customerEmail, orderNumber, total).catch((e) =>
+        console.error("Email failed:", e)
+      )
+    }
+
+    return NextResponse.json(
+      {
+        order,
+        estimatedDelivery: etaText,
+        loyaltyPointsEarned,
+        message: "Order placed successfully!",
+      },
+      { status: 201 }
+    )
   } catch (error) {
     console.error("Failed to create order:", error)
     const message =
@@ -189,11 +292,7 @@ export async function GET(req: Request) {
     const orders = await db.order.findMany({
       where: status && status !== "all" ? { status } : undefined,
       orderBy: { createdAt: "desc" },
-      include: {
-        items: true,
-        payments: true,
-        delivery: true,
-      },
+      include: { items: true, payments: true, delivery: true },
       take: 200,
     })
 

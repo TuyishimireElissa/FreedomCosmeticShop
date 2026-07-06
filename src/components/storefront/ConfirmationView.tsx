@@ -1,21 +1,25 @@
 "use client"
 
 /**
- * Order confirmation view.
+ * Order confirmation view — shown after a successful checkout.
  *
- * Shown after a successful checkout. Loads the order by ID and displays:
- *  - Success banner with checkmark
- *  - Order number + status timeline
- *  - Customer + delivery info
- *  - Items + totals
- *  - Next steps (SMS updates, delivery ETA)
- *  - CTA: continue shopping / view admin (for demo)
+ * Features:
+ *   - Success banner with checkmark
+ *   - Order number + status timeline
+ *   - Customer + delivery info
+ *   - Items + totals
+ *   - Payment status
+ *   - Estimated delivery time
+ *   - WhatsApp message with order details
+ *   - 'Track Order' button
+ *   - Share order on WhatsApp
+ *   - Next steps
  */
 
 import { useEffect, useState } from "react"
 import { useStore } from "@/store/useStore"
 import { Order } from "@/lib/types"
-import { formatRWF, PAYMENT_METHODS, PaymentMethodKey } from "@/lib/format"
+import { formatRWF, PAYMENT_METHODS, PaymentMethodKey, deliveryTimeFor } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -26,6 +30,9 @@ import {
   Phone,
   MapPin,
   MessageSquare,
+  MapPinned,
+  Share2,
+  Clock,
 } from "lucide-react"
 
 interface ConfirmationViewProps {
@@ -40,7 +47,7 @@ const STATUS_STEPS = [
 ]
 
 export function ConfirmationView({ orderId }: ConfirmationViewProps) {
-  const { goCatalog, goHome } = useStore()
+  const { goCatalog, goHome, goTrackOrder } = useStore()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -79,22 +86,39 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Order not found</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           We couldn&apos;t find this order. It may have been removed.
         </p>
-        <Button className="mt-6" onClick={goHome}>
-          Back to home
-        </Button>
+        <Button className="mt-6" onClick={goHome}>Back to home</Button>
       </div>
     )
   }
 
-  // Determine current step index for the timeline
   const currentStepIdx = STATUS_STEPS.findIndex((s) => s.key === order.status)
   const isCancelled = order.status === "CANCELLED"
 
   const paymentMethod = order.paymentMethod as PaymentMethodKey
   const paymentLabel = PAYMENT_METHODS[paymentMethod]?.label || order.paymentMethod
+
+  // ─── WhatsApp share ─────────────────────────────────────────────
+  const buildWhatsAppMessage = () => {
+    const lines = order.items.map(
+      (i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`
+    )
+    return `🛍️ Ubumwe Beauty Order ${order.orderNumber}\n\n${lines.join("\n")}\n\nTotal: ${formatRWF(order.total)}\nPayment: ${paymentLabel}\nDelivery to: ${order.address}, ${order.city}, ${order.province}\n\nTrack at ubumwe.beauty`
+  }
+
+  const handleShareWhatsApp = () => {
+    const url = `https://wa.me/?text=${encodeURIComponent(buildWhatsAppMessage())}`
+    window.open(url, "_blank", "noopener,noreferrer")
+  }
+
+  const handleSendToMyPhone = () => {
+    // Send order details to customer's phone via WhatsApp
+    const phone = order.customerPhone.replace(/[^\d]/g, "")
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(buildWhatsAppMessage())}`
+    window.open(url, "_blank", "noopener,noreferrer")
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
@@ -106,22 +130,36 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
           {isCancelled ? "Order cancelled" : "Thank you for your order!"}
         </h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           We&apos;ve received your order and will contact you on{" "}
-          <span className="text-foreground font-medium">{order.customerPhone}</span> to confirm.
+          <span className="font-medium text-foreground">{order.customerPhone}</span>{" "}
+          to confirm.
         </p>
-        <div className="bg-secondary mt-3 inline-flex items-center gap-2 rounded-full px-4 py-1.5">
-          <span className="text-muted-foreground text-xs tracking-wider uppercase">
+        <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5">
+          <span className="text-xs uppercase tracking-wider text-muted-foreground">
             Order number
           </span>
           <span className="font-mono text-sm font-semibold">{order.orderNumber}</span>
         </div>
       </div>
 
+      {/* Quick actions */}
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <Button variant="outline" onClick={() => goTrackOrder(order.orderNumber)} className="gap-2">
+          <MapPinned className="h-4 w-4" /> Track Order
+        </Button>
+        <Button variant="outline" onClick={handleShareWhatsApp} className="gap-2">
+          <Share2 className="h-4 w-4" /> Share
+        </Button>
+        <Button variant="outline" onClick={handleSendToMyPhone} className="gap-2 col-span-2 sm:col-span-1">
+          <MessageSquare className="h-4 w-4" /> Send to my phone
+        </Button>
+      </div>
+
       {/* Status timeline */}
       {!isCancelled && (
-        <div className="bg-card mt-8 rounded-2xl border p-5">
-          <h2 className="text-muted-foreground mb-4 text-sm font-semibold tracking-wider uppercase">
+        <div className="mt-8 rounded-2xl border bg-card p-5">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             Order status
           </h2>
           <ol className="grid grid-cols-4 gap-2 sm:gap-4">
@@ -135,7 +173,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
                       done
                         ? "border-primary bg-primary text-primary-foreground"
                         : "border-border bg-background text-muted-foreground"
-                    } ${isCurrent ? "ring-primary/20 ring-4" : ""}`}
+                    } ${isCurrent ? "ring-4 ring-primary/20" : ""}`}
                   >
                     <step.icon className="h-5 w-5" />
                   </div>
@@ -150,36 +188,37 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
               )
             })}
           </ol>
-          <p className="text-muted-foreground mt-4 text-center text-xs">
+          <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="h-3.5 w-3.5" />
             Estimated delivery:{" "}
-            <span className="text-foreground font-medium">
-              {order.province === "Kigali City" ? "1-2 business days" : "3-5 business days"}
+            <span className="font-medium text-foreground">
+              {deliveryTimeFor(order.province)}
             </span>
-          </p>
+          </div>
         </div>
       )}
 
       {/* Customer + delivery info */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <div className="bg-card rounded-2xl border p-5">
-          <h2 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
+        <div className="rounded-2xl border bg-card p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             Customer
           </h2>
           <p className="mt-2 font-medium">{order.customerName}</p>
-          <p className="text-muted-foreground mt-1 flex items-center gap-1.5 text-sm">
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
             <Phone className="h-3.5 w-3.5" />
             {order.customerPhone}
           </p>
           {order.customerEmail && (
-            <p className="text-muted-foreground mt-1 text-sm">{order.customerEmail}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{order.customerEmail}</p>
           )}
         </div>
-        <div className="bg-card rounded-2xl border p-5">
-          <h2 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
+        <div className="rounded-2xl border bg-card p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             Delivery address
           </h2>
           <p className="mt-2 flex items-start gap-1.5 text-sm">
-            <MapPin className="text-primary mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
             <span>
               {order.address}
               <br />
@@ -187,31 +226,29 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
             </span>
           </p>
           {order.notes && (
-            <p className="text-muted-foreground mt-2 text-xs italic">&ldquo;{order.notes}&rdquo;</p>
+            <p className="mt-2 text-xs italic text-muted-foreground">&ldquo;{order.notes}&rdquo;</p>
           )}
         </div>
       </div>
 
       {/* Order items */}
-      <div className="bg-card mt-6 rounded-2xl border p-5">
-        <h2 className="text-muted-foreground text-sm font-semibold tracking-wider uppercase">
+      <div className="mt-6 rounded-2xl border bg-card p-5">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
           Items
         </h2>
         <ul className="mt-3 space-y-3">
           {order.items.map((item) => (
             <li key={item.id} className="flex gap-3">
-              <div className="bg-secondary/30 h-14 w-14 shrink-0 overflow-hidden rounded-lg">
+              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-secondary/30">
                 {item.image ? (
                   <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
                 ) : (
-                  <div className="text-muted-foreground grid h-full w-full place-items-center text-xs">
-                    —
-                  </div>
+                  <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">—</div>
                 )}
               </div>
               <div className="flex-1">
-                <p className="text-sm leading-snug font-medium">{item.name}</p>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-sm font-medium leading-snug">{item.name}</p>
+                <p className="text-xs text-muted-foreground">
                   {formatRWF(item.price)} × {item.quantity}
                 </p>
               </div>
@@ -226,6 +263,12 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
             <span className="text-muted-foreground">Subtotal</span>
             <span>{formatRWF(order.subtotal)}</span>
           </div>
+          {order.discountAmount > 0 && (
+            <div className="flex justify-between text-emerald-600">
+              <span>Discount</span>
+              <span>−{formatRWF(order.discountAmount)}</span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-muted-foreground">Delivery fee</span>
             <span>{formatRWF(order.deliveryFee)}</span>
@@ -236,12 +279,16 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
           </div>
         </div>
 
-        <div className="bg-secondary/40 mt-4 flex items-center justify-between rounded-lg px-4 py-3 text-sm">
+        <div className="mt-4 flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-3 text-sm">
           <span className="text-muted-foreground">Payment</span>
           <span className="font-medium">
             {paymentLabel} ·{" "}
             <span
-              className={order.paymentStatus === "PAID" ? "text-emerald-600" : "text-amber-600"}
+              className={
+                order.paymentStatus === "PAID"
+                  ? "text-emerald-600"
+                  : "text-amber-600"
+              }
             >
               {order.paymentStatus}
             </span>
@@ -250,15 +297,15 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
       </div>
 
       {/* Next steps */}
-      <div className="bg-secondary/40 mt-6 rounded-2xl p-5">
+      <div className="mt-6 rounded-2xl bg-secondary/40 p-5">
         <div className="flex items-start gap-3">
-          <MessageSquare className="text-primary mt-0.5 h-5 w-5 shrink-0" />
+          <MessageSquare className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
           <div>
             <p className="font-medium">What happens next?</p>
-            <p className="text-muted-foreground mt-1 text-sm">
-              We&apos;ll send SMS updates to {order.customerPhone} as your order is confirmed,
-              shipped, and delivered. If you have any questions, call us at{" "}
-              <span className="text-foreground font-medium">+250 788 123 456</span>.
+            <p className="mt-1 text-sm text-muted-foreground">
+              We&apos;ll send SMS updates to {order.customerPhone} as your order is
+              confirmed, shipped, and delivered. If you have any questions, call us at{" "}
+              <span className="font-medium text-foreground">+250 788 123 456</span>.
             </p>
           </div>
         </div>
@@ -266,12 +313,8 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
 
       {/* CTAs */}
       <div className="mt-6 flex flex-wrap gap-3">
-        <Button onClick={() => goCatalog(null)} size="lg">
-          Continue shopping
-        </Button>
-        <Button variant="outline" onClick={goHome} size="lg">
-          Back to home
-        </Button>
+        <Button onClick={() => goCatalog(null)} size="lg">Continue shopping</Button>
+        <Button variant="outline" onClick={goHome} size="lg">Back to home</Button>
       </div>
     </div>
   )

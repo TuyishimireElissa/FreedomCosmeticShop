@@ -25,6 +25,7 @@ export type ViewKey =
   | "login"
   | "register"
   | "account"
+  | "trackOrder"
 
 /** Auth user type — matches the API response */
 export interface AuthUser {
@@ -63,7 +64,21 @@ interface StoreState {
 
   /* Cart */
   items: CartItem[]
+  /** Saved for later items (persisted) */
+  savedItems: CartItem[]
   isCartOpen: boolean
+
+  /* Coupon (applied at cart, used at checkout) */
+  appliedCoupon: {
+    code: string
+    type: string
+    value: number
+    discountAmount: number
+    freeShipping: boolean
+  } | null
+
+  /* Loyalty redemption */
+  redeemPoints: number
 
   /* Actions: navigation */
   goHome: () => void
@@ -76,6 +91,7 @@ interface StoreState {
   goLogin: () => void
   goRegister: () => void
   goAccount: () => void
+  goTrackOrder: (orderNumber?: string) => void
 
   /* Actions: catalog */
   setCatalogSearch: (q: string) => void
@@ -92,6 +108,15 @@ interface StoreState {
   updateQuantity: (productId: string, qty: number) => void
   clearCart: () => void
   setCartOpen: (open: boolean) => void
+  /** Save for later */
+  saveForLater: (productId: string) => void
+  moveToCart: (productId: string) => void
+  removeFromSaved: (productId: string) => void
+  /** Coupon */
+  setAppliedCoupon: (coupon: StoreState["appliedCoupon"]) => void
+  clearCoupon: () => void
+  /** Loyalty */
+  setRedeemPoints: (points: number) => void
 
   /* Derived getters */
   cartCount: () => number
@@ -112,7 +137,10 @@ export const useStore = create<StoreState>()(
       user: null,
       authLoading: true,
       items: [],
+      savedItems: [],
       isCartOpen: false,
+      appliedCoupon: null,
+      redeemPoints: 0,
 
       /* ---------- Navigation ---------- */
       setView: (view) => {
@@ -157,6 +185,10 @@ export const useStore = create<StoreState>()(
       },
       goAccount: () => {
         set({ view: "account" })
+        if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
+      },
+      goTrackOrder: (_orderNumber?: string) => {
+        set({ view: "trackOrder" })
         if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
       },
 
@@ -221,8 +253,35 @@ export const useStore = create<StoreState>()(
           ),
         })
       },
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], appliedCoupon: null, redeemPoints: 0 }),
       setCartOpen: (open) => set({ isCartOpen: open }),
+
+      /* ---------- Save for later ---------- */
+      saveForLater: (productId) => {
+        const item = get().items.find((i) => i.productId === productId)
+        if (!item) return
+        set({
+          items: get().items.filter((i) => i.productId !== productId),
+          savedItems: [...get().savedItems.filter((i) => i.productId !== productId), item],
+        })
+      },
+      moveToCart: (productId) => {
+        const item = get().savedItems.find((i) => i.productId === productId)
+        if (!item) return
+        set({
+          savedItems: get().savedItems.filter((i) => i.productId !== productId),
+          items: [...get().items, item],
+        })
+      },
+      removeFromSaved: (productId) =>
+        set({ savedItems: get().savedItems.filter((i) => i.productId !== productId) }),
+
+      /* ---------- Coupon ---------- */
+      setAppliedCoupon: (coupon) => set({ appliedCoupon: coupon }),
+      clearCoupon: () => set({ appliedCoupon: null }),
+
+      /* ---------- Loyalty ---------- */
+      setRedeemPoints: (points) => set({ redeemPoints: Math.max(0, points) }),
 
       /* ---------- Derived ---------- */
       cartCount: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
@@ -232,7 +291,8 @@ export const useStore = create<StoreState>()(
       name: "ubumwe-store",
       storage: createJSONStorage(() => localStorage),
       // Only persist the cart items — not transient view state or auth
-      partialize: (state) => ({ items: state.items }) as StoreState,
+      partialize: (state) =>
+        ({ items: state.items, savedItems: state.savedItems }) as StoreState,
     }
   )
 )
