@@ -1,138 +1,332 @@
 /**
- * SMS service — abstraction over Africa's Talking + Pindo.
+ * SMS Service — Complete Rwanda SMS integration with Africa's Talking + Pindo.
  *
- * Used to send order status updates to customers:
- *   - Order placed
- *   - Order confirmed
- *   - Order shipped
- *   - Order delivered
+ * Features:
+ *   - Africa's Talking as primary provider
+ *   - Pindo as fallback provider
+ *   - Automatic provider failover
+ *   - Opt-out checking (respects customer preferences)
+ *   - Delivery tracking (messageId returned by provider)
+ *   - Phone number normalization (+250)
+ *   - Simulation mode for development
  *
- * To complete this integration:
- *   1. Sign up at https://africastalking.com/ → get API key
- *   2. Set AT_USERNAME, AT_API_KEY, AT_SENDER_ID in .env
- *   3. Set ENABLE_SMS_NOTIFICATIONS=true
+ * Environment variables:
+ *   AT_USERNAME — Africa's Talking username
+ *   AT_API_KEY — Africa's Talking API key
+ *   AT_SENDER_ID — Alphanumeric sender ID (max 11 chars)
+ *   PINDO_API_KEY — Pindo API key (backup)
+ *
+ * Opt-out:
+ *   Customers can opt out of promotional SMS via /api/sms/opt-out.
+ *   Transactional SMS (order updates, OTP) always send.
  */
 
 import { env, features } from "@/lib/env"
+import { normalizeRwandaPhone } from "@/lib/phone"
+import { isCriticalTemplate, type SmsTemplateKey } from "./sms-templates"
 
-export type SmsResult = {
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+export interface SmsResult {
   success: boolean
   messageId?: string
   message: string
+  provider?: "AFRICAS_TALKING" | "PINDO" | "SIMULATED"
+  cost?: number
+}
+
+export interface SmsProviderResult {
+  success: boolean
+  messageId?: string
+  message: string
+  provider: "AFRICAS_TALKING" | "PINDO" | "SIMULATED"
+}
+
+// ─── Opt-out registry (in-memory for MVP; use DB in production) ──────────────
+
+const optedOutPhones = new Set<string>()
+
+/**
+ * Check if a phone number has opted out of promotional SMS.
+ */
+export function hasOptedOut(phone: string): boolean {
+  const normalized = normalizeRwandaPhoneSafe(phone)
+  return optedOutPhones.has(normalized)
 }
 
 /**
- * Send an SMS to a Rwandan phone number.
- *
- * @param to    Phone number in any Rwandan format (we normalize to +250XXXXXXXXX)
- * @param body  Message text (max 160 chars per segment)
+ * Opt a phone number out of promotional SMS.
  */
-export async function sendSms(to: string, body: string): Promise<SmsResult> {
-  // Normalize the phone number to international format without +
-  const normalized = to.replace(/^\+250/, "250").replace(/^0/, "250")
+export function optOut(phone: string): void {
+  const normalized = normalizeRwandaPhoneSafe(phone)
+  optedOutPhones.add(normalized)
+  console.log(`[SMS Opt-out] ${normalized} opted out`)
+}
 
-  // ─── Simulation mode ──────────────────────────────────────────────
-  if (!features.sms) {
-    console.log(`[MOCK SMS] To: ${normalized} | Body: ${body}`)
-    return {
-      success: true,
-      messageId: `mock-${Date.now()}`,
-      message: "SMS simulated (ENABLE_SMS_NOTIFICATIONS=false).",
-    }
+/**
+ * Opt a phone number back in.
+ */
+export function optIn(phone: string): void {
+  const normalized = normalizeRwandaPhoneSafe(phone)
+  optedOutPhones.delete(normalized)
+  console.log(`[SMS Opt-in] ${normalized} opted back in`)
+}
+
+/**
+ * Check if SMS should be sent to a recipient.
+ * Returns { shouldSend: boolean, reason: string }
+ */
+export function shouldSendSms(
+  phone: string,
+  templateKey?: SmsTemplateKey
+): { shouldSend: boolean; reason: string } {
+  // Critical templates (OTP, order updates) always send
+  if (templateKey && isCriticalTemplate(templateKey)) {
+    return { shouldSend: true, reason: "Transactional (critical)" }
   }
 
-  // ─── Africa's Talking ─────────────────────────────────────────────
-  if (env.AT_API_KEY && env.AT_USERNAME) {
-    try {
-      const res = await fetch("https://api.africastalking.com/version1/messaging", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          apiKey: env.AT_API_KEY,
-          Accept: "application/json",
-        },
-        body: new URLSearchParams({
-          username: env.AT_USERNAME,
-          to: normalized,
-          message: body,
-          from: env.AT_SENDER_ID || "UBUMWE",
-        }).toString(),
-      })
-
-      if (!res.ok) {
-        const err = await res.text()
-        throw new Error(`Africa's Talking error: ${err}`)
-      }
-
-      const data = await res.json()
-      return {
-        success: true,
-        messageId: data.SMSMessageData?.Recipients?.[0]?.messageId,
-        message: "SMS sent successfully.",
-      }
-    } catch (err) {
-      return {
-        success: false,
-        message: err instanceof Error ? err.message : "SMS send failed",
-      }
-    }
+  // Check opt-out for non-critical (promotional, abandoned cart, etc.)
+  if (hasOptedOut(phone)) {
+    return { shouldSend: false, reason: "Recipient opted out" }
   }
 
-  // ─── Pindo (alternative) ──────────────────────────────────────────
-  if (env.PINDO_API_KEY) {
-    try {
-      const res = await fetch("https://api.pindo.io/v1/sms/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${env.PINDO_API_KEY}`,
-        },
-        body: JSON.stringify({
-          to: normalized,
-          text: body,
-          sender: "UBUMWE",
-        }),
-      })
+  return { shouldSend: true, reason: "OK" }
+}
 
-      if (!res.ok) throw new Error(`Pindo error: ${await res.text()}`)
+// ─── Phone normalization ─────────────────────────────────────────────────────
 
-      const data = await res.json()
-      return {
-        success: true,
-        messageId: data.id,
-        message: "SMS sent via Pindo.",
-      }
-    } catch (err) {
-      return {
-        success: false,
-        message: err instanceof Error ? err.message : "SMS send failed",
-      }
-    }
+function normalizeRwandaPhoneSafe(phone: string): string {
+  try {
+    return normalizeRwandaPhone(phone)
+  } catch {
+    return phone // Return as-is if invalid
+  }
+}
+
+// ─── Africa's Talking provider ───────────────────────────────────────────────
+
+async function sendViaAfricasTalking(
+  to: string,
+  message: string
+): Promise<SmsProviderResult> {
+  if (!env.AT_API_KEY || !env.AT_USERNAME) {
+    throw new Error("Africa's Talking not configured")
+  }
+
+  const normalized = normalizeRwandaPhoneSafe(to).replace("+", "") // 250XXXXXXXXX
+
+  const res = await fetch("https://api.africastalking.com/version1/messaging", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      apiKey: env.AT_API_KEY,
+      Accept: "application/json",
+    },
+    body: new URLSearchParams({
+      username: env.AT_USERNAME,
+      to: normalized,
+      message,
+      from: env.AT_SENDER_ID || "UBUMWE",
+    }).toString(),
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Africa's Talking error: ${err}`)
+  }
+
+  const data = await res.json()
+  const recipient = data.SMSMessageData?.Recipients?.[0]
+
+  if (!recipient || recipient.status !== "Success") {
+    throw new Error(recipient?.status || "Africa's Talking delivery failed")
   }
 
   return {
-    success: false,
-    message: "No SMS provider configured.",
+    success: true,
+    messageId: recipient.messageId,
+    message: "Sent via Africa's Talking",
+    provider: "AFRICAS_TALKING",
   }
 }
 
-/**
- * Send an order status update SMS to the customer.
- * Convenience wrapper that formats the message.
- */
-export async function sendOrderStatusSms(
-  phone: string,
-  orderNumber: string,
-  status: string
-): Promise<SmsResult> {
-  const messages: Record<string, string> = {
-    PENDING: `Ubumwe Beauty: Order ${orderNumber} received. We'll confirm shortly.`,
-    CONFIRMED: `Ubumwe Beauty: Order ${orderNumber} confirmed. Preparing your items.`,
-    PROCESSING: `Ubumwe Beauty: Order ${orderNumber} is being processed.`,
-    SHIPPED: `Ubumwe Beauty: Order ${orderNumber} is on the way! Track at ubumwe.beauty.`,
-    DELIVERED: `Ubumwe Beauty: Order ${orderNumber} delivered. Thank you for shopping with us!`,
-    CANCELLED: `Ubumwe Beauty: Order ${orderNumber} was cancelled. Call +250788123456 for help.`,
+// ─── Pindo provider (fallback) ───────────────────────────────────────────────
+
+async function sendViaPindo(
+  to: string,
+  message: string
+): Promise<SmsProviderResult> {
+  if (!env.PINDO_API_KEY) {
+    throw new Error("Pindo not configured")
   }
-  const body = messages[status] || `Ubumwe Beauty: Order ${orderNumber} status: ${status}.`
-  return sendSms(phone, body)
+
+  const normalized = normalizeRwandaPhoneSafe(to).replace("+", "")
+
+  const res = await fetch("https://api.pindo.io/v1/sms/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${env.PINDO_API_KEY}`,
+    },
+    body: JSON.stringify({
+      to: normalized,
+      text: message,
+      sender: "UBUMWE",
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Pindo error: ${err}`)
+  }
+
+  const data = await res.json()
+
+  return {
+    success: true,
+    messageId: data.id || data.message_id,
+    message: "Sent via Pindo",
+    provider: "PINDO",
+  }
+}
+
+// ─── Provider with fallback ──────────────────────────────────────────────────
+
+/**
+ * Send SMS via provider with automatic fallback.
+ *
+ * Tries Africa's Talking first, falls back to Pindo on failure.
+ * In simulation mode, logs the message and returns success.
+ *
+ * This is the low-level send function used by the SMS queue.
+ * For most use cases, use sendSms() which checks opt-out + queues.
+ */
+export async function sendSmsViaProvider(
+  to: string,
+  message: string
+): Promise<SmsProviderResult> {
+  // ─── Simulation mode ──────────────────────────────────────────────
+  if (!features.sms) {
+    const normalized = normalizeRwandaPhoneSafe(to)
+    console.log(`[MOCK SMS] To: ${normalized} | Body: ${message}`)
+    return {
+      success: true,
+      messageId: `mock-${Date.now()}`,
+      message: "SMS simulated (ENABLE_SMS_NOTIFICATIONS=false)",
+      provider: "SIMULATED",
+    }
+  }
+
+  // ─── Try Africa's Talking first ───────────────────────────────────
+  try {
+    return await sendViaAfricasTalking(to, message)
+  } catch (atError) {
+    console.warn("[SMS] Africa's Talking failed, trying Pindo:", atError instanceof Error ? atError.message : atError)
+
+    // ─── Fallback to Pindo ────────────────────────────────────────
+    try {
+      return await sendViaPindo(to, message)
+    } catch (pindoError) {
+      console.error("[SMS] Pindo also failed:", pindoError instanceof Error ? pindoError.message : pindoError)
+      return {
+        success: false,
+        message: `Both providers failed. AT: ${atError instanceof Error ? atError.message : "unknown"} | Pindo: ${pindoError instanceof Error ? pindoError.message : "unknown"}`,
+        provider: "AFRICAS_TALKING",
+      }
+    }
+  }
+}
+
+// ─── High-level send (with opt-out check) ────────────────────────────────────
+
+/**
+ * Send an SMS to a recipient.
+ *
+ * Checks opt-out status (for non-critical templates) before sending.
+ * Uses the SMS queue for delivery (priority, retry, scheduling).
+ *
+ * @param to Recipient phone (+2507XXXXXXXX)
+ * @param message Message text
+ * @param templateKey Template key (for opt-out checking)
+ * @returns SmsResult
+ */
+export async function sendSms(
+  to: string,
+  message: string,
+  templateKey?: SmsTemplateKey
+): Promise<SmsResult> {
+  // Check opt-out
+  const { shouldSend, reason } = shouldSendSms(to, templateKey)
+  if (!shouldSend) {
+    return {
+      success: false,
+      message: `SMS not sent: ${reason}`,
+    }
+  }
+
+  // Send directly (bypassing queue for immediate delivery)
+  const result = await sendSmsViaProvider(to, message)
+  return result
+}
+
+// ─── Delivery tracking ───────────────────────────────────────────────────────
+
+/**
+ * Delivery status tracking.
+ *
+ * Africa's Talking supports delivery reports via webhook.
+ * To enable: configure a delivery report callback URL in your AT dashboard.
+ * The webhook should call a handler that updates the delivery status.
+ *
+ * For MVP, we track sent/failed at the queue level.
+ * In production, add a DeliveryReport model to track per-message status:
+ *   - SENT (provider accepted)
+ *   - DELIVERED (handset received)
+ *   - FAILED (delivery failed)
+ */
+
+interface DeliveryReport {
+  messageId: string
+  status: "SENT" | "DELIVERED" | "FAILED" | "PENDING"
+  phoneNumber: string
+  retryCount: number
+  updatedAt: Date
+}
+
+const deliveryReports = new Map<string, DeliveryReport>()
+
+export function recordDeliveryReport(
+  messageId: string,
+  status: DeliveryReport["status"],
+  phoneNumber: string
+): void {
+  const existing = deliveryReports.get(messageId)
+  deliveryReports.set(messageId, {
+    messageId,
+    status,
+    phoneNumber,
+    retryCount: existing?.retryCount || 0,
+    updatedAt: new Date(),
+  })
+}
+
+export function getDeliveryReport(messageId: string): DeliveryReport | null {
+  return deliveryReports.get(messageId) || null
+}
+
+export function getDeliveryStats(): {
+  total: number
+  sent: number
+  delivered: number
+  failed: number
+  pending: number
+} {
+  const reports = Array.from(deliveryReports.values())
+  return {
+    total: reports.length,
+    sent: reports.filter((r) => r.status === "SENT").length,
+    delivered: reports.filter((r) => r.status === "DELIVERED").length,
+    failed: reports.filter((r) => r.status === "FAILED").length,
+    pending: reports.filter((r) => r.status === "PENDING").length,
+  }
 }

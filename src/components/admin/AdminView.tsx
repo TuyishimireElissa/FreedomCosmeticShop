@@ -63,6 +63,7 @@ import { AdminAnalytics } from "./AdminAnalytics"
 import { AdminSettings } from "./AdminSettings"
 import { RealTimeNotifications } from "./RealTimeNotifications"
 import { InvoicePrinter } from "./InvoicePrinter"
+import { AdminSmsManager } from "./AdminSmsManager"
 import {
   Shield,
   Package,
@@ -333,7 +334,7 @@ export function AdminView() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6 grid w-full grid-cols-4 sm:grid-cols-7">
+        <TabsList className="mb-6 grid w-full grid-cols-4 sm:grid-cols-8">
           <TabsTrigger value="overview" className="gap-1">
             <LayoutDashboard className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Overview</span>
@@ -361,6 +362,10 @@ export function AdminView() {
           <TabsTrigger value="settings" className="gap-1">
             <SettingsIcon className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Settings</span>
+          </TabsTrigger>
+          <TabsTrigger value="sms" className="gap-1">
+            <Bell className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">SMS</span>
           </TabsTrigger>
         </TabsList>
 
@@ -577,6 +582,11 @@ export function AdminView() {
         {/* Settings */}
         <TabsContent value="settings">
           <AdminSettings />
+        </TabsContent>
+
+        {/* SMS */}
+        <TabsContent value="sms">
+          <AdminSmsManager />
         </TabsContent>
       </Tabs>
 

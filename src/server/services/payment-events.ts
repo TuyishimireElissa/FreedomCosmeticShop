@@ -20,7 +20,8 @@
  */
 
 import { db } from "@/lib/db"
-import { sendOrderStatusSms } from "@/server/services/sms"
+import { getSmsMessage } from "@/server/services/sms-templates"
+import { enqueueSms } from "@/server/services/sms-queue"
 import { sendOrderConfirmationEmail } from "@/server/services/email"
 import { features } from "@/lib/env"
 
@@ -103,11 +104,16 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
     await awardLoyaltyPoints(order.userId, order.loyaltyPointsEarned, orderId, order.orderNumber)
   }
 
-  // Send SMS confirmation
+  // Send SMS confirmation (payment confirmed)
   if (features.sms) {
-    await sendOrderStatusSms(order.customerPhone, order.orderNumber, "CONFIRMED").catch((e) =>
-      console.error("[Payment] SMS send failed:", e)
-    )
+    const message = getSmsMessage("PAYMENT_CONFIRMED", "en", {
+      orderNumber: order.orderNumber,
+      amount: order.total,
+    })
+    enqueueSms(order.customerPhone, message, {
+      priority: 0, // critical
+      template: "PAYMENT_CONFIRMED",
+    })
   }
 
   // Send email confirmation
@@ -178,11 +184,11 @@ export async function handlePaymentFailure(payload: PaymentFailurePayload): Prom
 
   // Send SMS about failed payment
   if (features.sms) {
-    await sendOrderStatusSms(
-      order.customerPhone,
-      order.orderNumber,
-      "CANCELLED"
-    ).catch((e) => console.error("[Payment] SMS send failed:", e))
+    // Use a custom message for payment failure
+    const message = `Your payment for order ${order.orderNumber} failed. Please try again or use a different payment method. Ubumwe Beauty`
+    enqueueSms(order.customerPhone, message, {
+      priority: 1, // high
+    })
   }
 
   // Create notification
