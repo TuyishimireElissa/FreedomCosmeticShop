@@ -1,19 +1,29 @@
 "use client"
 
 /**
- * Product detail view.
+ * Product detail view — complete with all enhancements.
  *
- * Shows:
- *  - Breadcrumb (Home / Category / Product)
- *  - Image gallery (main image + thumbnails)
- *  - Brand, name, rating, reviews count
- *  - Price + compare-at strikethrough + discount badge
- *  - Stock status
- *  - Quantity selector
- *  - Add to cart + Buy now buttons
- *  - Description
- *  - Trust badges (delivery, payment, authenticity)
- *  - Related products grid
+ * Features:
+ *   - Breadcrumb (Home / Category / Product)
+ *   - Image gallery with zoom on hover
+ *   - Brand, name, rating, reviews count
+ *   - Price + compare-at strikethrough + discount badge
+ *   - Stock status indicator
+ *   - Skin type badge
+ *   - Shades selector (for makeup)
+ *   - Quantity selector
+ *   - Add to cart + Buy now + Add to wishlist buttons
+ *   - Share buttons (WhatsApp, Instagram, Copy link)
+ *   - "Authentic Product Guarantee" badge
+ *   - Delivery estimator by district
+ *   - Description
+ *   - Ingredients accordion
+ *   - How to use section
+ *   - Warnings
+ *   - Reviews section
+ *   - Related products
+ *   - Recently viewed
+ *   - Trust badges
  */
 
 import { useEffect, useState } from "react"
@@ -21,10 +31,25 @@ import { useStore } from "@/store/useStore"
 import { Product } from "@/lib/types"
 import { formatRWF } from "@/lib/format"
 import { ProductCard } from "./ProductCard"
+import { ReviewsSection } from "./ReviewsSection"
+import { RecentlyViewed } from "./RecentlyViewed"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { useToast } from "@/hooks/use-toast"
 import {
   Star,
@@ -37,6 +62,11 @@ import {
   Check,
   ChevronRight,
   ArrowLeft,
+  Heart,
+  MessageCircle,
+  Instagram,
+  Copy,
+  Clock,
 } from "lucide-react"
 
 interface ProductDetailViewProps {
@@ -52,6 +82,10 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   const [loading, setLoading] = useState(true)
   const [activeImage, setActiveImage] = useState(0)
   const [qty, setQty] = useState(1)
+  const [selectedShade, setSelectedShade] = useState<string>("")
+  const [isWishlisted, setIsWishlisted] = useState(false)
+  const [zoom, setZoom] = useState({ active: false, x: 0, y: 0 })
+  const [deliveryDistrict, setDeliveryDistrict] = useState("Nyarugenge")
 
   useEffect(() => {
     let cancelled = false
@@ -60,6 +94,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
     setRelated([])
     setActiveImage(0)
     setQty(1)
+    setSelectedShade("")
 
     ;(async () => {
       try {
@@ -69,6 +104,10 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
         if (cancelled) return
         setProduct(data.product)
         setRelated(data.related || [])
+        // Set first shade as default
+        if (data.product?.shades?.length) {
+          setSelectedShade(data.product.shades[0])
+        }
       } catch (e) {
         console.error("Failed to load product:", e)
       } finally {
@@ -96,12 +135,61 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
     )
     toast({
       title: buyNow ? "Proceeding to checkout" : "Added to cart",
-      description: `${qty} × ${product.name}`,
+      description: `${qty} × ${product.name}${selectedShade ? ` (${selectedShade})` : ""}`,
     })
     if (buyNow) {
       goCheckout()
     }
   }
+
+  const handleShare = (platform: "whatsapp" | "instagram" | "copy") => {
+    if (!product) return
+    const url = typeof window !== "undefined" ? window.location.href : ""
+    const text = `Check out ${product.name} on Ubumwe Beauty!`
+
+    if (platform === "whatsapp") {
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`,
+        "_blank"
+      )
+    } else if (platform === "instagram") {
+      // Instagram doesn't support web share URLs — copy link + show instructions
+      navigator.clipboard?.writeText(url)
+      toast({
+        title: "Link copied!",
+        description: "Paste it in your Instagram story or DM.",
+      })
+    } else if (platform === "copy") {
+      navigator.clipboard?.writeText(url)
+      toast({ title: "Link copied!", description: "Share it anywhere." })
+    }
+  }
+
+  const handleWishlist = () => {
+    setIsWishlisted((w) => !w)
+    toast({
+      title: isWishlisted ? "Removed from wishlist" : "Added to wishlist",
+      description: product?.name,
+    })
+  }
+
+  // Image zoom handlers
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100
+    const y = ((e.clientY - rect.top) / rect.height) * 100
+    setZoom({ active: true, x, y })
+  }
+
+  // Delivery estimate based on district
+  const deliveryEstimate = (() => {
+    const kigaliDistricts = ["Nyarugenge", "Gasabo", "Kicukiro"]
+    const isKigali = kigaliDistricts.includes(deliveryDistrict)
+    return {
+      days: isKigali ? "1-2 business days" : "3-5 business days",
+      fee: isKigali ? 1500 : 3000,
+    }
+  })()
 
   if (loading) {
     return (
@@ -125,7 +213,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Product not found</h1>
-        <p className="text-muted-foreground mt-2">
+        <p className="mt-2 text-muted-foreground">
           The product you&apos;re looking for doesn&apos;t exist or is no longer available.
         </p>
         <Button className="mt-6" onClick={() => goCatalog(null)}>
@@ -136,9 +224,12 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   }
 
   const images = product.images || []
-  const hasDiscount = product.compareAt !== null && product.compareAt > product.price
+  const hasDiscount =
+    product.compareAt !== null && product.compareAt > product.price
   const discountPercent = hasDiscount
-    ? Math.round(((product.compareAt! - product.price) / product.compareAt!) * 100)
+    ? Math.round(
+        ((product.compareAt! - product.price) / product.compareAt!) * 100
+      )
     : 0
   const outOfStock = product.stock === 0
   const lowStock = product.stock > 0 && product.stock <= 5
@@ -146,7 +237,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
-      <nav className="text-muted-foreground mb-4 flex flex-wrap items-center gap-1 text-xs sm:text-sm">
+      <nav className="mb-4 flex flex-wrap items-center gap-1 text-xs text-muted-foreground sm:text-sm">
         <button onClick={goHome} className="hover:text-primary">
           Home
         </button>
@@ -158,7 +249,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           {product.category?.name || "Catalog"}
         </button>
         <ChevronRight className="h-3.5 w-3.5" />
-        <span className="text-foreground line-clamp-1">{product.name}</span>
+        <span className="line-clamp-1 text-foreground">{product.name}</span>
       </nav>
 
       {/* Back button (mobile) */}
@@ -172,30 +263,48 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
       </Button>
 
       <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-        {/* Image gallery */}
+        {/* ─── Image gallery with zoom ───────────────────────────────── */}
         <div className="space-y-3">
-          <div className="bg-secondary/20 relative aspect-square overflow-hidden rounded-2xl border">
+          <div
+            className="relative aspect-square overflow-hidden rounded-2xl border bg-secondary/20"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setZoom({ active: false, x: 0, y: 0 })}
+          >
             {images[activeImage] ? (
               <img
                 src={images[activeImage]}
                 alt={product.name}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover transition-transform duration-200"
+                style={
+                  zoom.active
+                    ? {
+                        transformOrigin: `${zoom.x}% ${zoom.y}%`,
+                        transform: "scale(2)",
+                      }
+                    : undefined
+                }
               />
             ) : (
-              <div className="text-muted-foreground grid h-full w-full place-items-center">
+              <div className="grid h-full w-full place-items-center text-muted-foreground">
                 No image available
               </div>
             )}
             {hasDiscount && (
-              <Badge className="bg-primary text-primary-foreground absolute top-3 left-3">
+              <Badge className="absolute left-3 top-3 bg-primary text-primary-foreground">
                 -{discountPercent}%
               </Badge>
             )}
             {outOfStock && (
-              <div className="bg-background/40 absolute inset-0 grid place-items-center">
-                <span className="bg-foreground/80 text-background rounded-full px-4 py-1.5 text-sm font-semibold tracking-wider uppercase">
+              <div className="absolute inset-0 grid place-items-center bg-background/40">
+                <span className="rounded-full bg-foreground/80 px-4 py-1.5 text-sm font-semibold uppercase tracking-wider text-background">
                   Sold out
                 </span>
+              </div>
+            )}
+            {/* Zoom hint */}
+            {!outOfStock && (
+              <div className="absolute bottom-3 right-3 rounded-full bg-background/80 px-2.5 py-1 text-xs text-muted-foreground backdrop-blur">
+                🔍 Hover to zoom
               </div>
             )}
           </div>
@@ -208,7 +317,9 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
                   key={i}
                   onClick={() => setActiveImage(i)}
                   className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors ${
-                    activeImage === i ? "border-primary" : "hover:border-border border-transparent"
+                    activeImage === i
+                      ? "border-primary"
+                      : "border-transparent hover:border-border"
                   }`}
                 >
                   <img
@@ -222,17 +333,24 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           )}
         </div>
 
-        {/* Info */}
+        {/* ─── Info ──────────────────────────────────────────────────── */}
         <div className="flex flex-col">
           {product.brand?.name && (
-            <p className="text-primary text-xs font-semibold tracking-wider uppercase">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary">
               {product.brand.name}
             </p>
           )}
-          <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{product.name}</h1>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
+            {product.name}
+          </h1>
 
-          {/* Rating */}
-          <div className="mt-2 flex items-center gap-2 text-sm">
+          {/* Rating + reviews link */}
+          <button
+            onClick={() => {
+              document.getElementById("reviews")?.scrollIntoView({ behavior: "smooth" })
+            }}
+            className="mt-2 flex items-center gap-2 text-sm hover:underline"
+          >
             <div className="flex items-center gap-0.5">
               {[1, 2, 3, 4, 5].map((s) => (
                 <Star
@@ -246,14 +364,16 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
               ))}
             </div>
             <span className="font-medium">{product.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground">({product.reviewsCount} reviews)</span>
-          </div>
+            <span className="text-muted-foreground">
+              ({product.reviewsCount} reviews)
+            </span>
+          </button>
 
           {/* Price */}
           <div className="mt-4 flex flex-wrap items-baseline gap-3">
             <span className="text-3xl font-bold">{formatRWF(product.price)}</span>
             {hasDiscount && (
-              <span className="text-muted-foreground text-base line-through">
+              <span className="text-base text-muted-foreground line-through">
                 {formatRWF(product.compareAt!)}
               </span>
             )}
@@ -264,120 +384,75 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
             )}
           </div>
 
-          {/* Stock */}
-          <div className="mt-3 text-sm">
+          {/* Badges: stock + skin type + authentic */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             {outOfStock ? (
-              <span className="text-destructive font-medium">Out of stock</span>
+              <Badge variant="destructive">Out of stock</Badge>
             ) : lowStock ? (
-              <span className="font-medium text-amber-600">
-                Only {product.stock} left in stock — order soon!
-              </span>
+              <Badge className="bg-amber-100 text-amber-700">
+                Only {product.stock} left!
+              </Badge>
             ) : (
-              <span className="flex items-center gap-1.5 font-medium text-emerald-600">
-                <Check className="h-4 w-4" /> In stock
-              </span>
+              <Badge className="bg-emerald-100 text-emerald-700">
+                <Check className="mr-1 h-3 w-3" /> In stock
+              </Badge>
             )}
-          </div>
-
-          {/* Description */}
-          <div className="prose prose-sm text-foreground/85 mt-5 max-w-none">
-            <p className="leading-relaxed whitespace-pre-line">{product.description}</p>
-          </div>
-
-          {/* Cosmetics-specific details */}
-          <div className="mt-5 space-y-3">
-            {/* Size */}
-            {product.size && (
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-muted-foreground">Size:</span>
-                <span className="font-medium">{product.size}</span>
-              </div>
-            )}
-
-            {/* Shades */}
-            {product.shades && product.shades.length > 0 && (
-              <div>
-                <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase mb-1.5">
-                  Available shades
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {product.shades.map((shade) => (
-                    <span
-                      key={shade}
-                      className="rounded-full border bg-secondary/40 px-3 py-1 text-xs font-medium"
-                    >
-                      {shade}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Skin type */}
             {product.skinType && product.skinType.length > 0 && (
-              <div>
-                <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase mb-1.5">
-                  Suitable for
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {product.skinType.map((st) => (
-                    <span
-                      key={st}
-                      className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary"
-                    >
-                      {st.charAt(0) + st.slice(1).toLowerCase()} skin
-                    </span>
-                  ))}
-                </div>
-              </div>
+              <Badge variant="outline" className="border-primary/30 text-primary">
+                {product.skinType
+                  .map((s) => s.charAt(0) + s.slice(1).toLowerCase())
+                  .join(" / ")}{" "}
+                skin
+              </Badge>
             )}
-
-            {/* Ingredients */}
-            {product.ingredients && product.ingredients.length > 0 && (
-              <div>
-                <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase mb-1.5">
-                  Key ingredients
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {product.ingredients.map((ing) => (
-                    <span
-                      key={ing}
-                      className="rounded-md border px-2 py-0.5 text-xs text-foreground/80"
-                    >
-                      {ing}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Usage instructions */}
-            {product.usageInstructions && (
-              <div className="rounded-xl bg-secondary/30 p-3 text-sm">
-                <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase mb-1">
-                  How to use
-                </p>
-                <p className="text-foreground/85">{product.usageInstructions}</p>
-              </div>
-            )}
-
-            {/* Warnings */}
-            {product.warnings && (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm">
-                <p className="text-amber-700 text-xs font-medium tracking-wider uppercase mb-1">
-                  Caution
-                </p>
-                <p className="text-amber-900/80">{product.warnings}</p>
-              </div>
-            )}
+            <Badge variant="outline" className="border-emerald-500/30 text-emerald-700">
+              <ShieldCheck className="mr-1 h-3 w-3" /> Authentic
+            </Badge>
           </div>
+
+          {/* Short description */}
+          {product.shortDescription && (
+            <p className="mt-4 text-sm text-foreground/85">{product.shortDescription}</p>
+          )}
+
+          {/* Shades selector */}
+          {product.shades && product.shades.length > 0 && (
+            <div className="mt-5">
+              <Label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                Shade: <span className="text-foreground">{selectedShade}</span>
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                {product.shades.map((shade) => (
+                  <button
+                    key={shade}
+                    onClick={() => setSelectedShade(shade)}
+                    className={`rounded-lg border-2 px-3 py-1.5 text-sm font-medium transition-colors ${
+                      selectedShade === shade
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/40"
+                    }`}
+                  >
+                    {shade}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Size */}
+          {product.size && (
+            <div className="mt-3 flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Size:</span>
+              <span className="font-medium">{product.size}</span>
+            </div>
+          )}
 
           {/* Quantity + actions */}
           <div className="mt-6 flex flex-wrap items-end gap-3">
             <div>
               <Label
                 htmlFor="qty"
-                className="text-muted-foreground mb-1.5 block text-xs font-medium tracking-wider uppercase"
+                className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Quantity
               </Label>
@@ -409,7 +484,9 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
                   variant="ghost"
                   size="icon"
                   className="h-10 w-10 rounded-l-none"
-                  onClick={() => setQty((q) => Math.min(product.stock || 1, q + 1))}
+                  onClick={() =>
+                    setQty((q) => Math.min(product.stock || 1, q + 1))
+                  }
                   disabled={outOfStock || qty >= product.stock}
                   aria-label="Increase quantity"
                 >
@@ -420,7 +497,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
 
             <Button
               size="lg"
-              className="min-w-[140px] flex-1"
+              className="flex-1 min-w-[140px]"
               onClick={() => handleAddToCart(false)}
               disabled={outOfStock}
             >
@@ -430,47 +507,226 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
             <Button
               size="lg"
               variant="secondary"
-              className="min-w-[140px] flex-1"
+              className="flex-1 min-w-[140px]"
               onClick={() => handleAddToCart(true)}
               disabled={outOfStock}
             >
               Buy now
             </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="px-3"
+              onClick={handleWishlist}
+              aria-label="Add to wishlist"
+            >
+              <Heart
+                className={`h-5 w-5 ${isWishlisted ? "fill-primary text-primary" : ""}`}
+              />
+            </Button>
+          </div>
+
+          {/* Share buttons */}
+          <div className="mt-4 flex items-center gap-2">
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Share:
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => handleShare("whatsapp")}
+            >
+              <MessageCircle className="h-4 w-4" /> WhatsApp
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => handleShare("instagram")}
+            >
+              <Instagram className="h-4 w-4" /> Instagram
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              onClick={() => handleShare("copy")}
+            >
+              <Copy className="h-4 w-4" /> Copy link
+            </Button>
+          </div>
+
+          {/* ─── Delivery estimator ──────────────────────────────────── */}
+          <div className="mt-6 rounded-2xl border bg-secondary/30 p-4">
+            <div className="flex items-center gap-2">
+              <Truck className="h-5 w-5 text-primary" />
+              <h3 className="text-sm font-semibold">Delivery estimator</h3>
+            </div>
+            <div className="mt-3 flex flex-wrap items-end gap-3">
+              <div className="flex-1 min-w-[180px]">
+                <Label className="mb-1 block text-xs text-muted-foreground">
+                  Your district
+                </Label>
+                <Select value={deliveryDistrict} onValueChange={setDeliveryDistrict}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[
+                      "Nyarugenge", "Gasabo", "Kicukiro", // Kigali
+                      "Musanze", "Burera", "Gicumbi", "Rulindo", "Gakenke", // Northern
+                      "Nyanza", "Gisagara", "Nyaruguru", "Huye", "Nyamagabe",
+                      "Ruhango", "Muhanga", "Kamonyi", // Southern
+                      "Rwamagana", "Nyagatare", "Gatsibo", "Kayonza", "Kirehe",
+                      "Ngoma", "Bugesera", // Eastern
+                      "Karongi", "Rutsiro", "Rubavu", "Nyabihu", "Ngororero",
+                      "Rusizi", "Nyamasheke", // Western
+                    ].map((d) => (
+                      <SelectItem key={d} value={d}>
+                        {d}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="rounded-lg bg-card px-3 py-2 text-sm">
+                <p className="flex items-center gap-1 font-medium">
+                  <Clock className="h-3.5 w-3.5 text-primary" />
+                  {deliveryEstimate.days}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Delivery fee: {formatRWF(deliveryEstimate.fee)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Authentic Product Guarantee */}
+          <div className="mt-4 flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-emerald-50 p-3">
+            <ShieldCheck className="h-8 w-8 shrink-0 text-emerald-600" />
+            <div>
+              <p className="text-sm font-semibold text-emerald-900">
+                Authentic Product Guarantee
+              </p>
+              <p className="text-xs text-emerald-700">
+                100% genuine. Sourced from authorized distributors.
+              </p>
+            </div>
           </div>
 
           {/* Trust badges */}
-          <div className="mt-8 grid grid-cols-1 gap-3 border-t pt-6 sm:grid-cols-3">
+          <div className="mt-6 grid grid-cols-1 gap-3 border-t pt-6 sm:grid-cols-3">
             <div className="flex items-start gap-2">
-              <Truck className="text-primary mt-0.5 h-5 w-5 shrink-0" />
+              <Truck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <p className="text-sm font-medium">Fast delivery</p>
-                <p className="text-muted-foreground text-xs">Kigali 1-2 days, provinces 3-5 days</p>
+                <p className="text-xs text-muted-foreground">Kigali 1-2 days, provinces 3-5 days</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <Smartphone className="text-primary mt-0.5 h-5 w-5 shrink-0" />
+              <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <p className="text-sm font-medium">Pay your way</p>
-                <p className="text-muted-foreground text-xs">MTN MoMo or cash on delivery</p>
+                <p className="text-xs text-muted-foreground">MTN MoMo or cash on delivery</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
-              <ShieldCheck className="text-primary mt-0.5 h-5 w-5 shrink-0" />
+              <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
                 <p className="text-sm font-medium">100% authentic</p>
-                <p className="text-muted-foreground text-xs">
-                  Sourced from authorized distributors
-                </p>
+                <p className="text-xs text-muted-foreground">Sourced from authorized distributors</p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Related products */}
+      {/* ─── Description + Accordions ────────────────────────────── */}
+      <div className="mt-12 grid gap-8 lg:grid-cols-2">
+        {/* Description */}
+        <div>
+          <h2 className="text-lg font-semibold">About this product</h2>
+          <div className="prose prose-sm mt-3 max-w-none text-foreground/85">
+            <p className="whitespace-pre-line leading-relaxed">{product.description}</p>
+          </div>
+        </div>
+
+        {/* Accordion: ingredients, how to use, warnings */}
+        <div>
+          <Accordion type="single" collapsible className="w-full">
+            {product.ingredients && product.ingredients.length > 0 && (
+              <AccordionItem value="ingredients">
+                <AccordionTrigger className="text-sm font-semibold">
+                  Key ingredients
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="flex flex-wrap gap-2">
+                    {product.ingredients.map((ing) => (
+                      <span
+                        key={ing}
+                        className="rounded-md border bg-secondary/40 px-2.5 py-1 text-xs font-medium"
+                      >
+                        {ing}
+                      </span>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
+            {product.usageInstructions && (
+              <AccordionItem value="usage">
+                <AccordionTrigger className="text-sm font-semibold">
+                  How to use
+                </AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-sm text-foreground/85">
+                    {product.usageInstructions}
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
+            {product.warnings && (
+              <AccordionItem value="warnings">
+                <AccordionTrigger className="text-sm font-semibold">
+                  Cautions &amp; warnings
+                </AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-sm text-amber-700">{product.warnings}</p>
+                </AccordionContent>
+              </AccordionItem>
+            )}
+
+            <AccordionItem value="shipping">
+              <AccordionTrigger className="text-sm font-semibold">
+                Shipping &amp; returns
+              </AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-1 text-sm text-foreground/85">
+                  <li>• Free delivery in Kigali for orders over RWF 50,000</li>
+                  <li>• Delivery to all 30 districts of Rwanda</li>
+                  <li>• Returns accepted within 7 days (unopened only)</li>
+                  <li>• Pay with MTN MoMo, Airtel Money, or Cash on Delivery</li>
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+      </div>
+
+      {/* ─── Reviews ──────────────────────────────────────────────── */}
+      <div id="reviews" className="mt-12 scroll-mt-24">
+        <ReviewsSection product={product} />
+      </div>
+
+      {/* ─── Related products ────────────────────────────────────── */}
       {related.length > 0 && (
         <section className="mt-16">
-          <h2 className="mb-4 text-xl font-bold tracking-tight sm:text-2xl">You may also like</h2>
+          <h2 className="mb-4 text-xl font-bold tracking-tight sm:text-2xl">
+            You may also like
+          </h2>
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
@@ -478,6 +734,9 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           </div>
         </section>
       )}
+
+      {/* ─── Recently viewed ──────────────────────────────────────── */}
+      <RecentlyViewed currentSlug={product.slug} />
     </div>
   )
 }

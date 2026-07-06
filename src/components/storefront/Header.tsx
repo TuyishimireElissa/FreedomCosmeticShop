@@ -16,10 +16,10 @@
 import { useState, useEffect } from "react"
 import { useStore } from "@/store/useStore"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Search, ShoppingBag, Menu, Sparkles, Shield, User as UserIcon, LogOut, Package, Heart, Globe } from "lucide-react"
+import { SearchWithSuggestions } from "@/components/storefront/SearchWithSuggestions"
+import { ShoppingBag, Menu, Sparkles, Shield, User as UserIcon, LogOut, Package, Heart, Globe } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,9 +31,8 @@ import {
 import { useToast } from "@/hooks/use-toast"
 
 export function Header() {
-  const { goHome, goCatalog, goCart, goAdmin, goLogin, goAccount, setCatalogSearch, cartCount, user, authLoading, logout } = useStore()
+  const { goHome, goCatalog, goCart, goAdmin, goLogin, goAccount, cartCount, user, authLoading, logout } = useStore()
   const { toast } = useToast()
-  const [searchInput, setSearchInput] = useState("")
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
@@ -44,18 +43,6 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!searchInput.trim()) return
-    setCatalogSearch(searchInput.trim())
-    goCatalog()
-    setMobileOpen(false)
-    toast({
-      title: "Searching",
-      description: `Results for "${searchInput.trim()}"`,
-    })
-  }
 
   const navLinks = [
     { label: "Skincare", slug: "skincare" },
@@ -173,44 +160,13 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Search (desktop) */}
-        <form
-          onSubmit={handleSearch}
-          className="ml-auto hidden max-w-xs flex-1 items-center lg:flex"
-        >
-          <div className="relative w-full">
-            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              type="search"
-              placeholder="Search products..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="h-9 rounded-full pr-3 pl-9"
-              aria-label="Search products"
-            />
-          </div>
-        </form>
+        {/* Search with suggestions (desktop) */}
+        <div className="ml-auto hidden max-w-xs flex-1 lg:block">
+          <SearchWithSuggestions />
+        </div>
 
         {/* Right side actions */}
         <div className="ml-auto flex items-center gap-1 lg:ml-0">
-          {/* Mobile search icon (opens a prompt-style input) */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden"
-            aria-label="Search"
-            onClick={() => {
-              const q = window.prompt("Search products:")
-              if (q && q.trim()) {
-                setSearchInput(q.trim())
-                setCatalogSearch(q.trim())
-                goCatalog()
-              }
-            }}
-          >
-            <Search className="h-5 w-5" />
-          </Button>
-
           {/* Admin link (desktop) */}
           <Button variant="ghost" size="sm" className="hidden lg:inline-flex" onClick={goAdmin}>
             <Shield className="mr-1.5 h-4 w-4" />
@@ -313,17 +269,7 @@ export function Header() {
 
       {/* Mobile search row (only on small screens) */}
       <div className="border-t px-4 py-2 lg:hidden">
-        <form onSubmit={handleSearch} className="relative">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-          <Input
-            type="search"
-            placeholder="Search skincare, makeup, haircare..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="h-9 rounded-full pr-3 pl-9"
-            aria-label="Search products"
-          />
-        </form>
+        <SearchWithSuggestions placeholder="Search skincare, makeup, haircare..." />
       </div>
     </header>
   )
