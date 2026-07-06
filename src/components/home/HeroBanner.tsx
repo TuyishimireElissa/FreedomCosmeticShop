@@ -121,11 +121,10 @@ export function HeroBanner({ banners }: HeroBannerProps) {
       <div className="relative h-[480px] sm:h-[520px] lg:h-[600px]">
         {slides.map((slide, i) => {
           const isActive = i === current
-          // Use mobile image on small screens if available
-          const image =
-            slide.mobileImage && typeof window !== "undefined" && window.innerWidth < 640
-              ? slide.mobileImage
-              : slide.image
+          // Use the main image for all breakpoints — responsive sizing
+          // is handled by the CSS layout, not by swapping src on the client.
+          // (Swapping src based on window.innerWidth causes hydration mismatch.)
+          const image = slide.image
           return (
             <div
               key={slide.id}
