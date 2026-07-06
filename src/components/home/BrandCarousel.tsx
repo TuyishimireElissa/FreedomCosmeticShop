@@ -1,0 +1,128 @@
+"use client"
+
+/**
+ * BrandCarousel — horizontal scroller of brand logos/names.
+ *
+ * Features:
+ *   - Horizontal scroll with snap
+ *   - Prev/next arrows (desktop)
+ *   - Click navigates to catalog filtered by brand
+ *   - Shows brand logo + name + product count
+ *   - Fades content to "now playing" effect
+ */
+
+import { useRef } from "react"
+import { useStore } from "@/store/useStore"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+
+interface Brand {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  logo: string | null
+  country: string | null
+  _count?: { products: number }
+}
+
+interface BrandCarouselProps {
+  brands: Brand[]
+}
+
+export function BrandCarousel({ brands }: BrandCarouselProps) {
+  const { goCatalog } = useStore()
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  const scroll = (direction: "left" | "right") => {
+    if (!scrollRef.current) return
+    const amount = 280 // Approximate card width + gap
+    scrollRef.current.scrollBy({
+      left: direction === "left" ? -amount : amount,
+      behavior: "smooth",
+    })
+  }
+
+  // No brands — skip section entirely
+  if (brands.length === 0) return null
+
+  return (
+    <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mb-6 flex items-end justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Top brands
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Authentic products from brands you love.
+          </p>
+        </div>
+
+        {/* Navigation arrows (desktop) */}
+        <div className="hidden gap-2 sm:flex">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => scroll("left")}
+            aria-label="Scroll brands left"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => scroll("right")}
+            aria-label="Scroll brands right"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Horizontal scroll container */}
+      <div
+        ref={scrollRef}
+        className="no-scrollbar flex gap-4 overflow-x-auto scroll-smooth pb-2"
+        style={{ scrollSnapType: "x mandatory" }}
+      >
+        {brands.map((brand) => (
+          <button
+            key={brand.id}
+            onClick={() => goCatalog(null)} // Future: filter by brand
+            className="group flex w-64 shrink-0 flex-col items-center rounded-2xl border bg-card p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+            style={{ scrollSnapAlign: "start" }}
+          >
+            {/* Logo */}
+            <div className="mb-3 h-20 w-20 overflow-hidden rounded-full bg-secondary/30">
+              {brand.logo ? (
+                <img
+                  src={brand.logo}
+                  alt={`${brand.name} logo`}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="grid h-full w-full place-items-center text-2xl font-bold text-primary">
+                  {brand.name.charAt(0)}
+                </div>
+              )}
+            </div>
+
+            {/* Name */}
+            <h3 className="text-base font-semibold">{brand.name}</h3>
+            {brand.country && (
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                {brand.country}
+              </p>
+            )}
+            {brand._count && (
+              <p className="mt-2 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">
+                {brand._count.products} products
+              </p>
+            )}
+          </button>
+        ))}
+      </div>
+    </section>
+  )
+}

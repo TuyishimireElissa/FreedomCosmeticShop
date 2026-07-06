@@ -18,7 +18,7 @@ import { useStore } from "@/store/useStore"
 import { formatRWF } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Star, Plus, Check } from "lucide-react"
+import { Star, Plus, Check, ShieldCheck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface ProductCardProps {
@@ -85,6 +85,18 @@ export function ProductCard({ product }: ProductCardProps) {
             <Badge className="bg-primary text-primary-foreground shadow">-{discountPercent}%</Badge>
           )}
           {product.featured && <Badge className="bg-amber-500 text-white shadow">★ Featured</Badge>}
+        </div>
+
+        {/* Top-right: Authentic badge */}
+        <div className="absolute top-2 right-2">
+          <Badge
+            variant="outline"
+            className="border-emerald-500/30 bg-background/90 text-emerald-700 shadow backdrop-blur"
+            title="100% authentic product"
+          >
+            <ShieldCheck className="mr-1 h-3 w-3" />
+            Authentic
+          </Badge>
         </div>
 
         {/* Out-of-stock overlay */}

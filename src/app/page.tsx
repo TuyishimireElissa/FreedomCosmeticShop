@@ -26,6 +26,7 @@ import { AdminView } from "@/components/admin/AdminView"
 import { LoginView } from "@/components/auth/LoginView"
 import { RegisterView } from "@/components/auth/RegisterView"
 import { AccountView } from "@/components/auth/AccountView"
+import { WhatsAppButton } from "@/components/ui/WhatsAppButton"
 
 export default function Home() {
   const { view, activeProductSlug, lastOrderId, fetchUser } = useStore()
@@ -61,6 +62,11 @@ export default function Home() {
 
       {/* Slide-out cart drawer (always mounted, opens via store state) */}
       <CartDrawer />
+
+      {/* Floating WhatsApp button (hidden on auth pages) */}
+      {view !== "login" && view !== "register" && (
+        <WhatsAppButton phone="250788123456" />
+      )}
     </div>
   )
 }

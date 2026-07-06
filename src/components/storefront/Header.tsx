@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Search, ShoppingBag, Menu, Sparkles, Shield, User as UserIcon, LogOut, Package } from "lucide-react"
+import { Search, ShoppingBag, Menu, Sparkles, Shield, User as UserIcon, LogOut, Package, Heart, Globe } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -217,6 +217,26 @@ export function Header() {
             Admin
           </Button>
 
+          {/* Language switcher (desktop) */}
+          <LanguageSwitcher />
+
+          {/* Wishlist icon */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden sm:flex"
+            onClick={() => {
+              toast({
+                title: "Wishlist",
+                description: "Sign in to save your favorite products.",
+              })
+              if (!user) goLogin()
+            }}
+            aria-label="Wishlist"
+          >
+            <Heart className="h-5 w-5" />
+          </Button>
+
           {/* Account / Login */}
           {authLoading ? (
             <div className="h-9 w-20 animate-pulse rounded-lg bg-secondary" />
@@ -306,5 +326,50 @@ export function Header() {
         </form>
       </div>
     </header>
+  )
+}
+
+/**
+ * LanguageSwitcher — EN / FR / RW language toggle.
+ *
+ * For the MVP, this is a visual stub that shows a toast on change.
+ * To fully implement, integrate next-intl with locale routing.
+ */
+function LanguageSwitcher() {
+  const { toast } = useToast()
+  const [current, setCurrent] = useState<"EN" | "FR" | "RW">("EN")
+
+  const languages: { code: "EN" | "FR" | "RW"; label: string; flag: string }[] = [
+    { code: "EN", label: "English", flag: "🇬🇧" },
+    { code: "FR", label: "Français", flag: "🇫🇷" },
+    { code: "RW", label: "Kinyarwanda", flag: "🇷🇼" },
+  ]
+
+  const handleCycle = () => {
+    const idx = languages.findIndex((l) => l.code === current)
+    const next = languages[(idx + 1) % languages.length]
+    setCurrent(next.code)
+    toast({
+      title: `Language: ${next.label}`,
+      description:
+        next.code === "EN"
+          ? "Language set to English."
+          : next.code === "FR"
+          ? "Langue définie sur Français. (Coming soon)"
+          : "Ururimi rwahiswemo Kinyarwanda. (Coming soon)",
+    })
+  }
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="hidden gap-1.5 lg:flex"
+      onClick={handleCycle}
+      aria-label={`Language: ${current}. Click to change.`}
+    >
+      <Globe className="h-4 w-4" />
+      <span className="font-medium">{current}</span>
+    </Button>
   )
 }
