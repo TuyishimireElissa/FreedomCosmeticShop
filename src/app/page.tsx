@@ -14,6 +14,8 @@
 import { useEffect } from "react"
 import { useStore } from "@/store/useStore"
 import { Header } from "@/components/storefront/Header"
+import { AnnouncementBar } from "@/components/storefront/AnnouncementBar"
+import { PaymentBar } from "@/components/storefront/PaymentBar"
 import { Footer } from "@/components/storefront/Footer"
 import { CartDrawer } from "@/components/storefront/CartDrawer"
 import { HomeView } from "@/components/storefront/HomeView"
@@ -39,7 +41,9 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      <AnnouncementBar />
       <Header />
+      <PaymentBar />
 
       <main className="flex-1">
         {view === "home" && <HomeView />}

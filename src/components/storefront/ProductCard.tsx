@@ -84,18 +84,18 @@ export function ProductCard({ product }: ProductCardProps) {
           {hasDiscount && (
             <Badge className="bg-primary text-primary-foreground shadow">-{discountPercent}%</Badge>
           )}
-          {product.featured && <Badge className="bg-amber-500 text-white shadow">★ Featured</Badge>}
+          {product.featured && <Badge className="bg-orange-500 text-white shadow">🔥 Best Seller</Badge>}
         </div>
 
-        {/* Top-right: Authentic badge */}
-        <div className="absolute top-2 right-2">
+        {/* Top-right: Authentic badge + Wishlist heart */}
+        <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end">
           <Badge
             variant="outline"
             className="border-emerald-500/30 bg-background/90 text-emerald-700 shadow backdrop-blur"
             title="100% authentic product"
           >
             <ShieldCheck className="mr-1 h-3 w-3" />
-            Authentic
+            Genuine
           </Badge>
         </div>
 
@@ -126,6 +126,20 @@ export function ProductCard({ product }: ProductCardProps) {
           <span className="text-foreground/80 font-medium">{product.rating.toFixed(1)}</span>
           <span>({product.reviewsCount})</span>
         </div>
+
+        {/* NEW: Skin type badge */}
+        {product.skinType && product.skinType.length > 0 && (
+          <span className="mt-1 inline-block w-fit rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+            {product.skinType[0].charAt(0) + product.skinType[0].slice(1).toLowerCase()} skin
+          </span>
+        )}
+
+        {/* NEW: Low stock indicator */}
+        {product.stock > 0 && product.stock <= 5 && (
+          <p className="mt-1 text-[10px] font-semibold text-amber-600">
+            ⚡ Only {product.stock} left!
+          </p>
+        )}
 
         {/* Price */}
         <div className="mt-2 flex items-baseline gap-2">

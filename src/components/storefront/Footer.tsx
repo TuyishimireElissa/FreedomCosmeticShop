@@ -214,7 +214,7 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="text-muted-foreground mt-6 border-t pt-6 text-center text-xs sm:flex sm:justify-between sm:text-left">
-          <p>© {new Date().getFullYear()} Ubumwe Beauty. Made with love in Kigali, Rwanda.</p>
+          <p>© {new Date().getFullYear()} Ubumwe Beauty. All rights reserved. Made with ❤️ in Rwanda 🇷🇼</p>
           <p className="mt-2 sm:mt-0">Ubumwe — beauty that unites us.</p>
         </div>
       </div>

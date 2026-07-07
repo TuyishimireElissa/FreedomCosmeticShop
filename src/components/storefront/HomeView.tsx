@@ -23,6 +23,7 @@ import { useStore } from "@/store/useStore"
 import { Product, Category } from "@/lib/types"
 import { HeroBanner } from "@/components/home/HeroBanner"
 import { CategoryGrid } from "@/components/home/CategoryGrid"
+import { FlashSale } from "@/components/home/FlashSale"
 import { ProductSection } from "@/components/home/ProductSection"
 import { BrandCarousel } from "@/components/home/BrandCarousel"
 import { BeautyTips } from "@/components/home/BeautyTips"
@@ -176,6 +177,9 @@ export function HomeView() {
       ) : (
         <CategoryGrid categories={categories} />
       )}
+
+      {/* 3b. Flash Sale — NEW */}
+      <FlashSale />
 
       {/* 4. Best Sellers */}
       <ProductSection

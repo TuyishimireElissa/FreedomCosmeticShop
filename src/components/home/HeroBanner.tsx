@@ -47,9 +47,9 @@ export function HeroBanner({ banners }: HeroBannerProps) {
       : [
           {
             id: "fallback-1",
-            title: "Beauty that unites us",
+            title: "Rwanda's #1 Beauty Store 🇷🇼",
             subtitle:
-              "Shop authentic skincare, makeup & haircare — hand-picked for melanin-rich skin and textured hair. Pay with MTN MoMo or cash on delivery.",
+              "100% Authentic Products. Shop skincare, makeup & haircare. Pay with MTN MoMo. Delivered to your door.",
             image:
               "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1200&auto=format&fit=crop",
             mobileImage:
@@ -60,9 +60,9 @@ export function HeroBanner({ banners }: HeroBannerProps) {
           },
           {
             id: "fallback-2",
-            title: "Glow from within",
+            title: "Glow from within ✨",
             subtitle:
-              "Vitamin C serums, mineral sunscreens & hydrating moisturizers. formulated for Rwanda's climate.",
+              "Vitamin C serums, mineral sunscreens & hydrating moisturizers. Formulated for Rwanda's climate.",
             image:
               "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=1200&auto=format&fit=crop",
             mobileImage:
@@ -73,7 +73,7 @@ export function HeroBanner({ banners }: HeroBannerProps) {
           },
           {
             id: "fallback-3",
-            title: "Shades for every skin tone",
+            title: "Shades for every skin tone 💄",
             subtitle:
               "Foundations, lipsticks & palettes made for melanin-rich skin. No ashiness, no compromise.",
             image:
@@ -180,7 +180,7 @@ export function HeroBanner({ banners }: HeroBannerProps) {
                             onClick={() => handleCtaClick(slide)}
                             className="bg-primary text-primary-foreground hover:bg-primary/90"
                           >
-                            Shop now
+                            🛍️ Shop now
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Button>
                           <Button
@@ -189,8 +189,27 @@ export function HeroBanner({ banners }: HeroBannerProps) {
                             onClick={() => goCatalog(null)}
                             className="border-background/30 bg-background/10 text-background backdrop-blur hover:bg-background/20"
                           >
-                            Browse all
+                            💄 Best Sellers
                           </Button>
+                        </div>
+
+                        {/* NEW: Trust row under CTAs */}
+                        <div
+                          className="mt-6 flex animate-in fade-in slide-in-from-bottom-4 flex-wrap gap-4"
+                          style={{ animationDelay: "400ms" }}
+                        >
+                          <span className="flex items-center gap-1.5 text-xs font-medium text-background/90">
+                            ✅ 100% Genuine
+                          </span>
+                          <span className="flex items-center gap-1.5 text-xs font-medium text-background/90">
+                            🚚 Fast Delivery
+                          </span>
+                          <span className="flex items-center gap-1.5 text-xs font-medium text-background/90">
+                            💛 MTN MoMo
+                          </span>
+                          <span className="flex items-center gap-1.5 text-xs font-medium text-background/90">
+                            🔄 Easy Returns
+                          </span>
                         </div>
                       </>
                     )}
