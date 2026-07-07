@@ -638,6 +638,30 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
                 <p className="text-xs text-muted-foreground">Sourced from authorized distributors</p>
               </div>
             </div>
+            {/* NEW: Easy Returns badge */}
+            <div className="flex items-start gap-2">
+              <ArrowLeft className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <p className="text-sm font-medium">Easy Returns</p>
+                <p className="text-xs text-muted-foreground">7-day return policy, no questions asked</p>
+              </div>
+            </div>
+            {/* NEW: Rwanda Official badge */}
+            <div className="flex items-start gap-2">
+              <span className="mt-0.5 text-lg shrink-0">🇷🇼</span>
+              <div>
+                <p className="text-sm font-medium">Officially in Rwanda</p>
+                <p className="text-xs text-muted-foreground">Local business, Kigali-based</p>
+              </div>
+            </div>
+            {/* NEW: MTN MoMo Accepted badge */}
+            <div className="flex items-start gap-2">
+              <span className="mt-0.5 text-lg shrink-0">📱</span>
+              <div>
+                <p className="text-sm font-medium">MTN MoMo Accepted</p>
+                <p className="text-xs text-muted-foreground">Pay instantly with Mobile Money</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

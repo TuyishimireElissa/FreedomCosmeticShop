@@ -24,7 +24,7 @@ interface WhatsAppButtonProps {
 
 export function WhatsAppButton({
   phone = "250788123456",
-  message = "Hello Ubumwe Beauty! I have a question about your products.",
+  message = "Hello Ubumwe Beauty, I need help with my order",
 }: WhatsAppButtonProps) {
   const [visible, setVisible] = useState(false)
   const [expanded, setExpanded] = useState(false)

@@ -16,7 +16,7 @@
  */
 
 import { useStore } from "@/store/useStore"
-import { Sparkles, Phone, Mail, MapPin, Instagram, Facebook, MessageCircle } from "lucide-react"
+import { Sparkles, Phone, Mail, MapPin, Instagram, Facebook, MessageCircle, ShieldCheck, Truck, Smartphone, Lock } from "lucide-react"
 
 export function Footer() {
   const { goCatalog, goHome, goAdmin } = useStore()
@@ -161,6 +161,30 @@ export function Footer() {
                 </a>
               </li>
             </ul>
+          </div>
+        </div>
+
+        {/* Trust badges row — NEW */}
+        <div className="mt-8 grid grid-cols-2 gap-4 border-t pt-6 sm:grid-cols-4">
+          <div className="flex flex-col items-center gap-1 text-center">
+            <ShieldCheck className="h-6 w-6 text-primary" />
+            <p className="text-xs font-semibold">100% Genuine</p>
+            <p className="text-[10px] text-muted-foreground">Authentic products</p>
+          </div>
+          <div className="flex flex-col items-center gap-1 text-center">
+            <Truck className="h-6 w-6 text-primary" />
+            <p className="text-xs font-semibold">Fast Delivery</p>
+            <p className="text-[10px] text-muted-foreground">All 30 districts</p>
+          </div>
+          <div className="flex flex-col items-center gap-1 text-center">
+            <Smartphone className="h-6 w-6 text-primary" />
+            <p className="text-xs font-semibold">MTN MoMo</p>
+            <p className="text-[10px] text-muted-foreground">Mobile Money accepted</p>
+          </div>
+          <div className="flex flex-col items-center gap-1 text-center">
+            <Lock className="h-6 w-6 text-primary" />
+            <p className="text-xs font-semibold">Safe Pay</p>
+            <p className="text-[10px] text-muted-foreground">Secured by PayPack</p>
           </div>
         </div>
 

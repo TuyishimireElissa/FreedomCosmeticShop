@@ -1081,6 +1081,20 @@ export function CheckoutView() {
                 <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                 Your information is encrypted and secure.
               </p>
+              {/* NEW: PayPack security badge + MoMo/Airtel logos */}
+              <div className="mt-3 flex flex-col items-center gap-2">
+                <p className="text-xs text-muted-foreground">
+                  🔒 Your payment is secured by <span className="font-medium text-foreground">PayPack Rwanda</span>
+                </p>
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1 rounded-md bg-yellow-400/10 px-2 py-1 text-xs font-medium">
+                    📱 MTN MoMo
+                  </span>
+                  <span className="flex items-center gap-1 rounded-md bg-red-500/10 px-2 py-1 text-xs font-medium">
+                    📲 Airtel Money
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </div>
