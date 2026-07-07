@@ -22,7 +22,8 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { deliveryFeeFor } from "@/lib/format"
 import { z } from "zod"
-import { sendOrderStatusSms } from "@/server/services/sms"
+import { getSmsMessage } from "@/server/services/sms-templates"
+import { enqueueSms } from "@/server/services/sms-queue"
 import { sendOrderConfirmationEmail } from "@/server/services/email"
 import { features } from "@/lib/env"
 
@@ -232,9 +233,11 @@ export async function POST(req: Request) {
 
     // ─── Send confirmations (non-blocking) ─────────────────────────
     if (features.sms) {
-      sendOrderStatusSms(order.customerPhone, order.orderNumber, "PENDING").catch((e) =>
-        console.error("SMS send failed:", e)
-      )
+      const message = getSmsMessage("ORDER_PLACED", "en", { orderNumber: order.orderNumber })
+      enqueueSms(order.customerPhone, message, {
+        priority: 0,
+        template: "ORDER_PLACED",
+      })
     }
     if (features.email && order.customerEmail) {
       sendOrderConfirmationEmail(order.customerEmail, order.orderNumber, order.total).catch(
