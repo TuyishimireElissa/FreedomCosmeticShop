@@ -84,6 +84,7 @@ import {
   TrendingUp,
   ChevronDown,
   LogOut,
+  MessageCircle,
 } from "lucide-react"
 
 const STATUS_OPTIONS = [
@@ -637,7 +638,14 @@ export function AdminView() {
                     {orders.map((o) => (
                       <tr
                         key={o.id}
-                        className="hover:bg-secondary/20"
+                        className={`hover:bg-secondary/20 ${
+                          o.status === "PENDING" ? "bg-amber-50/50" :
+                          o.status === "CONFIRMED" ? "bg-blue-50/30" :
+                          o.status === "SHIPPED" ? "bg-orange-50/30" :
+                          o.status === "DELIVERED" ? "bg-emerald-50/30" :
+                          o.status === "CANCELLED" ? "bg-red-50/30" :
+                          ""
+                        }`}
                       >
                         <td className="px-3 py-3">
                           <input
@@ -688,6 +696,30 @@ export function AdminView() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex justify-end gap-1">
+                            {/* NEW: Quick confirm for pending orders */}
+                            {o.status === "PENDING" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 px-2 text-xs text-emerald-600 hover:bg-emerald-50"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  updateOrderStatus(o.id, "status", "CONFIRMED")
+                                }}
+                              >
+                                <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
+                                Confirm
+                              </Button>
+                            )}
+                            {/* View button */}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 px-2 text-xs"
+                              onClick={() => handleRowClick(o)}
+                            >
+                              View
+                            </Button>
                             <InvoicePrinter order={o} />
                           </div>
                         </td>
@@ -846,6 +878,29 @@ export function AdminView() {
                     <label className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Payment status
                     </label>
+                    {/* NEW: Payment info block */}
+                    <div className="mb-2 rounded-lg bg-secondary/30 p-3 text-xs space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Method</span>
+                        <span className="font-medium">
+                          {PAYMENT_METHODS[selectedOrder.paymentMethod as PaymentMethodKey]?.label || selectedOrder.paymentMethod}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Amount</span>
+                        <span className="font-medium">{formatRWF(selectedOrder.total)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Status</span>
+                        <span className={`font-medium ${
+                          selectedOrder.paymentStatus === "PAID" ? "text-emerald-600" :
+                          selectedOrder.paymentStatus === "FAILED" ? "text-red-600" :
+                          "text-amber-600"
+                        }`}>
+                          {selectedOrder.paymentStatus}
+                        </span>
+                      </div>
+                    </div>
                     <Select
                       value={selectedOrder.paymentStatus}
                       onValueChange={(v) => updateOrderStatus(selectedOrder.id, "paymentStatus", v)}
@@ -861,6 +916,61 @@ export function AdminView() {
                 </div>
 
                 <InvoicePrinter order={selectedOrder} />
+
+                {/* NEW: Communication + Delivery actions */}
+                <div className="mt-4 space-y-2">
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Actions</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {/* Send SMS to customer */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={async () => {
+                        try {
+                          await fetch("/api/sms/send", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              to: selectedOrder.customerPhone,
+                              message: `Hello ${selectedOrder.customerName}, your order ${selectedOrder.orderNumber} status is: ${selectedOrder.status}. Total: ${formatRWF(selectedOrder.total)}. Ubumwe Beauty`,
+                            }),
+                          })
+                          toast({ title: "SMS sent", description: `To ${selectedOrder.customerPhone}` })
+                        } catch {
+                          toast({ title: "SMS failed", variant: "destructive" })
+                        }
+                      }}
+                    >
+                      <Bell className="mr-1.5 h-3.5 w-3.5" /> Send SMS
+                    </Button>
+
+                    {/* WhatsApp customer */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const phone = selectedOrder.customerPhone.replace(/[\s+]/g, "")
+                        const msg = `Hello ${selectedOrder.customerName}, regarding your order ${selectedOrder.orderNumber} (${formatRWF(selectedOrder.total)})`
+                        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank")
+                      }}
+                    >
+                      <MessageCircle className="mr-1.5 h-3.5 w-3.5" /> WhatsApp
+                    </Button>
+
+                    {/* Assign to deliveries tab */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setDetailOpen(false)
+                        setActiveTab("deliveries")
+                        toast({ title: "Go to Deliveries", description: "Assign a rider for this order" })
+                      }}
+                    >
+                      <Truck className="mr-1.5 h-3.5 w-3.5" /> Assign Rider
+                    </Button>
+                  </div>
+                </div>
               </div>
             </>
           )}
