@@ -117,24 +117,60 @@ export function AdminOverview() {
   const { goTrackOrder } = useStore()
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [chartRange, setChartRange] = useState<"today" | "week" | "month">("month")
+  const [prevOrderCount, setPrevOrderCount] = useState(0)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch("/api/admin/analytics?range=month")
+      const res = await fetch(`/api/admin/analytics?range=${chartRange}`)
       if (!res.ok) return
       const json = await res.json()
       setData(json)
+
+      // Sound alert on new order
+      const currentCount = json.totalOrders || 0
+      if (prevOrderCount > 0 && currentCount > prevOrderCount) {
+        playOrderSound()
+      }
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPrevOrderCount(currentCount)
     } catch (e) {
       console.error(e)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [chartRange, prevOrderCount])
 
   useEffect(() => {
     load()
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(load, 30000)
+    return () => clearInterval(interval)
   }, [load])
+
+  /**
+   * Play a subtle beep sound when a new order arrives.
+   */
+  function playOrderSound() {
+    try {
+      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      if (!AudioContextClass) return
+      const ctx = new AudioContextClass()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.value = 880
+      osc.type = "sine"
+      gain.gain.setValueAtTime(0.2, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.3)
+    } catch {
+      // Audio not supported — ignore
+    }
+  }
 
   if (loading || !data) {
     return (
@@ -339,9 +375,27 @@ export function AdminOverview() {
 
       {/* ─── Revenue chart ──────────────────────────────────────────── */}
       <div className="rounded-2xl border bg-card p-5">
-        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-          <TrendingUp className="h-5 w-5 text-primary" /> Revenue (last 30 days)
-        </h3>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h3 className="flex items-center gap-2 text-lg font-semibold">
+            <TrendingUp className="h-5 w-5 text-primary" /> Revenue Trend
+          </h3>
+          {/* NEW: Chart range toggle */}
+          <div className="flex gap-1 rounded-lg bg-secondary/50 p-1">
+            {(["today", "week", "month"] as const).map((r) => (
+              <button
+                key={r}
+                onClick={() => setChartRange(r)}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                  chartRange === r
+                    ? "bg-background shadow-sm text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {r === "today" ? "Today" : r === "week" ? "This Week" : "This Month"}
+              </button>
+            ))}
+          </div>
+        </div>
         <ResponsiveContainer width="100%" height={280}>
           <LineChart data={data.revenueChart}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
