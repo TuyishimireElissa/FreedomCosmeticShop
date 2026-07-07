@@ -55,6 +55,7 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { useStore } from "@/store/useStore"
 import { useAdminNotifications } from "@/hooks/useAdminNotifications"
+import { AdminLoginScreen } from "./AdminLoginScreen"
 import { AdminOverview } from "./AdminOverview"
 import { AdminProductManager } from "./AdminProductManager"
 import { AdminCustomers } from "./AdminCustomers"
@@ -241,6 +242,48 @@ export function AdminView() {
       .filter((o) => o.status === "DELIVERED")
       .reduce((sum, o) => sum + o.total, 0),
   }
+
+  // ─── ACCESS GATE ─────────────────────────────────────────────────
+  // If user is not logged in → show admin login screen
+  // If user is logged in but not admin → show access denied
+  // If user is admin → show the dashboard (existing code below)
+
+  const { authLoading } = useStore()
+
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Shield className="h-8 w-8 animate-pulse text-primary" />
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <AdminLoginScreen onBack={goHome} />
+  }
+
+  if (user.role !== "ADMIN" && user.role !== "STAFF" && user.role !== "MANAGER") {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl border bg-card p-8 text-center shadow-lg">
+          <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-red-100">
+            <Shield className="h-8 w-8 text-red-600" />
+          </div>
+          <h1 className="text-xl font-bold text-red-900">Access Denied</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            You do not have permission to access the admin panel.
+            <br />
+            Admin access only.
+          </p>
+          <Button variant="outline" className="mt-6" onClick={goHome}>
+            Back to store
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── ADMIN DASHBOARD (existing code) ──────────────────────────────
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
