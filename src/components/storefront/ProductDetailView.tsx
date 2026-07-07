@@ -26,7 +26,7 @@
  *   - Trust badges
  */
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useStore } from "@/store/useStore"
 import { Product } from "@/lib/types"
 import { formatRWF } from "@/lib/format"
@@ -86,6 +86,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [zoom, setZoom] = useState({ active: false, x: 0, y: 0 })
   const [deliveryDistrict, setDeliveryDistrict] = useState("Nyarugenge")
+  const touchStartX = useRef(0) // For mobile swipe gesture
 
   useEffect(() => {
     let cancelled = false
@@ -145,7 +146,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   const handleShare = (platform: "whatsapp" | "instagram" | "copy") => {
     if (!product) return
     const url = typeof window !== "undefined" ? window.location.href : ""
-    const text = `Check out ${product.name} on Ubumwe Beauty!`
+    const text = `Check out this product on Ubumwe Beauty:\n${product.name} - ${formatRWF(product.price)}\n${url}\nPay with MTN MoMo 💛`
 
     if (platform === "whatsapp") {
       window.open(
@@ -269,6 +270,22 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
             className="relative aspect-square overflow-hidden rounded-2xl border bg-secondary/20"
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setZoom({ active: false, x: 0, y: 0 })}
+            onTouchStart={(e) => {
+              // Track touch start X for swipe detection
+              touchStartX.current = e.touches[0].clientX
+            }}
+            onTouchEnd={(e) => {
+              // Swipe to change images on mobile
+              const touchEndX = e.changedTouches[0].clientX
+              const diff = touchStartX.current - touchEndX
+              if (Math.abs(diff) > 50) {
+                if (diff > 0 && activeImage < images.length - 1) {
+                  setActiveImage(activeImage + 1)
+                } else if (diff < 0 && activeImage > 0) {
+                  setActiveImage(activeImage - 1)
+                }
+              }
+            }}
           >
             {images[activeImage] ? (
               <img
@@ -728,11 +745,51 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
                 Shipping &amp; returns
               </AccordionTrigger>
               <AccordionContent>
+                {/* Delivery fee table */}
+                <div className="mb-3 overflow-hidden rounded-lg border">
+                  <table className="w-full text-xs">
+                    <thead className="bg-secondary/50 text-muted-foreground">
+                      <tr>
+                        <th className="px-3 py-2 text-left font-medium">Zone</th>
+                        <th className="px-3 py-2 text-right font-medium">Fee</th>
+                        <th className="px-3 py-2 text-right font-medium">Time</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      <tr>
+                        <td className="px-3 py-2">Kigali City</td>
+                        <td className="px-3 py-2 text-right font-medium">1,000 RWF</td>
+                        <td className="px-3 py-2 text-right">Same day</td>
+                      </tr>
+                      <tr>
+                        <td className="px-3 py-2">Northern Province</td>
+                        <td className="px-3 py-2 text-right font-medium">3,000 RWF</td>
+                        <td className="px-3 py-2 text-right">2-3 days</td>
+                      </tr>
+                      <tr>
+                        <td className="px-3 py-2">Southern Province</td>
+                        <td className="px-3 py-2 text-right font-medium">3,000 RWF</td>
+                        <td className="px-3 py-2 text-right">2-3 days</td>
+                      </tr>
+                      <tr>
+                        <td className="px-3 py-2">Eastern Province</td>
+                        <td className="px-3 py-2 text-right font-medium">3,500 RWF</td>
+                        <td className="px-3 py-2 text-right">2-3 days</td>
+                      </tr>
+                      <tr>
+                        <td className="px-3 py-2">Western Province</td>
+                        <td className="px-3 py-2 text-right font-medium">4,000 RWF</td>
+                        <td className="px-3 py-2 text-right">3-4 days</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
                 <ul className="space-y-1 text-sm text-foreground/85">
-                  <li>• Free delivery in Kigali for orders over RWF 50,000</li>
-                  <li>• Delivery to all 30 districts of Rwanda</li>
-                  <li>• Returns accepted within 7 days (unopened only)</li>
-                  <li>• Pay with MTN MoMo, Airtel Money, or Cash on Delivery</li>
+                  <li>• 🎉 Free delivery on orders above 50,000 RWF</li>
+                  <li>• 📦 Delivery to all 30 districts of Rwanda</li>
+                  <li>• 🔄 Returns accepted within 7 days (unopened only)</li>
+                  <li>• 💛 Pay with MTN MoMo, Airtel Money, or Cash on Delivery</li>
+                  <li>• ✅ 100% authentic — sourced from authorized distributors</li>
                 </ul>
               </AccordionContent>
             </AccordionItem>
@@ -754,6 +811,23 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─── Complete Your Routine — NEW ─────────────────────────────── */}
+      {related.length > 2 && (
+        <section className="mt-12">
+          <h2 className="mb-1 text-xl font-bold tracking-tight sm:text-2xl">
+            ✨ Complete your routine
+          </h2>
+          <p className="mb-4 text-sm text-muted-foreground">
+            Complementary products that work great together
+          </p>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+            {related.slice(0, 4).reverse().map((p) => (
+              <ProductCard key={`routine-${p.id}`} product={p} />
             ))}
           </div>
         </section>
