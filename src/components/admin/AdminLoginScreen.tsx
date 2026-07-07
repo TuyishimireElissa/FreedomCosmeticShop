@@ -45,7 +45,7 @@ interface AdminLoginScreenProps {
 }
 
 export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
-  const { login, fetchUser } = useStore()
+  const { fetchUser, logout } = useStore()
   const { toast } = useToast()
 
   const [phone, setPhone] = useState("")
@@ -97,7 +97,16 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
     setError(null)
 
     try {
-      await login(phone, password)
+      // Call the login API directly
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, password }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || "Invalid credentials")
+      }
       // Fetch the full user to check role
       await fetchUser()
       const user = useStore.getState().user

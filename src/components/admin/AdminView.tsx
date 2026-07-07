@@ -82,6 +82,8 @@ import {
   ShoppingCart,
   Clock,
   TrendingUp,
+  ChevronDown,
+  LogOut,
 } from "lucide-react"
 
 const STATUS_OPTIONS = [
@@ -250,6 +252,23 @@ export function AdminView() {
 
   const { authLoading } = useStore()
 
+  // Kigali real-time clock
+  useEffect(() => {
+    const updateClock = () => {
+      const clock = document.getElementById("admin-clock")
+      if (clock) {
+        clock.textContent = new Date().toLocaleTimeString("en-RW", {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "Africa/Kigali",
+        })
+      }
+    }
+    updateClock()
+    const interval = setInterval(updateClock, 1000)
+    return () => clearInterval(interval)
+  }, [])
+
   if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -286,94 +305,173 @@ export function AdminView() {
   // ─── ADMIN DASHBOARD (existing code) ──────────────────────────────
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <Shield className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              Admin dashboard
-            </h1>
+    <div className="min-h-screen bg-background">
+      {/* ─── Enhanced Admin Header ─────────────────────────────────── */}
+      <div className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur">
+        {/* Top row: logo + search + profile */}
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:gap-4 sm:px-6 lg:px-8">
+          {/* Logo + title */}
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground">
+              <Shield className="h-4 w-4" />
+            </span>
+            <div className="hidden sm:block">
+              <p className="text-sm font-bold leading-tight">Ubumwe Beauty</p>
+              <p className="text-[10px] text-muted-foreground">Admin Panel</p>
+            </div>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {user?.name ? `Welcome, ${user.name}` : "Manage your store"}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          {/* Notifications bell */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="relative">
-                <Bell className="h-4 w-4" />
-                {notifications.length > 0 && (
-                  <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
-                    {notifications.length}
-                  </span>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
-              <DropdownMenuLabel className="flex items-center justify-between">
-                <span>Notifications</span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setEnabled(!enabled)}
-                    className="text-xs text-primary hover:underline"
-                  >
-                    {enabled ? "Pause" : "Resume"}
-                  </button>
+
+          {/* Global search */}
+          <div className="relative ml-auto hidden max-w-xs flex-1 md:block">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search orders, products, customers..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-9 rounded-full pl-9 pr-3"
+            />
+          </div>
+
+          {/* Right side actions */}
+          <div className="ml-auto flex items-center gap-1.5 md:ml-0">
+            {/* Kigali clock */}
+            <div className="hidden items-center gap-1.5 rounded-lg bg-secondary/50 px-2.5 py-1.5 text-xs lg:flex">
+              <Clock className="h-3.5 w-3.5 text-primary" />
+              <span className="font-mono font-medium" id="admin-clock">--:--</span>
+              <span className="text-muted-foreground">KGL</span>
+            </div>
+
+            {/* Notifications bell */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" className="relative">
+                  <Bell className="h-4 w-4" />
                   {notifications.length > 0 && (
-                    <button onClick={clearAll} className="text-xs text-muted-foreground hover:underline">
-                      Clear
-                    </button>
+                    <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                      {notifications.length}
+                    </span>
                   )}
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {notifications.length === 0 ? (
-                <div className="py-6 text-center text-sm text-muted-foreground">
-                  No new notifications
-                </div>
-              ) : (
-                notifications.map((n) => (
-                  <DropdownMenuItem
-                    key={n.id}
-                    className="flex flex-col items-start gap-1 py-2"
-                  >
-                    <div className="flex w-full items-start justify-between gap-2">
-                      <div>
-                        <p className="text-sm font-medium">{n.title}</p>
-                        <p className="text-xs text-muted-foreground">{n.message}</p>
-                        <p className="text-[10px] text-muted-foreground">
-                          {new Date(n.timestamp).toLocaleTimeString()}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => dismiss(n.id)}
-                        className="text-muted-foreground hover:text-foreground"
-                      >
-                        ×
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80">
+                <DropdownMenuLabel className="flex items-center justify-between">
+                  <span>Notifications</span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setEnabled(!enabled)}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      {enabled ? "Pause" : "Resume"}
+                    </button>
+                    {notifications.length > 0 && (
+                      <button onClick={clearAll} className="text-xs text-muted-foreground hover:underline">
+                        Clear
                       </button>
+                    )}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {notifications.length === 0 ? (
+                  <div className="py-6 text-center text-sm text-muted-foreground">
+                    No new notifications
+                  </div>
+                ) : (
+                  notifications.map((n) => (
+                    <DropdownMenuItem
+                      key={n.id}
+                      className="flex flex-col items-start gap-1 py-2"
+                    >
+                      <div className="flex w-full items-start justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-medium">{n.title}</p>
+                          <p className="text-xs text-muted-foreground">{n.message}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            {new Date(n.timestamp).toLocaleTimeString()}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => dismiss(n.id)}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </DropdownMenuItem>
+                  ))
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Real-time notifications */}
+            <RealTimeNotifications />
+
+            {/* Reset button */}
+            <Button variant="outline" size="sm" onClick={handleReseed} className="hidden sm:inline-flex">
+              <Trash2 className="mr-1.5 h-4 w-4" /> Reset
+            </Button>
+
+            {/* Admin profile dropdown — NEW */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+                    {user?.name?.charAt(0).toUpperCase() || "A"}
+                  </span>
+                  <span className="hidden text-sm font-medium sm:inline">{user?.name?.split(" ")[0] || "Admin"}</span>
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex items-center gap-2">
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
+                      {user?.name?.charAt(0).toUpperCase() || "A"}
+                    </span>
+                    <div>
+                      <p className="text-sm font-medium">{user?.name}</p>
+                      <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        {user?.role} · Online
+                      </p>
                     </div>
-                  </DropdownMenuItem>
-                ))
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Button variant="outline" size="sm" onClick={handleReseed}>
-            <Trash2 className="mr-1.5 h-4 w-4" /> Reset
-          </Button>
-
-          {/* Real-time notifications */}
-          <RealTimeNotifications />
-
-          <Button variant="ghost" size="sm" onClick={goHome}>
-            Exit
-          </Button>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setActiveTab("settings")}>
+                  <SettingsIcon className="mr-2 h-4 w-4" /> Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("analytics")}>
+                  <BarChart3 className="mr-2 h-4 w-4" /> Analytics
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
+                    useStore.getState().logout()
+                    goHome()
+                  }}
+                  className="text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" /> Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </div>
+
+      {/* ─── Main content ──────────────────────────────────────────── */}
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        {/* Welcome message */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+            Admin dashboard
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {user?.name ? `Welcome back, ${user.name}` : "Manage your store"} · {new Date().toLocaleDateString("en-RW", { weekday: "long", day: "numeric", month: "long" })}
+          </p>
+        </div>
+
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -768,6 +866,7 @@ export function AdminView() {
           )}
         </SheetContent>
       </Sheet>
+      </div>
     </div>
   )
 }
