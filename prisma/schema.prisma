@@ -434,6 +434,13 @@ model Payment {
   // Failure
   failureReason String?
 
+  // ─── New fields for PayPack integration ───────────────────────────
+  // Network: MTN | AIRTEL (for MoMo payments)
+  network       String?
+  // Raw webhook payload (JSON string — SQLite doesn't support Json type)
+  webhookData   String?
+  // ─── End new fields ────────────────────────────────────────────────
+
   // Timestamps
   initiatedAt DateTime @default(now())
   completedAt DateTime?
@@ -442,6 +449,32 @@ model Payment {
   @@index([providerTransactionId])
   @@index([status])
   @@index([method])
+  @@index([network])
+}
+
+// =============================================================================
+// 10b. PAYMENT ATTEMPT (tracks retry attempts for MoMo/Airtel payments)
+// =============================================================================
+// NEW MODEL — does not affect existing Payment model.
+// Used to track individual payment attempts (customer may retry with different phones).
+
+model PaymentAttempt {
+  id            String   @id @default(cuid())
+  orderId       String
+  phone         String
+  amount        Int      // RWF
+  network       String   // MTN | AIRTEL
+  reference     String?  // PayPack transaction reference
+  status        String   @default("PENDING") // PENDING | SUCCESS | FAILED
+  attemptCount  Int      @default(1)
+  lastError     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([phone])
+  @@index([status])
+  @@index([reference])
 }
 
 // =============================================================================
