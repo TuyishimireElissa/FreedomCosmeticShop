@@ -42,7 +42,19 @@ import {
   ShoppingCart,
   DollarSign,
   AlertTriangle,
+  Zap,
+  Plus,
+  Bell,
+  Gift,
+  Truck,
+  Download,
+  UserPlus,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  ArrowRight,
 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface AnalyticsData {
   range: string
@@ -169,6 +181,130 @@ export function AdminOverview() {
           icon={TrendingUp}
           color="text-purple-600"
         />
+      </div>
+
+      {/* ─── Quick Actions + Alerts ─────────────────────────────────── */}
+      <div className="grid gap-4 lg:grid-cols-3">
+        {/* Quick Actions — NEW */}
+        <div className="rounded-2xl border bg-card p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold">
+            <Zap className="h-4 w-4 text-primary" /> Quick Actions
+          </h3>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+              <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Product
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+              <Package className="mr-1.5 h-3.5 w-3.5" /> Pending Orders
+              {(data.ordersByStatus.PENDING || 0) > 0 && (
+                <span className="ml-1 rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+                  {data.ordersByStatus.PENDING || 0}
+                </span>
+              )}
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+              <Bell className="mr-1.5 h-3.5 w-3.5" /> Send SMS
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+              <Gift className="mr-1.5 h-3.5 w-3.5" /> New Coupon
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+              <Truck className="mr-1.5 h-3.5 w-3.5" /> Assign Rider
+            </Button>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+              <Download className="mr-1.5 h-3.5 w-3.5" /> Export
+            </Button>
+          </div>
+        </div>
+
+        {/* Alerts Panel — NEW */}
+        <div className="rounded-2xl border bg-card p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold">
+            <AlertTriangle className="h-4 w-4 text-amber-500" /> Alerts
+          </h3>
+          <div className="mt-3 space-y-2">
+            {/* Critical */}
+            {(data.ordersByStatus.PENDING || 0) > 2 && (
+              <div className="flex items-start gap-2 rounded-lg bg-red-50 p-2">
+                <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-600" />
+                <p className="text-xs text-red-700">
+                  <span className="font-semibold">Critical:</span> {data.ordersByStatus.PENDING || 0} orders pending &gt; 2 hours
+                </p>
+              </div>
+            )}
+            {/* Warning */}
+            {(data.lowStockProducts?.length || 0) > 0 && (
+              <div className="flex items-start gap-2 rounded-lg bg-amber-50 p-2">
+                <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-600" />
+                <p className="text-xs text-amber-700">
+                  <span className="font-semibold">Warning:</span> {data.lowStockProducts?.length || 0} products with low stock
+                </p>
+              </div>
+            )}
+            {data.outOfStockCount > 0 && (
+              <div className="flex items-start gap-2 rounded-lg bg-red-50 p-2">
+                <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-red-600" />
+                <p className="text-xs text-red-700">
+                  <span className="font-semibold">Critical:</span> {data.outOfStockCount} products out of stock
+                </p>
+              </div>
+            )}
+            {/* Info */}
+            <div className="flex items-start gap-2 rounded-lg bg-emerald-50 p-2">
+              <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600" />
+              <p className="text-xs text-emerald-700">
+                <span className="font-semibold">Info:</span> {data.newCustomers} new customers this month
+              </p>
+            </div>
+            <div className="flex items-start gap-2 rounded-lg bg-blue-50 p-2">
+              <TrendingUp className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-600" />
+              <p className="text-xs text-blue-700">
+                <span className="font-semibold">Info:</span> Revenue {formatRWF(data.revenue.today)} today
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Live Order Feed — NEW */}
+        <div className="rounded-2xl border bg-card p-4">
+          <h3 className="flex items-center gap-2 text-sm font-semibold">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+            Live Orders
+            <span className="ml-auto text-[10px] text-muted-foreground">Auto-refresh 30s</span>
+          </h3>
+          <div className="mt-3 max-h-48 space-y-2 overflow-y-auto ub-scroll">
+            {data.recentOrders.length === 0 ? (
+              <p className="py-4 text-center text-xs text-muted-foreground">No recent orders</p>
+            ) : (
+              data.recentOrders.slice(0, 5).map((order) => (
+                <div key={order.id} className="rounded-lg border p-2 text-xs">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-medium">{order.orderNumber}</span>
+                    <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
+                      order.status === "DELIVERED" ? "bg-emerald-100 text-emerald-700" :
+                      order.status === "PENDING" ? "bg-amber-100 text-amber-700" :
+                      "bg-blue-100 text-blue-700"
+                    }`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between text-muted-foreground">
+                    <span>{order.customerName} · {order.itemCount} items</span>
+                    <span className="font-medium text-foreground">{formatRWF(order.total)}</span>
+                  </div>
+                  <div className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <Clock className="h-2.5 w-2.5" />
+                    {new Date(order.createdAt).toLocaleTimeString("en-RW", { hour: "2-digit", minute: "2-digit" })}
+                    <span className="ml-1">{order.paymentMethod === "MTN_MOMO" ? "💛" : order.paymentMethod === "AIRTEL_MONEY" ? "🔴" : order.paymentMethod === "CARD" ? "💳" : "💵"}</span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          <Button variant="ghost" size="sm" className="mt-2 w-full text-xs">
+            View All Orders <ArrowRight className="ml-1 h-3 w-3" />
+          </Button>
+        </div>
       </div>
 
       {/* ─── Quick stats ────────────────────────────────────────────── */}
