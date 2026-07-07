@@ -58,6 +58,8 @@ import {
   Loader2,
   X,
   ImagePlus,
+  Copy,
+  Download,
 } from "lucide-react"
 
 interface AdminProductManagerProps {
@@ -121,6 +123,11 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   const [brands, setBrands] = useState<Brand[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+
+  // NEW: Filter state
+  const [categoryFilter, setCategoryFilter] = useState("all")
+  const [brandFilter, setBrandFilter] = useState("all")
+  const [stockFilter, setStockFilter] = useState("all")
 
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState<ProductFormState>(EMPTY_FORM)
@@ -327,6 +334,70 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     }
   }
 
+  // NEW: Duplicate a product (opens create form pre-filled with product data)
+  const handleDuplicate = (product: Product) => {
+    setForm({
+      name: `${product.name} (Copy)`,
+      shortDescription: product.shortDescription || "",
+      description: product.description,
+      price: String(product.price),
+      compareAt: product.compareAt ? String(product.compareAt) : "",
+      stock: String(product.stock),
+      sku: product.sku || "",
+      categoryId: product.categoryId,
+      brandId: product.brandId || "",
+      images: product.images || [],
+      newImageUrl: "",
+      skinType: product.skinType || [],
+      shades: product.shades || [],
+      newShade: "",
+      ingredients: product.ingredients || [],
+      newIngredient: "",
+      size: product.size || "",
+      usageInstructions: product.usageInstructions || "",
+      warnings: product.warnings || "",
+      featured: product.featured,
+      isActive: true,
+    })
+    setShowForm(true)
+    toast({ title: "Product duplicated", description: "Edit and save the copy." })
+  }
+
+  // NEW: Export products to CSV
+  const handleExportCSV = () => {
+    const headers = ["Name", "SKU", "Category", "Brand", "Price (RWF)", "Compare At", "Stock", "Status", "Featured"]
+    const rows = filteredProducts.map((p) => [
+      `"${p.name}"`,
+      p.sku || "",
+      p.category?.name || "",
+      p.brand?.name || "",
+      p.price,
+      p.compareAt || "",
+      p.stock,
+      p.isActive ? "Active" : "Inactive",
+      p.featured ? "Yes" : "No",
+    ])
+    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `products-export-${new Date().toISOString().slice(0, 10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+    toast({ title: "Exported", description: `${filteredProducts.length} products exported to CSV` })
+  }
+
+  // NEW: Apply filters to products
+  const filteredProducts = products.filter((p) => {
+    if (categoryFilter !== "all" && p.categoryId !== categoryFilter) return false
+    if (brandFilter !== "all" && p.brandId !== brandFilter) return false
+    if (stockFilter === "in" && p.stock <= 5) return false
+    if (stockFilter === "low" && (p.stock === 0 || p.stock > 5)) return false
+    if (stockFilter === "out" && p.stock !== 0) return false
+    return true
+  })
+
   return (
     <div>
       {/* Header */}
@@ -338,21 +409,63 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
           </p>
         </div>
         <div className="flex gap-2">
+          {/* NEW: Export CSV button */}
+          <Button variant="outline" size="sm" onClick={handleExportCSV}>
+            <Download className="mr-1.5 h-4 w-4" /> Export
+          </Button>
           <Button onClick={openCreate}>
             <Plus className="mr-1.5 h-4 w-4" /> Add product
           </Button>
         </div>
       </div>
 
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search products by name, SKU, or brand..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="h-10 pl-9"
-        />
+      {/* Search + Filters */}
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search products by name, SKU, or brand..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-10 pl-9"
+          />
+        </div>
+        {/* NEW: Category filter */}
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="h-10 w-[140px]">
+            <SelectValue placeholder="All categories" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All categories</SelectItem>
+            {categories.map((c) => (
+              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {/* NEW: Brand filter */}
+        <Select value={brandFilter} onValueChange={setBrandFilter}>
+          <SelectTrigger className="h-10 w-[140px]">
+            <SelectValue placeholder="All brands" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All brands</SelectItem>
+            {brands.map((b) => (
+              <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {/* NEW: Stock status filter */}
+        <Select value={stockFilter} onValueChange={setStockFilter}>
+          <SelectTrigger className="h-10 w-[120px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All stock</SelectItem>
+            <SelectItem value="in">In stock</SelectItem>
+            <SelectItem value="low">Low stock</SelectItem>
+            <SelectItem value="out">Out of stock</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Table */}
@@ -385,7 +498,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {products.map((p) => (
+                {filteredProducts.map((p) => (
                   <tr key={p.id} className="hover:bg-secondary/20">
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2">
@@ -449,6 +562,16 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                           aria-label={`Edit ${p.name}`}
                         >
                           <Pencil className="h-4 w-4" />
+                        </Button>
+                        {/* NEW: Duplicate action */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => handleDuplicate(p)}
+                          aria-label={`Duplicate ${p.name}`}
+                        >
+                          <Copy className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
