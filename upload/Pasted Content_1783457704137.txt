@@ -1,0 +1,1116 @@
+ZDEV, BEFORE ANYTHING ELSE READ THESE 
+RULES AND CONFIRM YOU UNDERSTAND THEM:
+
+╔═════════════════════════════════════════╗
+║         🚨 IRON RULES 🚨                ║
+║   BREAK ANY OF THESE = START OVER       ║
+╠═════════════════════════════════════════╣
+║                                         ║
+║  RULE 1: NEVER DESTROY EXISTING CODE   ║
+║  Everything already working STAYS.      ║
+║  You only ADD. You only IMPROVE.        ║
+║  You NEVER delete working features.     ║
+║                                         ║
+║  RULE 2: REMEMBER EVERYTHING BUILT     ║
+║  The project already has:               ║
+║  ✅ Homepage (working)                  ║
+║  ✅ Product listing (working)           ║
+║  ✅ Product detail pages (working)      ║
+║  ✅ Categories (working)               ║
+║  ✅ Cart system (working)              ║
+║  ✅ Checkout (working)                 ║
+║  ✅ User auth (working)                ║
+║  ✅ Admin dashboard (working)          ║
+║  ✅ Mobile app (working)               ║
+║  ✅ Order system (working)             ║
+║  ✅ MTN MoMo payment (working)        ║
+║  ✅ Rwanda district delivery (working) ║
+║  ALL OF THIS MUST REMAIN WORKING.      ║
+║                                         ║
+║  RULE 3: SURGICAL CHANGES ONLY         ║
+║  Touch ONLY what needs improvement.    ║
+║  If a file is not related → SKIP IT.   ║
+║                                         ║
+║  RULE 4: CHECK BEFORE TOUCHING         ║
+║  Before modifying any existing file:   ║
+║  1. Tell me the file name              ║
+║  2. Tell me what EXISTS in it          ║
+║  3. Tell me what you will ADD          ║
+║  4. Get my approval if unsure          ║
+║                                         ║
+║  RULE 5: SHOW ALL CHANGES              ║
+║  After every improvement tell me:      ║
+║  📁 NEW files created: [list]          ║
+║  ✏️  MODIFIED files: [what changed]    ║
+║  🔒 UNTOUCHED files: [list]            ║
+║                                         ║
+║  RULE 6: NO PLACEHOLDER CODE           ║
+║  Every function must be complete.      ║
+║  No "// TODO: implement this"          ║
+║  No empty functions.                   ║
+║  No fake implementations.              ║
+║                                         ║
+║  RULE 7: TEST AFTER EACH CHANGE        ║
+║  After each improvement verify:        ║
+║  - Existing features still work        ║
+║  - New feature works correctly         ║
+║  - No new errors introduced            ║
+║                                         ║
+║  RULE 8: RWANDA FIRST ALWAYS           ║
+║  Every improvement must work for:      ║
+║  - Slow 3G internet                    ║
+║  - Low-end Android phones              ║
+║  - MTN MoMo payments                  ║
+║  - Rwanda districts                    ║
+║  - Kinyarwanda/English/French          ║
+║                                         ║
+║  RULE 9: PRODUCTION QUALITY            ║
+║  All code must be:                     ║
+║  - Production ready                    ║
+║  - Fully typed (TypeScript)            ║
+║  - Error handled                       ║
+║  - Secure                              ║
+║  - Optimized                           ║
+║                                         ║
+║  RULE 10: ONE SECTION AT A TIME        ║
+║  Complete one improvement fully.       ║
+║  Report what you did.                  ║
+║  Wait for my approval.                 ║
+║  Then move to next improvement.        ║
+║                                         ║
+╚═════════════════════════════════════════╝
+
+Confirm you understand all 10 rules.
+Say: "RULES CONFIRMED. READY TO IMPROVE."
+Then wait for me to say START.
+
+════════════════════════════════════════════
+PROJECT CONTEXT (REMEMBER THIS ALWAYS)
+════════════════════════════════════════════
+
+Project: BeautyHub Rwanda
+Type: Cosmetics E-Commerce
+Market: Rwanda 🇷🇼
+URL: https://e13ps57nf9u0-d.space-z.ai/
+Currency: RWF (Rwandan Franc)
+Primary Payment: MTN Mobile Money
+Stack: Next.js + Node.js + React Native
+       + PostgreSQL + Prisma + TypeScript
+
+Target Users:
+- Rwandan women aged 18-45
+- Using low-end Android phones
+- On MTN/Airtel network
+- Shopping in Kigali and provinces
+- Trust is very important to them
+- WhatsApp is their primary communication
+
+════════════════════════════════════════════
+IMPROVEMENT MISSION
+════════════════════════════════════════════
+
+Improve the existing BeautyHub Rwanda 
+website to make it a WORLD-CLASS 
+cosmetics e-commerce platform.
+
+Work through these improvements 
+ONE SECTION AT A TIME.
+Complete each fully before moving on.
+
+════════════════════════════════════════════
+IMPROVEMENT 1: HOMEPAGE STRENGTHENING
+════════════════════════════════════════════
+
+FIND the existing homepage (app/page.tsx).
+DO NOT rebuild it from scratch.
+IMPROVE these specific sections:
+
+1A. STRENGTHEN HERO SECTION
+────────────────────────────
+FIND existing hero/banner component.
+IMPROVE it to include:
+
+Headline (English):
+"Rwanda's #1 Beauty Store 🇷🇼
+ 100% Authentic Products"
+
+Headline (Kinyarwanda):
+"Aho Ibicuruzwa by'Ubuteki Biri Hose
+ Ibicuruzwa 100% Nyakuri"
+
+Sub-headline:
+"Shop skincare, makeup, haircare & more.
+ Pay with MTN MoMo. Delivered to your door."
+
+Trust row under headline:
+┌──────────┬──────────┬──────────┬──────────┐
+│ ✅ 100%  │ 🚚 Fast  │ 💛 MTN  │ 🔄 Easy  │
+│ Genuine  │ Delivery │  MoMo   │ Returns  │
+└──────────┴──────────┴──────────┴──────────┘
+
+CTA Buttons:
+[🛍️ Shop Now]  [💄 Best Sellers]
+
+KEEP existing banner images.
+KEEP existing slider animation.
+Just ADD the text and trust row.
+
+1B. STRENGTHEN PAYMENT VISIBILITY
+───────────────────────────────────
+FIND existing header/navbar.
+ADD payment methods bar below navbar:
+
+┌─────────────────────────────────────────┐
+│ 💛 MTN MoMo  🔴 Airtel  💳 Card  💵 COD│
+│        We accept all Rwanda payments    │
+└─────────────────────────────────────────┘
+
+Background: Light gold (#FFF8E7)
+Text: Small, clean, professional
+
+1C. ADD FREE DELIVERY ANNOUNCEMENT BAR
+────────────────────────────────────────
+ADD above navbar (top of page):
+
+┌─────────────────────────────────────────┐
+│ 🚚 FREE DELIVERY on orders above        │
+│    50,000 RWF | Use code BEAUTY20       │
+│    for 20% off your first order! 🎉    │
+└─────────────────────────────────────────┘
+
+Background: Black or brand primary color
+Text: White
+Add close button (X) to dismiss
+
+1D. STRENGTHEN BEST SELLERS SECTION
+─────────────────────────────────────
+FIND existing best sellers section.
+IMPROVE product cards to show:
+
+- 🔥 "Best Seller" badge (top left)
+- ⭐ Star rating with count
+- Original price crossed out
+- Discounted price in RWF
+- Skin type badge
+- "Add to Cart" button
+- "❤️ Wishlist" icon (top right)
+- Stock indicator:
+  "Only 5 left!" (when stock < 10)
+- Authentic badge: "✅ Genuine"
+
+1E. ADD FLASH SALE SECTION
+───────────────────────────
+ADD new section between categories 
+and best sellers:
+
+┌─────────────────────────────────────────┐
+│ ⚡ FLASH SALE — Ends in 04:21:33 ⏱️    │
+├─────────────────────────────────────────┤
+│ [Product] [Product] [Product] [Product] │
+│  -30%      -25%      -40%      -20%    │
+└─────────────────────────────────────────┘
+
+Countdown timer that actually counts down.
+Products from database with flash_sale=true.
+
+1F. STRENGTHEN FOOTER
+──────────────────────
+FIND existing footer.
+ADD these sections if missing:
+
+Column 1: About
+- About BeautyHub Rwanda
+- Our Story
+- Blog
+- Careers
+
+Column 2: Customer Service
+- Contact Us
+- FAQ
+- Returns Policy
+- Shipping Policy
+- Track Order
+
+Column 3: Shop
+- Skincare
+- Makeup
+- Hair Care
+- Fragrance
+- Deals
+
+Column 4: Contact
+- 📞 +250 78X XXX XXX
+- 📧 hello@beautyhub.rw
+- 💬 WhatsApp Chat
+- 📍 Kigali, Rwanda
+
+Payment icons row:
+[MTN MoMo] [Airtel] [Visa] [Mastercard]
+
+Social media:
+[Instagram] [TikTok] [Facebook] [YouTube]
+
+Trust badges row:
+[Secure Payment] [Authentic Products]
+[Fast Delivery] [Easy Returns]
+
+Bottom copyright:
+"© 2024 BeautyHub Rwanda. 
+ All rights reserved. 
+ Made with ❤️ in Rwanda 🇷🇼"
+
+After completing Improvement 1:
+Report all files changed.
+Wait for my approval before Improvement 2.
+
+════════════════════════════════════════════
+IMPROVEMENT 2: PRODUCT PAGES STRENGTHENING
+════════════════════════════════════════════
+
+FIND existing product detail page.
+DO NOT rebuild it.
+ADD these improvements:
+
+2A. STRENGTHEN PRODUCT IMAGE GALLERY
+──────────────────────────────────────
+FIND existing image display.
+IMPROVE to include:
+- Main large image
+- Thumbnail row (click to switch)
+- Image zoom on hover (desktop)
+- Pinch to zoom (mobile)
+- Swipe between images (mobile)
+- "View in 360°" placeholder
+- Share image to WhatsApp button
+
+2B. ADD COMPREHENSIVE PRODUCT INFO
+────────────────────────────────────
+FIND existing product description area.
+ADD tabbed sections:
+
+Tab 1: Description (already exists - keep)
+
+Tab 2: Ingredients
+- Full ingredients list
+- Highlight key active ingredients
+- "What does this do?" tooltips
+- Allergen warnings in red
+
+Tab 3: How To Use
+- Step by step instructions
+- Numbered list
+- Tip boxes in yellow
+
+Tab 4: Reviews
+- Star rating breakdown:
+  ⭐⭐⭐⭐⭐ 65%  ████████████
+  ⭐⭐⭐⭐   20%  ████
+  ⭐⭐⭐    10%  ██
+  ⭐⭐       3%  ▌
+  ⭐         2%  ▌
+- Review cards with:
+  * Customer name (partial: Ami** U**)
+  * Star rating
+  * Review text
+  * Review date
+  * "Verified Purchase" badge
+  * Helpful button
+  * Customer skin type
+- Add review form (if purchased)
+- Image upload in review
+
+Tab 5: Delivery & Returns
+- Delivery fee by district table:
+  Kigali: 1,000 RWF (Same day)
+  North: 3,000 RWF (2-3 days)
+  South: 3,000 RWF (2-3 days)
+  East: 3,500 RWF (2-3 days)
+  West: 4,000 RWF (3-4 days)
+- Return policy summary
+- Authenticity guarantee
+
+2C. ADD TRUST BADGES ON PRODUCT PAGE
+──────────────────────────────────────
+ADD below Add to Cart button:
+
+┌─────────────────────────────────────────┐
+│ ✅ 100% Authentic Product               │
+│ 🇷🇼 Sold & Shipped from Rwanda         │
+│ 💛 Pay with MTN MoMo                   │
+│ 🚚 Free delivery above 50,000 RWF      │
+│ 🔄 30-day easy returns                 │
+│ 🔒 Secure payment                      │
+└─────────────────────────────────────────┘
+
+2D. ADD SOCIAL PROOF SECTION
+──────────────────────────────
+ADD below trust badges:
+
+"💬 Share this product:"
+[WhatsApp] [Instagram] [Facebook] [Copy Link]
+
+WhatsApp share message:
+"Check out this product on BeautyHub Rwanda:
+ [Product Name] - [Price] RWF
+ [Product URL]
+ Pay with MTN MoMo 💛"
+
+2E. ADD DELIVERY ESTIMATOR
+───────────────────────────
+ADD interactive delivery estimator:
+
+┌─────────────────────────────────────────┐
+│ 🚚 ESTIMATE DELIVERY                    │
+│ Select your district:                   │
+│ [Gasabo ▼]                             │
+│                                         │
+│ ✅ Same Day Delivery Available          │
+│ Fee: 1,000 RWF                          │
+│ Order before 2PM for today delivery    │
+└─────────────────────────────────────────┘
+
+2F. STRENGTHEN RELATED PRODUCTS
+─────────────────────────────────
+FIND existing related products section.
+IMPROVE to show:
+
+"You May Also Like" (same category)
+"Customers Also Bought" (bought together)
+"Complete Your Routine" (complementary)
+
+Each with proper product cards
+(same improvements as 1D above).
+
+After completing Improvement 2:
+Report all files changed.
+Wait for my approval before Improvement 3.
+
+════════════════════════════════════════════
+IMPROVEMENT 3: CHECKOUT STRENGTHENING
+════════════════════════════════════════════
+
+FIND existing checkout flow.
+DO NOT rebuild it.
+IMPROVE these specific parts:
+
+3A. STRENGTHEN PROGRESS INDICATOR
+───────────────────────────────────
+FIND existing checkout steps.
+IMPROVE visual progress bar:
+
+●━━━━━━━━━━━━●━━━━━━━━━━━━●━━━━━━━━━━━━●
+Cart      Address      Payment    Confirm
+
+Current step highlighted in brand color.
+Completed steps show ✅.
+
+3B. STRENGTHEN ADDRESS FORM
+─────────────────────────────
+FIND existing address form.
+IMPROVE with:
+
+- Province auto-detect (if Kigali → highlight)
+- District dropdown with search
+- Sector auto-populates by district
+- Landmark field with placeholder:
+  "e.g., Near KCT Building, After Total Petrol"
+- Saved addresses (if logged in):
+  "Use saved address: Home (Gasabo) ✅"
+- Address validation before proceeding
+
+3C. STRENGTHEN PAYMENT SECTION
+────────────────────────────────
+FIND existing payment method selector.
+IMPROVE visual design:
+
+┌─────────────────────────────────────────┐
+│  HOW WOULD YOU LIKE TO PAY?            │
+├─────────────────────────────────────────┤
+│                                         │
+│  ○ 💛 MTN Mobile Money    [POPULAR]    │
+│    Most used in Rwanda                  │
+│                                         │
+│  ○ 🔴 Airtel Money                     │
+│                                         │
+│  ○ 💳 Visa / Mastercard                │
+│                                         │
+│  ○ 💵 Cash on Delivery                 │
+│    ⚠️ Kigali only                      │
+│                                         │
+└─────────────────────────────────────────┘
+
+When MTN MoMo selected expand:
+┌─────────────────────────────────────────┐
+│  Enter your MTN MoMo number:           │
+│  ┌─────────────────────────────────┐   │
+│  │ +250  078 ___ ___ ___          │   │
+│  └─────────────────────────────────┘   │
+│  ℹ️ Must be MTN number (078 or 079)    │
+│                                         │
+│  How it works:                         │
+│  1️⃣ Click "Pay Now"                    │
+│  2️⃣ Check your phone for MoMo prompt  │
+│  3️⃣ Enter your PIN to confirm         │
+│  4️⃣ Order confirmed automatically     │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │   💛 PAY 25,000 RWF with MoMo  │   │
+│  └─────────────────────────────────┘   │
+└─────────────────────────────────────────┘
+
+3D. STRENGTHEN ORDER SUMMARY
+──────────────────────────────
+FIND existing order summary.
+IMPROVE to show:
+
+┌─────────────────────────────────────────┐
+│  ORDER SUMMARY                          │
+├─────────────────────────────────────────┤
+│  [img] Nivea Body Lotion x2            │
+│        8,500 RWF each = 17,000 RWF     │
+│                                         │
+│  [img] L'Oréal Serum x1               │
+│        28,000 RWF                       │
+├─────────────────────────────────────────┤
+│  Subtotal:              45,000 RWF     │
+│  Delivery (Gasabo):      1,000 RWF     │
+│  Discount (BEAUTY20):   -9,000 RWF     │
+├─────────────────────────────────────────┤
+│  TOTAL:                 37,000 RWF     │
+├─────────────────────────────────────────┤
+│  💡 Spend 13,000 RWF more              │
+│     for FREE delivery!                  │
+├─────────────────────────────────────────┤
+│  ✅ Secure Payment                     │
+│  ✅ Authentic Products                 │
+│  ✅ Easy Returns                       │
+└─────────────────────────────────────────┘
+
+3E. STRENGTHEN CONFIRMATION PAGE
+──────────────────────────────────
+FIND existing order confirmation page.
+IMPROVE to show:
+
+┌─────────────────────────────────────────┐
+│  🎉 ORDER CONFIRMED!                   │
+│                                         │
+│  Thank you Amina!                       │
+│  Your order has been placed.            │
+│                                         │
+│  Order Number: #BHR-2024-001           │
+│  Total Paid: 37,000 RWF via MTN MoMo  │
+│  Delivery to: Gasabo, Kigali           │
+│  Estimated: Today by 6PM               │
+│                                         │
+│  📱 SMS sent to +250780000001          │
+│                                         │
+│  [📦 Track My Order]                   │
+│  [🛍️ Continue Shopping]                │
+│  [💬 Share on WhatsApp]                │
+│                                         │
+│  ────────────────────────────          │
+│  📲 Download our app for faster        │
+│     shopping next time!                 │
+│  [Google Play] [App Store]             │
+└─────────────────────────────────────────┘
+
+After completing Improvement 3:
+Report all files changed.
+Wait for my approval before Improvement 4.
+
+════════════════════════════════════════════
+IMPROVEMENT 4: TRUST & CONVERSION
+════════════════════════════════════════════
+
+4A. ADD WHATSAPP FLOATING BUTTON
+──────────────────────────────────
+ADD to main layout (appears on ALL pages):
+
+Position: Fixed bottom-right
+Style: Green circle (#25D366)
+Icon: WhatsApp logo (white)
+Pulse animation to draw attention
+
+On click open WhatsApp:
+wa.me/250780000000?text=Hello BeautyHub Rwanda!
+
+On mobile: Opens WhatsApp app directly
+On desktop: Opens web.whatsapp.com
+
+ADD to: /frontend/components/ui/
+        WhatsAppButton.tsx
+
+Import and add to: /frontend/app/layout.tsx
+(This adds it to ALL pages automatically)
+
+4B. ADD LOYALTY POINTS DISPLAY
+────────────────────────────────
+FIND existing user account/navbar area.
+ADD points display when logged in:
+
+In navbar (logged in state):
+"💎 1,250 pts" (clickable → loyalty page)
+
+On product pages:
+"Earn 85 points with this purchase"
+
+On checkout:
+"You will earn 370 points from this order"
+"Redeem your 1,250 pts = 12,500 RWF off"
+
+4C. ADD SKIN TYPE QUIZ BANNER
+──────────────────────────────
+ADD new section on homepage:
+
+┌─────────────────────────────────────────┐
+│  🧴 NOT SURE WHAT TO BUY?              │
+│                                         │
+│  Take our FREE Skin Type Quiz           │
+│  Get personalized product               │
+│  recommendations for your skin!         │
+│                                         │
+│  [Take the Quiz →]                     │
+└─────────────────────────────────────────┘
+
+Quiz page: /quiz
+Questions:
+1. What is your skin type?
+   (Oily/Dry/Combination/Normal/Sensitive)
+2. What is your main skin concern?
+   (Acne/Dark spots/Dryness/Anti-aging/Glow)
+3. What is your budget?
+   (Under 10K / 10K-30K / 30K-50K / 50K+)
+4. What products do you use now?
+5. Any allergies or sensitivities?
+
+Results page:
+"Based on your answers, we recommend:"
+[Show 6 personalized products]
+
+4D. ADD RECENTLY VIEWED PRODUCTS
+──────────────────────────────────
+ADD to product listing and homepage:
+
+"👀 Recently Viewed"
+[Show last 6 viewed products]
+
+Store in localStorage (no login needed).
+Clear after 7 days.
+
+4E. ADD STOCK URGENCY INDICATORS
+──────────────────────────────────
+On product cards and detail pages:
+
+When stock > 20: Show nothing
+When stock 11-20: "In Stock ✅"
+When stock 6-10: "⚠️ Only [X] left!"
+                  (orange color)
+When stock 1-5: "🔥 Almost gone! [X] left"
+                 (red color, pulse animation)
+When stock = 0: "❌ Out of Stock"
+                 [Notify Me When Available]
+                 (email/SMS notification)
+
+4F. ADD CUSTOMER REVIEWS HOMEPAGE
+───────────────────────────────────
+ADD reviews section to homepage:
+
+"⭐ What Our Customers Say"
+
+┌──────────────┬──────────────┬──────────────┐
+│ "Best beauty │"Fast delivery│ "Genuine     │
+│ store in     │ to Musanze!  │ products,    │
+│ Rwanda 🇷🇼"  │ Very happy"  │ love it!"   │
+│              │              │              │
+│ ⭐⭐⭐⭐⭐    │ ⭐⭐⭐⭐⭐    │ ⭐⭐⭐⭐⭐   │
+│ Amina U.     │ Claude N.    │ Diane M.     │
+│ Gasabo       │ Musanze      │ Huye         │
+└──────────────┴──────────────┴──────────────┘
+
+Real reviews from database.
+Auto-rotate (carousel).
+Show customer district for trust.
+
+After completing Improvement 4:
+Report all files changed.
+Wait for my approval before Improvement 5.
+
+════════════════════════════════════════════
+IMPROVEMENT 5: PERFORMANCE & SEO
+════════════════════════════════════════════
+
+5A. OPTIMIZE IMAGES
+────────────────────
+FIND all <img> tags.
+REPLACE with Next.js <Image> component.
+Add:
+- priority={true} for above-fold images
+- loading="lazy" for below-fold
+- placeholder="blur" for smooth loading
+- Proper width and height attributes
+- WebP format where possible
+
+5B. ADD SEO TO ALL PAGES
+─────────────────────────
+ADD proper metadata to each page:
+
+Homepage:
+title: "BeautyHub Rwanda | #1 Cosmetics Store 🇷🇼"
+description: "Shop 100% authentic skincare, 
+makeup, haircare in Rwanda. Pay with MTN MoMo. 
+Fast delivery to all 30 districts."
+keywords: "cosmetics Rwanda, beauty products 
+Kigali, MTN MoMo shopping, skincare Rwanda"
+
+Product pages:
+title: "[Product Name] | BeautyHub Rwanda"
+description: "[Product description] - 
+[Price] RWF. Authentic. Fast delivery Rwanda."
+
+Category pages:
+title: "[Category] Products | BeautyHub Rwanda"
+
+ADD Open Graph tags (for WhatsApp/Facebook share):
+og:title, og:description, og:image, og:url
+
+ADD structured data (JSON-LD):
+Product schema for Google Shopping
+
+5C. ADD LOADING SKELETONS
+──────────────────────────
+FIND all sections that load from API.
+ADD skeleton loading screens:
+
+While products loading:
+┌──────────────┬──────────────┬──────────────┐
+│ ░░░░░░░░░░░░ │ ░░░░░░░░░░░░ │ ░░░░░░░░░░░░ │
+│ ░░░░░░░░░░   │ ░░░░░░░░░░   │ ░░░░░░░░░░   │
+│ ░░░░░░░░     │ ░░░░░░░░     │ ░░░░░░░░     │
+│ ░░░░░        │ ░░░░░        │ ░░░░░        │
+└──────────────┴──────────────┴──────────────┘
+(Animated pulse effect)
+
+5D. ADD ERROR BOUNDARIES
+─────────────────────────
+WRAP all major sections with error boundary:
+
+If a section fails to load:
+┌─────────────────────────────────────────┐
+│ ⚠️ Could not load products              │
+│ Please check your connection            │
+│ [Try Again]                             │
+└─────────────────────────────────────────┘
+
+Never show raw error to customer.
+
+5E. OPTIMIZE FOR SLOW INTERNET
+────────────────────────────────
+- Add offline detection banner:
+  "⚠️ No internet connection. 
+   Some features may not work."
+
+- Cache product data in localStorage
+  (show cached data when offline)
+
+- Compress all API responses
+  (enable gzip/brotli compression)
+
+- Lazy load images below fold
+
+- Prefetch next page products
+
+5F. ADD GOOGLE ANALYTICS
+─────────────────────────
+ADD Google Analytics 4 tracking:
+
+Track these events:
+- page_view (all pages)
+- view_item (product viewed)
+- add_to_cart (product added)
+- begin_checkout (checkout started)
+- purchase (order completed)
+- search (search performed)
+- select_payment_method (MTN/Airtel/Card)
+
+ADD Facebook Pixel:
+- PageView
+- ViewContent
+- AddToCart
+- InitiateCheckout
+- Purchase
+
+After completing Improvement 5:
+Report all files changed.
+Wait for my approval before Improvement 6.
+
+════════════════════════════════════════════
+IMPROVEMENT 6: ADMIN DASHBOARD STRENGTHENING
+════════════════════════════════════════════
+
+FIND existing admin dashboard.
+DO NOT rebuild it.
+ADD these improvements:
+
+6A. STRENGTHEN OVERVIEW DASHBOARD
+───────────────────────────────────
+FIND existing stats cards.
+IMPROVE to show:
+
+Row 1 - Today's Stats:
+┌──────────┬──────────┬──────────┬──────────┐
+│ Revenue  │ Orders   │ Customers│ Avg Order│
+│ 450,000  │   18     │    5     │ 25,000   │
+│ RWF      │ orders   │ new      │ RWF      │
+│ ↑ 23%    │ ↑ 5%     │ ↑ 2%     │ ↑ 8%     │
+└──────────┴──────────┴──────────┴──────────┘
+
+ADD real-time order notifications:
+"🔔 New order from +250780001234 — 35,000 RWF"
+(Sound alert + popup)
+
+ADD Rwanda map visualization:
+Show heatmap of orders by district.
+Gasabo = most orders (darkest).
+
+ADD payment method breakdown:
+MTN MoMo: 65% ████████████
+Airtel:   20% ████
+Card:     10% ██
+COD:       5% █
+
+6B. ADD QUICK ACTION BUTTONS
+──────────────────────────────
+ADD to admin dashboard top:
+
+[+ Add Product] [📦 Pending Orders: 5]
+[📱 Send SMS Blast] [🎁 Create Coupon]
+
+6C. STRENGTHEN ORDERS TABLE
+─────────────────────────────
+FIND existing orders list.
+IMPROVE to show:
+
+Columns:
+Order # | Customer | Phone | Items | 
+Total(RWF) | Payment | District | Status | Actions
+
+Actions column:
+[✅ Confirm] [🚚 Assign Rider] 
+[💬 SMS] [🖨️ Invoice] [...]
+
+Color coded status:
+PENDING → Yellow
+CONFIRMED → Blue
+SHIPPED → Orange
+DELIVERED → Green
+CANCELLED → Red
+
+ADD bulk actions:
+Select multiple → [Confirm All] [Export]
+
+6D. ADD LOW STOCK ALERTS
+─────────────────────────
+ADD alert panel to dashboard:
+
+┌─────────────────────────────────────────┐
+│ ⚠️ LOW STOCK ALERTS (3 products)       │
+├─────────────────────────────────────────┤
+│ Nivea Lotion 400ml    → Only 3 left    │
+│ L'Oréal Foundation   → Only 5 left    │
+│ Dark & Lovely Kit    → Only 2 left    │
+│                      [Update Stock]    │
+└─────────────────────────────────────────┘
+
+6E. ADD REVENUE CHARTS
+───────────────────────
+FIND existing charts or ADD new ones:
+
+Chart 1: Revenue over time (line chart)
+- Toggle: Daily/Weekly/Monthly/Yearly
+- Compare to previous period
+
+Chart 2: Orders by category (pie chart)
+- Skincare: 40%
+- Makeup: 25%
+- Hair: 20%
+- Other: 15%
+
+Chart 3: Orders by district (bar chart)
+- All 30 Rwanda districts
+- Sort by most orders
+
+Chart 4: Payment methods (donut chart)
+
+Use: Recharts library (already in stack)
+
+After completing Improvement 6:
+Report all files changed.
+Wait for my approval before Improvement 7.
+
+════════════════════════════════════════════
+IMPROVEMENT 7: MOBILE APP STRENGTHENING
+════════════════════════════════════════════
+
+FIND existing mobile app screens.
+DO NOT rebuild any screen.
+IMPROVE these specific parts:
+
+7A. STRENGTHEN HOME SCREEN
+────────────────────────────
+FIND existing home screen.
+ADD/IMPROVE:
+- Pull to refresh
+- Skeleton loading
+- Offline banner
+- Flash sale countdown widget
+- "Continue where you left off"
+  (last viewed products)
+
+7B. ADD PUSH NOTIFICATION IMPROVEMENTS
+────────────────────────────────────────
+IMPROVE existing notifications:
+
+Notification types to add/improve:
+- Order placed → rich notification
+  with product image
+- Payment confirmed → with amount
+- Order shipped → with rider phone
+- Flash sale starting → with product
+- Low stock on wishlisted item
+- Loyalty points earned
+
+7C. STRENGTHEN PRODUCT SCREEN
+───────────────────────────────
+FIND existing product detail screen.
+ADD:
+- Swipe to see more images
+- Double tap to wishlist ❤️
+- Share to WhatsApp button
+- "Similar products" horizontal scroll
+- Reviews preview (top 3)
+
+7D. ADD BOTTOM TAB IMPROVEMENTS
+─────────────────────────────────
+FIND existing bottom navigation.
+IMPROVE tabs:
+
+[🏠 Home] [🔍 Search] [🛒 Cart(3)] 
+[❤️ Saved] [👤 Account]
+
+Cart shows count badge.
+Active tab highlighted.
+
+7E. STRENGTHEN CHECKOUT SCREEN
+────────────────────────────────
+FIND existing mobile checkout.
+ADD:
+- Saved addresses list
+- MTN MoMo animation
+  (phone vibrating + MoMo logo)
+- Payment countdown timer
+- Haptic feedback on success
+
+After completing Improvement 7:
+Report all files changed.
+Wait for my approval before Improvement 8.
+
+════════════════════════════════════════════
+IMPROVEMENT 8: LANGUAGE & LOCALIZATION
+════════════════════════════════════════════
+
+FIND existing language system.
+IMPROVE and complete:
+
+8A. COMPLETE KINYARWANDA TRANSLATIONS
+───────────────────────────────────────
+ADD/COMPLETE translations for:
+
+Navigation:
+- Home → Ahabanza
+- Products → Ibicuruzwa
+- Cart → Agashirwe
+- Account → Konti yanjye
+- Search → Shakisha
+
+Common phrases:
+- Add to Cart → Shyira mu Gashirwe
+- Buy Now → Gura None
+- Out of Stock → Nta Bubiko
+- Best Seller → Ibicuruzwa Bikunzwe
+- New Arrival → Bishya
+- Free Delivery → Guherekeza Ubuntu
+- Pay with MoMo → Ishyura na MoMo
+
+Product actions:
+- Add to Wishlist → Shyira mu Rutonde
+- Write a Review → Andika Ibitekerezo
+- Share → Sangira
+
+8B. ADD LANGUAGE SWITCHER
+──────────────────────────
+FIND or ADD language switcher:
+
+Top of navbar, top right:
+[EN] [FR] [RW]
+
+Selected language: Bold + underline
+Switch immediately (no page reload)
+Remember choice in localStorage
+
+8C. LOCALIZE ALL PRICES
+─────────────────────────
+Check ALL price displays.
+Ensure consistent format:
+
+✅ Correct: "8,500 RWF"
+✅ Correct: "8.500 Frw"
+❌ Wrong: "$8,500"
+❌ Wrong: "RWF8500"
+
+Number format: 1,000,000 (comma separator)
+
+After completing Improvement 8:
+Report all files changed.
+Wait for my approval before Improvement 9.
+
+════════════════════════════════════════════
+IMPROVEMENT 9: SECURITY HARDENING
+════════════════════════════════════════════
+
+FIND existing security implementations.
+IMPROVE without breaking anything:
+
+9A. STRENGTHEN INPUT VALIDATION
+─────────────────────────────────
+Check ALL forms have:
+- Required field validation
+- Phone number format (+250)
+- Email format validation
+- Price must be positive number
+- Quantity must be integer > 0
+- No special characters in names
+- SQL injection prevention
+- XSS prevention
+
+9B. STRENGTHEN API SECURITY
+─────────────────────────────
+ADD/IMPROVE to all API routes:
+- Rate limiting:
+  Auth endpoints: 5 requests/minute
+  Product endpoints: 60 requests/minute
+  Payment endpoints: 3 requests/minute
+- Request size limits
+- Helmet.js security headers
+- CORS properly configured
+- Admin routes: IP whitelist option
+
+9C. STRENGTHEN PAYMENT SECURITY
+─────────────────────────────────
+- Server-side order total calculation
+  (never trust client-side total)
+- Duplicate payment prevention
+- Webhook signature verification
+- Payment amount validation
+- Phone number ownership check
+
+After completing Improvement 9:
+Report all files changed.
+Wait for my approval before Improvement 10.
+
+════════════════════════════════════════════
+IMPROVEMENT 10: FINAL POLISH & LAUNCH PREP
+════════════════════════════════════════════
+
+10A. ADD 404 PAGE
+──────────────────
+CREATE beautiful 404 page:
+
+┌─────────────────────────────────────────┐
+│           😮 Page Not Found             │
+│                                         │
+│  Oops! This page doesn't exist.        │
+│  But our beauty products do! 💄        │
+│                                         │
+│  [← Go Back]  [🏠 Go Home]            │
+│                                         │
+│  Maybe you were looking for:           │
+│  [Skincare] [Makeup] [Hair Care]       │
+└─────────────────────────────────────────┘
+
+10B. ADD COOKIE CONSENT
+────────────────────────
+ADD GDPR-style cookie consent banner:
+(Required for professional sites)
+
+┌─────────────────────────────────────────┐
+│ 🍪 We use cookies to improve your      │
+│ experience. By using BeautyHub Rwanda  │
+│ you agree to our cookie policy.        │
+│                                         │
+│ [Accept All] [Reject] [Settings]       │
+└─────────────────────────────────────────┘
+
+10C. ADD BACK TO TOP BUTTON
+────────────────────────────
+ADD floating button appears after
+scrolling 300px down:
+
+Position: Bottom right (above WhatsApp)
+Style: Small circle with ↑ arrow
+Smooth scroll to top on click
+
+10D. FINAL ERROR CHECK
+───────────────────────
+Go through EVERY page:
+[ ] No console errors
+[ ] No TypeScript errors
+[ ] No broken links
+[ ] No missing images
+[ ] No undefined variables
+[ ] No failed API calls
+[ ] All forms submit correctly
+[ ] All payments work
+[ ] All SMS send correctly
+[ ] Mobile app runs without crash
+
+10E. PERFORMANCE FINAL CHECK
+──────────────────────────────
+[ ] Homepage loads under 3 seconds
+    (on 3G internet)
+[ ] Images are optimized
+[ ] No unused CSS
+[ ] No unused JavaScript
+[ ] API responses cached
+[ ] Database queries optimized
+
+After completing ALL 10 improvements:
+
+╔═════════════════════════════════════╗
+║    FINAL IMPROVEMENT REPORT         ║
+╠═════════════════════════════════════╣
+║ Improvement 1: Homepage    ✅/⚠️   ║
+║ Improvement 2: Products    ✅/⚠️   ║
+║ Improvement 3: Checkout    ✅/⚠️   ║
+║ Improvement 4: Trust       ✅/⚠️   ║
+║ Improvement 5: Performance ✅/⚠️   ║
+║ Improvement 6: Admin       ✅/⚠️   ║
+║ Improvement 7: Mobile      ✅/⚠️   ║
+║ Improvement 8: Language    ✅/⚠️   ║
+║ Improvement 9: Security    ✅/⚠️   ║
+║ Improvement 10: Polish     ✅/⚠️   ║
+╠═════════════════════════════════════╣
+║ Total files created:    [number]    ║
+║ Total files modified:   [number]    ║
+║ Total files untouched:  [number]    ║
+║ Existing features:      ALL INTACT  ║
+╠═════════════════════════════════════╣
+║ WEBSITE STATUS:                     ║
+║ ✅ READY FOR PRODUCTION             ║
+║ 🇷🇼 OPTIMIZED FOR RWANDA           ║
+║ 💛 MTN MOMO FULLY WORKING          ║
+║ 🚚 DISTRICT DELIVERY WORKING       ║
+║ 💄 COSMETICS FEATURES COMPLETE     ║
+╚═════════════════════════════════════╝
+
+Give me commands to run and test
+everything locally before deployment.
