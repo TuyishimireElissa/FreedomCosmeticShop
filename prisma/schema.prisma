@@ -823,3 +823,26 @@ model Notification {
   @@index([channel])
   @@index([createdAt])
 }
+
+// =============================================================================
+// 20. DELIVERY ZONE SETTINGS (admin-manageable delivery fees per zone)
+// =============================================================================
+// NEW MODEL — does not affect existing delivery logic.
+// Admin can edit fees, toggle same-day, set cutoff times.
+
+model DeliveryZoneSettings {
+  id              String   @id @default(cuid())
+  zoneName        String   // "Kigali Same Day", "Northern Province", etc.
+  zoneCode        String   @unique // "KIGALI_SAME_DAY", "NORTHERN", etc.
+  baseFee         Int      // RWF
+  freeThreshold   Int      @default(50000) // Orders above this = free delivery
+  estimatedDays   Int      @default(3) // Business days
+  isSameDay       Boolean  @default(false)
+  sameDayCutoff   String?  // "14:00" — orders before 2PM get same-day
+  isActive        Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  @@index([zoneCode])
+  @@index([isActive])
+}
