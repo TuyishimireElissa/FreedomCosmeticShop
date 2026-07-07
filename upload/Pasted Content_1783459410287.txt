@@ -1,0 +1,1338 @@
+ZDEV, BEFORE ANYTHING ELSE READ AND 
+CONFIRM THESE IRON RULES:
+
+╔═════════════════════════════════════════╗
+║         🚨 IRON RULES 🚨                ║
+╠═════════════════════════════════════════╣
+║                                         ║
+║  RULE 1: NEVER DESTROY EXISTING CODE   ║
+║  Admin dashboard already has features. ║
+║  Keep ALL existing features working.   ║
+║  Only ADD. Only IMPROVE. Never delete. ║
+║                                         ║
+║  RULE 2: REMEMBER EVERYTHING BUILT     ║
+║  These are already working:            ║
+║  ✅ Homepage (working)                  ║
+║  ✅ Products (working)                  ║
+║  ✅ Cart & Checkout (working)           ║
+║  ✅ MTN MoMo Payment (working)         ║
+║  ✅ Rwanda District Delivery (working)  ║
+║  ✅ User Authentication (working)       ║
+║  ✅ Mobile App (working)               ║
+║  ✅ Order System (working)             ║
+║  ✅ SMS System (working)               ║
+║  ✅ Admin Basic Features (working)     ║
+║  ALL MUST REMAIN WORKING AFTER CHANGES ║
+║                                         ║
+║  RULE 3: SURGICAL CHANGES ONLY         ║
+║  Only touch admin-related files.       ║
+║  Skip everything else completely.      ║
+║                                         ║
+║  RULE 4: CHECK BEFORE TOUCHING         ║
+║  Before any file modification:         ║
+║  1. Tell me the exact file name        ║
+║  2. Tell me what currently exists      ║
+║  3. Tell me exactly what you will add  ║
+║  4. Then and only then write code      ║
+║                                         ║
+║  RULE 5: COMPLETE CODE ONLY            ║
+║  No placeholder code.                  ║
+║  No empty functions.                   ║
+║  No "TODO: implement this"             ║
+║  Everything must be 100% complete.     ║
+║                                         ║
+║  RULE 6: SHOW ALL CHANGES              ║
+║  After every section report:           ║
+║  📁 NEW files created: [list]          ║
+║  ✏️  MODIFIED files: [what changed]    ║
+║  🔒 UNTOUCHED files: [confirmed list]  ║
+║                                         ║
+║  RULE 7: RWANDA FIRST ALWAYS           ║
+║  All admin features must support:      ║
+║  - RWF currency                        ║
+║  - MTN MoMo transactions               ║
+║  - Rwanda 30 districts                 ║
+║  - Kinyarwanda/English/French          ║
+║  - Rwanda timezone (Africa/Kigali)     ║
+║                                         ║
+║  RULE 8: PRODUCTION QUALITY            ║
+║  - TypeScript typed                    ║
+║  - Error handled                       ║
+║  - Secure (admin only)                 ║
+║  - Mobile responsive                   ║
+║  - Fast loading                        ║
+║                                         ║
+║  RULE 9: ONE SECTION AT A TIME         ║
+║  Finish one section completely.        ║
+║  Show me result.                       ║
+║  Wait for approval.                    ║
+║  Then move to next section.            ║
+║                                         ║
+║  RULE 10: TEST AFTER EACH SECTION      ║
+║  After each section verify:            ║
+║  - Existing admin features work        ║
+║  - New features work correctly         ║
+║  - No new errors introduced            ║
+║  - Other parts of site unaffected      ║
+║                                         ║
+╚═════════════════════════════════════════╝
+
+PROJECT CONTEXT:
+Project: BeautyHub Rwanda
+Type: Cosmetics E-Commerce
+Currency: RWF
+Payments: MTN MoMo + Airtel + Card + COD
+Stack: Next.js + Node.js + PostgreSQL
+       + Prisma + TypeScript + Tailwind
+Admin URL: /admin (protected route)
+Admin Stack: Next.js + Shadcn/UI
+             + Recharts + TanStack Table
+
+Confirm rules with:
+"RULES CONFIRMED. ADMIN IMPROVEMENT READY."
+Then wait for me to say START.
+
+════════════════════════════════════════════
+ADMIN IMPROVEMENT MISSION
+════════════════════════════════════════════
+
+Improve the existing admin dashboard
+into a WORLD-CLASS control panel for
+BeautyHub Rwanda cosmetics store.
+
+Work ONE SECTION at a time.
+Complete fully before moving on.
+
+════════════════════════════════════════════
+SECTION 1: ADMIN LOGIN PAGE
+════════════════════════════════════════════
+
+FIND existing admin login page.
+IMPROVE it completely:
+
+1A. STRENGTHEN ADMIN LOGIN UI
+───────────────────────────────
+
+Design:
+┌─────────────────────────────────────────┐
+│                                         │
+│     [BeautyHub Rwanda Logo]             │
+│     Admin Control Panel                 │
+│                                         │
+│  ┌───────────────────────────────────┐  │
+│  │          ADMIN LOGIN              │  │
+│  ├───────────────────────────────────┤  │
+│  │                                   │  │
+│  │  Phone or Email                   │  │
+│  │  ┌─────────────────────────────┐  │  │
+│  │  │ +250 780 000 000            │  │  │
+│  │  └─────────────────────────────┘  │  │
+│  │                                   │  │
+│  │  Password                         │  │
+│  │  ┌─────────────────────────────┐  │  │
+│  │  │ ••••••••••••  👁️            │  │  │
+│  │  └─────────────────────────────┘  │  │
+│  │                                   │  │
+│  │  [ ] Remember this device         │  │
+│  │                                   │  │
+│  │  [🔐 Login to Admin Panel]       │  │
+│  │                                   │  │
+│  │  Forgot Password?                 │  │
+│  │                                   │  │
+│  └───────────────────────────────────┘  │
+│                                         │
+│  🔒 Secure Admin Access Only           │
+│  © 2024 BeautyHub Rwanda               │
+│                                         │
+└─────────────────────────────────────────┘
+
+SECURITY FEATURES TO ADD:
+- Show/hide password toggle
+- Wrong password counter
+  (Lock after 5 failed attempts)
+- Lock duration: 30 minutes
+- Show: "Account locked. Try in 28 min"
+- IP address logging on each login
+- "New login detected" email alert
+- 2FA option (OTP to admin phone)
+- Remember device for 30 days
+- Auto logout after 2 hours inactivity
+- Session timeout warning:
+  "You will be logged out in 5 minutes"
+  [Stay Logged In] [Logout Now]
+
+After login redirect to dashboard.
+After failed login show clear error.
+Non-admin users get:
+"Access Denied. Admin only."
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 2: ADMIN LAYOUT & NAVIGATION
+════════════════════════════════════════════
+
+FIND existing admin layout.
+IMPROVE the sidebar and header:
+
+2A. IMPROVE ADMIN SIDEBAR
+───────────────────────────
+
+Full sidebar design:
+
+┌─────────────────────┐
+│  [Logo] BeautyHub   │
+│  Admin Panel        │
+├─────────────────────┤
+│  👤 Admin Name      │
+│  Super Admin        │
+│  🟢 Online          │
+├─────────────────────┤
+│  MAIN               │
+│  📊 Dashboard       │
+│  ─────────────────  │
+│  CATALOG            │
+│  📦 Products        │
+│     └ All Products  │
+│     └ Add Product   │
+│     └ Categories    │
+│     └ Brands        │
+│     └ Inventory     │
+│  ─────────────────  │
+│  SALES              │
+│  🛒 Orders          │
+│     └ All Orders    │
+│     └ Pending (5)🔴 │
+│     └ Processing    │
+│     └ Delivered     │
+│  💳 Payments        │
+│     └ Transactions  │
+│     └ Refunds       │
+│     └ Payouts       │
+│  ─────────────────  │
+│  CUSTOMERS          │
+│  👥 Customers       │
+│  ⭐ Reviews         │
+│  💎 Loyalty Points  │
+│  ─────────────────  │
+│  DELIVERY           │
+│  🚚 Deliveries      │
+│  🏍️ Riders          │
+│  📍 Zones & Fees    │
+│  ─────────────────  │
+│  MARKETING          │
+│  🎁 Promotions      │
+│  🏷️ Coupons         │
+│  📱 SMS Campaigns   │
+│  📢 Push Alerts     │
+│  ─────────────────  │
+│  CONTENT            │
+│  🖼️ Banners         │
+│  📝 Blog Posts      │
+│  ❓ FAQ             │
+│  📄 Pages           │
+│  ─────────────────  │
+│  STAFF              │
+│  👨‍💼 Staff Members  │
+│  🔐 Roles & Perms   │
+│  📋 Activity Logs   │
+│  ─────────────────  │
+│  ANALYTICS          │
+│  📈 Sales Reports   │
+│  📊 Product Stats   │
+│  👥 Customer Stats  │
+│  🗺️ District Map    │
+│  ─────────────────  │
+│  SYSTEM             │
+│  ⚙️ Settings        │
+│  🔔 Notifications   │
+│  🛡️ Security        │
+│  💾 Backup          │
+│  ─────────────────  │
+│  [← Logout]        │
+└─────────────────────┘
+
+Sidebar features:
+- Collapsible (icon only mode)
+- Active page highlighted
+- Pending counts in red badges
+- Smooth hover animations
+- Mobile: hidden (hamburger opens)
+- Remember collapsed state
+
+2B. IMPROVE ADMIN HEADER
+──────────────────────────
+
+┌─────────────────────────────────────────┐
+│ ☰  BeautyHub Admin    🔍 [Search...]    │
+│                                         │
+│              🌐 EN  🔔(3)  👤 Admin ▼  │
+└─────────────────────────────────────────┘
+
+Header features:
+- Search everything (orders/products/customers)
+- Notification bell with count
+- Notification dropdown:
+  "🔔 New order #BHR-001 — 35,000 RWF"
+  "⚠️ Nivea Lotion — Only 3 left"
+  "💳 Payment failed for order #BHR-002"
+- Admin profile dropdown:
+  [My Profile] [Change Password] 
+  [Activity Log] [Logout]
+- Real-time clock (Kigali time)
+- Dark/Light mode toggle 🌙/☀️
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 3: MAIN DASHBOARD OVERVIEW
+════════════════════════════════════════════
+
+FIND existing dashboard overview page.
+IMPROVE with these additions:
+
+3A. STRENGTHEN STATS CARDS
+────────────────────────────
+
+Row 1 — Revenue Stats:
+┌──────────┬──────────┬──────────┬──────────┐
+│ Today    │ This Week│ Month    │ This Year│
+│ 450,000  │2,800,000 │12,500,000│145,000,000│
+│ RWF ↑23% │RWF ↑15%  │RWF ↑8%  │RWF ↑45%  │
+│ vs yest. │vs l.week │vs l.month│vs l.year │
+└──────────┴──────────┴──────────┴──────────┘
+
+Row 2 — Orders Stats:
+┌──────────┬──────────┬──────────┬──────────┐
+│ Total    │ Pending  │Processing│ Delivered│
+│ Orders   │ Orders   │ Orders   │ Today    │
+│  1,245   │   23     │   45     │   18     │
+│ All time │ ⚠️ Act!  │ In prog. │ ✅ Done  │
+└──────────┴──────────┴──────────┴──────────┘
+
+Row 3 — Business Stats:
+┌──────────┬──────────┬──────────┬──────────┐
+│ Customers│ Products │ Low Stock│ Reviews  │
+│  3,456   │   234    │    5     │  4.6⭐   │
+│ Total    │ Active   │ ⚠️ Alert │ Average  │
+└──────────┴──────────┴──────────┴──────────┘
+
+Each card has:
+- Main number (large, bold)
+- % change vs previous period
+- ↑ green (improvement) ↓ red (decline)
+- Sparkline mini chart
+- Click to go to full section
+
+3B. ADD REAL-TIME ORDER FEED
+──────────────────────────────
+ADD live order notifications panel:
+
+┌─────────────────────────────────────────┐
+│  🔴 LIVE ORDERS (Auto-refresh 30s)     │
+├─────────────────────────────────────────┤
+│  Just now — #BHR-045                   │
+│  Amina U. • Gasabo • 35,000 RWF        │
+│  💛 MTN MoMo • [Confirm] [View]        │
+├─────────────────────────────────────────┤
+│  2 min ago — #BHR-044                  │
+│  Claude N. • Musanze • 22,000 RWF      │
+│  🔴 Airtel • ✅ Paid • [View]          │
+├─────────────────────────────────────────┤
+│  15 min ago — #BHR-043                 │
+│  Diane M. • Huye • 48,000 RWF          │
+│  💳 Card • ✅ Paid • [Assign Rider]    │
+├─────────────────────────────────────────┤
+│  [View All Orders →]                   │
+└─────────────────────────────────────────┘
+
+Sound alert: 🔔 when new order arrives
+Desktop notification permission request
+
+3C. ADD REVENUE CHARTS
+───────────────────────
+ADD three charts:
+
+Chart 1: Revenue Over Time
+- Line chart (Recharts)
+- Toggle: Daily/Weekly/Monthly
+- Two lines: This period vs Last period
+- X-axis: dates
+- Y-axis: RWF (formatted: 1.2M, 450K)
+- Hover tooltip: exact amount
+
+Chart 2: Orders by Rwanda District
+- Bar chart (horizontal)
+- All 30 districts
+- Color: brand primary
+- Sort by most orders
+- Shows: district name + order count
+
+Chart 3: Payment Method Breakdown
+- Donut chart
+- MTN MoMo: 65% (yellow)
+- Airtel: 20% (red)
+- Card: 10% (blue)
+- COD: 5% (green)
+- Center: Total transactions
+
+3D. ADD QUICK ACTION PANEL
+────────────────────────────
+
+┌─────────────────────────────────────────┐
+│  ⚡ QUICK ACTIONS                       │
+├──────────┬──────────┬──────────┬────────┤
+│ ➕ Add   │ 📦 View  │ 📱 Send  │ 🎁 New │
+│ Product  │ Pending  │ SMS Blast│ Coupon │
+│          │ Orders   │          │        │
+├──────────┴──────────┴──────────┴────────┤
+│ 🚚 Assign│ 📊 Export│ ⚠️ Stock │ 👤 Add │
+│  Riders  │  Report  │  Alerts  │  Staff │
+└──────────┴──────────┴──────────┴────────┘
+
+Each button navigates to correct section.
+
+3E. ADD ALERTS PANEL
+──────────────────────
+
+┌─────────────────────────────────────────┐
+│  ⚠️ ALERTS REQUIRING ATTENTION         │
+├─────────────────────────────────────────┤
+│  🔴 CRITICAL                           │
+│  • 3 failed payments need attention    │
+│  • 2 orders pending > 2 hours          │
+│                                         │
+│  🟡 WARNING                            │
+│  • 5 products with low stock           │
+│  • 8 reviews awaiting approval         │
+│  • 3 refund requests pending           │
+│                                         │
+│  🟢 INFO                               │
+│  • 45 new customers this week          │
+│  • Sales up 23% vs last week           │
+└─────────────────────────────────────────┘
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 4: PRODUCTS MANAGEMENT
+════════════════════════════════════════════
+
+FIND existing products management.
+IMPROVE completely:
+
+4A. IMPROVE PRODUCTS LIST PAGE
+────────────────────────────────
+
+Top bar:
+┌─────────────────────────────────────────┐
+│ Products (234)        [+ Add Product]   │
+│ [Import CSV] [Export] [Bulk Actions ▼] │
+└─────────────────────────────────────────┘
+
+Filter bar:
+┌────────┬────────┬────────┬────────┬─────┐
+│Category│ Brand  │ Status │ Stock  │Price│
+│   ▼    │   ▼    │   ▼    │   ▼    │Range│
+└────────┴────────┴────────┴────────┴─────┘
+
+Product table columns:
+[ ] | Image | Name+SKU | Category | Brand |
+Price(RWF) | Stock | Status | Sales | Actions
+
+Actions per row:
+[✏️ Edit] [👁️ View] [📋 Duplicate] [🗑️ Delete]
+
+Bulk actions (when rows selected):
+- Activate/Deactivate
+- Delete selected
+- Update category
+- Update brand
+- Export selected
+- Update price (% increase/decrease)
+
+4B. IMPROVE ADD/EDIT PRODUCT FORM
+───────────────────────────────────
+
+Organize in clear tabs:
+
+TAB 1: BASIC INFO
+- Product name (EN)
+- Product name (FR) optional
+- Product name (RW) optional
+- Description (rich text editor)
+- Short description (for cards)
+- Brand (searchable dropdown)
+- Category (parent → child)
+- Tags (add multiple)
+- URL slug (auto-generated, editable)
+
+TAB 2: COSMETIC DETAILS
+- Skin type (multi-select):
+  [Oily][Dry][Combination][Sensitive][All]
+- Shade/Color (color picker + name)
+- Volume/Weight: "50ml" "100g" "200ml"
+- Ingredients (textarea with formatting)
+- How to use (numbered list editor)
+- Warnings/Allergens (red highlighted)
+- Country of origin
+- Expiry period (in months)
+- Certifications:
+  [Rwanda FDA][ISO][Dermatologist Tested]
+- Is Authentic toggle ✅
+
+TAB 3: PRICING & INVENTORY
+- Selling price (RWF)
+- Compare price (original RWF)
+  Shows: ~~10,000~~ 8,500 RWF (15% off)
+- Cost price (RWF) — private
+- Profit margin: (auto-calculated %)
+  "Profit: 2,500 RWF (29.4%)"
+- SKU (auto-generate button)
+- Barcode
+- Stock quantity
+- Low stock alert threshold
+- Track inventory toggle
+- Allow backorder toggle
+
+TAB 4: IMAGES & MEDIA
+- Drag & drop upload area
+- Upload multiple (up to 8)
+- Image reorder (drag)
+- Set main image
+- Image crop tool
+- YouTube/video URL
+- Image optimization (auto)
+
+TAB 5: SHIPPING
+- Weight (grams)
+- Dimensions (L×W×H cm)
+- Fragile item toggle
+- Free shipping toggle
+- Shipping restrictions
+
+TAB 6: SEO
+- Meta title (character count)
+- Meta description (character count)
+- Focus keyword
+- SEO score indicator:
+  🟢 Good / 🟡 Okay / 🔴 Poor
+- Preview:
+  Google search preview
+  WhatsApp share preview
+
+TAB 7: PUBLISH
+- Status: Draft/Active/Inactive
+- Visibility: Public/Private
+- Schedule publish date
+- Featured toggle
+- New Arrival toggle
+- Best Seller toggle
+- Flash Sale toggle
+  → Flash price + end date
+- Save Draft button
+- Publish button
+- Preview on website button
+
+4C. IMPROVE INVENTORY MANAGEMENT
+──────────────────────────────────
+
+Separate inventory page showing:
+
+┌─────────────────────────────────────────┐
+│  INVENTORY OVERVIEW                     │
+│  Total: 234 products                    │
+│  In Stock: 198 | Low: 5 | Out: 31      │
+└─────────────────────────────────────────┘
+
+Table with:
+- Product name + image
+- Current stock (editable inline)
+- Low stock threshold
+- Status (In/Low/Out)
+- Last restocked date
+- Sales velocity (units/week)
+- Estimated days until out of stock
+- [Update Stock] quick button
+
+ADD stock movement history:
+Each product shows log:
++50 units — 01/12/2024 — Admin
+-3 units — sold — 02/12/2024
+-1 unit — returned — 03/12/2024
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 5: ORDERS MANAGEMENT
+════════════════════════════════════════════
+
+FIND existing orders management.
+IMPROVE completely:
+
+5A. IMPROVE ORDERS LIST
+─────────────────────────
+
+Order status tabs:
+[All(145)] [Pending(23)] [Confirmed(45)]
+[Processing(12)] [Shipped(48)] 
+[Delivered(12)] [Cancelled(3)] [Refunded(2)]
+
+Each tab shows count badge.
+Pending tab in RED (needs attention).
+
+Filter options:
+- Date range picker
+- Payment method
+- Delivery zone/district
+- Amount range (RWF)
+- Search by: order#/phone/name
+
+Order table:
+Order# | Date | Customer+Phone | Items |
+Total(RWF) | Payment | District | 
+Status | Rider | Actions
+
+Color coded rows:
+PENDING → light yellow background
+CONFIRMED → light blue
+SHIPPED → light orange
+DELIVERED → light green
+CANCELLED → light red
+REFUNDED → light purple
+
+Actions per row:
+[👁️ View] [✅ Confirm] [🚚 Assign]
+[💬 SMS] [🖨️ Invoice] [⋮ More]
+
+5B. IMPROVE ORDER DETAIL PAGE
+───────────────────────────────
+
+Full order detail layout:
+
+TOP ROW:
+[← Back to Orders]
+Order #BHR-2024-045 | 02 Dec 2024 10:45
+[Print Invoice] [Send SMS] [⋮ Actions]
+
+STATUS TIMELINE:
+●━━━━━●━━━━━●━━━━━●━━━━━●━━━━━●
+Placed Confirmed Processing Shipped Delivered
+10:45  11:02   11:30      14:00   (pending)
+
+GRID LAYOUT (2 columns):
+
+LEFT COLUMN:
+┌─────────────────────────────────────────┐
+│  ORDER ITEMS                            │
+├─────────────────────────────────────────┤
+│  [img] Nivea Body Lotion 400ml x2      │
+│        8,500 RWF × 2 = 17,000 RWF     │
+│        SKU: NIV-001                    │
+├─────────────────────────────────────────┤
+│  [img] L'Oréal Serum 30ml x1          │
+│        28,000 RWF × 1 = 28,000 RWF    │
+│        SKU: LOR-001                    │
+├─────────────────────────────────────────┤
+│  Subtotal:              45,000 RWF     │
+│  Delivery (Gasabo):      1,000 RWF     │
+│  Coupon (BEAUTY20):     -9,000 RWF     │
+│  ─────────────────────────────────     │
+│  TOTAL:                 37,000 RWF     │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│  PAYMENT INFORMATION                    │
+├─────────────────────────────────────────┤
+│  Method: 💛 MTN Mobile Money           │
+│  Status: ✅ PAID                        │
+│  Amount: 37,000 RWF                    │
+│  Phone: +250780000001                  │
+│  Transaction ID: PAY-123456789         │
+│  Paid at: 02/12/2024 10:47            │
+│                                         │
+│  [💰 Issue Refund]                     │
+└─────────────────────────────────────────┘
+
+RIGHT COLUMN:
+┌─────────────────────────────────────────┐
+│  CUSTOMER INFORMATION                   │
+├─────────────────────────────────────────┤
+│  👤 Amina Uwase                        │
+│  📱 +250780000001                      │
+│  📧 amina@gmail.com                    │
+│  📍 Gasabo, Kimironko, Kigali          │
+│  Landmark: Near KCT Building           │
+│                                         │
+│  Customer since: January 2024          │
+│  Total orders: 8                       │
+│  Total spent: 245,000 RWF             │
+│  Loyalty points: 2,450 pts            │
+│                                         │
+│  [👤 View Profile] [💬 Send SMS]       │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│  DELIVERY INFORMATION                   │
+├─────────────────────────────────────────┤
+│  Zone: Kigali Same Day                 │
+│  District: Gasabo                      │
+│  Sector: Kimironko                     │
+│  Landmark: Near KCT Building           │
+│  Fee: 1,000 RWF                        │
+│  ETA: Today by 6PM                     │
+│                                         │
+│  Assigned Rider: Jean Paul M.          │
+│  Rider Phone: +250789000001            │
+│                                         │
+│  [🏍️ Reassign Rider]                  │
+│  [📍 Update Status]                    │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│  ORDER ACTIONS                          │
+├─────────────────────────────────────────┤
+│  Update Status:                         │
+│  [Confirm] [Processing] [Shipped]      │
+│  [Delivered] [Cancel] [Refund]         │
+│                                         │
+│  Communications:                        │
+│  [📱 Send SMS] [📧 Send Email]         │
+│  [💬 WhatsApp Customer]                │
+│                                         │
+│  Documents:                             │
+│  [🖨️ Print Invoice] [📄 Delivery Note] │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│  INTERNAL NOTES (Staff only)           │
+├─────────────────────────────────────────┤
+│  02/12 10:50 - Admin: Order confirmed  │
+│  02/12 11:30 - Jean: Picked up items   │
+│  02/12 14:00 - Jean: Out for delivery  │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ Add note...                     │   │
+│  └─────────────────────────────────┘   │
+│  [Add Note]                            │
+└─────────────────────────────────────────┘
+
+5C. ADD MANUAL ORDER CREATION
+───────────────────────────────
+
+For phone/WhatsApp orders:
+Admin creates order manually.
+
+Form fields:
+- Search or create customer
+- Add products (search + add)
+- Set delivery address (Rwanda)
+- Set payment method
+- Notes from phone call
+- Confirm and create order
+- Automatically trigger SMS
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 6: PAYMENTS MANAGEMENT
+════════════════════════════════════════════
+
+FIND existing payment section.
+IMPROVE completely:
+
+6A. PAYMENT OVERVIEW DASHBOARD
+────────────────────────────────
+
+Stats row:
+┌────────┬────────┬────────┬────────┬───────┐
+│ Total  │  MTN   │ Airtel │  Card  │  COD  │
+│Revenue │  MoMo  │ Money  │  Paid  │ Recvd │
+│12.5M   │  8.1M  │  2.5M  │  1.2M  │ 700K  │
+│  RWF   │  65%   │  20%   │  10%   │  5%   │
+└────────┴────────┴────────┴────────┴───────┘
+
+Failed payments alert:
+┌─────────────────────────────────────────┐
+│  ⚠️ 3 Failed Payments Need Attention   │
+│  Total: 85,000 RWF unrecovered         │
+│  [View Failed Payments]                │
+└─────────────────────────────────────────┘
+
+6B. IMPROVE TRANSACTIONS LIST
+───────────────────────────────
+
+Columns:
+TXN ID | Date | Customer | Order# |
+Amount(RWF) | Method | Status | Actions
+
+Status badges:
+✅ COMPLETED (green)
+⏳ PENDING (yellow)
+❌ FAILED (red)
+🔄 REFUNDED (purple)
+
+Actions:
+[👁️ View] [💰 Refund] [🔄 Retry]
+
+6C. ADD REFUND MANAGEMENT
+───────────────────────────
+
+Refund process:
+1. Select order
+2. Select items to refund
+   (full or partial)
+3. Select refund method:
+   - Back to MTN MoMo
+   - Back to Airtel
+   - Store credit (loyalty points)
+4. Enter reason
+5. Confirm refund
+6. Auto-send SMS to customer:
+   "Your refund of 37,000 RWF has
+    been sent to your MTN MoMo.
+    BeautyHub Rwanda"
+
+6D. ADD CASHOUT MANAGEMENT
+────────────────────────────
+
+Admin can withdraw earnings:
+- Current balance: 2,450,000 RWF
+- Withdraw to: MTN MoMo
+- Enter amount
+- Confirm with PIN
+- History of withdrawals
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 7: CUSTOMERS MANAGEMENT
+════════════════════════════════════════════
+
+FIND existing customers section.
+IMPROVE completely:
+
+7A. IMPROVE CUSTOMER LIST
+───────────────────────────
+
+Segment tabs:
+[All(3,456)] [VIP(145)] [New(89)] 
+[Inactive(234)] [Blocked(5)]
+
+VIP = spent > 100,000 RWF
+New = registered < 30 days
+Inactive = no order > 60 days
+
+Filter:
+- Registration date
+- Total spent range
+- District
+- Orders count
+- Last order date
+
+Table columns:
+[ ] | Avatar | Name | Phone | District |
+Orders | Total Spent(RWF) | Points |
+Last Order | Status | Actions
+
+Actions:
+[👁️ View] [💬 SMS] [💎 Points] [⛔ Block]
+
+7B. IMPROVE CUSTOMER PROFILE
+──────────────────────────────
+
+Full profile page:
+
+HEADER:
+┌─────────────────────────────────────────┐
+│  👤 Amina Uwase          [⛔ Block]    │
+│  +250780000001 • amina@gmail.com       │
+│  Gasabo, Kigali • Member since Jan 2024│
+│  💎 GOLD MEMBER (245,000 RWF spent)   │
+└─────────────────────────────────────────┘
+
+STATS ROW:
+┌──────┬──────┬──────┬──────┬──────┐
+│  8   │245K  │ 2,450│  4.8 │ Dry  │
+│Orders│ RWF  │ Pts  │Rating│Skin  │
+└──────┴──────┴──────┴──────┴──────┘
+
+TABS:
+
+Tab 1: ORDER HISTORY
+All orders with status, amount, date
+[View Order] button per row
+
+Tab 2: WISHLIST
+Products customer saved
+[View Product] per item
+
+Tab 3: REVIEWS WRITTEN
+All reviews with rating and product
+[View] [Delete if fake]
+
+Tab 4: LOYALTY POINTS
+Balance: 2,450 points = 24,500 RWF
+History: earned/spent log
+[Add Points] [Deduct Points] buttons
+
+Tab 5: COMMUNICATIONS
+All SMS sent to this customer
+[Send SMS] button
+
+Tab 6: SAVED ADDRESSES
+All saved delivery addresses
+
+7C. ADD CUSTOMER SEGMENTS
+───────────────────────────
+
+Auto-segments:
+- 💎 VIP (> 100K RWF)
+- 🥇 Gold (50K-100K RWF)
+- 🥈 Silver (20K-50K RWF)
+- 🥉 Bronze (0-20K RWF)
+- 🆕 New (< 30 days)
+- 😴 Sleeping (60+ days no order)
+- ❤️ Loyal (5+ orders)
+
+Use segments for targeted SMS campaigns.
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 8: DELIVERY MANAGEMENT
+════════════════════════════════════════════
+
+FIND existing delivery section.
+IMPROVE completely:
+
+8A. DELIVERY OVERVIEW
+───────────────────────
+
+Stats:
+┌──────────┬──────────┬──────────┬──────────┐
+│ Active   │ Completed│ Failed   │ Avg Time │
+│Deliveries│  Today   │  Today   │  Today   │
+│   23     │   45     │    2     │ 1.5 hrs  │
+└──────────┴──────────┴──────────┴──────────┘
+
+8B. IMPROVE RIDERS MANAGEMENT
+───────────────────────────────
+
+Rider profile:
+- Name + phone
+- Zone coverage (districts)
+- Active orders now
+- Completed today
+- Rating from customers
+- Status: 🟢 Available / 🔴 Busy
+- [Assign Order] button
+
+Rider performance:
+- Total deliveries
+- Success rate %
+- Average delivery time
+- Customer ratings
+- Earnings this month
+
+8C. DELIVERY ZONES & FEES EDITOR
+──────────────────────────────────
+
+Visual table admin can edit:
+
+┌────────────────┬──────────┬──────────────┐
+│ Zone           │ Fee(RWF) │ Time         │
+├────────────────┼──────────┼──────────────┤
+│ Kigali Same Day│ [1,000]  │ [Same Day]   │
+│ Kigali Next Day│ [1,500]  │ [Next Day]   │
+│ North Province │ [3,000]  │ [2-3 days]   │
+│ South Province │ [3,000]  │ [2-3 days]   │
+│ East Province  │ [3,500]  │ [2-3 days]   │
+│ West Province  │ [4,000]  │ [3-4 days]   │
+└────────────────┴──────────┴──────────────┘
+
+[Edit] per row → inline editing
+[Save Changes] → updates immediately
+Free delivery threshold: [50,000] RWF
+
+Same-day cutoff time: [14:00] (2PM)
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 9: MARKETING TOOLS
+════════════════════════════════════════════
+
+FIND existing promotions section.
+IMPROVE completely:
+
+9A. IMPROVE COUPON MANAGEMENT
+───────────────────────────────
+
+Create coupon form:
+- Code (auto-generate or manual)
+- Type: % off or fixed RWF off
+- Value: [20] % or [5000] RWF
+- Min order: [10,000] RWF
+- Max discount: [15,000] RWF
+- Usage limit: [100] total
+- Per customer: [1] time
+- Valid from: [date]
+- Valid until: [date]
+- Applies to:
+  [All] [Category] [Brand] [Products]
+- Customer segment:
+  [All] [New] [VIP] [Inactive]
+
+Coupon analytics:
+- Times used: 45/100
+- Revenue generated: 890,000 RWF
+- Discount given: 135,000 RWF
+- Conversion rate: 78%
+
+9B. IMPROVE SMS CAMPAIGNS
+───────────────────────────
+
+Campaign builder:
+
+Step 1: Select Audience
+┌─────────────────────────────────────────┐
+│  Send to:                               │
+│  ○ All customers (3,456)               │
+│  ○ VIP customers (145)                 │
+│  ○ Inactive customers (234)            │
+│  ○ New customers (89)                  │
+│  ○ By district: [Gasabo ▼] (456)      │
+│  ○ Custom filter                       │
+│  Estimated reach: 3,456 people         │
+│  Estimated cost: 34,560 RWF            │
+└─────────────────────────────────────────┘
+
+Step 2: Write Message
+┌─────────────────────────────────────────┐
+│  Language: [EN] [FR] [RW]              │
+│                                         │
+│  ┌─────────────────────────────────┐   │
+│  │ BeautyHub Rwanda: Flash sale!   │   │
+│  │ 30% OFF all skincare today!     │   │
+│  │ Shop: beautyhub.rw              │   │
+│  │ Code: SKIN30                    │   │
+│  └─────────────────────────────────┘   │
+│  Characters: 142/160                   │
+│  SMS count: 1                          │
+│                                         │
+│  Dynamic tags:                         │
+│  {name} {points} {district} {code}    │
+└─────────────────────────────────────────┘
+
+Step 3: Schedule
+┌─────────────────────────────────────────┐
+│  ○ Send now                            │
+│  ○ Schedule: [Date] [Time]             │
+│  Best time in Rwanda: 12PM or 6PM      │
+└─────────────────────────────────────────┘
+
+Campaign results:
+- Sent: 3,456
+- Delivered: 3,401 (98.4%)
+- Failed: 55 (1.6%)
+- Orders generated: 234
+- Revenue: 4,500,000 RWF
+- ROI: 1,300%
+
+9C. IMPROVE BANNER MANAGEMENT
+───────────────────────────────
+
+Banner upload:
+- Drag & drop upload
+- Desktop image (1920×600px)
+- Mobile image (375×300px)
+- Title (EN/FR/RW)
+- Subtitle
+- CTA button text
+- Link to: product/category/URL
+- Start date
+- End date
+- Sort order (drag to reorder)
+- Preview before publishing
+- Active/Inactive toggle
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 10: ANALYTICS & REPORTS
+════════════════════════════════════════════
+
+FIND existing analytics.
+IMPROVE completely:
+
+10A. SALES ANALYTICS PAGE
+───────────────────────────
+
+Date range selector:
+[Today][Yesterday][7 Days][30 Days]
+[This Month][Last Month][Custom Range]
+
+Metrics shown:
+- Total Revenue (RWF)
+- Total Orders
+- Average Order Value
+- Conversion Rate
+- Refund Rate
+- New vs Returning customers
+
+Charts:
+1. Revenue trend (line)
+2. Orders trend (bar)
+3. Best selling products (top 10)
+4. Revenue by category (pie)
+5. Revenue by district (Rwanda map)
+6. Hourly orders (what time do people buy?)
+7. Payment methods (donut)
+
+10B. PRODUCT ANALYTICS
+────────────────────────
+
+Per product metrics:
+- Views
+- Add to cart rate
+- Purchase rate
+- Revenue generated
+- Return rate
+- Stock turnover
+- Average rating
+
+Table sortable by any metric.
+Export to Excel button.
+
+10C. CUSTOMER ANALYTICS
+─────────────────────────
+
+Metrics:
+- New customers per day
+- Retention rate
+- Average lifetime value
+- Churn rate
+- Average orders per customer
+- Best customer districts
+- Customer acquisition channels
+
+10D. EXPORT REPORTS
+─────────────────────
+
+Export options:
+- Sales report (Excel/PDF)
+- Orders report (Excel)
+- Customer report (Excel)
+- Inventory report (Excel)
+- Payment report (Excel)
+
+Schedule auto-reports:
+- Daily summary → email to admin
+- Weekly report → email to admin
+- Monthly report → email to admin
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 11: STAFF & SECURITY
+════════════════════════════════════════════
+
+FIND existing staff section.
+IMPROVE completely:
+
+11A. IMPROVE STAFF MANAGEMENT
+───────────────────────────────
+
+Staff roles:
+SUPER ADMIN → Full access (you)
+ADMIN → Most access
+MANAGER → Orders + Products
+SALES STAFF → Orders only
+DELIVERY MANAGER → Delivery only
+CONTENT EDITOR → Blog + Banners
+
+Add staff form:
+- Full name
+- Phone (+250)
+- Email
+- Role selection
+- Zone assignment (for riders)
+- Temporary password (auto-generated)
+- Send credentials via SMS
+
+Staff activity log:
+[Time] [Staff Name] [Action] [Details]
+10:45  Admin Amina  Confirmed  Order #BHR-045
+11:02  Jean Paul    Shipped    Order #BHR-043
+14:30  Admin Amina  Added      Product NIV-005
+
+11B. IMPROVE SECURITY SETTINGS
+────────────────────────────────
+
+Security dashboard:
+- Active sessions (who is logged in)
+- Recent logins list (IP + device)
+- Failed login attempts
+- Blocked IPs
+- 2FA settings
+
+Options admin can configure:
+- Force 2FA for all staff
+- Session timeout (minutes)
+- IP whitelist for admin panel
+- Password expiry (days)
+- Audit log retention (days)
+
+11C. SYSTEM SETTINGS PAGE
+───────────────────────────
+
+General:
+- Store name
+- Store logo
+- Contact phone
+- Contact email
+- WhatsApp number
+- Store address
+- Timezone: Africa/Kigali ✅
+
+Payment settings:
+- PayPack credentials (edit)
+- Flutterwave credentials (edit)
+- Enable/disable payment methods
+- COD available zones
+- Minimum order amount (RWF)
+
+SMS settings:
+- Provider selection
+- API credentials
+- Sender ID
+- Enable/disable per SMS type
+- Test SMS button
+
+Delivery settings:
+- Edit zone fees
+- Free delivery threshold
+- Same day cutoff time
+- Business hours
+
+Notification settings:
+- New order alert: [email][SMS][push]
+- Low stock alert: [email][SMS]
+- Failed payment: [email][SMS]
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 12: FINAL ADMIN IMPROVEMENTS
+════════════════════════════════════════════
+
+12A. ADD DARK MODE
+────────────────────
+Toggle in admin header: 🌙/☀️
+Save preference per admin user.
+Smooth transition animation.
+
+12B. ADD KEYBOARD SHORTCUTS
+────────────────────────────
+Admin power shortcuts:
+Ctrl+K → Global search
+Ctrl+N → New product
+Ctrl+O → View orders
+Ctrl+C → Customers
+Ctrl+S → Settings
+? → Show all shortcuts
+
+12C. ADD PRINT INVOICE
+────────────────────────
+Professional invoice PDF:
+
+┌─────────────────────────────────────────┐
+│  [Logo] BEAUTYHUB RWANDA                │
+│  Invoice #BHR-2024-045                  │
+│  Date: 02 December 2024                 │
+├─────────────────────────────────────────┤
+│  BILL TO:                               │
+│  Amina Uwase                            │
+│  +250780000001                          │
+│  Gasabo, Kigali, Rwanda                │
+├─────────────────────────────────────────┤
+│  ITEMS:                                 │
+│  Nivea Lotion x2    17,000 RWF         │
+│  L'Oréal Serum x1   28,000 RWF         │
+├─────────────────────────────────────────┤
+│  Subtotal:          45,000 RWF         │
+│  Delivery:           1,000 RWF         │
+│  Discount:          -9,000 RWF         │
+│  TOTAL:             37,000 RWF         │
+├─────────────────────────────────────────┤
+│  Payment: MTN MoMo ✅ PAID             │
+│  TXN: PAY-123456789                    │
+├─────────────────────────────────────────┤
+│  Thank you for shopping with us! 🇷🇼  │
+│  www.beautyhub.rw | +250780000000      │
+└─────────────────────────────────────────┘
+
+12D. ADD BACKUP SYSTEM
+────────────────────────
+
+Backup dashboard:
+- Last backup: 02/12/2024 02:00 AM ✅
+- Backup size: 245 MB
+- [Manual Backup Now] button
+- Auto-backup schedule: Daily 2AM
+- Backup location: Cloud storage
+- [Download Backup] button
+- Backup history (last 30)
+
+════════════════════════════════════════════
+AFTER ALL 12 SECTIONS COMPLETE:
+════════════════════════════════════════════
+
+Give me this FINAL ADMIN REPORT:
+
+╔═════════════════════════════════════════╗
+║     BEAUTYHUB RWANDA ADMIN REPORT      ║
+╠═════════════════════════════════════════╣
+║ Section 1:  Admin Login      ✅/⚠️     ║
+║ Section 2:  Layout & Nav     ✅/⚠️     ║
+║ Section 3:  Dashboard        ✅/⚠️     ║
+║ Section 4:  Products         ✅/⚠️     ║
+║ Section 5:  Orders           ✅/⚠️     ║
+║ Section 6:  Payments         ✅/⚠️     ║
+║ Section 7:  Customers        ✅/⚠️     ║
+║ Section 8:  Delivery         ✅/⚠️     ║
+║ Section 9:  Marketing        ✅/⚠️     ║
+║ Section 10: Analytics        ✅/⚠️     ║
+║ Section 11: Staff/Security   ✅/⚠️     ║
+║ Section 12: Final Polish     ✅/⚠️     ║
+╠═════════════════════════════════════════╣
+║ New Files Created:   [number]          ║
+║ Files Modified:      [number]          ║
+║ Files Untouched:     [number]          ║
+║ Existing features:   ALL INTACT ✅     ║
+╠═════════════════════════════════════════╣
+║ ADMIN STATUS:                          ║
+║ ✅ WORLD-CLASS ADMIN DASHBOARD         ║
+║ 🇷🇼 FULLY RWANDA OPTIMIZED            ║
+║ 💛 MTN MOMO FULLY MANAGED             ║
+║ 🔐 ENTERPRISE SECURITY                ║
+║ 📊 FULL ANALYTICS                     ║
+║ 🚚 DELIVERY FULLY MANAGED             ║
+╚═════════════════════════════════════════╝
+
+Commands to test admin locally:
+cd admin && npm run dev -- --port 3001
+Open: http://localhost:3001/admin
+Login: +250780000000 / admin123
