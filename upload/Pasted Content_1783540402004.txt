@@ -1,0 +1,1532 @@
+ZDEV, BEFORE ANYTHING ELSE READ AND 
+CONFIRM THESE IRON RULES:
+
+╔═════════════════════════════════════════╗
+║         🚨 IRON RULES 🚨                ║
+╠═════════════════════════════════════════╣
+║                                         ║
+║  RULE 1: NEVER DESTROY EXISTING CODE   ║
+║  Everything already working STAYS.     ║
+║  Keep ALL existing features:           ║
+║  ✅ Main website (working)             ║
+║  ✅ Admin dashboard (working)          ║
+║  ✅ MTN MoMo payment (working)        ║
+║  ✅ Rwanda district delivery (working) ║
+║  ✅ SMS system (working)              ║
+║  ✅ Order system (working)            ║
+║  ✅ Customer system (working)         ║
+║  ✅ Mobile app (working)              ║
+║  ✅ Real-time connection (working)    ║
+║  ONLY ADD wholesale/retail logic.     ║
+║                                        ║
+║  RULE 2: SURGICAL CHANGES ONLY        ║
+║  Touch ONLY what is needed for        ║
+║  wholesale and retail features.       ║
+║  Skip everything else completely.     ║
+║                                        ║
+║  RULE 3: CHECK BEFORE TOUCHING        ║
+║  Before modifying any file:           ║
+║  1. State exact file name             ║
+║  2. State what currently exists       ║
+║  3. State exactly what you will add   ║
+║  4. Then write complete code          ║
+║                                        ║
+║  RULE 4: COMPLETE CODE ONLY           ║
+║  No placeholder code.                 ║
+║  No empty functions.                  ║
+║  No TODO comments.                    ║
+║  Everything 100% complete.            ║
+║                                        ║
+║  RULE 5: SHOW ALL CHANGES             ║
+║  After each section report:           ║
+║  📁 NEW files created: [list]         ║
+║  ✏️  MODIFIED files: [what changed]   ║
+║  🔒 UNTOUCHED files: [confirmed]      ║
+║                                        ║
+║  RULE 6: RWANDA FIRST ALWAYS          ║
+║  All features must support:           ║
+║  - RWF currency                       ║
+║  - MTN MoMo payments                 ║
+║  - Rwanda 30 districts               ║
+║  - Kinyarwanda/English/French        ║
+║  - Local business needs              ║
+║                                        ║
+║  RULE 7: PRODUCTION QUALITY           ║
+║  - TypeScript typed                   ║
+║  - Error handled                      ║
+║  - Secure                             ║
+║  - Mobile responsive                  ║
+║  - Fast loading                       ║
+║                                        ║
+║  RULE 8: ONE SECTION AT A TIME        ║
+║  Complete one section fully.          ║
+║  Report what changed.                 ║
+║  Wait for approval.                   ║
+║  Move to next section.                ║
+║                                        ║
+╚═════════════════════════════════════════╝
+
+PROJECT CONTEXT:
+Project: BeautyHub Rwanda
+Type: Cosmetics E-Commerce
+Currency: RWF
+Payments: MTN MoMo + Airtel + Card + COD
+Stack: Next.js + Node.js + PostgreSQL
+       + Prisma + TypeScript + Tailwind
+
+WHOLESALE CONTEXT FOR RWANDA:
+Wholesale buyers in Rwanda are:
+- Beauty salons (Kigali + provinces)
+- Hair salons
+- Spas and wellness centers
+- Small shops and kiosks
+- Market vendors
+- Beauty schools
+- Hotels and lodges
+- Individual resellers
+
+Wholesale minimum: 50,000 RWF order
+Wholesale account: Must be approved by admin
+
+Confirm rules:
+"RULES CONFIRMED. WHOLESALE & RETAIL READY."
+Then wait for me to say START.
+
+════════════════════════════════════════════
+WHOLESALE & RETAIL MISSION
+════════════════════════════════════════════
+
+Build a COMPLETE dual-pricing system:
+
+RETAIL = Normal customers
+(Buy 1-2 products for personal use)
+
+WHOLESALE = Business buyers
+(Buy in bulk for resale or salon use)
+
+Both must work perfectly on:
+✅ Main website
+✅ Admin dashboard
+✅ Mobile app
+✅ SMS notifications
+✅ Invoices/receipts
+
+════════════════════════════════════════════
+SECTION 1: DATABASE SETUP
+════════════════════════════════════════════
+
+FIND existing schema.prisma.
+ADD only these new models and fields.
+DO NOT remove any existing model.
+
+1A. ADD TO EXISTING USER MODEL:
+────────────────────────────────
+
+ADD these fields to User model:
+(Keep all existing fields)
+
+  userType          UserType    @default(RETAIL)
+  wholesaleStatus   WholesaleStatus?
+  businessName      String?
+  businessType      BusinessType?
+  businessPhone     String?
+  businessAddress   String?
+  businessDistrict  String?
+  tinNumber         String?     // Rwanda Tax ID
+  wholesaleApprovedAt DateTime?
+  wholesaleApprovedBy String?
+  wholesaleLimit    Decimal?    // Credit limit RWF
+  wholesaleBalance  Decimal     @default(0)
+  wholesaleDiscount Int         @default(0) // %
+
+1B. ADD NEW ENUMS:
+───────────────────
+
+enum UserType {
+  RETAIL
+  WHOLESALE
+  BOTH
+}
+
+enum WholesaleStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum BusinessType {
+  BEAUTY_SALON
+  HAIR_SALON
+  SPA
+  SHOP
+  MARKET_VENDOR
+  BEAUTY_SCHOOL
+  HOTEL
+  RESELLER
+  OTHER
+}
+
+enum PriceType {
+  RETAIL
+  WHOLESALE
+  SPECIAL
+}
+
+enum OrderType {
+  RETAIL
+  WHOLESALE
+}
+
+1C. ADD NEW MODELS:
+────────────────────
+
+model WholesaleApplication {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  
+  businessName    String
+  businessType    BusinessType
+  businessPhone   String
+  businessAddress String
+  businessDistrict String
+  tinNumber       String?
+  yearsInBusiness Int?
+  monthlyRevenue  String?
+  
+  documents       String[]
+  notes           String?
+  
+  status          WholesaleStatus @default(PENDING)
+  reviewedBy      String?
+  reviewNotes     String?
+  rejectionReason String?
+  
+  appliedAt       DateTime  @default(now())
+  reviewedAt      DateTime?
+  
+  @@index([userId])
+  @@index([status])
+}
+
+model ProductPricing {
+  id              String    @id @default(cuid())
+  product         Product   @relation(fields: [productId], references: [id])
+  productId       String
+  
+  priceType       PriceType
+  
+  retailPrice     Decimal
+  
+  wholesaleTiers  WholesaleTier[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([productId])
+}
+
+model WholesaleTier {
+  id              String        @id @default(cuid())
+  pricing         ProductPricing @relation(fields: [pricingId], references: [id])
+  pricingId       String
+  
+  tierName        String
+  minQuantity     Int
+  maxQuantity     Int?
+  pricePerUnit    Decimal
+  discountPercent Int
+  
+  @@index([pricingId])
+}
+
+model WholesaleCredit {
+  id              String    @id @default(cuid())
+  user            User      @relation(fields: [userId], references: [id])
+  userId          String    @unique
+  
+  creditLimit     Decimal   @default(0)
+  usedCredit      Decimal   @default(0)
+  availableCredit Decimal   @default(0)
+  
+  paymentTermDays Int       @default(30)
+  
+  history         CreditHistory[]
+  
+  updatedAt       DateTime  @updatedAt
+}
+
+model CreditHistory {
+  id          String          @id @default(cuid())
+  credit      WholesaleCredit @relation(fields: [creditId], references: [id])
+  creditId    String
+  
+  type        String
+  amount      Decimal
+  description String
+  orderId     String?
+  
+  createdAt   DateTime        @default(now())
+}
+
+model WholesaleInvoice {
+  id              String    @id @default(cuid())
+  invoiceNumber   String    @unique
+  order           Order     @relation(fields: [orderId], references: [id])
+  orderId         String    @unique
+  
+  businessName    String
+  businessAddress String
+  tinNumber       String?
+  
+  subtotal        Decimal
+  tax             Decimal   @default(0)
+  discount        Decimal   @default(0)
+  totalAmount     Decimal
+  
+  paymentTerms    String?
+  dueDate         DateTime?
+  isPaid          Boolean   @default(false)
+  paidAt          DateTime?
+  
+  notes           String?
+  
+  issuedAt        DateTime  @default(now())
+}
+
+ADD to existing Order model:
+  orderType         OrderType   @default(RETAIL)
+  priceType         PriceType   @default(RETAIL)
+  wholesaleInvoice  WholesaleInvoice?
+  isCredit          Boolean     @default(false)
+  creditDueDate     DateTime?
+
+ADD to existing Product model:
+  pricing           ProductPricing?
+  minWholesaleQty   Int         @default(6)
+  wholesaleActive   Boolean     @default(true)
+
+Run migration after this section.
+Show me migration command.
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 2: BACKEND WHOLESALE API
+════════════════════════════════════════════
+
+FIND existing backend routes folder.
+ADD new wholesale routes.
+DO NOT touch existing routes.
+
+2A. CREATE /backend/src/routes/
+    wholesale.routes.ts
+────────────────────────────────
+
+PUBLIC ROUTES (no auth needed):
+GET /api/wholesale/info
+  → Returns wholesale benefits info
+  → Minimum order, discount tiers
+  → How to apply
+
+CUSTOMER ROUTES (auth required):
+POST /api/wholesale/apply
+  → Submit wholesale application
+  → Validate business details
+  → Save application
+  → Notify admin via SMS + notification
+  → Send confirmation SMS to applicant:
+    "Application received! We will 
+     review within 24-48 hours.
+     BeautyHub Rwanda"
+
+GET /api/wholesale/application/status
+  → Check own application status
+  → Returns: pending/approved/rejected
+
+GET /api/wholesale/my-pricing
+  → Get wholesale prices for all products
+  → Only for approved wholesale accounts
+
+GET /api/wholesale/my-credit
+  → Get credit limit and balance
+  → Only for approved accounts
+
+GET /api/wholesale/my-invoices
+  → Get all wholesale invoices
+  → With payment status
+
+ADMIN ROUTES (admin auth required):
+GET /api/admin/wholesale/applications
+  → All applications with filters
+  → Filter: pending/approved/rejected
+  → Search by business name/phone
+
+GET /api/admin/wholesale/applications/:id
+  → Single application details
+
+PUT /api/admin/wholesale/applications/:id/approve
+  Body: { creditLimit, paymentTerms, notes }
+  → Approve application
+  → Set credit limit
+  → Send approval SMS:
+    "Congratulations! Your wholesale
+     account is approved! Shop now:
+     beautyhub.rw/wholesale
+     BeautyHub Rwanda 🎉"
+  → Send approval email
+
+PUT /api/admin/wholesale/applications/:id/reject
+  Body: { reason }
+  → Reject application
+  → Send rejection SMS:
+    "Unfortunately your wholesale
+     application was not approved.
+     Reason: [reason]
+     Questions? Call: +250780000000"
+
+GET /api/admin/wholesale/customers
+  → All approved wholesale customers
+  → With order history and credit
+
+PUT /api/admin/wholesale/customers/:id/pricing
+  → Set custom pricing for specific customer
+  → Override default wholesale tiers
+
+GET /api/admin/wholesale/orders
+  → All wholesale orders
+  → Filter by status, customer, date
+
+PUT /api/admin/wholesale/orders/:id/invoice
+  → Generate/update wholesale invoice
+
+GET /api/admin/wholesale/analytics
+  → Wholesale revenue
+  → Top wholesale customers
+  → Most ordered wholesale products
+
+2B. CREATE /backend/src/services/
+    wholesale.service.ts
+─────────────────────────────────────
+
+Complete service functions:
+
+calculateWholesalePrice(
+  productId, quantity, userId
+):
+  1. Check user is approved wholesale
+  2. Get product wholesale tiers
+  3. Find correct tier for quantity
+  4. Apply user-specific discount if any
+  5. Return: unit price, total, savings
+
+generateWholesaleInvoice(orderId):
+  1. Get order details
+  2. Get buyer business details
+  3. Calculate totals
+  4. Generate invoice number: 
+     INV-WHL-2024-001
+  5. Save invoice
+  6. Return invoice data for PDF
+
+checkCreditLimit(userId, orderAmount):
+  1. Get user credit limit
+  2. Get current used credit
+  3. Check if order fits in limit
+  4. Return: allowed/denied + available
+
+updateCreditBalance(userId, amount, type):
+  DEBIT: when order placed on credit
+  CREDIT: when payment received
+
+getWholesaleTiers(productId):
+  Return all price tiers for product:
+  1-5 units: 8,500 RWF
+  6-11 units: 7,500 RWF (12% off)
+  12-23 units: 7,000 RWF (18% off)
+  24-47 units: 6,500 RWF (24% off)
+  48+ units: 6,000 RWF (29% off)
+
+2C. CREATE /backend/src/controllers/
+    wholesale.controller.ts
+──────────────────────────────────────
+
+Complete controllers for all routes.
+Full error handling.
+Full validation with Zod.
+Full TypeScript types.
+
+2D. UPDATE EXISTING PRODUCT CONTROLLER
+────────────────────────────────────────
+
+FIND existing product controller.
+ADD price calculation logic:
+
+When returning product data:
+- Check requesting user type
+- If RETAIL user → return retail price
+- If WHOLESALE user → return wholesale price
+  based on their discount tier
+- If not logged in → return retail price
+
+Price response format:
+{
+  retailPrice: 8500,
+  wholesalePrice: 6000,
+  currentPrice: 6000, // for this user
+  priceType: "WHOLESALE",
+  savings: 2500,
+  savingsPercent: 29,
+  wholesaleTiers: [
+    { minQty: 1, maxQty: 5, price: 8500, label: "Retail" },
+    { minQty: 6, maxQty: 11, price: 7500, label: "Buy 6+" },
+    { minQty: 12, maxQty: 23, price: 7000, label: "Buy 12+" },
+    { minQty: 24, maxQty: 47, price: 6500, label: "Buy 24+" },
+    { minQty: 48, price: 6000, label: "Buy 48+" }
+  ]
+}
+
+2E. UPDATE EXISTING ORDER CONTROLLER
+──────────────────────────────────────
+
+FIND existing order controller.
+ADD wholesale order handling:
+
+When wholesale user creates order:
+1. Verify wholesale account is active
+2. Calculate wholesale prices
+3. Check minimum order (50,000 RWF)
+4. Check credit limit if paying on credit
+5. Create order with orderType: WHOLESALE
+6. Generate wholesale invoice
+7. Update credit balance if credit order
+8. Send SMS with invoice number
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 3: PRODUCT PRICING MANAGEMENT
+════════════════════════════════════════════
+
+Admin controls all pricing from admin panel.
+
+3A. ADD WHOLESALE PRICING TAB TO PRODUCT
+──────────────────────────────────────────
+
+FIND existing product add/edit form.
+ADD new tab: "Wholesale Pricing"
+DO NOT touch other tabs.
+
+WHOLESALE PRICING TAB:
+
+┌─────────────────────────────────────────┐
+│  WHOLESALE PRICING                      │
+├─────────────────────────────────────────┤
+│                                         │
+│  Enable Wholesale Pricing               │
+│  [Toggle ✅ ON]                         │
+│                                         │
+│  Minimum Wholesale Quantity:            │
+│  [6] units                             │
+│                                         │
+│  PRICE TIERS:                          │
+│  ┌────────┬────────┬────────┬────────┐  │
+│  │Min Qty │Max Qty │Price   │Discount│  │
+│  ├────────┼────────┼────────┼────────┤  │
+│  │ 1      │ 5      │8,500   │ 0%     │  │
+│  │        │        │(retail)│        │  │
+│  ├────────┼────────┼────────┼────────┤  │
+│  │ 6      │ 11     │[7,500] │ 12%    │  │
+│  ├────────┼────────┼────────┼────────┤  │
+│  │ 12     │ 23     │[7,000] │ 18%    │  │
+│  ├────────┼────────┼────────┼────────┤  │
+│  │ 24     │ 47     │[6,500] │ 24%    │  │
+│  ├────────┼────────┼────────┼────────┤  │
+│  │ 48     │ ∞      │[6,000] │ 29%    │  │
+│  └────────┴────────┴────────┴────────┘  │
+│                                         │
+│  [+ Add Tier]  [Remove Last Tier]      │
+│                                         │
+│  PROFIT CALCULATOR:                    │
+│  Cost price: 4,200 RWF                 │
+│  Retail profit: 4,300 RWF (51%)       │
+│  Wholesale min profit: 1,800 RWF (43%)│
+│                                         │
+│  [Save Wholesale Pricing]              │
+└─────────────────────────────────────────┘
+
+3B. ADD BULK WHOLESALE PRICE UPDATE
+─────────────────────────────────────
+
+In admin products list page.
+ADD bulk action: "Set Wholesale Price"
+
+Select multiple products →
+[Set Wholesale Pricing ▼]
+
+Opens modal:
+┌─────────────────────────────────────────┐
+│  SET WHOLESALE PRICING                 │
+│  For 15 selected products              │
+├─────────────────────────────────────────┤
+│  Apply discount tiers to all:          │
+│                                         │
+│  Tier 1 (6-11 units): [12] % off      │
+│  Tier 2 (12-23 units): [18] % off     │
+│  Tier 3 (24-47 units): [24] % off     │
+│  Tier 4 (48+ units): [29] % off       │
+│                                         │
+│  Calculate from: [Retail Price ▼]      │
+│                                         │
+│  [Preview] [Apply to All 15 Products] │
+└─────────────────────────────────────────┘
+
+3C. ADD CUSTOMER-SPECIFIC PRICING
+───────────────────────────────────
+
+In wholesale customer profile:
+ADD custom pricing override:
+
+┌─────────────────────────────────────────┐
+│  SPECIAL PRICING FOR:                  │
+│  Amina Beauty Salon — Kigali           │
+├─────────────────────────────────────────┤
+│  Extra discount on top of wholesale:   │
+│  [5] % additional discount            │
+│                                         │
+│  OR set specific product prices:       │
+│  Nivea Lotion: [5,500] RWF (custom)   │
+│  L'Oréal Serum: [19,000] RWF (custom) │
+│                                         │
+│  Credit limit: [500,000] RWF          │
+│  Payment terms: [30] days             │
+│                                         │
+│  [Save Special Pricing]               │
+└─────────────────────────────════════════┘
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 4: MAIN WEBSITE — RETAIL EXPERIENCE
+════════════════════════════════════════════
+
+Retail experience stays mostly the same.
+Just ADD wholesale awareness.
+
+4A. ADD "BECOME A WHOLESALER" BANNER
+──────────────────────────────────────
+
+ADD to existing homepage:
+(Between best sellers and footer)
+
+┌─────────────────────────────────────────┐
+│  🏪 ARE YOU A SALON OR SHOP OWNER?    │
+│                                         │
+│  Join BeautyHub Rwanda Wholesale!      │
+│                                         │
+│  ✅ Up to 30% discount on all products │
+│  ✅ Priority delivery                   │
+│  ✅ Dedicated account manager          │
+│  ✅ Credit payment available           │
+│  ✅ Bulk order support                 │
+│  ✅ Professional invoices              │
+│                                         │
+│  Minimum order: 50,000 RWF            │
+│                                         │
+│  [Apply for Wholesale Account →]       │
+└─────────────────────────────────────────┘
+
+Background: Dark brand color
+Text: White
+CTA: Brand accent color
+
+4B. ADD PRICE DISPLAY LOGIC
+─────────────────────────────
+
+FIND existing product card component.
+ADD wholesale price display:
+
+For RETAIL users (default):
+┌──────────────────────┐
+│ [Product Image]      │
+│ Nivea Body Lotion    │
+│ ~~10,000~~ 8,500 RWF │
+│ ⭐⭐⭐⭐⭐ (23)        │
+│ [Add to Cart]        │
+└──────────────────────┘
+
+For WHOLESALE users (logged in):
+┌──────────────────────┐
+│ [Product Image]      │
+│ Nivea Body Lotion    │
+│ Retail: 8,500 RWF    │
+│ YOUR PRICE:          │
+│ 6,000 RWF 💛 (-29%) │
+│ Min. 48 units        │
+│ [Add to Cart]        │
+└──────────────────────┘
+
+On product detail page:
+Show full price tier table
+for wholesale users.
+
+4C. ADD WHOLESALE PRICE TIERS
+ON PRODUCT PAGE
+───────────────────────────────
+
+FIND existing product detail page.
+ADD wholesale pricing table
+BELOW the main price for wholesale users:
+
+┌─────────────────────────────────────────┐
+│  💰 YOUR WHOLESALE PRICING             │
+│  (Approved Wholesale Account)          │
+├──────────┬────────────┬────────────────┤
+│ Quantity │ Unit Price │ You Save       │
+├──────────┼────────────┼────────────────┤
+│  1 - 5   │ 8,500 RWF  │ —             │
+├──────────┼────────────┼────────────────┤
+│  6 - 11  │ 7,500 RWF  │ 1,000 (12%)   │
+├──────────┼────────────┼────────────────┤
+│  12 - 23 │ 7,000 RWF  │ 1,500 (18%)   │
+├──────────┼────────────┼────────────────┤
+│  24 - 47 │ 6,500 RWF  │ 2,000 (24%)   │
+├──────────┼────────────┼────────────────┤
+│  48+     │ 6,000 RWF  │ 2,500 (29%)   │
+└──────────┴────────────┴────────────────┘
+
+Quantity: [48] → Total: 288,000 RWF
+           ↑
+    (updates as user changes quantity)
+
+For retail users:
+Show teaser:
+┌─────────────────────────────────────────┐
+│  💡 BUY IN BULK & SAVE UP TO 30%       │
+│  Available for wholesale accounts      │
+│  [Apply for Wholesale →]              │
+└─────────────────────────────────────────┘
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 5: WHOLESALE APPLICATION FLOW
+════════════════════════════════════════════
+
+Build complete wholesale application
+experience on main website.
+
+5A. CREATE WHOLESALE LANDING PAGE
+───────────────────────────────────
+
+CREATE: /frontend/app/wholesale/page.tsx
+
+Page sections:
+
+HERO:
+┌─────────────────────────────────────────┐
+│  🏪 BeautyHub Rwanda                   │
+│  WHOLESALE PROGRAM                      │
+│                                         │
+│  Rwanda's Premier Beauty               │
+│  Wholesale Supplier                    │
+│                                         │
+│  Up to 30% off retail prices          │
+│  For salons, shops & resellers         │
+│                                         │
+│  [Apply Now — It's Free]              │
+│  [Learn More ↓]                        │
+└─────────────────────────────────────────┘
+
+BENEFITS SECTION:
+┌──────────┬──────────┬──────────┬────────┐
+│ 💰 Save  │ 🚚 Fast  │ 📄 Pro   │ 💳 Pay │
+│ Up to 30%│ Bulk     │ Invoices │ Later  │
+│  on all  │Delivery  │  & TIN   │(Credit)│
+│ products │ Rwanda   │ receipts │ option │
+└──────────┴──────────┴──────────┴────────┘
+
+WHO CAN APPLY:
+┌──────────┬──────────┬──────────┬────────┐
+│ 💇 Beauty│ ✂️ Hair  │ 🧖 Spas  │ 🏪 Shop│
+│  Salons  │  Salons  │          │ Owners │
+├──────────┼──────────┼──────────┼────────┤
+│ 🛒 Market│ 🎓 Beauty│ 🏨 Hotels│ 📦 Re- │
+│ Vendors  │ Schools  │& Lodges  │ sellers│
+└──────────┴──────────┴──────────┴────────┘
+
+PRICE EXAMPLE TABLE:
+Product: Nivea Body Lotion 400ml
+┌────────────┬────────────┬──────────────┐
+│  Quantity  │ Unit Price │ Total Savings│
+├────────────┼────────────┼──────────────┤
+│ 1-5 units  │ 8,500 RWF  │ —           │
+│ 6-11 units │ 7,500 RWF  │ Up to 10K   │
+│ 12-23 units│ 7,000 RWF  │ Up to 34K   │
+│ 24-47 units│ 6,500 RWF  │ Up to 96K   │
+│ 48+ units  │ 6,000 RWF  │ Over 240K   │
+└────────────┴────────────┴──────────────┘
+
+HOW IT WORKS:
+Step 1: Apply online (5 minutes)
+Step 2: We review (24-48 hours)
+Step 3: Get approved + access prices
+Step 4: Order and save!
+
+FAQ SECTION:
+- What is minimum order?
+- How long does approval take?
+- What documents do I need?
+- Is credit available?
+- Can I order from provinces?
+
+TESTIMONIALS:
+"Saved 2,500,000 RWF last year!"
+— Salon Owner, Kigali
+
+[Apply for Wholesale Account]
+
+5B. CREATE WHOLESALE APPLICATION FORM
+───────────────────────────────────────
+
+CREATE: /frontend/app/wholesale/apply/page.tsx
+
+Multi-step application form:
+
+STEP 1: BUSINESS INFORMATION
+┌─────────────────────────────────────────┐
+│  Step 1 of 3: Business Details         │
+├─────────────────────────────────────────┤
+│  Business Name *                        │
+│  [Amina Beauty Salon               ]   │
+│                                         │
+│  Business Type *                        │
+│  [Beauty Salon ▼]                      │
+│                                         │
+│  Business Phone *                       │
+│  [+250 780 000 001                 ]   │
+│                                         │
+│  Business District *                    │
+│  [Gasabo ▼]                            │
+│                                         │
+│  Business Address *                     │
+│  [KG 123 St, near KCT Building     ]   │
+│                                         │
+│  Years in Business                      │
+│  [3 years ▼]                           │
+│                                         │
+│  TIN Number (optional)                  │
+│  [123456789                        ]   │
+│                                         │
+│  [Next Step →]                         │
+└─────────────────────────────────────────┘
+
+STEP 2: OWNER INFORMATION
+┌─────────────────────────────────────────┐
+│  Step 2 of 3: Owner Details            │
+├─────────────────────────────────────────┤
+│  Owner Full Name *                      │
+│  [Amina Uwase                      ]   │
+│                                         │
+│  Owner Phone *                          │
+│  [+250 780 000 001                 ]   │
+│                                         │
+│  Owner Email                            │
+│  [amina@gmail.com                  ]   │
+│                                         │
+│  National ID Number *                   │
+│  [1 1990 8 0000001 0 00            ]   │
+│                                         │
+│  Estimated Monthly Order:              │
+│  [100,000 - 500,000 RWF ▼]            │
+│                                         │
+│  How did you hear about us?            │
+│  [Instagram ▼]                         │
+│                                         │
+│  [← Back] [Next Step →]               │
+└─────────────────────────────────────────┘
+
+STEP 3: DOCUMENTS & SUBMIT
+┌─────────────────────────────────────────┐
+│  Step 3 of 3: Documents                │
+├─────────────────────────────────────────┤
+│  Business Registration (optional)      │
+│  [📎 Upload document]                  │
+│                                         │
+│  TIN Certificate (optional)            │
+│  [📎 Upload document]                  │
+│                                         │
+│  Any Other Document                    │
+│  [📎 Upload document]                  │
+│                                         │
+│  Additional Notes                      │
+│  [We supply 5 salons in Kimironko...]  │
+│                                         │
+│  ✅ I agree to wholesale terms         │
+│  ✅ I confirm info is accurate         │
+│                                         │
+│  [← Back] [Submit Application]        │
+└─────────────────────────────────────────┘
+
+SUBMISSION SUCCESS:
+┌─────────────────────────────────────────┐
+│  🎉 APPLICATION SUBMITTED!             │
+│                                         │
+│  Application #WHL-2024-045             │
+│                                         │
+│  We will review your application       │
+│  within 24-48 business hours.          │
+│                                         │
+│  We will contact you on:               │
+│  📱 +250780000001                      │
+│  📧 amina@gmail.com                    │
+│                                         │
+│  [Check Application Status]           │
+│  [Continue Shopping as Retail]        │
+└─────────────────────────────────────────┘
+
+SMS sent automatically:
+"Your wholesale application
+ #WHL-2024-045 received!
+ Review: 24-48 hours.
+ BeautyHub Rwanda 📦"
+
+5C. CREATE APPLICATION STATUS PAGE
+────────────────────────────────────
+
+CREATE: /frontend/app/wholesale/status/page.tsx
+
+Shows current application status:
+
+PENDING:
+┌─────────────────────────────────────────┐
+│  ⏳ APPLICATION UNDER REVIEW           │
+│  #WHL-2024-045                         │
+│                                         │
+│  ●━━━━━━━━━◌━━━━━━━━━◌                │
+│  Submitted  Review    Decision         │
+│  ✅ Done    ⏳ In     ◌ Pending        │
+│             Progress                   │
+│                                         │
+│  Submitted: 02/12/2024                 │
+│  Expected: Within 48 hours             │
+│                                         │
+│  We will SMS you when ready.           │
+│                                         │
+│  Questions? WhatsApp: +250780000000    │
+└─────────────────────────────────────────┘
+
+APPROVED:
+┌─────────────────────────────────────────┐
+│  🎉 WHOLESALE ACCOUNT APPROVED!        │
+│                                         │
+│  Welcome to BeautyHub Rwanda           │
+│  Wholesale Program!                    │
+│                                         │
+│  Your benefits:                        │
+│  💰 Up to 30% discount                │
+│  💳 Credit limit: 500,000 RWF         │
+│  📄 Professional invoices             │
+│  🚚 Priority delivery                  │
+│                                         │
+│  [Start Shopping Wholesale →]         │
+└─────────────────────────────────────────┘
+
+REJECTED:
+┌─────────────────────────────────────────┐
+│  ❌ APPLICATION NOT APPROVED           │
+│                                         │
+│  Reason: [rejection reason]            │
+│                                         │
+│  You can still shop as retail.        │
+│  Questions? Call: +250780000000        │
+│                                         │
+│  [Reapply in 30 days]                 │
+│  [Continue Shopping]                  │
+└─────────────────────────────────────────┘
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 6: WHOLESALE SHOPPING EXPERIENCE
+════════════════════════════════════════════
+
+Approved wholesale users get
+special shopping experience.
+
+6A. CREATE WHOLESALE DASHBOARD
+────────────────────────────────
+
+CREATE: /frontend/app/wholesale/dashboard/page.tsx
+
+Only for approved wholesale users:
+
+┌─────────────────────────────────────────┐
+│  🏪 WHOLESALE DASHBOARD                │
+│  Amina Beauty Salon                    │
+│  Account #WHL-045 | Gold Member        │
+├─────────────────────────────────────────┤
+│                                         │
+│  ┌──────────┬──────────┬──────────┐    │
+│  │ Credit   │ Total    │ This     │    │
+│  │ Available│ Saved    │ Month    │    │
+│  │ 350,000  │ 245,000  │ 78,000   │    │
+│  │ RWF      │ RWF      │ RWF      │    │
+│  └──────────┴──────────┴──────────┘    │
+│                                         │
+│  QUICK ACTIONS:                        │
+│  [🛒 New Order] [📄 My Invoices]      │
+│  [📦 Track Orders] [💬 Support]       │
+│                                         │
+│  RECENT ORDERS:                        │
+│  #BHR-W-045 | 285,000 RWF | Delivered │
+│  #BHR-W-044 | 175,000 RWF | Shipped   │
+│  #BHR-W-043 | 320,000 RWF | Delivered │
+│                                         │
+│  CREDIT USAGE:                         │
+│  Used: 150,000 / 500,000 RWF          │
+│  ████████░░░░░░░░░░░░░░ 30%           │
+│  Next payment due: 01/01/2025         │
+│                                         │
+│  MY ACCOUNT MANAGER:                   │
+│  Jean Paul — +250789000001            │
+│  [📱 Call] [💬 WhatsApp]              │
+└─────────────────────────────────────────┘
+
+6B. WHOLESALE PRODUCT CATALOG
+───────────────────────────────
+
+FIND existing product listing page.
+ADD wholesale mode toggle for
+wholesale users:
+
+Toggle at top:
+[👤 Retail View] [🏪 Wholesale View ●]
+
+In WHOLESALE VIEW:
+- Show wholesale prices
+- Show price tiers
+- Show minimum quantities
+- Show bulk discount badge
+- Quantity selector shows tier breaks
+- Sort by: biggest discount, bulk price
+
+Wholesale product card:
+┌──────────────────────┐
+│ [Product Image]      │
+│ 💰 WHOLESALE        │
+│ Nivea Body Lotion    │
+│ From: 6,000 RWF/unit │
+│ (Buy 48+ units)      │
+│ Retail: 8,500 RWF    │
+│ Save up to 29% 🔥    │
+│ Min. order: 6 units  │
+│ [Add to Bulk Cart]  │
+└──────────────────────┘
+
+6C. WHOLESALE CART & CHECKOUT
+───────────────────────────────
+
+FIND existing cart and checkout.
+ADD wholesale-specific behavior:
+
+WHOLESALE CART:
+- Minimum order warning:
+  "Add 15,000 RWF more to reach
+   50,000 RWF minimum order"
+- Price tier updates as qty increases:
+  "Add 6 more to save 1,000 RWF/unit!"
+- Show subtotal savings:
+  "You are saving 125,000 RWF
+   vs retail price! 🎉"
+- Wholesale cart has no item limit
+
+WHOLESALE CHECKOUT:
+- Business details pre-filled
+- Payment options:
+  ✅ MTN MoMo (all orders)
+  ✅ Airtel Money (all orders)
+  ✅ Bank Transfer (orders > 500K)
+  ✅ Credit (if credit limit allows)
+  ✅ Cash on Delivery (Kigali, < 200K)
+
+Credit payment option:
+┌─────────────────────────────────────────┐
+│  💳 PAY ON CREDIT (30 days)            │
+│                                         │
+│  Credit limit: 500,000 RWF            │
+│  Used: 150,000 RWF                    │
+│  Available: 350,000 RWF               │
+│                                         │
+│  This order: 285,000 RWF              │
+│  ✅ Within your credit limit           │
+│                                         │
+│  Due date: 01/01/2025                 │
+│                                         │
+│  [Confirm Credit Order]               │
+└─────────────────────────────────────────┘
+
+Wholesale order confirmation:
+- Professional invoice generated
+- Invoice number: INV-WHL-2024-045
+- PDF download available
+- Email with invoice
+- SMS with invoice number:
+  "Order #BHR-W-045 confirmed!
+   Invoice: INV-WHL-2024-045
+   Amount: 285,000 RWF
+   Due: 01/01/2025
+   BeautyHub Rwanda"
+
+6D. WHOLESALE INVOICE PAGE
+────────────────────────────
+
+CREATE: /frontend/app/wholesale/invoices/page.tsx
+
+Professional invoice list:
+┌────────────┬──────────┬──────────┬────────┐
+│ Invoice #  │ Date     │ Amount   │ Status │
+├────────────┼──────────┼──────────┼────────┤
+│INV-WHL-045 │02/12/2024│285,000   │ PAID ✅│
+│INV-WHL-044 │15/11/2024│175,000   │ DUE ⚠️ │
+│INV-WHL-043 │01/11/2024│320,000   │ PAID ✅│
+└────────────┴──────────┴──────────┴────────┘
+
+[Download PDF] per invoice
+
+Professional PDF invoice:
+┌─────────────────────────────────────────┐
+│  BEAUTYHUB RWANDA                       │
+│  WHOLESALE INVOICE                      │
+│                                         │
+│  Invoice #: INV-WHL-2024-045           │
+│  Date: 02 December 2024                │
+│  Due Date: 01 January 2025             │
+├─────────────────────────────────────────┤
+│  FROM:                                  │
+│  BeautyHub Rwanda Ltd                  │
+│  Kigali, Rwanda                        │
+│  TIN: 123456789                        │
+│  Tel: +250780000000                    │
+├─────────────────────────────────────────┤
+│  TO:                                    │
+│  Amina Beauty Salon                    │
+│  KG 123 Street, Gasabo, Kigali        │
+│  TIN: 987654321                        │
+│  Tel: +250780000001                    │
+├─────────────────────────────────────────┤
+│  ITEMS:                                 │
+│  Nivea Lotion 400ml                    │
+│  48 units × 6,000 RWF = 288,000 RWF  │
+│                                         │
+│  L'Oréal Serum 30ml                   │
+│  12 units × 19,000 RWF = 228,000 RWF │
+├─────────────────────────────────────────┤
+│  Subtotal:         516,000 RWF        │
+│  Wholesale Disc:  -231,000 RWF (30%) │
+│  Delivery:           3,000 RWF        │
+│  VAT (18%):          51,840 RWF       │
+│  ─────────────────────────────────    │
+│  TOTAL:            339,840 RWF        │
+├─────────────────────────────────────────┤
+│  Payment Terms: 30 days               │
+│  Due Date: 01/01/2025                 │
+│  Payment to MTN MoMo: 078XXXXXXX     │
+│  Ref: INV-WHL-2024-045               │
+├─────────────────────────────────────────┤
+│  Thank you for your business! 🇷🇼    │
+│  Questions? +250780000000             │
+│  wholesale@beautyhub.rw               │
+└─────────────────────────────────────────┘
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 7: ADMIN WHOLESALE MANAGEMENT
+════════════════════════════════════════════
+
+Admin has FULL control over
+wholesale program.
+
+7A. ADD WHOLESALE SECTION TO ADMIN SIDEBAR
+────────────────────────────────────────────
+
+FIND existing admin sidebar.
+ADD new section (do not remove anything):
+
+  ─────────────────
+  🏪 WHOLESALE
+  ├── Applications (5)🔴
+  ├── WHL Customers
+  ├── WHL Orders
+  ├── WHL Invoices
+  ├── Credit Management
+  └── WHL Analytics
+  ─────────────────
+
+7B. CREATE WHOLESALE APPLICATIONS PAGE
+───────────────────────────────────────
+
+/admin/wholesale/applications
+
+Tabs:
+[Pending(5)🔴] [Approved(145)] 
+[Rejected(23)] [All]
+
+Application card:
+┌─────────────────────────────────────────┐
+│  Amina Beauty Salon            [Review] │
+│  Beauty Salon | Gasabo, Kigali         │
+│  Owner: Amina Uwase                    │
+│  Phone: +250780000001                  │
+│  Applied: 02/12/2024 (2 hours ago)    │
+│  Est. Monthly: 100K-500K RWF          │
+└─────────────────────────────────────────┘
+
+Review application modal:
+┌─────────────────────────────────────────┐
+│  REVIEW APPLICATION                    │
+│  Amina Beauty Salon                    │
+├─────────────────────────────────────────┤
+│  Business Details:                     │
+│  Type: Beauty Salon                    │
+│  District: Gasabo, Kigali             │
+│  TIN: 123456789                        │
+│  Years: 3 years                       │
+│  Monthly Est: 100K-500K RWF           │
+│                                         │
+│  Documents: [View Business Reg]       │
+│                                         │
+│  IF APPROVING:                         │
+│  Credit Limit: [500,000] RWF          │
+│  Payment Terms: [30] days             │
+│  Special Discount: [0] %              │
+│  Account Manager: [Jean Paul ▼]       │
+│  Notes: [                        ]    │
+│                                         │
+│  [✅ Approve] [❌ Reject]              │
+│                                         │
+│  IF REJECTING:                         │
+│  Reason: [                       ]    │
+│  [Send Rejection]                      │
+└─────────────────────────────────────────┘
+
+7C. CREATE WHOLESALE CUSTOMERS PAGE
+─────────────────────────────────────
+
+/admin/wholesale/customers
+
+Customer tiers:
+[All] [Diamond 💎] [Gold 🥇] [Silver 🥈]
+
+Table columns:
+Business | Owner | Phone | District |
+Orders | Revenue | Credit Used | Status
+
+Customer tiers:
+💎 Diamond: > 1,000,000 RWF/month
+🥇 Gold: 500K-1M RWF/month
+🥈 Silver: 100K-500K RWF/month
+🥉 Bronze: < 100K RWF/month
+
+Customer profile actions:
+- View all orders
+- Adjust credit limit
+- Set special pricing
+- Suspend account
+- Assign account manager
+- Download all invoices
+- Send SMS
+
+7D. CREATE WHOLESALE ORDERS PAGE
+──────────────────────────────────
+
+/admin/wholesale/orders
+
+Different from retail orders:
+- Larger amounts
+- Business name shown
+- Invoice status
+- Credit payment tracking
+- Bulk delivery needs
+
+Table:
+WHL Order# | Business | Items | 
+Amount(RWF) | Payment | Invoice | 
+Credit Due | Status | Actions
+
+Special wholesale actions:
+[📄 Invoice] [💳 Record Payment]
+[🚚 Arrange Delivery] [💬 Call]
+
+7E. CREATE CREDIT MANAGEMENT PAGE
+───────────────────────────────────
+
+/admin/wholesale/credit
+
+Overview:
+┌─────────────────────────────────────────┐
+│  CREDIT OVERVIEW                        │
+│  Total Credit Given: 15,000,000 RWF   │
+│  Currently Used: 4,500,000 RWF        │
+│  Overdue: 750,000 RWF ⚠️             │
+│  Available: 10,500,000 RWF            │
+└─────────────────────────────────────────┘
+
+Overdue payments list:
+┌─────────────────────────────────────────┐
+│  ⚠️ OVERDUE PAYMENTS                   │
+├────────────────┬────────┬──────────────┤
+│ Business       │ Amount │ Days Overdue │
+├────────────────┼────────┼──────────────┤
+│ Kali Salon     │250,000 │ 5 days      │
+│ Beauty Center  │500,000 │ 12 days     │
+└────────────────┴────────┴──────────────┘
+
+Actions:
+[Send Payment Reminder SMS]
+[Mark as Paid]
+[Extend Due Date]
+[Suspend Account]
+
+Auto SMS reminder:
+"Dear [Business], invoice 
+INV-WHL-045 of [amount] RWF
+is due on [date].
+Pay to MTN: 078XXXXXXX
+BeautyHub Rwanda"
+
+7F. CREATE WHOLESALE ANALYTICS PAGE
+─────────────────────────────────────
+
+/admin/wholesale/analytics
+
+Charts:
+1. Wholesale vs Retail revenue (comparison)
+2. Top 10 wholesale customers by revenue
+3. Most ordered wholesale products
+4. Credit utilization rate
+5. Monthly wholesale growth
+6. Orders by business type
+   (salons vs shops vs schools)
+7. Geographic: wholesale by district
+
+Key metrics:
+- Total wholesale revenue this month
+- % of total business that is wholesale
+- Average wholesale order value
+- Wholesale customer retention rate
+- Most popular products for wholesale
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 8: SMS & NOTIFICATIONS
+════════════════════════════════════════════
+
+All wholesale events trigger
+correct SMS notifications.
+
+8A. WHOLESALE SMS TEMPLATES
+─────────────────────────────
+
+Application Received (to applicant):
+EN: "BeautyHub Rwanda: Wholesale 
+application #[ID] received!
+We review in 24-48 hours.
+Questions? +250780000000"
+
+RW: "BeautyHub Rwanda: Ibisabwa 
+#[ID] byakirwa! Tuzasuzuma
+mu masaha 24-48.
+Ibibazo? +250780000000"
+
+Application Approved:
+EN: "Congratulations [NAME]! Your
+wholesale account at BeautyHub
+Rwanda is APPROVED! 🎉
+Shop now: beautyhub.rw/wholesale
+Save up to 30% on all orders!"
+
+Application Rejected:
+EN: "BeautyHub Rwanda: Your wholesale
+application was not approved.
+Reason: [REASON]
+Questions: +250780000000"
+
+Order Confirmed (wholesale):
+EN: "Wholesale Order #[ORDER]
+confirmed! Amount: [AMOUNT] RWF
+Invoice: [INVOICE]
+Due: [DATE]
+BeautyHub Rwanda 📦"
+
+Payment Due Reminder:
+EN: "Reminder: Invoice [INVOICE]
+of [AMOUNT] RWF due on [DATE].
+Pay MTN MoMo: [NUMBER]
+Ref: [INVOICE]
+BeautyHub Rwanda 💳"
+
+Payment Overdue:
+EN: "URGENT: Invoice [INVOICE]
+of [AMOUNT] RWF is OVERDUE.
+Pay now to avoid suspension.
+Call: +250780000000
+BeautyHub Rwanda ⚠️"
+
+Payment Received:
+EN: "Payment of [AMOUNT] RWF
+received for [INVOICE]. 
+Balance: [REMAINING] RWF
+Thank you! BeautyHub Rwanda ✅"
+
+8B. ADMIN WHOLESALE NOTIFICATIONS
+───────────────────────────────────
+
+Admin gets notified for:
+🏪 New wholesale application
+💰 Large wholesale order (> 500K RWF)
+⚠️ Credit payment overdue
+💳 Wholesale payment received
+📋 New invoice due soon
+
+All show in admin notification bell.
+Critical ones also SMS to admin phone.
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 9: MOBILE APP WHOLESALE
+════════════════════════════════════════════
+
+FIND existing mobile app.
+ADD wholesale features.
+DO NOT rebuild any existing screen.
+
+9A. ADD WHOLESALE MODE TO MOBILE
+──────────────────────────────────
+
+For approved wholesale users:
+- Home screen shows wholesale badge
+- "🏪 Wholesale Account" banner
+- Wholesale prices shown automatically
+- Bulk quantity selector
+
+9B. ADD WHOLESALE DASHBOARD SCREEN
+────────────────────────────────────
+
+New screen: WholesaleDashboard.tsx
+
+Shows:
+- Credit balance
+- Total saved this month
+- Recent wholesale orders
+- Quick reorder (order same as last time)
+- Account manager contact
+
+9C. ADD APPLY FOR WHOLESALE
+────────────────────────────
+
+For retail users on mobile:
+ADD banner in account section:
+"Upgrade to Wholesale Account
+ Save up to 30%! [Apply →]"
+
+Opens simplified mobile
+application form.
+
+Report files changed.
+Wait for approval.
+
+════════════════════════════════════════════
+SECTION 10: FINAL TESTING
+════════════════════════════════════════════
+
+Test complete wholesale flow:
+
+RETAIL FLOW:
+[ ] Normal customer sees retail prices
+[ ] No wholesale content shown
+[ ] Can see "Apply for Wholesale" banner
+[ ] Can click and apply for wholesale
+
+WHOLESALE APPLICATION FLOW:
+[ ] Customer fills application form
+[ ] SMS confirmation received
+[ ] Admin gets notification
+[ ] Admin reviews in admin panel
+[ ] Admin approves with credit limit
+[ ] Approval SMS sent to business
+[ ] Account upgraded to wholesale
+
+WHOLESALE SHOPPING FLOW:
+[ ] Wholesale user sees wholesale prices
+[ ] Price tiers shown correctly
+[ ] Quantity changes → price updates
+[ ] Minimum order enforced (50,000 RWF)
+[ ] Bulk discount applied correctly
+[ ] Credit payment option available
+[ ] Wholesale invoice generated
+[ ] Invoice PDF downloadable
+[ ] SMS with invoice details sent
+
+ADMIN FLOW:
+[ ] Applications list works
+[ ] Approve/reject works
+[ ] Wholesale orders visible
+[ ] Credit management works
+[ ] Overdue reminder SMS works
+[ ] Wholesale analytics correct
+
+PRICE CALCULATION:
+[ ] Retail user: sees 8,500 RWF
+[ ] Wholesale (1-5): sees 8,500 RWF
+[ ] Wholesale (6-11): sees 7,500 RWF
+[ ] Wholesale (12-23): sees 7,000 RWF
+[ ] Wholesale (24-47): sees 6,500 RWF
+[ ] Wholesale (48+): sees 6,000 RWF
+
+════════════════════════════════════════════
+AFTER ALL SECTIONS COMPLETE:
+════════════════════════════════════════════
+
+╔═════════════════════════════════════════╗
+║  BEAUTYHUB RWANDA WHOLESALE REPORT     ║
+╠═════════════════════════════════════════╣
+║ Section 1:  Database Setup     ✅/⚠️   ║
+║ Section 2:  Backend API        ✅/⚠️   ║
+║ Section 3:  Product Pricing    ✅/⚠️   ║
+║ Section 4:  Retail Experience  ✅/⚠️   ║
+║ Section 5:  Application Flow   ✅/⚠️   ║
+║ Section 6:  WHL Shopping       ✅/⚠️   ║
+║ Section 7:  Admin Control      ✅/⚠️   ║
+║ Section 8:  SMS & Alerts       ✅/⚠️   ║
+║ Section 9:  Mobile App         ✅/⚠️   ║
+║ Section 10: All Tests Pass     ✅/⚠️   ║
+╠═════════════════════════════════════════╣
+║ New Files Created:   [number]          ║
+║ Files Modified:      [number]          ║
+║ Files Untouched:     [number]          ║
+║ Existing Features:   ALL INTACT ✅     ║
+╠═════════════════════════════════════════╣
+║ WHOLESALE STATUS:                      ║
+║ ✅ RETAIL SYSTEM INTACT               ║
+║ ✅ WHOLESALE SYSTEM COMPLETE          ║
+║ ✅ ADMIN HAS FULL CONTROL            ║
+║ ✅ PRICE TIERS WORKING               ║
+║ ✅ INVOICES GENERATING               ║
+║ ✅ CREDIT SYSTEM WORKING            ║
+║ ✅ SMS NOTIFICATIONS WORKING         ║
+║ ✅ MOBILE APP UPDATED               ║
+║ 🇷🇼 RWANDA WHOLESALE READY! 🎉      ║
+╚═════════════════════════════════════════╝

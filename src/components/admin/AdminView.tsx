@@ -65,6 +65,7 @@ import { AdminSettings } from "./AdminSettings"
 import { RealTimeNotifications } from "./RealTimeNotifications"
 import { InvoicePrinter } from "./InvoicePrinter"
 import { AdminSmsManager } from "./AdminSmsManager"
+import { AdminPayments } from "./AdminPayments"
 import {
   Shield,
   Package,
@@ -85,6 +86,8 @@ import {
   ChevronDown,
   LogOut,
   MessageCircle,
+  CreditCard,
+  RotateCcw,
 } from "lucide-react"
 
 const STATUS_OPTIONS = [
@@ -476,7 +479,7 @@ export function AdminView() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6 grid w-full grid-cols-4 sm:grid-cols-8">
+        <TabsList className="mb-6 grid w-full grid-cols-4 sm:grid-cols-9">
           <TabsTrigger value="overview" className="gap-1">
             <LayoutDashboard className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Overview</span>
@@ -508,6 +511,11 @@ export function AdminView() {
           <TabsTrigger value="sms" className="gap-1">
             <Bell className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">SMS</span>
+          </TabsTrigger>
+          {/* NEW: Payments tab */}
+          <TabsTrigger value="payments" className="gap-1">
+            <CreditCard className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Payments</span>
           </TabsTrigger>
         </TabsList>
 
@@ -761,6 +769,11 @@ export function AdminView() {
         <TabsContent value="sms">
           <AdminSmsManager />
         </TabsContent>
+
+        {/* NEW: Payments tab */}
+        <TabsContent value="payments">
+          <AdminPayments />
+        </TabsContent>
       </Tabs>
 
       {/* Order detail drawer */}
@@ -916,6 +929,44 @@ export function AdminView() {
                 </div>
 
                 <InvoicePrinter order={selectedOrder} />
+
+                {/* NEW: Issue Refund button (only for PAID orders) */}
+                {selectedOrder.paymentStatus === "PAID" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 w-full border-purple-300 text-purple-600 hover:bg-purple-50"
+                    onClick={async () => {
+                      try {
+                        const res = await fetch("/api/payments/refund", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            orderId: selectedOrder.id,
+                            reason: "Admin initiated refund from order detail",
+                          }),
+                        })
+                        const data = await res.json()
+                        if (!res.ok) throw new Error(data.error || "Refund failed")
+                        toast({
+                          title: "Refund initiated",
+                          description: `${formatRWF(selectedOrder.total)} → ${selectedOrder.customerPhone}`,
+                        })
+                        loadOrders()
+                        setDetailOpen(false)
+                      } catch (e) {
+                        toast({
+                          title: "Refund failed",
+                          description: e instanceof Error ? e.message : "Unknown error",
+                          variant: "destructive",
+                        })
+                      }
+                    }}
+                  >
+                    <RotateCcw className="mr-2 h-3.5 w-3.5" />
+                    Issue Refund ({formatRWF(selectedOrder.total)})
+                  </Button>
+                )}
 
                 {/* NEW: Communication + Delivery actions */}
                 <div className="mt-4 space-y-2">

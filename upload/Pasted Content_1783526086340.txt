@@ -1,0 +1,1282 @@
+ZDEV, BEFORE ANYTHING ELSE READ AND 
+CONFIRM THESE IRON RULES:
+
+╔═════════════════════════════════════════╗
+║         🚨 IRON RULES 🚨                ║
+╠═════════════════════════════════════════╣
+║                                         ║
+║  RULE 1: NEVER DESTROY EXISTING CODE   ║
+║  Admin is working. Keep it.            ║
+║  Main website is working. Keep it.     ║
+║  Backend is working. Keep it.          ║
+║  Mobile app is working. Keep it.       ║
+║  Only ADD connections between them.    ║
+║  Never delete any working feature.     ║
+║                                         ║
+║  RULE 2: REMEMBER EVERYTHING BUILT     ║
+║  Already working:                      ║
+║  ✅ Main website (frontend)            ║
+║  ✅ Admin dashboard                    ║
+║  ✅ Backend API                        ║
+║  ✅ Mobile app                         ║
+║  ✅ MTN MoMo payments                 ║
+║  ✅ Rwanda district delivery           ║
+║  ✅ SMS system                         ║
+║  ✅ Product management                 ║
+║  ✅ Order management                   ║
+║  ✅ Customer management               ║
+║  ALL MUST REMAIN WORKING.              ║
+║                                         ║
+║  RULE 3: SURGICAL CONNECTIONS ONLY     ║
+║  Only add what connects admin          ║
+║  to main website.                      ║
+║  Touch nothing unrelated.              ║
+║                                         ║
+║  RULE 4: CHECK BEFORE TOUCHING         ║
+║  Before modifying any file:            ║
+║  1. State the exact file name          ║
+║  2. State what currently exists        ║
+║  3. State exactly what you will add    ║
+║  4. Then write the code                ║
+║                                         ║
+║  RULE 5: REAL-TIME SYNC               ║
+║  When admin changes something:         ║
+║  Main website must reflect it          ║
+║  IMMEDIATELY. No manual refresh.       ║
+║  No delays. Live connection.           ║
+║                                         ║
+║  RULE 6: COMPLETE CODE ONLY            ║
+║  No placeholder code.                  ║
+║  No empty functions.                   ║
+║  No TODO comments.                     ║
+║  Everything 100% complete.             ║
+║                                         ║
+║  RULE 7: SHOW ALL CHANGES              ║
+║  After each section report:            ║
+║  📁 NEW files created: [list]          ║
+║  ✏️  MODIFIED files: [what changed]    ║
+║  🔒 UNTOUCHED files: [confirmed]       ║
+║                                         ║
+║  RULE 8: RWANDA FIRST ALWAYS           ║
+║  All connections must support:         ║
+║  - RWF currency                        ║
+║  - MTN MoMo payments                  ║
+║  - Rwanda 30 districts                 ║
+║  - Kinyarwanda/English/French          ║
+║                                         ║
+║  RULE 9: SECURITY ALWAYS               ║
+║  Admin actions must be:                ║
+║  - Protected by JWT                    ║
+║  - Role verified                       ║
+║  - Audit logged                        ║
+║  - Rate limited                        ║
+║                                         ║
+║  RULE 10: ONE SECTION AT A TIME        ║
+║  Complete one section fully.           ║
+║  Report what changed.                  ║
+║  Wait for approval.                    ║
+║  Then move to next section.            ║
+║                                         ║
+╚═════════════════════════════════════════╝
+
+PROJECT CONTEXT:
+Project: BeautyHub Rwanda
+Main Website: http://localhost:3000
+Admin Panel: http://localhost:3001/admin
+Backend API: http://localhost:5000/api
+Mobile App: Expo React Native
+Database: PostgreSQL + Prisma
+Auth: JWT tokens
+Real-time: Socket.io
+Cache: Redis
+
+GOAL:
+When admin does ANYTHING in admin panel
+→ Main website shows changes INSTANTLY
+→ Mobile app shows changes INSTANTLY
+→ Everything stays in sync always
+
+Confirm rules:
+"RULES CONFIRMED. READY TO CONNECT."
+Then wait for me to say START.
+
+════════════════════════════════════════════
+CONNECTION MISSION
+════════════════════════════════════════════
+
+Connect admin panel to main website
+so admin has FULL REAL-TIME CONTROL
+over everything customers see.
+
+════════════════════════════════════════════
+SECTION 1: REAL-TIME CONNECTION SETUP
+════════════════════════════════════════════
+
+This is the FOUNDATION.
+Build this first before everything else.
+
+1A. SET UP SOCKET.IO (Real-time Engine)
+────────────────────────────────────────
+
+FIND existing backend server file.
+ADD Socket.io to it (do not replace server):
+
+File: /backend/src/app.ts
+ADD Socket.io setup:
+
+Events admin emits → website receives:
+
+PRODUCT EVENTS:
+product:created    → website shows new product
+product:updated    → website updates product
+product:deleted    → website removes product
+product:stockLow   → website shows low stock
+product:outOfStock → website shows sold out
+product:priceChange → website updates price
+product:featured   → website features product
+product:onSale     → website shows sale badge
+
+ORDER EVENTS:
+order:new          → admin gets alert sound
+order:confirmed    → customer sees confirmed
+order:processing   → customer sees processing
+order:shipped      → customer sees shipped
+order:delivered    → customer sees delivered
+order:cancelled    → customer sees cancelled
+
+PAYMENT EVENTS:
+payment:confirmed  → order auto-confirms
+payment:failed     → admin gets alert
+payment:refunded   → customer notified
+
+BANNER EVENTS:
+banner:updated     → website shows new banner
+banner:created     → website adds banner
+banner:deleted     → website removes banner
+
+PROMOTION EVENTS:
+promotion:started  → website shows flash sale
+promotion:ended    → website removes flash sale
+coupon:created     → website accepts new code
+coupon:deactivated → website rejects old code
+
+CONTENT EVENTS:
+blog:published     → website shows new blog
+blog:unpublished   → website hides blog
+faq:updated        → website shows new FAQ
+
+DELIVERY EVENTS:
+delivery:feeUpdated → website shows new fees
+delivery:assigned   → customer sees rider info
+
+NOTIFICATION EVENTS:
+notification:new   → admin bell count updates
+notification:read  → bell count decreases
+
+File to create:
+/backend/src/services/socket.service.ts
+
+Complete implementation:
+- Initialize Socket.io with CORS
+- Admin room (only admin users)
+- Customer room (all website users)
+- Authentication middleware for sockets
+  (verify JWT before allowing connection)
+- Event emitter functions:
+  emitToAdmin(event, data)
+  emitToCustomers(event, data)
+  emitToAll(event, data)
+  emitToUser(userId, event, data)
+- Connection logging
+- Disconnection handling
+- Reconnection logic
+
+1B. CONNECT FRONTEND TO SOCKET
+────────────────────────────────
+
+File: /frontend/lib/socket.ts
+CREATE socket client:
+
+- Connect to backend
+- Auto-reconnect if disconnects
+- Listen for all website events
+- Update UI when event received
+- No page refresh needed
+
+File: /frontend/hooks/useSocket.ts
+CREATE socket hook:
+
+- useProductUpdates()
+  → auto-update product list/detail
+- useBannerUpdates()
+  → auto-update homepage banners
+- usePromotionUpdates()
+  → auto-update flash sales
+- useOrderUpdates(orderId)
+  → auto-update order status
+- useCartUpdates()
+  → update if product goes out of stock
+
+1C. CONNECT ADMIN TO SOCKET
+─────────────────────────────
+
+File: /admin/lib/socket.ts
+CREATE admin socket client:
+
+- Connect to backend (admin room)
+- Listen for new orders → play sound
+- Listen for payments → show alert
+- Listen for low stock → show warning
+- Emit events when admin makes changes
+
+1D. SET UP REDIS CACHE SYNC
+─────────────────────────────
+
+FIND existing Redis setup.
+ADD cache invalidation:
+
+When admin updates product:
+→ Delete product cache in Redis
+→ Backend fetches fresh from database
+→ New data served to website
+
+When admin updates banner:
+→ Delete homepage cache
+→ Fresh homepage served
+
+Cache keys to manage:
+- products:all
+- products:featured
+- products:bestsellers
+- products:new-arrivals
+- categories:all
+- brands:all
+- banners:homepage
+- promotions:active
+- delivery:zones
+
+After completing Section 1:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 2: PRODUCT CONTROL CONNECTION
+════════════════════════════════════════════
+
+When admin manages products →
+Main website updates INSTANTLY.
+
+2A. ADD PRODUCT → WEBSITE SHOWS IT
+────────────────────────────────────
+
+FLOW:
+Admin clicks [Save Product] in admin
+→ Backend saves to database
+→ Backend emits: product:created event
+→ Redis cache cleared for products
+→ Website receives socket event
+→ Website adds product to listing
+→ No page refresh needed
+→ Mobile app also updates
+
+WHAT TO IMPLEMENT:
+
+Backend (ADD to existing product controller):
+After successful product creation:
+1. Save to database (already exists)
+2. Clear Redis product cache
+3. Emit socket event: product:created
+   with full product data
+4. Log action in audit log
+
+Frontend (ADD to existing product listing):
+Listen for product:created socket event:
+→ Add new product to top of list
+→ Show toast: "New product available!"
+→ Update product count
+→ If on homepage update sections
+
+Admin (ADD to existing save handler):
+After API returns success:
+→ Show success toast
+→ Real-time confirmation received
+→ Update admin product count
+
+2B. EDIT PRODUCT → WEBSITE UPDATES
+────────────────────────────────────
+
+FLOW:
+Admin updates price/name/stock/etc
+→ Backend saves changes
+→ Clears product from Redis
+→ Emits: product:updated
+→ Website updates that product card
+→ If on product page: updates live
+→ Mobile app updates too
+
+SPECIFIC UPDATES:
+
+Price change:
+Website product card: old price → new price
+Product detail: updates immediately
+Cart: if item in cart, price updates
+Mobile: updates in real-time
+
+Stock change:
+Website: In Stock → Low Stock → Out of Stock
+Product card badge updates
+Add to Cart button state updates
+"Only 3 left!" banner shows/hides
+
+Name change:
+Product card name updates
+Product detail updates
+URL slug updates (redirect old to new)
+
+Status change (Active/Inactive):
+Inactive → product disappears from website
+Active → product appears on website
+
+2C. DELETE PRODUCT → WEBSITE REMOVES
+──────────────────────────────────────
+
+FLOW:
+Admin deletes product
+→ Backend soft-deletes (not hard delete)
+→ Emits: product:deleted
+→ Website removes from all listings
+→ Product page shows 404
+→ Cart removes item if exists
+→ Wishlist removes item
+
+Handle gracefully:
+If customer on that product page:
+Show: "This product is no longer available"
+[Browse Similar Products]
+
+If product in customer cart:
+Show notification: 
+"[Product Name] was removed 
+ from your cart (no longer available)"
+
+2D. STOCK MANAGEMENT CONNECTION
+─────────────────────────────────
+
+Real-time stock display:
+
+When order is placed:
+→ Stock decreases immediately
+→ Website shows updated stock
+→ Admin sees stock update in real-time
+
+When stock drops below threshold:
+→ Admin gets alert notification
+→ Website shows "Only X left!"
+→ When 0: shows "Out of Stock"
+
+Stock counter on website:
+When customer adds to cart:
+→ Available stock shows -1 for others
+→ Prevents overselling
+
+Admin stock update:
+Admin types new stock number
+→ Website updates immediately
+→ If was out of stock → shows in stock
+→ Customers who clicked "Notify Me" 
+   get SMS: "Product back in stock!"
+
+After completing Section 2:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 3: ORDER CONTROL CONNECTION
+════════════════════════════════════════════
+
+When admin manages orders →
+Customer sees updates INSTANTLY.
+
+3A. NEW ORDER ALERT → ADMIN
+────────────────────────────
+
+FLOW:
+Customer places order on website
+→ Backend creates order
+→ Emits: order:new to admin room
+→ Admin panel:
+  - 🔔 Bell rings (sound)
+  - Desktop notification pops up
+  - Live orders feed shows new order
+  - Pending count badge increases
+  - Toast: "New order! #BHR-045 — 35,000 RWF"
+→ Admin can confirm immediately
+
+Sound alert implementation:
+- Play sound on new order
+- Allow admin to mute/unmute
+- Different sounds for:
+  New order: 🔔 ding
+  Payment confirmed: ✅ success sound
+  Failed payment: ⚠️ alert sound
+
+3B. ADMIN CONFIRMS → CUSTOMER SEES
+────────────────────────────────────
+
+FLOW:
+Admin clicks [Confirm Order]
+→ Backend updates order status
+→ Emits: order:confirmed to customer
+→ SMS sent automatically to customer:
+  "Order #BHR-045 confirmed!
+   We are preparing your order.
+   BeautyHub Rwanda ✅"
+→ Customer order page updates live:
+  PENDING → CONFIRMED (no refresh)
+→ Admin order count updates
+
+3C. ADMIN SHIPS → CUSTOMER TRACKS
+───────────────────────────────────
+
+FLOW:
+Admin clicks [Mark as Shipped]
+→ Admin assigns rider:
+  Name: Jean Paul
+  Phone: +250789000001
+→ Backend updates order
+→ Emits: order:shipped
+→ SMS to customer:
+  "Your order #BHR-045 is on the way!
+   Rider: Jean Paul — +250789000001
+   Estimated: Today by 6PM
+   BeautyHub Rwanda 🚚"
+→ Customer tracking page updates:
+  - Status: SHIPPED ✅
+  - Rider name shown
+  - Rider phone (tap to call)
+  - Estimated time shown
+→ Mobile app push notification:
+  "Your order is on the way! 🚚"
+
+3D. ADMIN DELIVERS → ORDER COMPLETES
+──────────────────────────────────────
+
+FLOW:
+Admin/Rider marks as Delivered
+→ Backend updates order
+→ Emits: order:delivered
+→ SMS to customer:
+  "Order #BHR-045 delivered! 🎉
+   Thank you for shopping with us!
+   Leave a review: [link]
+   BeautyHub Rwanda ❤️"
+→ Customer order shows DELIVERED
+→ Review prompt appears on website
+→ Loyalty points awarded automatically:
+  "You earned 370 points! 💎"
+→ Push notification on mobile:
+  "Order delivered! Leave a review 🌟"
+
+3E. ORDER TRACKING PAGE (LIVE)
+────────────────────────────────
+
+FIND existing order tracking page.
+IMPROVE with live updates:
+
+┌─────────────────────────────────────────┐
+│  ORDER TRACKING #BHR-2024-045          │
+│  Last updated: Just now 🔴 LIVE        │
+├─────────────────────────────────────────┤
+│                                         │
+│  ●━━━━━━━━━●━━━━━━━━━●━━━━━━━━━◌      │
+│  ✅Placed  ✅Confirmed ✅Shipped  ◌Delivered│
+│  10:45     11:02      14:00     ~18:00  │
+│                                         │
+├─────────────────────────────────────────┤
+│  📦 Your order is on the way!          │
+│                                         │
+│  🏍️ Rider: Jean Paul                  │
+│  📱 +250789000001 [Call] [WhatsApp]    │
+│  📍 Estimated: Today by 6PM            │
+│                                         │
+│  DELIVERY ADDRESS:                     │
+│  Kimironko, Gasabo, Kigali             │
+│  Near KCT Building                     │
+│                                         │
+├─────────────────────────────────────────┤
+│  ORDER ITEMS:                          │
+│  Nivea Lotion x2    — 17,000 RWF      │
+│  L'Oréal Serum x1   — 28,000 RWF      │
+│  Delivery           —  1,000 RWF      │
+│  TOTAL              — 37,000 RWF ✅   │
+└─────────────────────────────────────────┘
+
+Page auto-updates without refresh.
+Customer stays on page to watch status.
+
+After completing Section 3:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 4: HOMEPAGE CONTROL CONNECTION
+════════════════════════════════════════════
+
+Admin controls everything on homepage
+from admin panel.
+
+4A. BANNER MANAGEMENT CONNECTION
+──────────────────────────────────
+
+FLOW:
+Admin uploads new banner in admin
+→ Sets title, image, link, dates
+→ Clicks [Publish Banner]
+→ Backend saves banner
+→ Emits: banner:updated
+→ Website homepage:
+  - New banner appears in slider
+  - Old expired banners disappear
+  - No refresh needed
+  - Mobile app also updates
+
+Admin controls:
+- Add banner (instant)
+- Remove banner (instant)
+- Reorder banners (drag → instant)
+- Schedule: auto-show on start date
+- Auto-hide on end date
+- Mobile vs desktop different images
+
+4B. FLASH SALE CONTROL CONNECTION
+───────────────────────────────────
+
+FLOW:
+Admin creates flash sale in admin:
+→ Selects products
+→ Sets discount %
+→ Sets countdown time
+→ Clicks [Start Flash Sale]
+→ Backend saves promotion
+→ Emits: promotion:started
+→ Website homepage:
+  - Flash sale section appears instantly
+  - Countdown timer starts
+  - Sale prices show on products
+  - Sale badges appear on cards
+→ Mobile app:
+  - Push notification to all users:
+    "⚡ FLASH SALE STARTED!
+     30% OFF skincare — 4 hours only!
+     Shop now: beautyhub.rw"
+
+When countdown ends:
+→ Backend auto-emits: promotion:ended
+→ Website removes flash sale section
+→ Prices return to normal
+→ Badges disappear
+→ All automatic
+
+4C. FEATURED PRODUCTS CONTROL
+───────────────────────────────
+
+FLOW:
+Admin toggles "Featured" on product
+→ Backend updates product
+→ Emits: product:featured
+→ Homepage featured section updates
+→ New product appears in featured
+→ Old product removed if limit reached
+
+Admin controls featured sections:
+- Best Sellers (admin picks or auto)
+- New Arrivals (auto from date added)
+- Featured (admin handpicks)
+- On Sale (admin sets)
+- Top Brands (admin picks)
+
+All update instantly on website.
+
+4D. ANNOUNCEMENT BAR CONTROL
+──────────────────────────────
+
+FIND existing announcement bar.
+ADD admin control:
+
+Admin can edit from admin panel:
+- Bar text (EN/FR/RW)
+- Bar color (background)
+- Text color
+- Show/Hide toggle
+- Link (optional)
+
+Changes appear on website instantly.
+
+Example admin control:
+┌─────────────────────────────────────────┐
+│  ANNOUNCEMENT BAR SETTINGS             │
+├─────────────────────────────────────────┤
+│  Text (EN):                            │
+│  [🚚 FREE delivery above 50,000 RWF!] │
+│                                         │
+│  Text (RW):                            │
+│  [Guherekeza ubuntu hejuru ya 50K RWF] │
+│                                         │
+│  Background: [■ Black ▼]              │
+│  Text color: [■ White ▼]              │
+│                                         │
+│  Status: [● Active ▼]                 │
+│                                         │
+│  [Save & Apply Instantly]              │
+└─────────────────────────────────────────┘
+
+After completing Section 4:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 5: PRICING & PROMOTIONS CONNECTION
+════════════════════════════════════════════
+
+Admin changes prices/promotions →
+Website updates instantly.
+
+5A. PRICE CHANGE CONNECTION
+─────────────────────────────
+
+FLOW:
+Admin edits product price
+→ Backend updates price
+→ Clears price from Redis cache
+→ Emits: product:updated (with new price)
+→ Website:
+  - Product cards update price
+  - Product detail updates price
+  - Search results update price
+  - If in customer cart: cart updates
+→ Mobile app updates price
+
+If customer has item in cart 
+and price increases:
+Show notification:
+"Price updated: Nivea Lotion
+ Old: 8,500 RWF → New: 9,000 RWF"
+[Keep in Cart] [Remove]
+
+5B. COUPON CONTROL CONNECTION
+───────────────────────────────
+
+FLOW:
+Admin creates coupon: BEAUTY20
+→ Backend saves coupon
+→ Emits: coupon:created
+→ Website immediately accepts BEAUTY20
+→ Customers can use it right away
+
+Admin deactivates coupon:
+→ Backend deactivates
+→ Emits: coupon:deactivated
+→ Website immediately rejects BEAUTY20
+→ Any customer trying it sees:
+  "This coupon has expired"
+
+Admin creates auto-apply coupon:
+→ Sets minimum order amount
+→ Discount auto-applies at checkout
+→ No code needed
+
+5C. LOYALTY POINTS CONTROL
+────────────────────────────
+
+FLOW:
+Admin awards points to customer
+→ Backend updates points
+→ Emits to that specific customer
+→ Customer sees points update on:
+  - Account dashboard (live)
+  - Navbar points display (live)
+  - Mobile app (push notification)
+→ Notification to customer:
+  "💎 You received 500 bonus points!
+   Balance: 2,950 points = 29,500 RWF"
+
+After completing Section 5:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 6: CONTENT CONTROL CONNECTION
+════════════════════════════════════════════
+
+Admin controls all website content
+from admin panel.
+
+6A. BLOG CONTROL CONNECTION
+─────────────────────────────
+
+FLOW:
+Admin writes and publishes blog post
+→ Backend saves post
+→ Emits: blog:published
+→ Website blog page:
+  - New post appears instantly
+  - Homepage blog preview updates
+  - No refresh needed
+
+Admin unpublishes:
+→ Post disappears from website
+→ Anyone on that page redirected
+→ 404 or "Post removed" message
+
+6B. FAQ CONTROL CONNECTION
+────────────────────────────
+
+FLOW:
+Admin adds new FAQ question
+→ Saves in admin
+→ Website FAQ page updates instantly
+→ No rebuild needed
+→ No deployment needed
+
+Admin reorders FAQs:
+→ Drag in admin panel
+→ Website shows new order instantly
+
+6C. CATEGORY CONTROL CONNECTION
+─────────────────────────────────
+
+FLOW:
+Admin adds new category: "Men's Grooming"
+→ Backend saves category
+→ Website navigation updates:
+  - Navbar dropdown shows new category
+  - Category grid on homepage updates
+  - Category page created automatically
+→ Mobile app updates category list
+
+Admin deactivates category:
+→ Category hidden from navigation
+→ Products still exist (not deleted)
+→ Products show in "All Products"
+
+6D. BRAND CONTROL CONNECTION
+──────────────────────────────
+
+FLOW:
+Admin adds new brand: "Olay"
+→ Backend saves brand
+→ Website brand carousel updates
+→ Products can now be assigned to Olay
+→ Brand page auto-created
+
+Admin marks brand as featured:
+→ Brand appears in homepage carousel
+→ Instantly visible
+
+After completing Section 6:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 7: DELIVERY CONTROL CONNECTION
+════════════════════════════════════════════
+
+Admin controls delivery in real-time.
+
+7A. DELIVERY FEE UPDATE CONNECTION
+────────────────────────────────────
+
+FLOW:
+Admin updates Musanze fee: 3000→3500 RWF
+→ Backend updates zone
+→ Clears delivery cache
+→ Emits: delivery:feeUpdated
+→ Website checkout:
+  - New fee shows immediately
+  - Any customer in checkout sees new fee
+  - Order summary updates
+→ Mobile app updates fees
+
+7B. RIDER ASSIGNMENT CONNECTION
+─────────────────────────────────
+
+FLOW:
+Admin assigns rider to order
+→ Backend updates delivery record
+→ Emits: delivery:assigned to customer
+→ Customer order tracking shows:
+  - Rider name
+  - Rider phone (tap to call)
+  - Updated ETA
+→ SMS to customer automatically sent
+→ SMS to rider with order details
+
+7C. FREE DELIVERY THRESHOLD
+─────────────────────────────
+
+Admin changes free delivery threshold
+→ Website checkout updates instantly
+→ Homepage announcement bar updates
+→ Product pages update
+→ "Spend X more for free delivery"
+   shows correct amount
+
+After completing Section 7:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 8: SMS & NOTIFICATION CONNECTION
+════════════════════════════════════════════
+
+All admin actions trigger correct
+notifications automatically.
+
+8A. AUTOMATIC SMS TRIGGERS
+────────────────────────────
+
+Connect all order status changes
+to automatic SMS:
+
+Order CONFIRMED:
+"Murakoze! Itumwa #[ORDER] ryemejwe.
+ Turategura ibicuruzwa byanyu.
+ BeautyHub Rwanda ✅"
+
+Order PROCESSING:
+"Itumwa #[ORDER] riri gutegurwa.
+ Tuzabyoherekeza vuba.
+ BeautyHub Rwanda 📦"
+
+Order SHIPPED:
+"Itumwa #[ORDER] riri mu nzira!
+ Umuherekeza: [RIDER] - [PHONE]
+ Uzabibona: [TIME]
+ BeautyHub Rwanda 🚚"
+
+Order DELIVERED:
+"Itumwa #[ORDER] ryafitiwe! 🎉
+ Murakoze guhitamo BeautyHub Rwanda.
+ Tanga ibitekerezo: [LINK]"
+
+Order CANCELLED:
+"Itumwa #[ORDER] ravanweho.
+ Amafaranga [AMOUNT] RWF azagaruka.
+ Twifurije: +250780000000"
+
+Payment FAILED:
+"Kwishyura kwawe #[ORDER] ntibyanenze.
+ Ongera ugerageze cyangwa uvugane
+ natwe: +250780000000
+ BeautyHub Rwanda"
+
+8B. ADMIN NOTIFICATION CENTER
+───────────────────────────────
+
+FIND existing notification bell in admin.
+IMPROVE to show:
+
+Notification types with icons:
+🛒 New order — #BHR-045 — 35,000 RWF
+💳 Payment confirmed — #BHR-043
+❌ Payment failed — #BHR-044 — 22,000 RWF
+⚠️ Low stock — Nivea Lotion (3 left)
+⭐ New review — 5 stars — Amina U.
+👤 New customer — +250780000001
+🔄 Refund request — #BHR-040
+💬 WhatsApp message received
+
+Notification features:
+- Click → goes to related page
+- Mark as read (one or all)
+- Real-time count badge
+- Sound for critical (new order)
+- Filter by type
+
+8C. BULK SMS FROM ADMIN
+─────────────────────────
+
+Admin sends bulk SMS campaign
+→ Backend queues all SMS
+→ Sends via Africa's Talking
+→ Shows progress in admin:
+  Sending... 1,234/3,456 sent
+  ████████████░░░░░░░░ 36%
+  Estimated: 2 minutes remaining
+→ Completion report:
+  Sent: 3,401
+  Failed: 55
+  Cost: 34,010 RWF
+
+After completing Section 8:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 9: CUSTOMER CONTROL CONNECTION
+════════════════════════════════════════════
+
+Admin has full control over 
+customer accounts from admin panel.
+
+9A. CUSTOMER ACCOUNT CONTROL
+──────────────────────────────
+
+FLOW - Admin blocks customer:
+→ Backend marks account blocked
+→ Socket emits to that customer
+→ Customer immediately logged out
+→ Shows: "Your account has been 
+   suspended. Contact support."
+→ Cannot login again until unblocked
+
+FLOW - Admin unblocks:
+→ Customer can login again
+→ Optional SMS: "Your account has 
+   been reactivated. BeautyHub Rwanda"
+
+FLOW - Admin adds loyalty points:
+→ Customer balance updates live
+→ Notification to customer:
+  "💎 500 bonus points added!
+   New balance: 2,950 pts"
+
+FLOW - Admin removes bad review:
+→ Review disappears from website
+→ Customer notified:
+  "Your review was removed for 
+   violating our community guidelines"
+
+9B. LIVE CUSTOMER SUPPORT
+───────────────────────────
+
+When customer sends WhatsApp message:
+→ Admin sees it in admin panel
+→ Admin replies from admin panel
+→ Customer receives in WhatsApp
+→ All conversation logged
+
+Admin can see:
+- Active customers on website NOW
+- What page they are on
+- How long they have been browsing
+- What is in their cart
+- If they are stuck at checkout
+
+Admin can proactively message:
+"Hi! I see you are checking out.
+ Need any help? 😊"
+
+After completing Section 9:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 10: ANALYTICS CONNECTION
+════════════════════════════════════════════
+
+Admin sees everything happening on
+website in real-time.
+
+10A. REAL-TIME WEBSITE ANALYTICS
+──────────────────────────────────
+
+Admin dashboard shows LIVE:
+
+┌─────────────────────────────────────────┐
+│  🔴 LIVE WEBSITE ACTIVITY              │
+├─────────────────────────────────────────┤
+│  👥 Active visitors right now: 47      │
+│  🛒 Active carts: 12                   │
+│  💳 Checkouts in progress: 3           │
+│  📱 Mobile users: 38 (81%)            │
+│  🖥️  Desktop users: 9 (19%)           │
+├─────────────────────────────────────────┤
+│  CURRENTLY POPULAR:                    │
+│  1. Nivea Lotion — 8 viewing now       │
+│  2. L'Oréal Serum — 5 viewing now     │
+│  3. Dark & Lovely — 3 viewing now     │
+├─────────────────────────────────────────┤
+│  LIVE EVENTS:                          │
+│  Just now: User added Nivea to cart   │
+│  1 min: New user registered (+250780) │
+│  2 min: Order placed #BHR-045        │
+│  3 min: Payment confirmed #BHR-043   │
+└─────────────────────────────────────────┘
+
+10B. REVENUE LIVE TICKER
+──────────────────────────
+
+In admin header:
+"Today's Revenue: 450,000 RWF ↑"
+Updates every time new payment confirmed.
+
+10C. CONVERSION FUNNEL LIVE
+─────────────────────────────
+
+Shows live:
+Visitors: 47
+↓ Viewed product: 32 (68%)
+↓ Added to cart: 12 (25%)
+↓ Started checkout: 5 (10%)
+↓ Completed payment: 3 (6%)
+
+Updates in real-time.
+
+After completing Section 10:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 11: SECURITY & ACCESS CONTROL
+════════════════════════════════════════════
+
+Secure the admin-website connection.
+
+11A. ADMIN ACTION AUTHENTICATION
+──────────────────────────────────
+
+Every admin action must:
+- Verify JWT token
+- Verify role permission
+- Log action with:
+  admin ID + name
+  action performed
+  affected resource ID
+  timestamp
+  IP address
+- Rate limit per action type
+
+Critical actions need confirmation:
+- Delete product: "Type product name"
+- Block customer: "Confirm reason"
+- Issue refund: "Enter amount + reason"
+- Send bulk SMS: "Confirm: Send to 3,456?"
+
+11B. ADMIN SESSION MANAGEMENT
+───────────────────────────────
+
+Active sessions panel in admin:
+Shows all logged-in admin sessions:
+[Device] [Location] [Last Active] [End]
+
+Admin can:
+- End other sessions remotely
+- Force all logout (security breach)
+- See suspicious login alerts
+
+11C. PERMISSION-BASED CONTROL
+───────────────────────────────
+
+What each role can control:
+
+SUPER ADMIN: Everything
+ADMIN: All except staff management
+MANAGER:
+  ✅ Products (add/edit)
+  ✅ Orders (confirm/ship)
+  ✅ Customers (view)
+  ❌ Settings
+  ❌ Staff
+  ❌ Financial reports
+SALES STAFF:
+  ✅ Orders (view/confirm)
+  ✅ Customers (view)
+  ❌ Products
+  ❌ Settings
+DELIVERY MANAGER:
+  ✅ Orders (ship/deliver)
+  ✅ Riders (manage)
+  ❌ Products
+  ❌ Settings
+CONTENT EDITOR:
+  ✅ Blog (add/edit)
+  ✅ Banners (manage)
+  ✅ FAQ (manage)
+  ❌ Orders
+  ❌ Products prices
+  ❌ Settings
+
+Implement middleware that checks
+permission before every admin action.
+Return 403 if not permitted.
+
+After completing Section 11:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 12: MOBILE APP CONNECTION
+════════════════════════════════════════════
+
+Admin changes also reflect in mobile app.
+
+12A. MOBILE REAL-TIME UPDATES
+───────────────────────────────
+
+Mobile app connects to same socket:
+
+When admin updates product:
+→ Mobile product list updates
+→ Mobile product detail updates
+→ Mobile cart updates if item changed
+
+When admin starts flash sale:
+→ Mobile gets push notification:
+  "⚡ FLASH SALE! 30% OFF skincare!"
+→ Mobile homepage shows flash sale
+→ Countdown timer on mobile
+
+When admin confirms order:
+→ Mobile push notification:
+  "✅ Order confirmed! Preparing now"
+→ Mobile order tracking updates
+
+When admin marks delivered:
+→ Mobile push: "Delivered! 🎉"
+→ Review prompt on mobile
+→ Points notification on mobile
+
+12B. MOBILE ADMIN MINI-PANEL
+──────────────────────────────
+
+Admin can do quick actions from phone:
+
+Mobile admin features:
+- View pending orders
+- Confirm order with one tap
+- See today's revenue
+- Assign rider to order
+- Send quick SMS to customer
+- View low stock alerts
+- Approve/reject reviews
+
+Access: /admin on mobile
+Shows simplified mobile admin UI
+Protected with same JWT
+
+After completing Section 12:
+Report all files changed.
+Wait for my approval.
+
+════════════════════════════════════════════
+SECTION 13: FINAL CONNECTION TESTING
+════════════════════════════════════════════
+
+After ALL sections complete,
+test EVERY connection:
+
+TEST 1: Product Lifecycle
+[ ] Admin adds product
+    → Website shows it (< 1 second)
+[ ] Admin edits price
+    → Website updates price (< 1 second)
+[ ] Admin deletes product
+    → Website removes it (< 1 second)
+[ ] Stock decreases on purchase
+    → Admin sees update (< 1 second)
+
+TEST 2: Order Lifecycle
+[ ] Customer places order
+    → Admin hears alert (< 1 second)
+[ ] Admin confirms order
+    → Customer sees confirmed (< 1 second)
+    → SMS sent to customer
+[ ] Admin assigns rider + ships
+    → Customer sees rider info (< 1 second)
+    → SMS sent to customer
+[ ] Admin marks delivered
+    → Customer sees delivered (< 1 second)
+    → SMS sent to customer
+    → Points awarded (< 1 second)
+
+TEST 3: Homepage Control
+[ ] Admin uploads banner
+    → Website shows it (< 1 second)
+[ ] Admin starts flash sale
+    → Website shows sale (< 1 second)
+    → Mobile push notification sent
+[ ] Admin ends flash sale
+    → Website removes it (< 1 second)
+[ ] Admin updates announcement
+    → Website shows new text (< 1 second)
+
+TEST 4: Content Control
+[ ] Admin publishes blog
+    → Website shows it (< 1 second)
+[ ] Admin adds category
+    → Navbar updates (< 1 second)
+[ ] Admin adds brand
+    → Brand carousel updates (< 1 second)
+
+TEST 5: Customer Control
+[ ] Admin blocks customer
+    → Customer logged out (immediate)
+[ ] Admin adds points
+    → Customer balance updates (< 1 second)
+[ ] Admin deletes review
+    → Website removes it (< 1 second)
+
+TEST 6: Delivery Control
+[ ] Admin updates fee
+    → Checkout shows new fee (< 1 second)
+[ ] Admin assigns rider
+    → Customer sees rider (< 1 second)
+
+TEST 7: Security
+[ ] Non-admin cannot access admin
+[ ] Expired token rejected
+[ ] Wrong role gets 403
+[ ] All actions logged
+
+════════════════════════════════════════════
+AFTER ALL SECTIONS COMPLETE:
+════════════════════════════════════════════
+
+Give me FINAL CONNECTION REPORT:
+
+╔═════════════════════════════════════════╗
+║   BEAUTYHUB RWANDA CONNECTION REPORT   ║
+╠═════════════════════════════════════════╣
+║ Section 1:  Real-time Setup    ✅/⚠️   ║
+║ Section 2:  Products Control   ✅/⚠️   ║
+║ Section 3:  Orders Control     ✅/⚠️   ║
+║ Section 4:  Homepage Control   ✅/⚠️   ║
+║ Section 5:  Pricing Control    ✅/⚠️   ║
+║ Section 6:  Content Control    ✅/⚠️   ║
+║ Section 7:  Delivery Control   ✅/⚠️   ║
+║ Section 8:  SMS Connection     ✅/⚠️   ║
+║ Section 9:  Customer Control   ✅/⚠️   ║
+║ Section 10: Analytics Live     ✅/⚠️   ║
+║ Section 11: Security           ✅/⚠️   ║
+║ Section 12: Mobile Connection  ✅/⚠️   ║
+║ Section 13: All Tests Pass     ✅/⚠️   ║
+╠═════════════════════════════════════════╣
+║ New Files Created:   [number]          ║
+║ Files Modified:      [number]          ║
+║ Files Untouched:     [number]          ║
+║ Existing Features:   ALL INTACT ✅     ║
+╠═════════════════════════════════════════╣
+║ CONNECTION STATUS:                     ║
+║ ✅ ADMIN HAS FULL CONTROL             ║
+║ ✅ ALL CHANGES ARE REAL-TIME          ║
+║ ✅ SMS AUTO-TRIGGERS WORKING          ║
+║ ✅ MOBILE APP CONNECTED               ║
+║ ✅ SECURITY VERIFIED                  ║
+║ ✅ RWANDA FEATURES INTACT             ║
+║ 🇷🇼 BEAUTYHUB RWANDA — FULLY LIVE!   ║
+╚═════════════════════════════════════════╝
+
+Then give me commands to test
+everything locally:
+
+Terminal 1: cd backend && npm run dev
+Terminal 2: cd frontend && npm run dev
+Terminal 3: cd admin && npm run dev --port 3001
+Terminal 4: cd mobile && npx expo start
+
+Open:
+Website: http://localhost:3000
+Admin: http://localhost:3001/admin
+API: http://localhost:5000
+DB: http://localhost:5555 (Prisma Studio)
