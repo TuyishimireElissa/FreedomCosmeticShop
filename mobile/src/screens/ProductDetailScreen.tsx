@@ -121,7 +121,7 @@ export function ProductDetailScreen() {
         </TouchableOpacity>
         <View className="flex-row gap-3">
           <TouchableOpacity onPress={() => toggleWishlist(product.id)}>
-            <Heart color={wishlisted ? "#b76e79" : "#6d3a45" size={22} fill={wishlisted ? "#b76e79" : "transparent"} />
+            <Heart color={wishlisted ? "#b76e79" : "#6d3a45"} size={22} fill={wishlisted ? "#b76e79" : "transparent"} />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleShare}>
             <Share2 color="#6d3a45" size={22} />

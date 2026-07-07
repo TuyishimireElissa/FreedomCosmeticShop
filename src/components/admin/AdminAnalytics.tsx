@@ -296,7 +296,7 @@ export function AdminAnalytics() {
               tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
             />
             <Tooltip
-              formatter={(value: number) => [formatRWF(value), "Revenue"]}
+              formatter={(value) => [formatRWF(Number(value)), "Revenue"]}
               labelStyle={{ fontWeight: 600 }}
             />
             <Area
@@ -330,8 +330,8 @@ export function AdminAnalytics() {
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  label={({ method, percent }: { method: string; percent?: number }) =>
-                    `${method.replace("_", " ")} ${((percent || 0) * 100).toFixed(0)}%`
+                  label={({ method, percent }: { method?: string; percent?: number }) =>
+                    `${(method || "").replace("_", " ")} ${((percent || 0) * 100).toFixed(0)}%`
                   }
                   labelLine={false}
                 >
@@ -342,7 +342,7 @@ export function AdminAnalytics() {
                     />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: number) => formatRWF(value)} />
+                <Tooltip formatter={(value) => formatRWF(Number(value))} />
               </PieChart>
             </ResponsiveContainer>
           )}
@@ -398,7 +398,7 @@ export function AdminAnalytics() {
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
               <XAxis type="number" tick={{ fontSize: 12 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
               <YAxis type="category" dataKey="category" tick={{ fontSize: 12 }} width={100} />
-              <Tooltip formatter={(value: number) => formatRWF(value)} />
+              <Tooltip formatter={(value) => formatRWF(Number(value))} />
               <Bar dataKey="revenue" fill="#b76e79" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>

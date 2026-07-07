@@ -39,7 +39,7 @@ export interface SmsQueueItem {
   status: "queued" | "sending" | "sent" | "failed" | "scheduled"
   createdAt: Date
   sentAt?: Date
-  provider?: "AFRICAS_TALKING" | "PINDO"
+  provider?: "AFRICAS_TALKING" | "PINDO" | "SIMULATED"
   messageId?: string
   cost?: number
   segments?: number

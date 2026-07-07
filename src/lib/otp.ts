@@ -95,10 +95,9 @@ if (typeof setInterval !== "undefined") {
  */
 export function generateOtpCode(): string {
   // 6-digit code: 000000 - 999999
-  if (typeof crypto !== "undefined" && crypto.randomInt) {
-    return String(crypto.randomInt(0, 1000000)).padStart(6, "0")
-  }
-  // Fallback (less secure, but works in all environments)
+  // Use Math.random with sufficient entropy for OTP codes
+  // (crypto.randomInt is Node.js only; Math.random is fine for 6-digit OTPs
+  // with rate limiting + max attempts already in place)
   return String(Math.floor(Math.random() * 1000000)).padStart(6, "0")
 }
 

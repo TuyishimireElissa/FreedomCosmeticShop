@@ -106,20 +106,24 @@ export function CartView() {
     toast({
       title: "Removed from cart",
       description: item.name,
-      action: {
-        label: "Undo",
-        onClick: () => {
-          useStore.getState().addToCart({
-            productId: item.productId,
-            slug: item.slug,
-            name: item.name,
-            price: item.price,
-            image: item.image,
-            stock: item.stock,
-          }, item.quantity)
-          if (undoTimer) clearTimeout(undoTimer)
-        },
-      },
+      action: (
+        <button
+          className="rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+          onClick={() => {
+            useStore.getState().addToCart({
+              productId: item.productId,
+              slug: item.slug,
+              name: item.name,
+              price: item.price,
+              image: item.image,
+              stock: item.stock,
+            }, item.quantity)
+            if (undoTimer) clearTimeout(undoTimer)
+          }}
+        >
+          Undo
+        </button>
+      ),
     })
   }
 

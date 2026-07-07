@@ -56,7 +56,7 @@ export async function GET(req: Request) {
           },
           orders: {
             where: { status: { not: "CANCELLED" } },
-            select: { total: true },
+            select: { total: true, createdAt: true },
             orderBy: { createdAt: "desc" },
             take: 1,
           },

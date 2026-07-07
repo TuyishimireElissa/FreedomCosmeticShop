@@ -222,7 +222,7 @@ export function AdminOverview() {
               tick={{ fontSize: 11 }}
             />
             <Tooltip
-              formatter={(value: number) => [formatRWF(value), "Revenue"]}
+              formatter={(value) => [formatRWF(Number(value)), "Revenue"]}
               labelFormatter={(label) => new Date(label).toLocaleDateString("en-RW")}
             />
             <Line
@@ -269,7 +269,7 @@ export function AdminOverview() {
                     />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value: number) => formatRWF(value)} />
+                <Tooltip formatter={(value) => formatRWF(Number(value))} />
               </PieChart>
             </ResponsiveContainer>
           )}
@@ -291,7 +291,7 @@ export function AdminOverview() {
                   tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
                   tick={{ fontSize: 11 }}
                 />
-                <Tooltip formatter={(value: number) => formatRWF(value)} />
+                <Tooltip formatter={(value) => formatRWF(Number(value))} />
                 <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

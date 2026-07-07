@@ -238,10 +238,10 @@ function CouponsManager() {
       })
       setShowForm(false)
       load()
-    } catch {
+    } catch (err) {
       toast({
         title: "Save failed",
-        description: e instanceof Error ? e.message : "Unknown error",
+        description: err instanceof Error ? err.message : "Unknown error",
         variant: "destructive",
       })
     } finally {
@@ -259,10 +259,10 @@ function CouponsManager() {
       toast({ title: "Coupon deleted", description: deleteTarget.code })
       setDeleteTarget(null)
       load()
-    } catch {
+    } catch (err) {
       toast({
         title: "Delete failed",
-        description: e instanceof Error ? e.message : "Unknown error",
+        description: err instanceof Error ? err.message : "Unknown error",
         variant: "destructive",
       })
     }

@@ -157,9 +157,9 @@ export async function GET(req: Request) {
           slug: p.slug,
           price: p.price,
           image: JSON.parse(p.images)[0] || null,
-          totalSold: t._sum.quantity,
+          totalSold: t._sum.quantity || 0,
           orderCount: t._count,
-          revenue: t._sum.quantity * p.price,
+          revenue: (t._sum.quantity || 0) * p.price,
         }
       })
       .filter(Boolean)
@@ -170,7 +170,7 @@ export async function GET(req: Request) {
       _count: true,
       _sum: { total: true },
       where: { createdAt: { gte: rangeStart }, status: { not: "CANCELLED" } },
-      orderBy: { _count: "desc" },
+      orderBy: { _count: { district: "desc" } },
       take: 10,
     })
 
@@ -179,7 +179,7 @@ export async function GET(req: Request) {
       .map((d) => ({
         district: d.district,
         orders: d._count,
-        revenue: d._sum.total || 0,
+        revenue: (d._sum && d._sum.total) || 0,
       }))
 
     // ─── Sales by category ────────────────────────────────────────────

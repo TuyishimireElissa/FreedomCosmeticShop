@@ -16,7 +16,7 @@ const SendSmsSchema = z.object({
   message: z.string().optional(),
   templateKey: z.string().optional(),
   language: z.enum(["en", "rw"]).default("en"),
-  variables: z.record(z.string()).optional(),
+  variables: z.record(z.string(), z.union([z.string(), z.number()])).optional(),
 })
 
 export async function POST(req: Request) {

@@ -44,6 +44,7 @@ const envSchema = z.object({
   // Africa's Talking (SMS)
   AT_USERNAME: z.string().optional(),
   AT_API_KEY: z.string().optional(),
+  PINDO_API_KEY: z.string().optional(),
   AT_SENDER_ID: z.string().max(11).optional(),
 
   // Cloudinary

@@ -10,6 +10,7 @@
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { Prisma } from "@prisma/client"
 import { requireRole } from "@/lib/auth"
 import { z } from "zod"
 
@@ -53,7 +54,7 @@ export async function GET(req: Request) {
       Math.max(1, Number(searchParams.get("pageSize") || "50"))
     )
 
-    const where: { isDeleted: boolean; OR?: unknown[] } = { isDeleted: false }
+    const where: Prisma.ProductWhereInput = { isDeleted: false }
     if (search) {
       where.OR = [
         { name: { contains: search } },
