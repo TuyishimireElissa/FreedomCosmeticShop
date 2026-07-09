@@ -1,39 +1,35 @@
 // =============================================================================
-// FreedomCosmeticShop — Complete Prisma Schema (PostgreSQL / Production)
+// FreedomCosmeticShop — Complete Prisma Schema (SQLite / Development)
 // =============================================================================
 //
-// 29 models for a production-ready Rwanda cosmetics e-commerce platform:
-//   1.  User           — with +250 phone, role enum, soft delete, wholesale
-//   2.  StaffProfile   — extends User for admin/staff
+// 19 models for a production-ready Rwanda cosmetics e-commerce platform:
+//   1.  User           — with +250 phone, role enum, soft delete
+//   2.  StaffProfile   — extends User for admin/staff (model #19)
 //   3.  Category       — hierarchical (parent/child self-relation)
 //   4.  Brand          — product brands
-//   5.  Product        — with skinType, shade, ingredients, wholesale pricing
+//   5.  Product        — with skinType, shade, ingredients
 //   6.  Cart           — authenticated user cart
 //   7.  CartItem       — cart line items
-//   8.  Order          — RWF currency, sequential order number, wholesale
+//   8.  Order          — RWF currency, sequential order number
 //   9.  OrderItem      — snapshot line items
-//  10.  Payment        — MTN MoMo / Airtel / Card / COD / Credit
-//  11.  PaymentAttempt — payment retry tracking
-//  12.  Delivery       — driver + tracking
-//  13.  Review         — with photos, skin type, shade used
-//  14.  Wishlist       — user ↔ product
-//  15.  Address        — Rwanda province/district/sector/cell/village
-//  16.  Coupon         — percentage / fixed / free shipping
-//  17.  LoyaltyPoints  — points ledger (earn / redeem / expire)
-//  18.  BlogPost       — content marketing
-//  19.  Banner         — promotional banners
-//  20.  Notification   — in-app / SMS / email / push
-//  21.  DeliveryZoneSettings — admin-manageable delivery fees
-//  22.  ActivityLog    — audit trail for staff/admin actions
-//  23.  WholesaleApplication — business wholesale applications
-//  24.  ProductPricing — wholesale tier pricing per product
-//  25.  WholesaleTier  — quantity-based price breaks
-//  26.  WholesaleCredit — credit account for wholesale customers
-//  27.  CreditHistory  — credit transaction ledger
-//  28.  WholesaleInvoice — professional invoices for wholesale orders
-//  29.  StoreSettings  — store name, logo, colors, social links
+//  10.  Payment        — MTN MoMo / Airtel / Card / COD
+//  11.  Delivery       — driver + tracking
+//  12.  Review         — with photos, skin type, shade used
+//  13.  Wishlist       — user ↔ product
+//  14.  Address        — Rwanda province/district/sector/cell/village
+//  15.  Coupon         — percentage / fixed / free shipping
+//  16.  LoyaltyPoints  — points ledger (earn / redeem / expire)
+//  17.  BlogPost       — content marketing
+//  18.  Banner         — promotional banners
+//  19.  Notification   — in-app / SMS / email / push
 //
-// PostgreSQL production schema — uses Supabase.
+// SQLite limitations (vs PostgreSQL):
+//   - Enums stored as String (valid values documented in comments)
+//   - Arrays stored as JSON string (use JSON.parse/stringify in app code)
+//   - No @db.Text (use String)
+//   - No full-text search (use contains)
+//
+// For the PostgreSQL production version, see prisma/schema.postgres.prisma
 // =============================================================================
 
 generator client {
@@ -41,9 +37,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 // =============================================================================
