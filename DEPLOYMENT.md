@@ -1,109 +1,93 @@
 # FreedomCosmeticShop — Vercel Deployment Guide
 
-## Prerequisites
-- Vercel CLI installed: `npm install -g vercel`
-- Logged in to Vercel: `vercel login` (use tuyishimire-elissa account)
-- Project linked to existing: `vercel link` → select `samuel-cosmetic-shop`
+## Project: freedomcosmeticshop
+## Target URL: https://freedomcosmeticshop.vercel.app
 
-## Step 1: Set Environment Variables on Vercel
+This is a SINGLE Next.js app (storefront + admin + API all in one).
 
-Run these commands ONE BY ONE (each will prompt you to paste the value):
+## Step 1: Install Vercel CLI + Login
 
 ```bash
-# Database (Supabase — use port 6543 for pooler)
-vercel env add DATABASE_URL production
-# Paste: postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1
-
-vercel env add DIRECT_URL production
-# Paste: postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:6543/postgres
-
-# Cloudinary
-vercel env add CLOUDINARY_CLOUD_NAME production
-# Paste: dohoc0tmp
-
-vercel env add CLOUDINARY_API_KEY production
-# Paste: 524578837153868
-
-vercel env add CLOUDINARY_API_SECRET production
-# Paste: ggf5-0eqMOIvtxQXokzy6-Nr1yU
-
-vercel env add NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME production
-# Paste: dohoc0tmp
-
-# Supabase
-vercel env add NEXT_PUBLIC_SUPABASE_URL production
-# Paste: https://hsdqahltrqjeaskhheis.supabase.co
-
-# Auth
-vercel env add JWT_SECRET production
-# Paste: freedomcosmeticshop-jwt-secret-rwanda-2024-very-strong
-
-vercel env add JWT_REFRESH_SECRET production
-# Paste: freedomcosmeticshop-refresh-secret-rwanda-2024
-
-# Store
-vercel env add NEXT_PUBLIC_APP_URL production
-# Paste: https://samuel-cosmetic-shop.vercel.app
-
-vercel env add NEXT_PUBLIC_CURRENCY production
-# Paste: RWF
-
-vercel env add NEXT_PUBLIC_WHATSAPP production
-# Paste: +250780000000
-
-vercel env add STORE_NAME production
-# Paste: FreedomCosmeticShop
+npm install -g vercel
+vercel login
+# Login with: tuyishimire-elissa account
 ```
 
-## Step 2: Deploy to Vercel
+## Step 2: Deploy as NEW project
 
 ```bash
 cd /home/z/my-project
+
+# Remove any old .vercel link
+rm -rf .vercel
+
+# Deploy as new project
+vercel
+
+# Answer prompts:
+# Set up and deploy? → Y
+# Which scope? → tuyishimire-elissa
+# Link to existing project? → N
+# Project name? → freedomcosmeticshop
+# In which directory? → ./
+# Want to override settings? → N
+```
+
+## Step 3: Set Environment Variables
+
+Use the Vercel Dashboard (easiest):
+1. Go to: https://vercel.com/tuyishimire-elissa/freedomcosmeticshop/settings/environment-variables
+2. Add EACH variable below:
+
+| Variable | Value | Environments |
+|----------|-------|-------------|
+| DATABASE_URL | postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:5432/postgres | Production |
+| DIRECT_URL | postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:5432/postgres | Production |
+| CLOUDINARY_CLOUD_NAME | dohoc0tmp | All |
+| CLOUDINARY_API_KEY | 524578837153868 | Production |
+| CLOUDINARY_API_SECRET | ggf5-0eqMOIvtxQXokzy6-Nr1yU | Production |
+| NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME | dohoc0tmp | All |
+| NEXT_PUBLIC_APP_URL | https://freedomcosmeticshop.vercel.app | All |
+| NEXT_PUBLIC_CURRENCY | RWF | All |
+| NEXT_PUBLIC_WHATSAPP | +250780000000 | All |
+| NEXT_PUBLIC_SUPABASE_URL | https://hsdqahltrqjeaskhheis.supabase.co | All |
+| JWT_SECRET | freedomcosmeticshop-jwt-secret-rwanda-2024-very-strong | Production |
+| JWT_REFRESH_SECRET | freedomcosmeticshop-refresh-secret-rwanda-2024 | Production |
+| STORE_NAME | FreedomCosmeticShop | All |
+| STORE_CURRENCY | RWF | All |
+| STORE_TIMEZONE | Africa/Kigali | All |
+
+## Step 4: Redeploy with env vars
+
+```bash
 vercel --prod
 ```
 
-## Step 3: Run Database Migration on Vercel
+## Step 5: Create database tables on Supabase
 
-After the first deploy, you need to create the database tables on Supabase.
-Go to the Supabase SQL Editor (https://supabase.com/dashboard/project/hsdqahltrqjeaskhheis/sql/new)
-and run the SQL from: `prisma/migrations/init.sql`
-
-OR run this command locally with the Supabase connection:
+After deployment, run from your local machine:
 
 ```bash
-# Set the DATABASE_URL temporarily for migration
-export DATABASE_URL="postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
-export DIRECT_URL="postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:6543/postgres"
-
+cd /home/z/my-project
+export DATABASE_URL="postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:5432/postgres"
+export DIRECT_URL="postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:5432/postgres"
 npx prisma db push
 npx prisma generate
 ```
 
-## Step 4: Seed the Database
-
-After tables are created, seed initial data:
-
-```bash
-npx prisma db seed
-```
-
-OR run the seed script:
+## Step 6: Seed database
 
 ```bash
 npx tsx scripts/seed.ts
 ```
 
-## Step 5: Verify
+## Step 7: Delete old project
 
-- Website: https://samuel-cosmetic-shop.vercel.app
-- Admin: https://samuel-cosmetic-shop.vercel.app (click admin icon)
+Go to: https://vercel.com/tuyishimire-elissa/samuel-cosmetic-shop/settings
+Scroll to bottom → Click "Delete Project" → Type: samuel-cosmetic-shop → Delete
+
+## Step 8: Verify
+
+- Website: https://freedomcosmeticshop.vercel.app
+- Admin: https://freedomcosmeticshop.vercel.app (click admin icon)
 - Admin login: +250788123456 / Admin@2026
-
-## Important Notes
-
-1. The Prisma schema is set to PostgreSQL (`provider = "postgresql"`)
-2. Supabase pooler uses port 6543 (not 5432)
-3. The `?pgbouncer=true&connection_limit=1` is required for Supabase pooler
-4. The `DIRECT_URL` is used for migrations (no pgbouncer param)
-5. All 29 models will be created on Supabase
-6. The seed script creates admin user + sample products
