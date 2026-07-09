@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Ubumwe Beauty",
-    "slug": "ubumwe-beauty",
+    "name": "FreedomCosmeticShop",
+    "slug": "freedom-cosmetic-shop",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,7 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ubumwe.beauty",
+      "bundleIdentifier": "com.freedomcosmeticshop.rw",
       "infoPlist": {
         "NSCameraUsageDescription": "We need camera access for product review photos",
         "NSFaceIDUsageDescription": "Use Face ID for quick login"
@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#b76e79"
       },
-      "package": "com.ubumwe.beauty",
+      "package": "com.freedomcosmeticshop.rw",
       "permissions": [
         "CAMERA",
         "USE_BIOMETRIC",
@@ -41,7 +41,7 @@
       "expo-secure-store",
       "expo-local-authentication"
     ],
-    "scheme": "ubumwe",
+    "scheme": "freedomcosmetic",
     "extra": {
       "eas": {
         "projectId": "your-eas-project-id"
@@ -49,7 +49,7 @@
     },
     "notification": {
       "androidMode": "default",
-      "androidCollapsedTitle": "Ubumwe Beauty",
+      "androidCollapsedTitle": "FreedomCosmeticShop",
       "iosDisplayInForeground": true
     }
   }

@@ -113,7 +113,7 @@ export async function POST(req: Request) {
         txRef,
         customer: {
           name: order.customerName,
-          email: order.customerEmail || "customer@ubumwe.beauty",
+          email: order.customerEmail || "customer@freedomcosmeticshop.rw",
           phone: order.customerPhone,
         },
         redirectUrl: `${process.env.APP_URL || "http://localhost:3000"}/checkout?tx_ref=${txRef}`,

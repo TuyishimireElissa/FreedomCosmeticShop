@@ -4,7 +4,7 @@
  * AdminLoginScreen — branded admin login page.
  *
  * Features:
- *   - BeautyHub Rwanda branding + "Admin Control Panel" title
+ *   - FreedomCosmeticShop branding + "Admin Control Panel" title
  *   - Phone + password login (reuses existing auth API)
  *   - Show/hide password toggle
  *   - Failed attempt counter (lock after 5 attempts, 30min lockout)
@@ -38,7 +38,7 @@ import {
 
 const MAX_ATTEMPTS = 5
 const LOCK_DURATION_MS = 30 * 60 * 1000 // 30 minutes
-const LOCK_STORAGE_KEY = "ubumwe-admin-lockout"
+const LOCK_STORAGE_KEY = "freedom-admin-lockout"
 
 interface AdminLoginScreenProps {
   onBack: () => void
@@ -72,7 +72,7 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
 
   // Check if "Remember device" is already set
   useEffect(() => {
-    const remembered = localStorage.getItem("ubumwe-admin-remember")
+    const remembered = localStorage.getItem("freedom-admin-remember")
     if (remembered === "true") {
       setRememberDevice(true)
     }
@@ -134,7 +134,7 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
 
       // Success — admin logged in
       if (rememberDevice) {
-        localStorage.setItem("ubumwe-admin-remember", "true")
+        localStorage.setItem("freedom-admin-remember", "true")
       }
       setAttempts(0)
       toast({
@@ -193,7 +193,7 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
             <Sparkles className="h-7 w-7 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            Ubumwe Beauty
+            FreedomCosmeticShop
           </h1>
           <p className="text-sm font-medium text-primary">Admin Control Panel</p>
         </div>
@@ -319,7 +319,7 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
             Secure Admin Access Only
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Ubumwe Beauty. All rights reserved.
+            © {new Date().getFullYear()} FreedomCosmeticShop. All rights reserved.
           </p>
           <button
             onClick={onBack}

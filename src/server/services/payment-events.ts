@@ -185,7 +185,7 @@ export async function handlePaymentFailure(payload: PaymentFailurePayload): Prom
   // Send SMS about failed payment
   if (features.sms) {
     // Use a custom message for payment failure
-    const message = `Your payment for order ${order.orderNumber} failed. Please try again or use a different payment method. Ubumwe Beauty`
+    const message = `Your payment for order ${order.orderNumber} failed. Please try again or use a different payment method. FreedomCosmeticShop`
     enqueueSms(order.customerPhone, message, {
       priority: 1, // high
     })

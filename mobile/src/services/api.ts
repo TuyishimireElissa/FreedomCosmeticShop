@@ -1,5 +1,5 @@
 /**
- * API Service — HTTP client for the Ubumwe Beauty backend.
+ * API Service — HTTP client for the FreedomCosmeticShop backend.
  *
  * Base URL: configurable via EXPO_PUBLIC_API_URL
  * Auth: JWT tokens stored in SecureStore (access + refresh)
@@ -10,7 +10,7 @@ import * as SecureStore from "expo-secure-store"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000/api"
-const CACHE_PREFIX = "@ubumwe_cache_"
+const CACHE_PREFIX = "@freedom_cache_"
 const CACHE_TTL = 10 * 60 * 1000 // 10 minutes
 
 // ─── Token management ────────────────────────────────────────────────────────

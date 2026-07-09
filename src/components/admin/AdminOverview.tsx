@@ -33,8 +33,9 @@ import {
 } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
-import { formatRWF } from "@/lib/format"
+import { formatRWF, formatRWFCompact } from "@/lib/format"
 import { useStore } from "@/store/useStore"
+import { useLiveStats, type LiveEvent } from "@/hooks/use-live-stats"
 import {
   TrendingUp,
   Users,
@@ -53,6 +54,7 @@ import {
   XCircle,
   Clock,
   ArrowRight,
+  Activity,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -120,16 +122,50 @@ export function AdminOverview() {
   const [chartRange, setChartRange] = useState<"today" | "week" | "month">("month")
   const [prevOrderCount, setPrevOrderCount] = useState(0)
 
+  // Section 10: Live stats for the live activity widget
+  const liveStats = useLiveStats()
+
   const load = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch(`/api/admin/analytics?range=${chartRange}`)
       if (!res.ok) return
       const json = await res.json()
-      setData(json)
+
+      // Transform API response to match the component's expected shape.
+      // The /api/admin/analytics endpoint returns:
+      //   - statusBreakdown: Array<{ status, count }>
+      //   - lowStock: Array<{ id, name, stock, image }>
+      //   - revenue.rangeCount: number (total non-cancelled orders in range)
+      //   - revenueOverTime: Array<{ date, revenue, orders }>
+      // The component expects:
+      //   - ordersByStatus: Record<string, number>
+      //   - lowStockProducts: Array
+      //   - totalOrders: number
+      //   - revenueChart: Array
+      const ordersByStatus: Record<string, number> = {}
+      if (Array.isArray(json.statusBreakdown)) {
+        for (const s of json.statusBreakdown) {
+          ordersByStatus[s.status] = s.count
+        }
+      }
+
+      const lowStockProducts = Array.isArray(json.lowStock) ? json.lowStock : []
+      const outOfStockCount = lowStockProducts.filter((p: { stock: number }) => p.stock === 0).length
+      const totalOrders = json.revenue?.rangeCount ?? 0
+      const revenueChart = Array.isArray(json.revenueOverTime) ? json.revenueOverTime : []
+
+      setData({
+        ...json,
+        ordersByStatus,
+        lowStockProducts,
+        outOfStockCount,
+        totalOrders,
+        revenueChart,
+      })
 
       // Sound alert on new order
-      const currentCount = json.totalOrders || 0
+      const currentCount = totalOrders
       if (prevOrderCount > 0 && currentCount > prevOrderCount) {
         playOrderSound()
       }
@@ -217,6 +253,77 @@ export function AdminOverview() {
           icon={TrendingUp}
           color="text-purple-600"
         />
+      </div>
+
+      {/* ─── Section 10: Live Activity Widget ──────────────────────────── */}
+      <div className="rounded-2xl border bg-card p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="flex items-center gap-2 text-sm font-semibold">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
+            </span>
+            🔴 LIVE WEBSITE ACTIVITY
+          </h3>
+          <span className="text-[10px] text-muted-foreground">Updates every 5s</span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-xl border p-3 text-center">
+            <Users className="mx-auto h-4 w-4 text-emerald-500" />
+            <p className="mt-1 text-2xl font-bold text-emerald-600">{liveStats.activeVisitors}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Active visitors</p>
+          </div>
+          <div className="rounded-xl border p-3 text-center">
+            <TrendingUp className="mx-auto h-4 w-4 text-primary" />
+            <p className="mt-1 text-lg font-bold">{formatRWFCompact(liveStats.todayRevenue)}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Revenue today</p>
+          </div>
+          <div className="rounded-xl border p-3 text-center">
+            <Package className="mx-auto h-4 w-4 text-sky-500" />
+            <p className="mt-1 text-2xl font-bold">{liveStats.todayOrderCount}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Orders today</p>
+          </div>
+          <div className="rounded-xl border p-3 text-center">
+            <Activity className="mx-auto h-4 w-4 text-violet-500" />
+            <p className="mt-1 text-2xl font-bold">{liveStats.liveEvents.length}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Recent events</p>
+          </div>
+        </div>
+
+        {/* Live events feed */}
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Live Events
+          </p>
+          {liveStats.liveEvents.length === 0 ? (
+            <p className="rounded-lg border border-dashed p-3 text-center text-xs text-muted-foreground">
+              No recent activity. Events will appear here in real-time.
+            </p>
+          ) : (
+            <div className="max-h-48 space-y-1 overflow-y-auto ub-scroll">
+              {liveStats.liveEvents.slice(0, 15).map((evt: LiveEvent) => (
+                <div key={evt.id} className="flex items-start gap-2 rounded-lg border p-2 text-xs">
+                  <span className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full ${
+                    evt.type === "order" ? "bg-sky-100 text-sky-600" :
+                    evt.type === "payment" ? "bg-emerald-100 text-emerald-600" :
+                    evt.type === "product" ? "bg-amber-100 text-amber-600" :
+                    "bg-secondary text-muted-foreground"
+                  }`}>
+                    {evt.type === "order" ? "🛒" : evt.type === "payment" ? "💳" : evt.type === "product" ? "📦" : "ℹ️"}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{evt.title}</p>
+                    <p className="truncate text-muted-foreground">{evt.message}</p>
+                  </div>
+                  <span className="shrink-0 text-[10px] text-muted-foreground">
+                    {new Date(evt.timestamp).toLocaleTimeString("en-RW", { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ─── Quick Actions + Alerts ─────────────────────────────────── */}

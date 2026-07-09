@@ -166,9 +166,9 @@ export function CartView() {
 
   // ─── WhatsApp share cart ─────────────────────────────────────────
   const handleShareCart = () => {
-    const message = `🛍️ My Ubumwe Beauty Cart:\n\n${items
+    const message = `🛍️ My FreedomCosmeticShop Cart:\n\n${items
       .map((i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`)
-      .join("\n")}\n\nSubtotal: ${formatRWF(subtotal)}\n\nShop at Ubumwe Beauty! 🌸`
+      .join("\n")}\n\nSubtotal: ${formatRWF(subtotal)}\n\nShop at FreedomCosmeticShop! 🌸`
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(url, "_blank")
   }

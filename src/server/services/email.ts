@@ -59,7 +59,7 @@ export async function sendEmail(opts: EmailOptions): Promise<EmailResult> {
         Authorization: `Bearer ${env.RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: env.EMAIL_FROM || "Ubumwe Beauty <hello@ubumwe.beauty>",
+        from: env.EMAIL_FROM || "FreedomCosmeticShop <hello@freedomcosmeticshop.rw>",
         to: opts.to,
         subject: opts.subject,
         html: opts.html,
@@ -102,7 +102,7 @@ export async function sendOrderConfirmationEmail(
       <p>Hi there,</p>
       <p>We've received your order <strong>${orderNumber}</strong> totalling <strong>RWF ${total.toLocaleString()}</strong>.</p>
       <p>We'll send you another email when your order ships.</p>
-      <p>Warm regards,<br>The Ubumwe Beauty team</p>
+      <p>Warm regards,<br>The FreedomCosmeticShop team</p>
     </div>
   `
   return sendEmail({

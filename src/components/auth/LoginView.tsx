@@ -223,7 +223,7 @@ export function LoginView() {
           <Sparkles className="h-5 w-5" />
         </span>
         <span className="text-xl font-semibold">
-          Ubumwe <span className="text-primary">Beauty</span>
+          FreedomCosmeticShop
         </span>
       </button>
 

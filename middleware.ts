@@ -1,5 +1,5 @@
 /**
- * Next.js middleware for Ubumwe Beauty.
+ * Next.js middleware for FreedomCosmeticShop.
  *
  * Currently adds security headers to all responses. In the future:
  *   - Block /admin routes unless authenticated

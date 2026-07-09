@@ -7,6 +7,8 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
+import { broadcastCouponEvent } from "@/lib/realtime"
+import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
 
 const UpdateCouponSchema = z.object({
@@ -28,7 +30,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole("ADMIN")
+    const adminUser = await requireRole("ADMIN")
     const { id } = await params
     const body = await req.json()
 
@@ -59,6 +61,46 @@ export async function PUT(
     if (data.code) data.code = (data.code as string).toUpperCase()
 
     const updated = await db.coupon.update({ where: { id }, data })
+
+    // ─── Section 5: Real-time broadcast ──────────────────────────────
+    // Determine if this is an activation/deactivation change
+    const wasDeactivated =
+      parsed.data.isActive === false && existing.isActive === true
+    const wasActivated =
+      parsed.data.isActive === true && existing.isActive === false
+
+    if (wasDeactivated) {
+      // Coupon deactivated — storefront should reject it immediately
+      await broadcastCouponEvent("deactivated", {
+        id: updated.id,
+        code: updated.code,
+        type: updated.type,
+        value: updated.value,
+        isActive: false,
+      }, { source: adminUser.name })
+    } else {
+      // General update (price change, code change, reactivation, etc.)
+      await broadcastCouponEvent("updated", {
+        id: updated.id,
+        code: updated.code,
+        type: updated.type,
+        value: updated.value,
+        isActive: updated.isActive,
+      }, { source: adminUser.name })
+    }
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "COUPON_UPDATE",
+      entityType: "COUPON",
+      entityId: updated.id,
+      description: `Updated coupon: ${updated.code}${wasDeactivated ? " (deactivated)" : wasActivated ? " (activated)" : ""}`,
+      req,
+    }).catch(() => {})
+
     return NextResponse.json({ coupon: updated })
   } catch (error) {
     if (error instanceof Error && "statusCode" in error) {
@@ -73,11 +115,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole("ADMIN")
+    const adminUser = await requireRole("ADMIN")
     const { id } = await params
 
     const existing = await db.coupon.findUnique({ where: { id } })
@@ -86,6 +128,29 @@ export async function DELETE(
     }
 
     await db.coupon.delete({ where: { id } })
+
+    // ─── Section 5: Real-time broadcast ──────────────────────────────
+    // Coupon deleted — storefront should reject it immediately
+    await broadcastCouponEvent("deleted", {
+      id: existing.id,
+      code: existing.code,
+      type: existing.type,
+      value: existing.value,
+      isActive: false,
+    }, { source: adminUser.name })
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "COUPON_DELETE",
+      entityType: "COUPON",
+      entityId: existing.id,
+      description: `Deleted coupon: ${existing.code}`,
+      req,
+    }).catch(() => {})
+
     return NextResponse.json({ success: true })
   } catch (error) {
     if (error instanceof Error && "statusCode" in error) {

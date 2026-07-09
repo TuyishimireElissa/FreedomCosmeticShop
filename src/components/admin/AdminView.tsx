@@ -18,7 +18,7 @@
  *   - Responsive tab layout
  */
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { Order } from "@/lib/types"
 import { formatRWF, PAYMENT_METHODS, PaymentMethodKey } from "@/lib/format"
 import { Button } from "@/components/ui/button"
@@ -66,6 +66,11 @@ import { RealTimeNotifications } from "./RealTimeNotifications"
 import { InvoicePrinter } from "./InvoicePrinter"
 import { AdminSmsManager } from "./AdminSmsManager"
 import { AdminPayments } from "./AdminPayments"
+import { AdminMarketing } from "./AdminMarketing"
+import { AdminReports } from "./AdminReports"
+import { AdminStaff } from "./AdminStaff"
+import { AdminMobilePanel } from "./AdminMobilePanel"
+import { AdminWholesale } from "./AdminWholesale"
 import {
   Shield,
   Package,
@@ -88,7 +93,19 @@ import {
   MessageCircle,
   CreditCard,
   RotateCcw,
+  Megaphone,
+  FileText,
+  Sun,
+  Moon,
+  Keyboard,
+  Smartphone,
+  Store,
 } from "lucide-react"
+import { useTheme } from "@/hooks/use-theme"
+import { useOrderUpdates } from "@/hooks/use-realtime"
+import { useLiveStats } from "@/hooks/use-live-stats"
+import { useSettings } from "@/hooks/use-settings"
+import { formatRWFCompact } from "@/lib/format"
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All statuses" },
@@ -123,8 +140,93 @@ export function AdminView() {
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("overview")
 
+  // Dynamic store settings (logo, name, etc.)
+  const { settings: adminSettings } = useSettings()
+
+  // Section 12: Mobile admin mini-panel toggle
+  const [mobileMode, setMobileMode] = useState(false)
+
+  // Section 12: theme + keyboard shortcuts
+  const { theme, toggleTheme, mounted } = useTheme()
+  const [shortcutsOpen, setShortcutsOpen] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // Ignore when typing in inputs/textareas (except for the ? key with no modifier)
+      const target = e.target as HTMLElement
+      const isTyping =
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.tagName === "SELECT" ||
+        target?.isContentEditable
+
+      // Alt+1..9 → switch tabs
+      if (e.altKey && !e.ctrlKey && !e.metaKey && /^[1-9]$/.test(e.key)) {
+        e.preventDefault()
+        const tabOrder = [
+          "overview", "orders", "products", "customers", "deliveries",
+          "analytics", "reports", "settings", "staff", "sms", "payments", "marketing",
+        ]
+        const idx = Number(e.key) - 1
+        if (idx < tabOrder.length) {
+          setActiveTab(tabOrder[idx])
+        }
+        return
+      }
+
+      // Alt+T → toggle theme
+      if (e.altKey && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "t") {
+        e.preventDefault()
+        toggleTheme()
+        return
+      }
+
+      // Alt+K → focus search
+      if (e.altKey && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "k") {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+        searchInputRef.current?.select()
+        return
+      }
+
+      // Alt+/ → show shortcuts help
+      if (e.altKey && !e.ctrlKey && !e.metaKey && e.key === "/") {
+        e.preventDefault()
+        setShortcutsOpen(true)
+        return
+      }
+
+      // Alt+P → print (only works if reports tab is active)
+      if (e.altKey && !e.ctrlKey && !e.metaKey && e.key.toLowerCase() === "p") {
+        e.preventDefault()
+        window.print()
+        return
+      }
+
+      // ? (with no modifier) → show shortcuts help (only when not typing)
+      if (!e.altKey && !e.ctrlKey && !e.metaKey && e.key === "?" && !isTyping) {
+        e.preventDefault()
+        setShortcutsOpen(true)
+        return
+      }
+
+      // Escape → close shortcuts modal
+      if (e.key === "Escape" && shortcutsOpen) {
+        setShortcutsOpen(false)
+        return
+      }
+    }
+    window.addEventListener("keydown", handler)
+    return () => window.removeEventListener("keydown", handler)
+  }, [toggleTheme, shortcutsOpen])
+
   // Real-time notifications
   const { notifications, enabled, setEnabled, dismiss, clearAll } = useAdminNotifications()
+
+  // ─── Section 10: Live stats (revenue ticker + visitor count) ──────
+  const liveStats = useLiveStats()
 
   // ─── Orders state ─────────────────────────────────────────────────
   const [orders, setOrders] = useState<Order[]>([])
@@ -168,6 +270,61 @@ export function AdminView() {
   useEffect(() => {
     if (activeTab === "orders") loadOrders()
   }, [loadOrders, activeTab])
+
+  // ─── Section 3: Real-time order updates (admin side) ──────────────
+  // When a new order comes in, play a sound + refresh the orders list +
+  // show a toast. When an order status changes (from another admin or
+  // system), refresh the list to reflect the change.
+  useOrderUpdates((event, data) => {
+    const o = data as { id: string; orderNumber: string; status: string; total: number; customerName?: string }
+
+    if (event === "order:new") {
+      // Play alert sound for new orders
+      try {
+        const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+        if (AudioContextClass) {
+          const ctx = new AudioContextClass()
+          const osc = ctx.createOscillator()
+          const gain = ctx.createGain()
+          osc.connect(gain)
+          gain.connect(ctx.destination)
+          osc.frequency.value = 880
+          osc.type = "sine"
+          gain.gain.setValueAtTime(0.2, ctx.currentTime)
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5)
+          osc.start(ctx.currentTime)
+          osc.stop(ctx.currentTime + 0.5)
+        }
+      } catch {
+        // Audio not supported
+      }
+
+      // Show toast notification
+      toast({
+        title: "🔔 New order received!",
+        description: `${o.orderNumber} — ${o.customerName || "Customer"} — ${formatRWF(o.total)}`,
+      })
+
+      // Refresh the orders list if on the orders tab
+      if (activeTab === "orders") {
+        loadOrders()
+      }
+    } else if (event.startsWith("order:") && event !== "order:new") {
+      // Order status changed — update in-place if in the list
+      setOrders((prev) =>
+        prev.map((item) =>
+          item.id === o.id || item.orderNumber === o.orderNumber
+            ? { ...item, status: o.status }
+            : item
+        )
+      )
+
+      // If the detail drawer is open for this order, update it too
+      if (selectedOrder && (selectedOrder.id === o.id || selectedOrder.orderNumber === o.orderNumber)) {
+        setSelectedOrder({ ...selectedOrder, status: o.status })
+      }
+    }
+  })
 
   const handleRowClick = (order: Order) => {
     setSelectedOrder(order)
@@ -314,13 +471,17 @@ export function AdminView() {
       <div className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur">
         {/* Top row: logo + search + profile */}
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:gap-4 sm:px-6 lg:px-8">
-          {/* Logo + title */}
+          {/* Logo + title — Section 3: Dynamic logo */}
           <div className="flex shrink-0 items-center gap-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground">
-              <Shield className="h-4 w-4" />
-            </span>
+            {adminSettings?.logoUrl ? (
+              <img src={adminSettings.logoUrl} alt="FreedomCosmeticShop" className="max-h-9 max-w-[120px] object-contain" />
+            ) : (
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground">
+                <Shield className="h-4 w-4" />
+              </span>
+            )}
             <div className="hidden sm:block">
-              <p className="text-sm font-bold leading-tight">Ubumwe Beauty</p>
+              <p className="text-sm font-bold leading-tight">FreedomCosmeticShop</p>
               <p className="text-[10px] text-muted-foreground">Admin Panel</p>
             </div>
           </div>
@@ -329,8 +490,9 @@ export function AdminView() {
           <div className="relative ml-auto hidden max-w-xs flex-1 md:block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
+              ref={searchInputRef}
               type="search"
-              placeholder="Search orders, products, customers..."
+              placeholder="Search orders, products, customers... (Alt+K)"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="h-9 rounded-full pl-9 pr-3"
@@ -339,6 +501,71 @@ export function AdminView() {
 
           {/* Right side actions */}
           <div className="ml-auto flex items-center gap-1.5 md:ml-0">
+            {/* Section 12: Dark-mode toggle */}
+            {mounted && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  toggleTheme()
+                  toast({
+                    title: `Switched to ${theme === "dark" ? "light" : "dark"} mode`,
+                  })
+                }}
+                title="Toggle theme (Alt+T)"
+                className="h-9 w-9"
+              >
+                {theme === "dark" ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
+              </Button>
+            )}
+
+            {/* Section 12: Keyboard shortcuts help */}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShortcutsOpen(true)}
+              title="Keyboard shortcuts (Alt+/)"
+              className="h-9 w-9"
+            >
+              <Keyboard className="h-4 w-4" />
+            </Button>
+
+            {/* Section 12: Mobile admin mini-panel toggle */}
+            <Button
+              variant={mobileMode ? "default" : "outline"}
+              size="icon"
+              onClick={() => setMobileMode(!mobileMode)}
+              title="Mobile admin mini-panel"
+              className="h-9 w-9"
+            >
+              <Smartphone className="h-4 w-4" />
+            </Button>
+
+            {/* Section 10: Live revenue ticker */}
+            <div className="hidden items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1.5 text-xs lg:flex dark:bg-emerald-950">
+              <TrendingUp className="h-3.5 w-3.5 text-emerald-600" />
+              <span className="text-muted-foreground">Today:</span>
+              <span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">
+                {formatRWFCompact(liveStats.todayRevenue)}
+              </span>
+              <span className="text-muted-foreground">·</span>
+              <span className="font-medium text-emerald-600">{liveStats.todayOrderCount} orders</span>
+            </div>
+
+            {/* Section 10: Live visitor count */}
+            <div className="hidden items-center gap-1.5 rounded-lg bg-secondary/50 px-2.5 py-1.5 text-xs lg:flex">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+              <span className="font-mono font-medium">{liveStats.activeVisitors}</span>
+              <span className="text-muted-foreground">live</span>
+            </div>
+
             {/* Kigali clock */}
             <div className="hidden items-center gap-1.5 rounded-lg bg-secondary/50 px-2.5 py-1.5 text-xs lg:flex">
               <Clock className="h-3.5 w-3.5 text-primary" />
@@ -464,6 +691,11 @@ export function AdminView() {
         </div>
       </div>
 
+      {/* ─── Section 12: Mobile admin mini-panel ─────────────────────── */}
+      {mobileMode ? (
+        <AdminMobilePanel />
+      ) : (
+        <>
       {/* ─── Main content ──────────────────────────────────────────── */}
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {/* Welcome message */}
@@ -479,7 +711,7 @@ export function AdminView() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6 grid w-full grid-cols-4 sm:grid-cols-9">
+        <TabsList className="mb-6 grid w-full grid-cols-4 sm:grid-cols-13">
           <TabsTrigger value="overview" className="gap-1">
             <LayoutDashboard className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Overview</span>
@@ -504,9 +736,19 @@ export function AdminView() {
             <BarChart3 className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Analytics</span>
           </TabsTrigger>
+          {/* NEW: Reports tab (print-ready performance report) */}
+          <TabsTrigger value="reports" className="gap-1">
+            <FileText className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Reports</span>
+          </TabsTrigger>
           <TabsTrigger value="settings" className="gap-1">
             <SettingsIcon className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Settings</span>
+          </TabsTrigger>
+          {/* NEW: Staff & Security tab */}
+          <TabsTrigger value="staff" className="gap-1">
+            <Shield className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Staff</span>
           </TabsTrigger>
           <TabsTrigger value="sms" className="gap-1">
             <Bell className="h-3.5 w-3.5" />
@@ -516,6 +758,16 @@ export function AdminView() {
           <TabsTrigger value="payments" className="gap-1">
             <CreditCard className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Payments</span>
+          </TabsTrigger>
+          {/* NEW: Marketing tab */}
+          <TabsTrigger value="marketing" className="gap-1">
+            <Megaphone className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Marketing</span>
+          </TabsTrigger>
+          {/* NEW: Wholesale tab */}
+          <TabsTrigger value="wholesale" className="gap-1">
+            <Store className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Wholesale</span>
           </TabsTrigger>
         </TabsList>
 
@@ -760,9 +1012,19 @@ export function AdminView() {
           <AdminAnalytics />
         </TabsContent>
 
+        {/* NEW: Reports — print-ready performance report */}
+        <TabsContent value="reports">
+          <AdminReports />
+        </TabsContent>
+
         {/* Settings */}
         <TabsContent value="settings">
           <AdminSettings />
+        </TabsContent>
+
+        {/* NEW: Staff & Security */}
+        <TabsContent value="staff">
+          <AdminStaff />
         </TabsContent>
 
         {/* SMS */}
@@ -773,6 +1035,16 @@ export function AdminView() {
         {/* NEW: Payments tab */}
         <TabsContent value="payments">
           <AdminPayments />
+        </TabsContent>
+
+        {/* NEW: Marketing tab */}
+        <TabsContent value="marketing">
+          <AdminMarketing />
+        </TabsContent>
+
+        {/* NEW: Wholesale tab */}
+        <TabsContent value="wholesale">
+          <AdminWholesale />
         </TabsContent>
       </Tabs>
 
@@ -983,7 +1255,7 @@ export function AdminView() {
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                               to: selectedOrder.customerPhone,
-                              message: `Hello ${selectedOrder.customerName}, your order ${selectedOrder.orderNumber} status is: ${selectedOrder.status}. Total: ${formatRWF(selectedOrder.total)}. Ubumwe Beauty`,
+                              message: `Hello ${selectedOrder.customerName}, your order ${selectedOrder.orderNumber} status is: ${selectedOrder.status}. Total: ${formatRWF(selectedOrder.total)}. FreedomCosmeticShop`,
                             }),
                           })
                           toast({ title: "SMS sent", description: `To ${selectedOrder.customerPhone}` })
@@ -1027,6 +1299,88 @@ export function AdminView() {
           )}
         </SheetContent>
       </Sheet>
+      </div>
+        </>
+      )}
+
+      {/* Section 12: Keyboard shortcuts modal */}
+      {shortcutsOpen && (
+        <div
+          className="fixed inset-0 z-[100] grid place-items-center bg-black/50 p-4"
+          onClick={() => setShortcutsOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg rounded-2xl border bg-card p-6 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="flex items-center gap-2 text-lg font-bold">
+                <Keyboard className="h-5 w-5 text-primary" />
+                Keyboard shortcuts
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShortcutsOpen(false)}
+                className="rounded-md p-1 text-muted-foreground hover:bg-secondary"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Navigation
+                </p>
+                <div className="space-y-1">
+                  <ShortcutRow keys={["Alt", "1"]} description="Overview tab" />
+                  <ShortcutRow keys={["Alt", "2"]} description="Orders tab" />
+                  <ShortcutRow keys={["Alt", "3"]} description="Products tab" />
+                  <ShortcutRow keys={["Alt", "4"]} description="Customers tab" />
+                  <ShortcutRow keys={["Alt", "5"]} description="Deliveries tab" />
+                  <ShortcutRow keys={["Alt", "6"]} description="Analytics tab" />
+                  <ShortcutRow keys={["Alt", "7"]} description="Reports tab" />
+                  <ShortcutRow keys={["Alt", "8"]} description="Settings tab" />
+                  <ShortcutRow keys={["Alt", "9"]} description="Staff & Security tab" />
+                </div>
+              </div>
+              <div>
+                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Actions
+                </p>
+                <div className="space-y-1">
+                  <ShortcutRow keys={["Alt", "T"]} description="Toggle dark / light theme" />
+                  <ShortcutRow keys={["Alt", "K"]} description="Focus global search" />
+                  <ShortcutRow keys={["Alt", "P"]} description="Print current view" />
+                  <ShortcutRow keys={["Alt", "/"]} description="Show this shortcuts help" />
+                  <ShortcutRow keys={["?"]} description="Show this shortcuts help" />
+                  <ShortcutRow keys={["Esc"]} description="Close dialogs" />
+                </div>
+              </div>
+            </div>
+            <p className="mt-4 text-center text-[10px] text-muted-foreground">
+              Shortcuts are disabled while typing in input fields.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Section 12: Shortcut row sub-component
+function ShortcutRow({ keys, description }: { keys: string[]; description: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-muted-foreground">{description}</span>
+      <div className="flex gap-1">
+        {keys.map((k, i) => (
+          <span key={i} className="flex items-center gap-1">
+            {i > 0 && <span className="text-[10px] text-muted-foreground">+</span>}
+            <kbd className="rounded border border-border bg-secondary px-1.5 py-0.5 font-mono text-[10px] font-semibold">
+              {k}
+            </kbd>
+          </span>
+        ))}
       </div>
     </div>
   )

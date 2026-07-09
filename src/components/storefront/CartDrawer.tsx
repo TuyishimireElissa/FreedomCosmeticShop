@@ -6,6 +6,9 @@
  * Opens automatically when a product is added to the cart.
  * Shows the cart contents in a compact format with quick quantity controls
  * and a "View cart" / "Checkout" CTA.
+ *
+ * Section 2: Also listens for real-time product events (out-of-stock,
+ * price changes, deletions) and updates the cart accordingly.
  */
 
 import { useStore } from "@/store/useStore"
@@ -19,8 +22,11 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet"
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
+import { useCartUpdates } from "@/hooks/use-realtime"
+import { useToast } from "@/hooks/use-toast"
 
 export function CartDrawer() {
+  const { toast } = useToast()
   const {
     isCartOpen,
     setCartOpen,
@@ -34,6 +40,37 @@ export function CartDrawer() {
   } = useStore()
 
   const subtotal = cartSubtotal()
+
+  // ─── Section 2: Real-time cart sync ───────────────────────────────
+  // When a product in the cart goes out of stock, changes price, or is
+  // deleted, update the cart immediately and notify the customer.
+  useCartUpdates((event, data) => {
+    const p = data as { id: string; name: string; price?: number; oldPrice?: number; stock?: number }
+    const cartItem = items.find((i) => i.productId === p.id)
+    if (!cartItem) return // Product not in cart — ignore
+
+    if (event === "product:outOfStock" || event === "product:deleted") {
+      // Remove from cart and notify
+      removeFromCart(p.id)
+      toast({
+        title: event === "product:deleted" ? "Product removed" : "Out of stock",
+        description: `"${p.name}" was removed from your cart (no longer available).`,
+        variant: "destructive",
+      })
+    } else if (event === "product:priceChange" && p.price !== undefined) {
+      // Update price in cart — we need to update the store directly
+      // since there's no dedicated "updatePrice" action
+      useStore.setState({
+        items: useStore.getState().items.map((i) =>
+          i.productId === p.id ? { ...i, price: p.price! } : i
+        ),
+      })
+      toast({
+        title: "Price updated",
+        description: `"${p.name}" is now ${formatRWF(p.price)}`,
+      })
+    }
+  })
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setCartOpen}>

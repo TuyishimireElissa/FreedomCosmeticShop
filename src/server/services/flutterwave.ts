@@ -220,7 +220,7 @@ export async function initializePayment(
           name: params.customer.name,
         },
         customizations: {
-          title: "Ubumwe Beauty",
+          title: "FreedomCosmeticShop",
           description: `Order ${params.txRef}`,
           logo: `${env.APP_URL}/logo.svg`,
         },

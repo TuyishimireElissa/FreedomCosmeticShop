@@ -12,7 +12,7 @@ export function SplashScreen() {
     <View className="flex-1 items-center justify-center bg-primary">
       <Sparkles color="#fff" size={48} />
       <Text className="mt-4 text-2xl font-bold text-white">
-        Ubumwe Beauty
+        FreedomCosmeticShop
       </Text>
       <Text className="mt-1 text-sm text-white/80">
         Beauty that unites us

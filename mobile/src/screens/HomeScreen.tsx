@@ -127,7 +127,7 @@ export function HomeScreen() {
               <Sparkles color="#fff" size={16} />
             </View>
             <Text className="text-lg font-bold text-foreground">
-              Ubumwe <Text className="text-primary">Beauty</Text>
+              FreedomCosmeticShop
             </Text>
           </View>
           <View className="flex-row gap-3">

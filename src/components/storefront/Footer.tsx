@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Footer for Ubumwe Beauty.
+ * Footer for FreedomCosmeticShop.
  *
  * Sticky-footer pattern: this component itself doesn't need mt-auto
  * because the page wrapper applies it. But it has padding so that
@@ -32,7 +32,7 @@ export function Footer() {
                 <Sparkles className="h-4 w-4" />
               </span>
               <span className="text-base font-semibold">
-                Ubumwe <span className="text-primary">Beauty</span>
+                FreedomCosmeticShop
               </span>
             </button>
             <p className="text-muted-foreground text-sm">
@@ -156,8 +156,8 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="text-primary h-4 w-4 shrink-0" />
-                <a href="mailto:hello@ubumwe.beauty" className="hover:text-primary">
-                  hello@ubumwe.beauty
+                <a href="mailto:hello@freedomcosmeticshop.rw" className="hover:text-primary">
+                  hello@freedomcosmeticshop.rw
                 </a>
               </li>
             </ul>
@@ -214,8 +214,8 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="text-muted-foreground mt-6 border-t pt-6 text-center text-xs sm:flex sm:justify-between sm:text-left">
-          <p>© {new Date().getFullYear()} Ubumwe Beauty. All rights reserved. Made with ❤️ in Rwanda 🇷🇼</p>
-          <p className="mt-2 sm:mt-0">Ubumwe — beauty that unites us.</p>
+          <p>© {new Date().getFullYear()} FreedomCosmeticShop. All rights reserved. Made with ❤️ in Rwanda 🇷🇼</p>
+          <p className="mt-2 sm:mt-0">FreedomCosmeticShop — Rwanda's Beauty Freedom.</p>
         </div>
       </div>
     </footer>

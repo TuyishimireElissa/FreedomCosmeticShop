@@ -7,6 +7,8 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
+import { broadcastBannerEvent } from "@/lib/realtime"
+import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
 
 const UpdateBannerSchema = z.object({
@@ -30,7 +32,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole("ADMIN")
+    const adminUser = await requireRole("ADMIN")
     const { id } = await params
     const body = await req.json()
 
@@ -48,6 +50,27 @@ export async function PUT(
     }
 
     const updated = await db.banner.update({ where: { id }, data: parsed.data })
+
+    // ─── Section 4: Real-time broadcast ──────────────────────────────
+    await broadcastBannerEvent("updated", {
+      id: updated.id,
+      title: updated.title,
+      placement: updated.placement,
+      isActive: updated.isActive,
+    }, { source: adminUser.name })
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "BANNER_UPDATE",
+      entityType: "BANNER",
+      entityId: updated.id,
+      description: `Updated banner: ${updated.title}`,
+      req,
+    }).catch(() => {})
+
     return NextResponse.json({ banner: updated })
   } catch (error) {
     if (error instanceof Error && "statusCode" in error) {
@@ -62,11 +85,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole("ADMIN")
+    const adminUser = await requireRole("ADMIN")
     const { id } = await params
 
     const existing = await db.banner.findUnique({ where: { id } })
@@ -75,6 +98,27 @@ export async function DELETE(
     }
 
     await db.banner.delete({ where: { id } })
+
+    // ─── Section 4: Real-time broadcast ──────────────────────────────
+    await broadcastBannerEvent("deleted", {
+      id: existing.id,
+      title: existing.title,
+      placement: existing.placement,
+      isActive: false,
+    }, { source: adminUser.name })
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "BANNER_DELETE",
+      entityType: "BANNER",
+      entityId: existing.id,
+      description: `Deleted banner: ${existing.title}`,
+      req,
+    }).catch(() => {})
+
     return NextResponse.json({ success: true })
   } catch (error) {
     if (error instanceof Error && "statusCode" in error) {

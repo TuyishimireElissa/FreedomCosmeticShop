@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Ubumwe Beauty — Rwanda's Cosmetics Store",
+  title: "FreedomCosmeticShop — Rwanda's Cosmetics Store",
   description:
     "Shop skincare, makeup & haircare products in Rwanda. Pay with MTN MoMo or cash on delivery. Fast delivery in Kigali and across all provinces.",
   keywords: [
@@ -23,20 +23,20 @@ export const metadata: Metadata = {
     "makeup Rwanda",
     "haircare Rwanda",
     "beauty products Rwanda",
-    "Ubumwe Beauty",
+    "FreedomCosmeticShop",
     "MTN MoMo shopping Rwanda",
   ],
-  authors: [{ name: "Ubumwe Beauty" }],
+  authors: [{ name: "FreedomCosmeticShop" }],
   openGraph: {
-    title: "Ubumwe Beauty — Rwanda's Cosmetics Store",
+    title: "FreedomCosmeticShop — Rwanda's Cosmetics Store",
     description:
       "Shop skincare, makeup & haircare products in Rwanda. Pay with MTN MoMo or cash on delivery.",
-    siteName: "Ubumwe Beauty",
+    siteName: "FreedomCosmeticShop",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ubumwe Beauty — Rwanda's Cosmetics Store",
+    title: "FreedomCosmeticShop — Rwanda's Cosmetics Store",
     description:
       "Shop skincare, makeup & haircare products in Rwanda. Pay with MTN MoMo or cash on delivery.",
   },
@@ -49,6 +49,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Theme initialization script — runs before React hydration to prevent FOUC */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('freedom-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}if(t==='dark'){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark'}}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
       >

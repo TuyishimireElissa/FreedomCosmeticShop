@@ -247,6 +247,114 @@ export async function GET(req: Request) {
       include: { items: true, payments: true },
     })
 
+    // ─── Section 10 enhancements ─────────────────────────────────────
+    //
+    // (a) Customer growth — daily new customers + cumulative count
+    // (b) Hourly orders — 24-point distribution (0..23) for the selected range
+    // (c) Conversion funnel — orders placed → paid → delivered
+    // (d) Repeat customer rate — % of customers in range with ≥2 orders
+    // (e) AOV trend — daily average order value
+
+    // (a) Customer growth
+    const newCustomersRaw = await db.user.findMany({
+      where: {
+        role: "CUSTOMER",
+        createdAt: { gte: rangeStart },
+        isDeleted: false,
+      },
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    })
+    const customerByDay = new Map<string, number>()
+    for (const u of newCustomersRaw) {
+      const key = u.createdAt.toISOString().slice(0, 10)
+      customerByDay.set(key, (customerByDay.get(key) || 0) + 1)
+    }
+    let cumulative = 0
+    // Seed cumulative with customers who joined before rangeStart
+    const preRangeCustomers = await db.user.count({
+      where: {
+        role: "CUSTOMER",
+        createdAt: { lt: rangeStart },
+        isDeleted: false,
+      },
+    })
+    cumulative = preRangeCustomers
+    const customerGrowth = Array.from(customerByDay.entries())
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([date, count]) => {
+        cumulative += count
+        return {
+          date: new Date(date).toLocaleDateString("en-RW", { month: "short", day: "numeric" }),
+          newCustomers: count,
+          cumulative,
+        }
+      })
+
+    // (b) Hourly orders — distribution by hour-of-day across the range
+    const hourlyBuckets = new Array(24).fill(0)
+    for (const o of rangeOrdersRaw) {
+      const hour = o.createdAt.getHours()
+      hourlyBuckets[hour]++
+    }
+    const hourlyOrders = hourlyBuckets.map((count, hour) => ({
+      hour: `${hour.toString().padStart(2, "0")}:00`,
+      orders: count,
+    }))
+
+    // (c) Conversion funnel
+    const placedCount = rangeOrdersRaw.length
+    const paidOrdersRaw = await db.order.count({
+      where: {
+        createdAt: { gte: rangeStart },
+        status: { not: "CANCELLED" },
+        payments: { some: { status: "PAID" } },
+      },
+    })
+    const deliveredCount = await db.order.count({
+      where: {
+        createdAt: { gte: rangeStart },
+        status: "DELIVERED",
+      },
+    })
+    const conversionFunnel = [
+      { stage: "Orders Placed", count: placedCount, color: "#94a3b8" },
+      { stage: "Paid", count: paidOrdersRaw, color: "#3b82f6" },
+      { stage: "Delivered", count: deliveredCount, color: "#10b981" },
+    ]
+
+    // (d) Repeat customer rate
+    const customerOrderCounts = await db.order.groupBy({
+      by: ["userId"],
+      _count: true,
+      where: {
+        createdAt: { gte: rangeStart },
+        status: { not: "CANCELLED" },
+        userId: { not: null },
+      },
+    })
+    const uniqueCustomers = customerOrderCounts.length
+    const repeatCustomers = customerOrderCounts.filter((c) => c._count >= 2).length
+    const repeatCustomerRate = uniqueCustomers > 0
+      ? Math.round((repeatCustomers / uniqueCustomers) * 100)
+      : 0
+
+    // (e) AOV trend — daily average order value
+    const aovByDay = new Map<string, { total: number; count: number }>()
+    for (const o of rangeOrdersRaw) {
+      const key = o.createdAt.toISOString().slice(0, 10)
+      const existing = aovByDay.get(key) || { total: 0, count: 0 }
+      existing.total += o.total
+      existing.count += 1
+      aovByDay.set(key, existing)
+    }
+    const aovTrend = Array.from(aovByDay.entries())
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([date, d]) => ({
+        date: new Date(date).toLocaleDateString("en-RW", { month: "short", day: "numeric" }),
+        aov: d.count > 0 ? Math.round(d.total / d.count) : 0,
+      }))
+
     return NextResponse.json({
       revenue: {
         today: todayOrders._sum.total || 0,
@@ -287,6 +395,16 @@ export async function GET(req: Request) {
         paymentMethod: o.payments[0]?.method || "COD",
         paymentStatus: o.payments[0]?.status || "PENDING",
       })),
+      // ─── Section 10 additions ───
+      customerGrowth,
+      hourlyOrders,
+      conversionFunnel,
+      repeatCustomerRate,
+      repeatCustomers,
+      uniqueCustomers,
+      aovTrend,
+      rangeStart: rangeStart.toISOString(),
+      rangeEnd: now.toISOString(),
     })
   } catch (error) {
     if (error instanceof Error && "statusCode" in error) {

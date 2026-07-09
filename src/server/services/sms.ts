@@ -126,7 +126,7 @@ async function sendViaAfricasTalking(
       username: env.AT_USERNAME,
       to: normalized,
       message,
-      from: env.AT_SENDER_ID || "UBUMWE",
+      from: env.AT_SENDER_ID || "FREEDOM",
     }).toString(),
   })
 
@@ -171,7 +171,7 @@ async function sendViaPindo(
     body: JSON.stringify({
       to: normalized,
       text: message,
-      sender: "UBUMWE",
+      sender: "FREEDOM",
     }),
   })
 

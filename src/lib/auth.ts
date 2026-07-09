@@ -56,6 +56,11 @@ export interface AuthUser {
   phone: string
   email: string | null
   role: string
+  loyaltyPoints?: number
+  userType?: string
+  wholesaleStatus?: string | null
+  wholesaleDiscount?: number
+  businessName?: string | null
 }
 
 // ─── Password hashing ────────────────────────────────────────────────────────
@@ -80,8 +85,8 @@ export async function signAccessToken(payload: AccessTokenPayload): Promise<stri
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(ACCESS_TOKEN_TTL)
-    .setIssuer("ubumwe-beauty")
-    .setAudience("ubumwe-beauty")
+    .setIssuer("freedom-cosmetic-shop")
+    .setAudience("freedom-cosmetic-shop")
     .sign(JWT_SECRET)
 }
 
@@ -92,16 +97,16 @@ export async function signRefreshToken(
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(REFRESH_TOKEN_TTL)
-    .setIssuer("ubumwe-beauty")
-    .setAudience("ubumwe-beauty")
+    .setIssuer("freedom-cosmetic-shop")
+    .setAudience("freedom-cosmetic-shop")
     .sign(JWT_SECRET)
 }
 
 export async function verifyAccessToken(token: string): Promise<AccessTokenPayload | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET, {
-      issuer: "ubumwe-beauty",
-      audience: "ubumwe-beauty",
+      issuer: "freedom-cosmetic-shop",
+      audience: "freedom-cosmetic-shop",
     })
     return payload as unknown as AccessTokenPayload
   } catch {
@@ -114,8 +119,8 @@ export async function verifyRefreshToken(
 ): Promise<RefreshTokenPayload | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET, {
-      issuer: "ubumwe-beauty",
-      audience: "ubumwe-beauty",
+      issuer: "freedom-cosmetic-shop",
+      audience: "freedom-cosmetic-shop",
     })
     return payload as unknown as RefreshTokenPayload
   } catch {
@@ -233,6 +238,11 @@ export async function requireAuth(): Promise<AuthUser | null> {
       phone: true,
       email: true,
       role: true,
+      loyaltyPoints: true,
+      userType: true,
+      wholesaleStatus: true,
+      wholesaleDiscount: true,
+      businessName: true,
     },
   })
 

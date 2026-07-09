@@ -12,6 +12,8 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { Prisma } from "@prisma/client"
 import { requireRole } from "@/lib/auth"
+import { broadcastProductEvent } from "@/lib/realtime"
+import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
 
 const CreateProductSchema = z.object({
@@ -105,7 +107,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    await requireRole("ADMIN")
+    const adminUser = await requireRole("ADMIN")
 
     const body = await req.json()
     const parsed = CreateProductSchema.safeParse(body)
@@ -152,16 +154,41 @@ export async function POST(req: Request) {
       include: { category: true, brand: true },
     })
 
+    const serializedProduct = {
+      ...product,
+      images: JSON.parse(product.images),
+      skinType: product.skinType ? JSON.parse(product.skinType) : null,
+      shades: product.shades ? JSON.parse(product.shades) : null,
+      ingredients: product.ingredients ? JSON.parse(product.ingredients) : null,
+    }
+
+    // ─── Section 2: Real-time broadcast ──────────────────────────────
+    // Notify all connected storefront clients that a new product was created.
+    // This busts the Next.js cache + pushes an SSE event so the product
+    // appears instantly on the storefront without a page refresh.
+    await broadcastProductEvent("created", {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      stock: product.stock,
+      isActive: product.isActive,
+    }, { source: adminUser.name })
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "PRODUCT_CREATE",
+      entityType: "PRODUCT",
+      entityId: product.id,
+      description: `Created product: ${product.name} (${product.price} RWF)`,
+      req,
+    }).catch(() => {})
+
     return NextResponse.json(
-      {
-        product: {
-          ...product,
-          images: JSON.parse(product.images),
-          skinType: product.skinType ? JSON.parse(product.skinType) : null,
-          shades: product.shades ? JSON.parse(product.shades) : null,
-          ingredients: product.ingredients ? JSON.parse(product.ingredients) : null,
-        },
-      },
+      { product: serializedProduct },
       { status: 201 }
     )
   } catch (error) {

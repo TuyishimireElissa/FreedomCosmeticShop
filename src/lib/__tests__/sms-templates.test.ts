@@ -34,7 +34,7 @@ describe("SMS Templates", () => {
     it("renders ORDER_PLACED in English", () => {
       const msg = getSmsMessage("ORDER_PLACED", "en", { orderNumber: "UB-2026-001" })
       expect(msg).toContain("UB-2026-001")
-      expect(msg).toContain("Ubumwe Beauty")
+      expect(msg).toContain("FreedomCosmeticShop")
     })
 
     it("renders ORDER_PLACED in Kinyarwanda", () => {

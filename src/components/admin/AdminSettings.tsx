@@ -55,7 +55,14 @@ import {
   Image as ImageIcon,
   Truck,
   Loader2,
+  Download,
+  Upload,
+  Database,
+  AlertTriangle,
+  CheckCircle2,
+  FileJson,
 } from "lucide-react"
+import { LogoUploader } from "./LogoUploader"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -96,13 +103,18 @@ export function AdminSettings() {
         </p>
       </div>
 
-      <Tabs defaultValue="coupons">
-        <TabsList className="mb-4 grid w-full max-w-md grid-cols-3">
+      <Tabs defaultValue="logo">
+        <TabsList className="mb-4 grid w-full max-w-md grid-cols-5">
+          <TabsTrigger value="logo">Logo</TabsTrigger>
           <TabsTrigger value="coupons">Coupons</TabsTrigger>
           <TabsTrigger value="banners">Banners</TabsTrigger>
           <TabsTrigger value="delivery">Delivery</TabsTrigger>
+          <TabsTrigger value="backup">Backup</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="logo">
+          <LogoUploader />
+        </TabsContent>
         <TabsContent value="coupons">
           <CouponsManager />
         </TabsContent>
@@ -111,6 +123,9 @@ export function AdminSettings() {
         </TabsContent>
         <TabsContent value="delivery">
           <DeliverySettings />
+        </TabsContent>
+        <TabsContent value="backup">
+          <BackupManager />
         </TabsContent>
       </Tabs>
     </div>
@@ -851,6 +866,273 @@ function DeliverySettings() {
         <code className="rounded bg-amber-100 px-1">DELIVERY_FEES</code> constant in{" "}
         <code className="rounded bg-amber-100 px-1">src/lib/format.ts</code>
       </p>
+    </div>
+  )
+}
+
+// ─── Backup Manager (Section 12) ─────────────────────────────────────────────
+
+interface BackupMetadata {
+  version: string
+  createdAt: string
+  counts: Record<string, number>
+}
+
+function BackupManager() {
+  const { toast } = useToast()
+  const [downloading, setDownloading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [preview, setPreview] = useState<BackupMetadata | null>(null)
+  const [pendingBackup, setPendingBackup] = useState<unknown>(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  const handleDownload = async () => {
+    setDownloading(true)
+    try {
+      const res = await fetch("/api/admin/backup")
+      if (!res.ok) throw new Error("Backup failed")
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = `freedom-backup-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 15)}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      toast({
+        title: "Backup downloaded",
+        description: "Save this file in a secure location.",
+      })
+    } catch (e) {
+      toast({
+        title: "Backup failed",
+        description: e instanceof Error ? e.message : "Unknown error",
+        variant: "destructive",
+      })
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      try {
+        const json = JSON.parse(ev.target?.result as string)
+        if (!json.metadata || !json.metadata.version) {
+          toast({
+            title: "Invalid backup file",
+            description: "Missing metadata.version field.",
+            variant: "destructive",
+          })
+          return
+        }
+        setPendingBackup(json)
+        setPreview(json.metadata)
+        toast({
+          title: "Backup file loaded",
+          description: `Version ${json.metadata.version} · ${json.metadata.counts?.orders || 0} orders`,
+        })
+      } catch {
+        toast({
+          title: "Invalid JSON",
+          description: "Could not parse the selected file.",
+          variant: "destructive",
+        })
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  const handleRestore = async () => {
+    if (!pendingBackup) return
+    setUploading(true)
+    try {
+      const res = await fetch("/api/admin/backup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ backup: pendingBackup, mode: "apply" }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Restore failed")
+      toast({
+        title: "Restore complete",
+        description: `${data.results?.users || 0} users, ${data.results?.products || 0} products, ${data.results?.orders || 0} orders restored. ${data.results?.errors?.length || 0} errors.`,
+      })
+      setConfirmOpen(false)
+      setPendingBackup(null)
+      setPreview(null)
+    } catch (e) {
+      toast({
+        title: "Restore failed",
+        description: e instanceof Error ? e.message : "Unknown error",
+        variant: "destructive",
+      })
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Download backup */}
+      <div className="rounded-2xl border bg-card p-5">
+        <h3 className="flex items-center gap-2 text-lg font-semibold">
+          <Download className="h-5 w-5 text-primary" />
+          Download backup
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Export a JSON snapshot of all business data: users, products, orders, payments, deliveries, coupons, banners, and settings.
+        </p>
+        <div className="mt-3 rounded-lg bg-secondary/30 p-3 text-xs text-muted-foreground">
+          <p className="font-medium text-foreground">What&apos;s included:</p>
+          <ul className="mt-1 space-y-0.5">
+            <li>✅ Users (without password hashes for security)</li>
+            <li>✅ Products + categories + brands</li>
+            <li>✅ Orders + order items + payments</li>
+            <li>✅ Deliveries, coupons, banners, delivery zone settings</li>
+            <li>✅ Staff profiles + recent activity logs (last 1000)</li>
+            <li>❌ Passwords, OTPs, refresh tokens (excluded for security)</li>
+          </ul>
+        </div>
+        <Button
+          className="mt-4"
+          onClick={handleDownload}
+          disabled={downloading}
+        >
+          {downloading ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="mr-2 h-4 w-4" />
+          )}
+          {downloading ? "Creating backup..." : "Download backup now"}
+        </Button>
+      </div>
+
+      {/* Restore from file */}
+      <div className="rounded-2xl border bg-card p-5">
+        <h3 className="flex items-center gap-2 text-lg font-semibold">
+          <Upload className="h-5 w-5 text-primary" />
+          Restore from backup
+        </h3>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Upload a previously-downloaded backup JSON file to restore data.
+        </p>
+
+        <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+          <p className="flex items-start gap-1.5 font-medium">
+            <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            Warning: Restore is destructive
+          </p>
+          <p className="mt-1">
+            This will UPSERT records by ID — existing records with the same ID will be overwritten.
+            New records from the backup will be created. Make sure you have a current backup before restoring.
+          </p>
+        </div>
+
+        <div className="mt-4">
+          <label
+            htmlFor="backup-file"
+            className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center hover:bg-secondary/30"
+          >
+            <FileJson className="h-10 w-10 text-muted-foreground/60" />
+            <p className="mt-2 text-sm font-medium">
+              {pendingBackup ? "Backup file loaded ✓" : "Click to select a .json backup file"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {pendingBackup ? "Review the preview below, then click Restore" : "Max size: 50MB"}
+            </p>
+            <input
+              id="backup-file"
+              type="file"
+              accept="application/json,.json"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+          </label>
+        </div>
+
+        {/* Preview */}
+        {preview !== null && (
+          <div className="mt-4 rounded-lg border p-4">
+            <p className="mb-2 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              <Database className="h-3.5 w-3.5" />
+              Backup preview
+            </p>
+            <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
+              {Object.entries(preview.counts || {}).map(([key, value]) => (
+                <div key={key} className="rounded-md bg-secondary/30 p-2">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{key}</p>
+                  <p className="text-sm font-bold">{String(value)}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-[10px] text-muted-foreground">
+              Created: {new Date(preview.createdAt).toLocaleString("en-RW")} · Version {preview.version}
+            </p>
+          </div>
+        )}
+
+        {pendingBackup !== null && (
+          <Button
+            variant="destructive"
+            className="mt-4"
+            onClick={() => setConfirmOpen(true)}
+            disabled={uploading}
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            Restore backup (destructive)
+          </Button>
+        )}
+      </div>
+
+      {/* Confirmation dialog */}
+      {confirmOpen && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4"
+          onClick={() => setConfirmOpen(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-red-500" />
+              <h3 className="text-lg font-bold">Confirm restore</h3>
+            </div>
+            <p className="mb-4 text-sm text-muted-foreground">
+              This will overwrite existing data with the backup contents. This action cannot be undone.
+              Are you absolutely sure?
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => setConfirmOpen(false)}
+                disabled={uploading}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={handleRestore}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                )}
+                {uploading ? "Restoring..." : "Yes, restore"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

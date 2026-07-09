@@ -18,6 +18,8 @@ import { formatRWF, PAYMENT_METHODS, PaymentMethodKey, deliveryTimeFor } from "@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useToast } from "@/hooks/use-toast"
+import { useOrderUpdates, useDeliveryUpdates } from "@/hooks/use-realtime"
 import {
   Package,
   Search,
@@ -72,6 +74,7 @@ interface TimelineStep {
 
 export function TrackOrderView() {
   const { goHome } = useStore()
+  const { toast } = useToast()
   const [orderNumber, setOrderNumber] = useState("")
   const [order, setOrder] = useState<TrackedOrder | null>(null)
   const [timeline, setTimeline] = useState<TimelineStep[]>([])
@@ -105,13 +108,98 @@ export function TrackOrderView() {
     }
   }
 
+  // ─── Section 3: Real-time order status updates ─────────────────────
+  // When admin changes the order status (confirm/ship/deliver/cancel),
+  // update the tracking page live without requiring the customer to refresh.
+  // Only reacts to events for the currently-tracked order.
+  useOrderUpdates((event, data) => {
+    if (!order) return
+    const o = data as { id: string; orderNumber: string; status: string }
+
+    // Only react to events for THIS order
+    if (o.orderNumber !== order.orderNumber && o.id !== order.id) return
+
+    if (event.startsWith("order:") && event !== "order:new") {
+      // Update the order status live
+      setOrder((prev) => (prev ? { ...prev, status: o.status } : prev))
+
+      // Show a toast notification for the status change
+      const statusMessages: Record<string, string> = {
+        confirmed: "✅ Order confirmed! We're preparing your order.",
+        processing: "📦 Order is being processed.",
+        shipped: "🚚 Order shipped! It's on the way.",
+        delivered: "🎉 Order delivered! Thank you for shopping with us.",
+        cancelled: "❌ Order has been cancelled.",
+      }
+      const action = event.replace("order:", "")
+      const message = statusMessages[action]
+      if (message) {
+        toast({ title: "Order Update", description: message })
+      }
+
+      // If shipped or delivered, refetch the full order to get rider info + timeline
+      if (event === "order:shipped" || event === "order:delivered") {
+        fetch(`/api/orders/${encodeURIComponent(order.orderNumber)}/track`)
+          .then((r) => r.json())
+          .then((d) => {
+            if (d.order) {
+              setOrder(d.order)
+              setTimeline(d.timeline || [])
+            }
+          })
+          .catch(() => {})
+      }
+    }
+  })
+
+  // ─── Section 7: Real-time rider assignment updates ──────────────────
+  // When admin assigns a rider to this order, refetch the order to show
+  // the rider's name + phone (tap-to-call) + updated ETA instantly.
+  useDeliveryUpdates((event, data) => {
+    if (!order) return
+    const d = data as { orderId: string; orderNumber: string; riderName?: string; riderPhone?: string }
+
+    // Only react to events for THIS order
+    if (d.orderNumber !== order.orderNumber && d.orderId !== order.id) return
+
+    if (event === "delivery:assigned") {
+      // Rider just assigned — refetch to get rider info + show toast
+      fetch(`/api/orders/${encodeURIComponent(order.orderNumber)}/track`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.order) {
+            setOrder(data.order)
+            setTimeline(data.timeline || [])
+          }
+        })
+        .catch(() => {})
+      toast({
+        title: "🏍️ Rider assigned!",
+        description: d.riderName
+          ? `${d.riderName} — ${d.riderPhone || "Phone pending"}`
+          : "Your order is on the way!",
+      })
+    } else if (event === "delivery:updated") {
+      // General delivery update — refetch to get latest status
+      fetch(`/api/orders/${encodeURIComponent(order.orderNumber)}/track`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.order) {
+            setOrder(data.order)
+            setTimeline(data.timeline || [])
+          }
+        })
+        .catch(() => {})
+    }
+  })
+
   // ─── WhatsApp share ───────────────────────────────────────────────
   const handleShare = () => {
     if (!order) return
     const items = order.items
       .map((i) => `• ${i.name} × ${i.quantity}`)
       .join("\n")
-    const msg = `📦 Order ${order.orderNumber} status: ${order.status}\n\n${items}\n\nTotal: ${formatRWF(order.total)}\nTrack at ubumwe.beauty 🌸`
+    const msg = `📦 Order ${order.orderNumber} status: ${order.status}\n\n${items}\n\nTotal: ${formatRWF(order.total)}\nTrack at freedomcosmeticshop.rw 🌸`
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank")
   }
 

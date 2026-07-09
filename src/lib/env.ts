@@ -18,7 +18,7 @@ import { z } from "zod"
 const envSchema = z.object({
   // App
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  APP_NAME: z.string().default("Ubumwe Beauty"),
+  APP_NAME: z.string().default("FreedomCosmeticShop"),
   APP_URL: z.string().url().default("http://localhost:3000"),
 
   // Database
@@ -57,7 +57,7 @@ const envSchema = z.object({
   ALGOLIA_APP_ID: z.string().optional(),
   ALGOLIA_ADMIN_API_KEY: z.string().optional(),
   ALGOLIA_SEARCH_API_KEY: z.string().optional(),
-  ALGOLIA_INDEX_NAME: z.string().default("ubumwe_products"),
+  ALGOLIA_INDEX_NAME: z.string().default("freedom_products"),
 
   // Redis
   REDIS_URL: z.string().optional(),

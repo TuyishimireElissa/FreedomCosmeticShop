@@ -1,8 +1,8 @@
-# Ubumwe Beauty — React Native Mobile App 📱
+# FreedomCosmeticShop — React Native Mobile App 📱
 
 > Beauty that unites us — Rwanda's cosmetics e-commerce app
 
-A complete React Native (Expo) mobile app for Android & iOS, built to complement the Ubumwe Beauty web platform.
+A complete React Native (Expo) mobile app for Android & iOS, built to complement the FreedomCosmeticShop web platform.
 
 ## 🚀 Quick Start
 
@@ -190,7 +190,7 @@ Links:
 
 ## 🌐 Backend Integration
 
-The app connects to the Ubumwe Beauty Next.js backend:
+The app connects to the FreedomCosmeticShop Next.js backend:
 - API base: `EXPO_PUBLIC_API_URL`
 - Auth: JWT tokens in SecureStore
 - Offline: GET responses cached in AsyncStorage

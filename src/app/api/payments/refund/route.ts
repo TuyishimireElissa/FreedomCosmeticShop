@@ -113,7 +113,7 @@ export async function POST(req: Request) {
 
         // Send SMS to customer
         if (features.sms) {
-          const message = `Refund of ${payment.amount} RWF has been initiated for order ${order.orderNumber}. You will receive it on your phone. Ubumwe Beauty`
+          const message = `Refund of ${payment.amount} RWF has been initiated for order ${order.orderNumber}. You will receive it on your phone. FreedomCosmeticShop`
           enqueueSms(order.customerPhone, message, {
             priority: 1,
             template: "PROMOTIONAL",

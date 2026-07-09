@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * HomeView for Ubumwe Beauty — complete homepage with all sections.
+ * HomeView for FreedomCosmeticShop — complete homepage with all sections.
  *
  * Sections (in order):
  *   1. Hero Banner Slider (auto-sliding)
@@ -24,12 +24,14 @@ import { Product, Category } from "@/lib/types"
 import { HeroBanner } from "@/components/home/HeroBanner"
 import { CategoryGrid } from "@/components/home/CategoryGrid"
 import { FlashSale } from "@/components/home/FlashSale"
+import { useProductUpdates, useBannerUpdates, usePromotionUpdates, useBlogUpdates, useCategoryUpdates } from "@/hooks/use-realtime"
 import { ProductSection } from "@/components/home/ProductSection"
 import { BrandCarousel } from "@/components/home/BrandCarousel"
 import { BeautyTips } from "@/components/home/BeautyTips"
 import { ReviewsCarousel } from "@/components/home/ReviewsCarousel"
 import { SpecialOffers } from "@/components/home/SpecialOffers"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
 import { Truck, Smartphone, ShieldCheck, Sparkles } from "lucide-react"
 
 interface Banner {
@@ -120,6 +122,81 @@ export function HomeView() {
       cancelled = true
     }
   }, [])
+
+  // ─── Section 2: Real-time product updates ─────────────────────────
+  // When admin updates a product that appears in Best Sellers or New Arrivals,
+  // update it in-place. When a product is deleted, remove it. When a new
+  // product is created, refetch New Arrivals (since it might qualify).
+  useProductUpdates((event, data) => {
+    const p = data as { id: string; name: string; price?: number; stock?: number; featured?: boolean }
+
+    if (event === "product:created") {
+      // Refetch new arrivals to pick up the new product
+      fetch("/api/products?sort=newest&limit=4")
+        .then((r) => r.json())
+        .then((d) => setNewArrivals(d.products || []))
+        .catch(() => {})
+    } else if (event === "product:updated" || event === "product:priceChange" || event === "product:stockLow" || event === "product:outOfStock") {
+      // Update in-place in both lists
+      const updateFn = (item: Product) =>
+        item.id === p.id
+          ? {
+              ...item,
+              name: p.name ?? item.name,
+              price: p.price ?? item.price,
+              stock: p.stock ?? item.stock,
+            }
+          : item
+      setBestSellers((prev) => prev.map(updateFn))
+      setNewArrivals((prev) => prev.map(updateFn))
+    } else if (event === "product:deleted") {
+      // Remove from both lists
+      setBestSellers((prev) => prev.filter((item) => item.id !== p.id))
+      setNewArrivals((prev) => prev.filter((item) => item.id !== p.id))
+    }
+  })
+
+  // ─── Section 4: Real-time banner updates ──────────────────────────
+  // When admin creates/updates/deletes a banner, refetch the homepage
+  // banners so the hero slider updates instantly.
+  useBannerUpdates((event) => {
+    if (event === "banner:created" || event === "banner:updated" || event === "banner:deleted") {
+      // Refetch banners from the public API
+      fetch("/api/banners?placement=HOME_HERO")
+        .then((r) => r.json())
+        .then((d) => setBanners(d.banners || []))
+        .catch(() => {})
+    }
+  })
+
+  // ─── Section 4: Real-time promotion/coupon updates ────────────────
+  // When admin starts/ends a flash sale or creates/deactivates a coupon,
+  // the FlashSale component will pick up the change on its next render.
+  // We don't need to do anything special here — the FlashSale component
+  // has its own refresh logic. But we could force a re-render if needed.
+  usePromotionUpdates(() => {
+    // Promotion events are handled by the FlashSale component itself.
+    // This hook is here to ensure the SSE listener is registered early.
+  })
+
+  // ─── Section 6: Real-time blog + category updates ─────────────────
+  // When admin publishes/unpublishes/updates a blog post, refetch the
+  // blog posts so the BeautyTips section updates instantly.
+  useBlogUpdates(() => {
+    fetch("/api/blog?limit=3")
+      .then((r) => r.json())
+      .then((d) => setBlogPosts(d.posts || []))
+      .catch(() => {})
+  })
+
+  // When admin creates/updates/deactivates a category, refetch the
+  // categories so the CategoryGrid + navigation update instantly.
+  useCategoryUpdates(() => {
+    fetch("/api/categories")
+      .then((r) => r.json())
+      .then((d) => setCategories(d.categories || []))
+      .catch(() => {})
+  })
 
   return (
     <div className="flex flex-col">
@@ -216,6 +293,62 @@ export function HomeView() {
 
       {/* 9. Customer Reviews Carousel */}
       <ReviewsCarousel />
+
+      {/* 10. Section 4: Wholesale CTA Banner */}
+      <WholesaleCtaBanner />
     </div>
+  )
+}
+
+// ─── Section 4: Wholesale CTA Banner ─────────────────────────────────────────
+
+function WholesaleCtaBanner() {
+  const { user, setView } = useStore()
+  const isWholesale = user?.userType === "WHOLESALE" || user?.userType === "BOTH"
+
+  // Don't show to approved wholesale customers
+  if (isWholesale && user?.wholesaleStatus === "APPROVED") return null
+
+  return (
+    <section className="bg-gradient-to-br from-primary to-primary/80 px-4 py-10 text-primary-foreground sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl text-center">
+        <p className="text-3xl">🏪</p>
+        <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
+          Are you a salon or shop owner?
+        </h2>
+        <p className="mt-2 text-sm text-primary-foreground/90">
+          Join FreedomCosmeticShop Wholesale Program and save up to 30% on all products
+        </p>
+
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+          {[
+            { icon: "💰", label: "Up to 30% off" },
+            { icon: "🚚", label: "Priority delivery" },
+            { icon: "📄", label: "Pro invoices" },
+            { icon: "💳", label: "Credit available" },
+            { icon: "📦", label: "Bulk support" },
+            { icon: "🏆", label: "Loyalty rewards" },
+          ].map((b) => (
+            <div key={b.label} className="rounded-xl bg-primary-foreground/10 p-3 text-center">
+              <p className="text-2xl">{b.icon}</p>
+              <p className="mt-1 text-[10px] font-medium">{b.label}</p>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-4 text-xs text-primary-foreground/80">
+          Minimum order: 50,000 RWF · For salons, shops, spas & resellers across Rwanda
+        </p>
+
+        <Button
+          size="lg"
+          variant="secondary"
+          className="mt-6"
+          onClick={() => setView("wholesale" as never)}
+        >
+          Apply for Wholesale Account →
+        </Button>
+      </div>
+    </section>
   )
 }

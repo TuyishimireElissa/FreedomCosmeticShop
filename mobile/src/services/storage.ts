@@ -11,12 +11,12 @@ import * as SecureStore from "expo-secure-store"
 // ─── AsyncStorage (non-sensitive) ────────────────────────────────────────────
 
 const KEYS = {
-  CART: "@ubumwe_cart",
-  WISHLIST: "@ubumwe_wishlist",
-  RECENTLY_VIEWED: "@ubumwe_recently_viewed",
-  ONBOARDING: "@ubumwe_onboarding",
-  PREFERENCES: "@ubumwe_preferences",
-  CACHED_PRODUCTS: "@ubumwe_cached_products",
+  CART: "@freedom_cart",
+  WISHLIST: "@freedom_wishlist",
+  RECENTLY_VIEWED: "@freedom_recently_viewed",
+  ONBOARDING: "@freedom_onboarding",
+  PREFERENCES: "@freedom_preferences",
+  CACHED_PRODUCTS: "@freedom_cached_products",
 } as const
 
 export async function getItem<T>(key: string): Promise<T | null> {

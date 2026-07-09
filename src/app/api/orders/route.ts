@@ -21,11 +21,13 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { deliveryFeeFor } from "@/lib/format"
+import { requireAuth } from "@/lib/auth"
 import { z } from "zod"
 import { getSmsMessage } from "@/server/services/sms-templates"
 import { enqueueSms } from "@/server/services/sms-queue"
 import { sendOrderConfirmationEmail } from "@/server/services/email"
 import { features } from "@/lib/env"
+import { broadcastOrderEvent } from "@/lib/realtime"
 
 const OrderItemSchema = z.object({
   productId: z.string().min(1),
@@ -48,10 +50,11 @@ const CreateOrderSchema = z.object({
   cell: z.string().max(100).optional(),
   landmark: z.string().max(200).optional(),
   notes: z.string().max(500).optional(),
-  paymentMethod: z.enum(["MTN_MOMO", "AIRTEL_MONEY", "CARD", "COD", "BANK_TRANSFER"]),
+  paymentMethod: z.enum(["MTN_MOMO", "AIRTEL_MONEY", "CARD", "COD", "BANK_TRANSFER", "CREDIT"]),
   couponCode: z.string().max(50).optional(),
   useLoyaltyPoints: z.number().int().min(0).optional(),
   items: z.array(OrderItemSchema).min(1, "Cart cannot be empty"),
+  isWholesale: z.boolean().optional().default(false),
 })
 
 async function generateOrderNumber(): Promise<string> {
@@ -95,22 +98,80 @@ export async function POST(req: Request) {
       )
     }
 
-    // Build line items
-    const orderItems = data.items.map((item) => {
-      const product = products.find((p) => p.id === item.productId)!
-      if (product.stock < item.quantity) {
-        throw new Error(`Insufficient stock for ${product.name}`)
+    // ─── Section 2: Determine if this is a wholesale order ──────────
+    let isWholesale = data.isWholesale || false
+    const isCreditOrder = data.paymentMethod === "CREDIT"
+    let userId: string | null = null
+
+    if (isWholesale || isCreditOrder) {
+      // Verify user is authenticated + approved wholesale
+      const authUser = await requireAuth()
+      if (!authUser) {
+        return NextResponse.json({ error: "Authentication required for wholesale orders" }, { status: 401 })
       }
-      return {
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: item.quantity,
-        image: JSON.parse(product.images)[0] || null,
+      userId = authUser.id
+
+      if (
+        authUser.userType !== "WHOLESALE" &&
+        authUser.userType !== "BOTH"
+      ) {
+        return NextResponse.json({ error: "Your account is not a wholesale account" }, { status: 403 })
       }
-    })
+      if (authUser.wholesaleStatus !== "APPROVED") {
+        return NextResponse.json({ error: "Your wholesale account is not approved" }, { status: 403 })
+      }
+      isWholesale = true
+    }
+
+    // Build line items (with wholesale pricing if applicable)
+    const orderItems = await Promise.all(
+      data.items.map(async (item) => {
+        const product = products.find((p) => p.id === item.productId)!
+        if (product.stock < item.quantity) {
+          throw new Error(`Insufficient stock for ${product.name}`)
+        }
+
+        let unitPrice = product.price
+
+        // ─── Section 2: Apply wholesale pricing ─────────────────────
+        if (isWholesale && product.wholesaleActive) {
+          const { calculateWholesalePrice } = await import("@/server/services/wholesale")
+          const result = await calculateWholesalePrice(product.id, item.quantity, userId || undefined)
+          unitPrice = result.currentPrice
+        }
+
+        return {
+          productId: product.id,
+          name: product.name,
+          price: unitPrice,
+          quantity: item.quantity,
+          image: JSON.parse(product.images)[0] || null,
+        }
+      })
+    )
 
     const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
+
+    // ─── Section 2: Enforce wholesale minimum order ─────────────────
+    if (isWholesale && subtotal < 50_000) {
+      return NextResponse.json(
+        { error: `Wholesale minimum order is 50,000 RWF. Current subtotal: ${subtotal.toLocaleString()} RWF. Add ${(50_000 - subtotal).toLocaleString()} RWF more.` },
+        { status: 400 }
+      )
+    }
+
+    // ─── Section 2: Check credit limit for credit orders ────────────
+    if (isCreditOrder && userId) {
+      const { checkCreditLimit } = await import("@/server/services/wholesale")
+      const creditCheck = await checkCreditLimit(userId, subtotal)
+      if (!creditCheck.allowed) {
+        return NextResponse.json(
+          { error: creditCheck.message || "Insufficient credit limit" },
+          { status: 400 }
+        )
+      }
+    }
+
     let deliveryFee = deliveryFeeFor(data.province)
     let discountAmount = 0
     let couponId: string | null = null
@@ -171,6 +232,7 @@ export async function POST(req: Request) {
           customerName: data.customerName,
           customerPhone: data.customerPhone,
           customerEmail: data.customerEmail || null,
+          userId: userId || null,
           address: fullAddress,
           city: data.city,
           province: data.province,
@@ -184,6 +246,11 @@ export async function POST(req: Request) {
           couponId,
           loyaltyPointsEarned,
           status: "PENDING",
+          // ─── Section 2: Wholesale order fields ──────────────────────
+          orderType: isWholesale ? "WHOLESALE" : "RETAIL",
+          priceType: isWholesale ? "WHOLESALE" : "RETAIL",
+          isCredit: isCreditOrder,
+          creditDueDate: isCreditOrder ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null,
           items: { create: orderItems },
         },
         include: { items: true },
@@ -195,7 +262,7 @@ export async function POST(req: Request) {
           orderId: created.id,
           method: data.paymentMethod,
           amount: total,
-          status: data.paymentMethod === "COD" || data.paymentMethod === "BANK_TRANSFER" ? "PENDING" : "PENDING",
+          status: isCreditOrder ? "PAID" : "PENDING", // Credit orders are marked as PAID (deferred)
           phoneNumber:
             data.paymentMethod === "MTN_MOMO" || data.paymentMethod === "AIRTEL_MONEY"
               ? data.customerPhone
@@ -244,6 +311,39 @@ export async function POST(req: Request) {
         (e) => console.error("Email send failed:", e)
       )
     }
+
+    // ─── Section 2: Generate wholesale invoice if wholesale order ────
+    let invoice: { invoiceNumber: string; dueDate: Date | null } | null = null
+    if (isWholesale) {
+      try {
+        const { generateWholesaleInvoice, sendWholesaleSms } = await import("@/server/services/wholesale")
+        invoice = await generateWholesaleInvoice(order.id)
+        // Send wholesale-specific SMS with invoice number
+        if (features.sms && invoice) {
+          await sendWholesaleSms(order.customerPhone, "order_confirmed", {
+            orderNumber: order.orderNumber,
+            amount: order.total,
+            invoice: invoice.invoiceNumber,
+            dueDate: invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("en-RW") : "N/A",
+          })
+        }
+      } catch (e) {
+        console.error("Invoice generation failed:", e)
+      }
+    }
+
+    // ─── Section 3: Broadcast new order to admin (real-time alert) ──
+    // This fires the "order:new" event which the admin dashboard listens
+    // for to play a sound alert + increment the pending count badge.
+    await broadcastOrderEvent("new", {
+      id: order.id,
+      orderNumber: order.orderNumber,
+      userId: order.userId,
+      customerPhone: order.customerPhone,
+      customerName: order.customerName,
+      status: order.status,
+      total: order.total,
+    }, { source: "customer" })
 
     return NextResponse.json({ order }, { status: 201 })
   } catch (error) {

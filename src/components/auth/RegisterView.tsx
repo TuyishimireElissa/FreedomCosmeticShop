@@ -145,7 +145,7 @@ export function RegisterView() {
       // Success — user is logged in
       setUser(data.user)
       toast({
-        title: "Welcome to Ubumwe Beauty! 🌸",
+        title: "Welcome to FreedomCosmeticShop! 🌸",
         description: "Your account has been created.",
       })
       goCatalog(null)
@@ -191,7 +191,7 @@ export function RegisterView() {
           <Sparkles className="h-5 w-5" />
         </span>
         <span className="text-xl font-semibold">
-          Ubumwe <span className="text-primary">Beauty</span>
+          FreedomCosmeticShop
         </span>
       </button>
 
@@ -200,7 +200,7 @@ export function RegisterView() {
           <>
             <h1 className="text-2xl font-bold">Create your account</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Join Ubumwe Beauty for faster checkout and order tracking.
+              Join FreedomCosmeticShop for faster checkout and order tracking.
             </p>
 
             <form onSubmit={handleSubmitForm} className="mt-6 space-y-4">

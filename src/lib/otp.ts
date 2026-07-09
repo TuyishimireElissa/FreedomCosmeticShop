@@ -210,7 +210,7 @@ export async function createOtp(opts: CreateOtpOptions): Promise<CreateOtpResult
   otpStore.set(key, entry)
 
   // Send via SMS (or simulate)
-  const smsBody = `Ubumwe Beauty: Your verification code is ${code}. It expires in 5 minutes. Do not share it with anyone.`
+  const smsBody = `FreedomCosmeticShop: Your verification code is ${code}. It expires in 5 minutes. Do not share it with anyone.`
   const smsResult = await sendSms(opts.phone, smsBody)
 
   if (!smsResult.success) {

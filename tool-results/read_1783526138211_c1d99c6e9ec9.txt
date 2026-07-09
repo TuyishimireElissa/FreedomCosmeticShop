@@ -1,0 +1,1282 @@
+     1→     1→ZDEV, BEFORE ANYTHING ELSE READ AND 
+     2→     2→CONFIRM THESE IRON RULES:
+     3→     3→
+     4→     4→╔═════════════════════════════════════════╗
+     5→     5→║         🚨 IRON RULES 🚨                ║
+     6→     6→╠═════════════════════════════════════════╣
+     7→     7→║                                         ║
+     8→     8→║  RULE 1: NEVER DESTROY EXISTING CODE   ║
+     9→     9→║  Admin is working. Keep it.            ║
+    10→    10→║  Main website is working. Keep it.     ║
+    11→    11→║  Backend is working. Keep it.          ║
+    12→    12→║  Mobile app is working. Keep it.       ║
+    13→    13→║  Only ADD connections between them.    ║
+    14→    14→║  Never delete any working feature.     ║
+    15→    15→║                                         ║
+    16→    16→║  RULE 2: REMEMBER EVERYTHING BUILT     ║
+    17→    17→║  Already working:                      ║
+    18→    18→║  ✅ Main website (frontend)            ║
+    19→    19→║  ✅ Admin dashboard                    ║
+    20→    20→║  ✅ Backend API                        ║
+    21→    21→║  ✅ Mobile app                         ║
+    22→    22→║  ✅ MTN MoMo payments                 ║
+    23→    23→║  ✅ Rwanda district delivery           ║
+    24→    24→║  ✅ SMS system                         ║
+    25→    25→║  ✅ Product management                 ║
+    26→    26→║  ✅ Order management                   ║
+    27→    27→║  ✅ Customer management               ║
+    28→    28→║  ALL MUST REMAIN WORKING.              ║
+    29→    29→║                                         ║
+    30→    30→║  RULE 3: SURGICAL CONNECTIONS ONLY     ║
+    31→    31→║  Only add what connects admin          ║
+    32→    32→║  to main website.                      ║
+    33→    33→║  Touch nothing unrelated.              ║
+    34→    34→║                                         ║
+    35→    35→║  RULE 4: CHECK BEFORE TOUCHING         ║
+    36→    36→║  Before modifying any file:            ║
+    37→    37→║  1. State the exact file name          ║
+    38→    38→║  2. State what currently exists        ║
+    39→    39→║  3. State exactly what you will add    ║
+    40→    40→║  4. Then write the code                ║
+    41→    41→║                                         ║
+    42→    42→║  RULE 5: REAL-TIME SYNC               ║
+    43→    43→║  When admin changes something:         ║
+    44→    44→║  Main website must reflect it          ║
+    45→    45→║  IMMEDIATELY. No manual refresh.       ║
+    46→    46→║  No delays. Live connection.           ║
+    47→    47→║                                         ║
+    48→    48→║  RULE 6: COMPLETE CODE ONLY            ║
+    49→    49→║  No placeholder code.                  ║
+    50→    50→║  No empty functions.                   ║
+    51→    51→║  No TODO comments.                     ║
+    52→    52→║  Everything 100% complete.             ║
+    53→    53→║                                         ║
+    54→    54→║  RULE 7: SHOW ALL CHANGES              ║
+    55→    55→║  After each section report:            ║
+    56→    56→║  📁 NEW files created: [list]          ║
+    57→    57→║  ✏️  MODIFIED files: [what changed]    ║
+    58→    58→║  🔒 UNTOUCHED files: [confirmed]       ║
+    59→    59→║                                         ║
+    60→    60→║  RULE 8: RWANDA FIRST ALWAYS           ║
+    61→    61→║  All connections must support:         ║
+    62→    62→║  - RWF currency                        ║
+    63→    63→║  - MTN MoMo payments                  ║
+    64→    64→║  - Rwanda 30 districts                 ║
+    65→    65→║  - Kinyarwanda/English/French          ║
+    66→    66→║                                         ║
+    67→    67→║  RULE 9: SECURITY ALWAYS               ║
+    68→    68→║  Admin actions must be:                ║
+    69→    69→║  - Protected by JWT                    ║
+    70→    70→║  - Role verified                       ║
+    71→    71→║  - Audit logged                        ║
+    72→    72→║  - Rate limited                        ║
+    73→    73→║                                         ║
+    74→    74→║  RULE 10: ONE SECTION AT A TIME        ║
+    75→    75→║  Complete one section fully.           ║
+    76→    76→║  Report what changed.                  ║
+    77→    77→║  Wait for approval.                    ║
+    78→    78→║  Then move to next section.            ║
+    79→    79→║                                         ║
+    80→    80→╚═════════════════════════════════════════╝
+    81→    81→
+    82→    82→PROJECT CONTEXT:
+    83→    83→Project: BeautyHub Rwanda
+    84→    84→Main Website: http://localhost:3000
+    85→    85→Admin Panel: http://localhost:3001/admin
+    86→    86→Backend API: http://localhost:5000/api
+    87→    87→Mobile App: Expo React Native
+    88→    88→Database: PostgreSQL + Prisma
+    89→    89→Auth: JWT tokens
+    90→    90→Real-time: Socket.io
+    91→    91→Cache: Redis
+    92→    92→
+    93→    93→GOAL:
+    94→    94→When admin does ANYTHING in admin panel
+    95→    95→→ Main website shows changes INSTANTLY
+    96→    96→→ Mobile app shows changes INSTANTLY
+    97→    97→→ Everything stays in sync always
+    98→    98→
+    99→    99→Confirm rules:
+   100→   100→"RULES CONFIRMED. READY TO CONNECT."
+   101→   101→Then wait for me to say START.
+   102→   102→
+   103→   103→════════════════════════════════════════════
+   104→   104→CONNECTION MISSION
+   105→   105→════════════════════════════════════════════
+   106→   106→
+   107→   107→Connect admin panel to main website
+   108→   108→so admin has FULL REAL-TIME CONTROL
+   109→   109→over everything customers see.
+   110→   110→
+   111→   111→════════════════════════════════════════════
+   112→   112→SECTION 1: REAL-TIME CONNECTION SETUP
+   113→   113→════════════════════════════════════════════
+   114→   114→
+   115→   115→This is the FOUNDATION.
+   116→   116→Build this first before everything else.
+   117→   117→
+   118→   118→1A. SET UP SOCKET.IO (Real-time Engine)
+   119→   119→────────────────────────────────────────
+   120→   120→
+   121→   121→FIND existing backend server file.
+   122→   122→ADD Socket.io to it (do not replace server):
+   123→   123→
+   124→   124→File: /backend/src/app.ts
+   125→   125→ADD Socket.io setup:
+   126→   126→
+   127→   127→Events admin emits → website receives:
+   128→   128→
+   129→   129→PRODUCT EVENTS:
+   130→   130→product:created    → website shows new product
+   131→   131→product:updated    → website updates product
+   132→   132→product:deleted    → website removes product
+   133→   133→product:stockLow   → website shows low stock
+   134→   134→product:outOfStock → website shows sold out
+   135→   135→product:priceChange → website updates price
+   136→   136→product:featured   → website features product
+   137→   137→product:onSale     → website shows sale badge
+   138→   138→
+   139→   139→ORDER EVENTS:
+   140→   140→order:new          → admin gets alert sound
+   141→   141→order:confirmed    → customer sees confirmed
+   142→   142→order:processing   → customer sees processing
+   143→   143→order:shipped      → customer sees shipped
+   144→   144→order:delivered    → customer sees delivered
+   145→   145→order:cancelled    → customer sees cancelled
+   146→   146→
+   147→   147→PAYMENT EVENTS:
+   148→   148→payment:confirmed  → order auto-confirms
+   149→   149→payment:failed     → admin gets alert
+   150→   150→payment:refunded   → customer notified
+   151→   151→
+   152→   152→BANNER EVENTS:
+   153→   153→banner:updated     → website shows new banner
+   154→   154→banner:created     → website adds banner
+   155→   155→banner:deleted     → website removes banner
+   156→   156→
+   157→   157→PROMOTION EVENTS:
+   158→   158→promotion:started  → website shows flash sale
+   159→   159→promotion:ended    → website removes flash sale
+   160→   160→coupon:created     → website accepts new code
+   161→   161→coupon:deactivated → website rejects old code
+   162→   162→
+   163→   163→CONTENT EVENTS:
+   164→   164→blog:published     → website shows new blog
+   165→   165→blog:unpublished   → website hides blog
+   166→   166→faq:updated        → website shows new FAQ
+   167→   167→
+   168→   168→DELIVERY EVENTS:
+   169→   169→delivery:feeUpdated → website shows new fees
+   170→   170→delivery:assigned   → customer sees rider info
+   171→   171→
+   172→   172→NOTIFICATION EVENTS:
+   173→   173→notification:new   → admin bell count updates
+   174→   174→notification:read  → bell count decreases
+   175→   175→
+   176→   176→File to create:
+   177→   177→/backend/src/services/socket.service.ts
+   178→   178→
+   179→   179→Complete implementation:
+   180→   180→- Initialize Socket.io with CORS
+   181→   181→- Admin room (only admin users)
+   182→   182→- Customer room (all website users)
+   183→   183→- Authentication middleware for sockets
+   184→   184→  (verify JWT before allowing connection)
+   185→   185→- Event emitter functions:
+   186→   186→  emitToAdmin(event, data)
+   187→   187→  emitToCustomers(event, data)
+   188→   188→  emitToAll(event, data)
+   189→   189→  emitToUser(userId, event, data)
+   190→   190→- Connection logging
+   191→   191→- Disconnection handling
+   192→   192→- Reconnection logic
+   193→   193→
+   194→   194→1B. CONNECT FRONTEND TO SOCKET
+   195→   195→────────────────────────────────
+   196→   196→
+   197→   197→File: /frontend/lib/socket.ts
+   198→   198→CREATE socket client:
+   199→   199→
+   200→   200→- Connect to backend
+   201→   201→- Auto-reconnect if disconnects
+   202→   202→- Listen for all website events
+   203→   203→- Update UI when event received
+   204→   204→- No page refresh needed
+   205→   205→
+   206→   206→File: /frontend/hooks/useSocket.ts
+   207→   207→CREATE socket hook:
+   208→   208→
+   209→   209→- useProductUpdates()
+   210→   210→  → auto-update product list/detail
+   211→   211→- useBannerUpdates()
+   212→   212→  → auto-update homepage banners
+   213→   213→- usePromotionUpdates()
+   214→   214→  → auto-update flash sales
+   215→   215→- useOrderUpdates(orderId)
+   216→   216→  → auto-update order status
+   217→   217→- useCartUpdates()
+   218→   218→  → update if product goes out of stock
+   219→   219→
+   220→   220→1C. CONNECT ADMIN TO SOCKET
+   221→   221→─────────────────────────────
+   222→   222→
+   223→   223→File: /admin/lib/socket.ts
+   224→   224→CREATE admin socket client:
+   225→   225→
+   226→   226→- Connect to backend (admin room)
+   227→   227→- Listen for new orders → play sound
+   228→   228→- Listen for payments → show alert
+   229→   229→- Listen for low stock → show warning
+   230→   230→- Emit events when admin makes changes
+   231→   231→
+   232→   232→1D. SET UP REDIS CACHE SYNC
+   233→   233→─────────────────────────────
+   234→   234→
+   235→   235→FIND existing Redis setup.
+   236→   236→ADD cache invalidation:
+   237→   237→
+   238→   238→When admin updates product:
+   239→   239→→ Delete product cache in Redis
+   240→   240→→ Backend fetches fresh from database
+   241→   241→→ New data served to website
+   242→   242→
+   243→   243→When admin updates banner:
+   244→   244→→ Delete homepage cache
+   245→   245→→ Fresh homepage served
+   246→   246→
+   247→   247→Cache keys to manage:
+   248→   248→- products:all
+   249→   249→- products:featured
+   250→   250→- products:bestsellers
+   251→   251→- products:new-arrivals
+   252→   252→- categories:all
+   253→   253→- brands:all
+   254→   254→- banners:homepage
+   255→   255→- promotions:active
+   256→   256→- delivery:zones
+   257→   257→
+   258→   258→After completing Section 1:
+   259→   259→Report all files changed.
+   260→   260→Wait for my approval.
+   261→   261→
+   262→   262→════════════════════════════════════════════
+   263→   263→SECTION 2: PRODUCT CONTROL CONNECTION
+   264→   264→════════════════════════════════════════════
+   265→   265→
+   266→   266→When admin manages products →
+   267→   267→Main website updates INSTANTLY.
+   268→   268→
+   269→   269→2A. ADD PRODUCT → WEBSITE SHOWS IT
+   270→   270→────────────────────────────────────
+   271→   271→
+   272→   272→FLOW:
+   273→   273→Admin clicks [Save Product] in admin
+   274→   274→→ Backend saves to database
+   275→   275→→ Backend emits: product:created event
+   276→   276→→ Redis cache cleared for products
+   277→   277→→ Website receives socket event
+   278→   278→→ Website adds product to listing
+   279→   279→→ No page refresh needed
+   280→   280→→ Mobile app also updates
+   281→   281→
+   282→   282→WHAT TO IMPLEMENT:
+   283→   283→
+   284→   284→Backend (ADD to existing product controller):
+   285→   285→After successful product creation:
+   286→   286→1. Save to database (already exists)
+   287→   287→2. Clear Redis product cache
+   288→   288→3. Emit socket event: product:created
+   289→   289→   with full product data
+   290→   290→4. Log action in audit log
+   291→   291→
+   292→   292→Frontend (ADD to existing product listing):
+   293→   293→Listen for product:created socket event:
+   294→   294→→ Add new product to top of list
+   295→   295→→ Show toast: "New product available!"
+   296→   296→→ Update product count
+   297→   297→→ If on homepage update sections
+   298→   298→
+   299→   299→Admin (ADD to existing save handler):
+   300→   300→After API returns success:
+   301→   301→→ Show success toast
+   302→   302→→ Real-time confirmation received
+   303→   303→→ Update admin product count
+   304→   304→
+   305→   305→2B. EDIT PRODUCT → WEBSITE UPDATES
+   306→   306→────────────────────────────────────
+   307→   307→
+   308→   308→FLOW:
+   309→   309→Admin updates price/name/stock/etc
+   310→   310→→ Backend saves changes
+   311→   311→→ Clears product from Redis
+   312→   312→→ Emits: product:updated
+   313→   313→→ Website updates that product card
+   314→   314→→ If on product page: updates live
+   315→   315→→ Mobile app updates too
+   316→   316→
+   317→   317→SPECIFIC UPDATES:
+   318→   318→
+   319→   319→Price change:
+   320→   320→Website product card: old price → new price
+   321→   321→Product detail: updates immediately
+   322→   322→Cart: if item in cart, price updates
+   323→   323→Mobile: updates in real-time
+   324→   324→
+   325→   325→Stock change:
+   326→   326→Website: In Stock → Low Stock → Out of Stock
+   327→   327→Product card badge updates
+   328→   328→Add to Cart button state updates
+   329→   329→"Only 3 left!" banner shows/hides
+   330→   330→
+   331→   331→Name change:
+   332→   332→Product card name updates
+   333→   333→Product detail updates
+   334→   334→URL slug updates (redirect old to new)
+   335→   335→
+   336→   336→Status change (Active/Inactive):
+   337→   337→Inactive → product disappears from website
+   338→   338→Active → product appears on website
+   339→   339→
+   340→   340→2C. DELETE PRODUCT → WEBSITE REMOVES
+   341→   341→──────────────────────────────────────
+   342→   342→
+   343→   343→FLOW:
+   344→   344→Admin deletes product
+   345→   345→→ Backend soft-deletes (not hard delete)
+   346→   346→→ Emits: product:deleted
+   347→   347→→ Website removes from all listings
+   348→   348→→ Product page shows 404
+   349→   349→→ Cart removes item if exists
+   350→   350→→ Wishlist removes item
+   351→   351→
+   352→   352→Handle gracefully:
+   353→   353→If customer on that product page:
+   354→   354→Show: "This product is no longer available"
+   355→   355→[Browse Similar Products]
+   356→   356→
+   357→   357→If product in customer cart:
+   358→   358→Show notification: 
+   359→   359→"[Product Name] was removed 
+   360→   360→ from your cart (no longer available)"
+   361→   361→
+   362→   362→2D. STOCK MANAGEMENT CONNECTION
+   363→   363→─────────────────────────────────
+   364→   364→
+   365→   365→Real-time stock display:
+   366→   366→
+   367→   367→When order is placed:
+   368→   368→→ Stock decreases immediately
+   369→   369→→ Website shows updated stock
+   370→   370→→ Admin sees stock update in real-time
+   371→   371→
+   372→   372→When stock drops below threshold:
+   373→   373→→ Admin gets alert notification
+   374→   374→→ Website shows "Only X left!"
+   375→   375→→ When 0: shows "Out of Stock"
+   376→   376→
+   377→   377→Stock counter on website:
+   378→   378→When customer adds to cart:
+   379→   379→→ Available stock shows -1 for others
+   380→   380→→ Prevents overselling
+   381→   381→
+   382→   382→Admin stock update:
+   383→   383→Admin types new stock number
+   384→   384→→ Website updates immediately
+   385→   385→→ If was out of stock → shows in stock
+   386→   386→→ Customers who clicked "Notify Me" 
+   387→   387→   get SMS: "Product back in stock!"
+   388→   388→
+   389→   389→After completing Section 2:
+   390→   390→Report all files changed.
+   391→   391→Wait for my approval.
+   392→   392→
+   393→   393→════════════════════════════════════════════
+   394→   394→SECTION 3: ORDER CONTROL CONNECTION
+   395→   395→════════════════════════════════════════════
+   396→   396→
+   397→   397→When admin manages orders →
+   398→   398→Customer sees updates INSTANTLY.
+   399→   399→
+   400→   400→3A. NEW ORDER ALERT → ADMIN
+   401→   401→────────────────────────────
+   402→   402→
+   403→   403→FLOW:
+   404→   404→Customer places order on website
+   405→   405→→ Backend creates order
+   406→   406→→ Emits: order:new to admin room
+   407→   407→→ Admin panel:
+   408→   408→  - 🔔 Bell rings (sound)
+   409→   409→  - Desktop notification pops up
+   410→   410→  - Live orders feed shows new order
+   411→   411→  - Pending count badge increases
+   412→   412→  - Toast: "New order! #BHR-045 — 35,000 RWF"
+   413→   413→→ Admin can confirm immediately
+   414→   414→
+   415→   415→Sound alert implementation:
+   416→   416→- Play sound on new order
+   417→   417→- Allow admin to mute/unmute
+   418→   418→- Different sounds for:
+   419→   419→  New order: 🔔 ding
+   420→   420→  Payment confirmed: ✅ success sound
+   421→   421→  Failed payment: ⚠️ alert sound
+   422→   422→
+   423→   423→3B. ADMIN CONFIRMS → CUSTOMER SEES
+   424→   424→────────────────────────────────────
+   425→   425→
+   426→   426→FLOW:
+   427→   427→Admin clicks [Confirm Order]
+   428→   428→→ Backend updates order status
+   429→   429→→ Emits: order:confirmed to customer
+   430→   430→→ SMS sent automatically to customer:
+   431→   431→  "Order #BHR-045 confirmed!
+   432→   432→   We are preparing your order.
+   433→   433→   BeautyHub Rwanda ✅"
+   434→   434→→ Customer order page updates live:
+   435→   435→  PENDING → CONFIRMED (no refresh)
+   436→   436→→ Admin order count updates
+   437→   437→
+   438→   438→3C. ADMIN SHIPS → CUSTOMER TRACKS
+   439→   439→───────────────────────────────────
+   440→   440→
+   441→   441→FLOW:
+   442→   442→Admin clicks [Mark as Shipped]
+   443→   443→→ Admin assigns rider:
+   444→   444→  Name: Jean Paul
+   445→   445→  Phone: +250789000001
+   446→   446→→ Backend updates order
+   447→   447→→ Emits: order:shipped
+   448→   448→→ SMS to customer:
+   449→   449→  "Your order #BHR-045 is on the way!
+   450→   450→   Rider: Jean Paul — +250789000001
+   451→   451→   Estimated: Today by 6PM
+   452→   452→   BeautyHub Rwanda 🚚"
+   453→   453→→ Customer tracking page updates:
+   454→   454→  - Status: SHIPPED ✅
+   455→   455→  - Rider name shown
+   456→   456→  - Rider phone (tap to call)
+   457→   457→  - Estimated time shown
+   458→   458→→ Mobile app push notification:
+   459→   459→  "Your order is on the way! 🚚"
+   460→   460→
+   461→   461→3D. ADMIN DELIVERS → ORDER COMPLETES
+   462→   462→──────────────────────────────────────
+   463→   463→
+   464→   464→FLOW:
+   465→   465→Admin/Rider marks as Delivered
+   466→   466→→ Backend updates order
+   467→   467→→ Emits: order:delivered
+   468→   468→→ SMS to customer:
+   469→   469→  "Order #BHR-045 delivered! 🎉
+   470→   470→   Thank you for shopping with us!
+   471→   471→   Leave a review: [link]
+   472→   472→   BeautyHub Rwanda ❤️"
+   473→   473→→ Customer order shows DELIVERED
+   474→   474→→ Review prompt appears on website
+   475→   475→→ Loyalty points awarded automatically:
+   476→   476→  "You earned 370 points! 💎"
+   477→   477→→ Push notification on mobile:
+   478→   478→  "Order delivered! Leave a review 🌟"
+   479→   479→
+   480→   480→3E. ORDER TRACKING PAGE (LIVE)
+   481→   481→────────────────────────────────
+   482→   482→
+   483→   483→FIND existing order tracking page.
+   484→   484→IMPROVE with live updates:
+   485→   485→
+   486→   486→┌─────────────────────────────────────────┐
+   487→   487→│  ORDER TRACKING #BHR-2024-045          │
+   488→   488→│  Last updated: Just now 🔴 LIVE        │
+   489→   489→├─────────────────────────────────────────┤
+   490→   490→│                                         │
+   491→   491→│  ●━━━━━━━━━●━━━━━━━━━●━━━━━━━━━◌      │
+   492→   492→│  ✅Placed  ✅Confirmed ✅Shipped  ◌Delivered│
+   493→   493→│  10:45     11:02      14:00     ~18:00  │
+   494→   494→│                                         │
+   495→   495→├─────────────────────────────────────────┤
+   496→   496→│  📦 Your order is on the way!          │
+   497→   497→│                                         │
+   498→   498→│  🏍️ Rider: Jean Paul                  │
+   499→   499→│  📱 +250789000001 [Call] [WhatsApp]    │
+   500→   500→│  📍 Estimated: Today by 6PM            │
+   501→   501→│                                         │
+   502→   502→│  DELIVERY ADDRESS:                     │
+   503→   503→│  Kimironko, Gasabo, Kigali             │
+   504→   504→│  Near KCT Building                     │
+   505→   505→│                                         │
+   506→   506→├─────────────────────────────────────────┤
+   507→   507→│  ORDER ITEMS:                          │
+   508→   508→│  Nivea Lotion x2    — 17,000 RWF      │
+   509→   509→│  L'Oréal Serum x1   — 28,000 RWF      │
+   510→   510→│  Delivery           —  1,000 RWF      │
+   511→   511→│  TOTAL              — 37,000 RWF ✅   │
+   512→   512→└─────────────────────────────────────────┘
+   513→   513→
+   514→   514→Page auto-updates without refresh.
+   515→   515→Customer stays on page to watch status.
+   516→   516→
+   517→   517→After completing Section 3:
+   518→   518→Report all files changed.
+   519→   519→Wait for my approval.
+   520→   520→
+   521→   521→════════════════════════════════════════════
+   522→   522→SECTION 4: HOMEPAGE CONTROL CONNECTION
+   523→   523→════════════════════════════════════════════
+   524→   524→
+   525→   525→Admin controls everything on homepage
+   526→   526→from admin panel.
+   527→   527→
+   528→   528→4A. BANNER MANAGEMENT CONNECTION
+   529→   529→──────────────────────────────────
+   530→   530→
+   531→   531→FLOW:
+   532→   532→Admin uploads new banner in admin
+   533→   533→→ Sets title, image, link, dates
+   534→   534→→ Clicks [Publish Banner]
+   535→   535→→ Backend saves banner
+   536→   536→→ Emits: banner:updated
+   537→   537→→ Website homepage:
+   538→   538→  - New banner appears in slider
+   539→   539→  - Old expired banners disappear
+   540→   540→  - No refresh needed
+   541→   541→  - Mobile app also updates
+   542→   542→
+   543→   543→Admin controls:
+   544→   544→- Add banner (instant)
+   545→   545→- Remove banner (instant)
+   546→   546→- Reorder banners (drag → instant)
+   547→   547→- Schedule: auto-show on start date
+   548→   548→- Auto-hide on end date
+   549→   549→- Mobile vs desktop different images
+   550→   550→
+   551→   551→4B. FLASH SALE CONTROL CONNECTION
+   552→   552→───────────────────────────────────
+   553→   553→
+   554→   554→FLOW:
+   555→   555→Admin creates flash sale in admin:
+   556→   556→→ Selects products
+   557→   557→→ Sets discount %
+   558→   558→→ Sets countdown time
+   559→   559→→ Clicks [Start Flash Sale]
+   560→   560→→ Backend saves promotion
+   561→   561→→ Emits: promotion:started
+   562→   562→→ Website homepage:
+   563→   563→  - Flash sale section appears instantly
+   564→   564→  - Countdown timer starts
+   565→   565→  - Sale prices show on products
+   566→   566→  - Sale badges appear on cards
+   567→   567→→ Mobile app:
+   568→   568→  - Push notification to all users:
+   569→   569→    "⚡ FLASH SALE STARTED!
+   570→   570→     30% OFF skincare — 4 hours only!
+   571→   571→     Shop now: beautyhub.rw"
+   572→   572→
+   573→   573→When countdown ends:
+   574→   574→→ Backend auto-emits: promotion:ended
+   575→   575→→ Website removes flash sale section
+   576→   576→→ Prices return to normal
+   577→   577→→ Badges disappear
+   578→   578→→ All automatic
+   579→   579→
+   580→   580→4C. FEATURED PRODUCTS CONTROL
+   581→   581→───────────────────────────────
+   582→   582→
+   583→   583→FLOW:
+   584→   584→Admin toggles "Featured" on product
+   585→   585→→ Backend updates product
+   586→   586→→ Emits: product:featured
+   587→   587→→ Homepage featured section updates
+   588→   588→→ New product appears in featured
+   589→   589→→ Old product removed if limit reached
+   590→   590→
+   591→   591→Admin controls featured sections:
+   592→   592→- Best Sellers (admin picks or auto)
+   593→   593→- New Arrivals (auto from date added)
+   594→   594→- Featured (admin handpicks)
+   595→   595→- On Sale (admin sets)
+   596→   596→- Top Brands (admin picks)
+   597→   597→
+   598→   598→All update instantly on website.
+   599→   599→
+   600→   600→4D. ANNOUNCEMENT BAR CONTROL
+   601→   601→──────────────────────────────
+   602→   602→
+   603→   603→FIND existing announcement bar.
+   604→   604→ADD admin control:
+   605→   605→
+   606→   606→Admin can edit from admin panel:
+   607→   607→- Bar text (EN/FR/RW)
+   608→   608→- Bar color (background)
+   609→   609→- Text color
+   610→   610→- Show/Hide toggle
+   611→   611→- Link (optional)
+   612→   612→
+   613→   613→Changes appear on website instantly.
+   614→   614→
+   615→   615→Example admin control:
+   616→   616→┌─────────────────────────────────────────┐
+   617→   617→│  ANNOUNCEMENT BAR SETTINGS             │
+   618→   618→├─────────────────────────────────────────┤
+   619→   619→│  Text (EN):                            │
+   620→   620→│  [🚚 FREE delivery above 50,000 RWF!] │
+   621→   621→│                                         │
+   622→   622→│  Text (RW):                            │
+   623→   623→│  [Guherekeza ubuntu hejuru ya 50K RWF] │
+   624→   624→│                                         │
+   625→   625→│  Background: [■ Black ▼]              │
+   626→   626→│  Text color: [■ White ▼]              │
+   627→   627→│                                         │
+   628→   628→│  Status: [● Active ▼]                 │
+   629→   629→│                                         │
+   630→   630→│  [Save & Apply Instantly]              │
+   631→   631→└─────────────────────────────────────────┘
+   632→   632→
+   633→   633→After completing Section 4:
+   634→   634→Report all files changed.
+   635→   635→Wait for my approval.
+   636→   636→
+   637→   637→════════════════════════════════════════════
+   638→   638→SECTION 5: PRICING & PROMOTIONS CONNECTION
+   639→   639→════════════════════════════════════════════
+   640→   640→
+   641→   641→Admin changes prices/promotions →
+   642→   642→Website updates instantly.
+   643→   643→
+   644→   644→5A. PRICE CHANGE CONNECTION
+   645→   645→─────────────────────────────
+   646→   646→
+   647→   647→FLOW:
+   648→   648→Admin edits product price
+   649→   649→→ Backend updates price
+   650→   650→→ Clears price from Redis cache
+   651→   651→→ Emits: product:updated (with new price)
+   652→   652→→ Website:
+   653→   653→  - Product cards update price
+   654→   654→  - Product detail updates price
+   655→   655→  - Search results update price
+   656→   656→  - If in customer cart: cart updates
+   657→   657→→ Mobile app updates price
+   658→   658→
+   659→   659→If customer has item in cart 
+   660→   660→and price increases:
+   661→   661→Show notification:
+   662→   662→"Price updated: Nivea Lotion
+   663→   663→ Old: 8,500 RWF → New: 9,000 RWF"
+   664→   664→[Keep in Cart] [Remove]
+   665→   665→
+   666→   666→5B. COUPON CONTROL CONNECTION
+   667→   667→───────────────────────────────
+   668→   668→
+   669→   669→FLOW:
+   670→   670→Admin creates coupon: BEAUTY20
+   671→   671→→ Backend saves coupon
+   672→   672→→ Emits: coupon:created
+   673→   673→→ Website immediately accepts BEAUTY20
+   674→   674→→ Customers can use it right away
+   675→   675→
+   676→   676→Admin deactivates coupon:
+   677→   677→→ Backend deactivates
+   678→   678→→ Emits: coupon:deactivated
+   679→   679→→ Website immediately rejects BEAUTY20
+   680→   680→→ Any customer trying it sees:
+   681→   681→  "This coupon has expired"
+   682→   682→
+   683→   683→Admin creates auto-apply coupon:
+   684→   684→→ Sets minimum order amount
+   685→   685→→ Discount auto-applies at checkout
+   686→   686→→ No code needed
+   687→   687→
+   688→   688→5C. LOYALTY POINTS CONTROL
+   689→   689→────────────────────────────
+   690→   690→
+   691→   691→FLOW:
+   692→   692→Admin awards points to customer
+   693→   693→→ Backend updates points
+   694→   694→→ Emits to that specific customer
+   695→   695→→ Customer sees points update on:
+   696→   696→  - Account dashboard (live)
+   697→   697→  - Navbar points display (live)
+   698→   698→  - Mobile app (push notification)
+   699→   699→→ Notification to customer:
+   700→   700→  "💎 You received 500 bonus points!
+   701→   701→   Balance: 2,950 points = 29,500 RWF"
+   702→   702→
+   703→   703→After completing Section 5:
+   704→   704→Report all files changed.
+   705→   705→Wait for my approval.
+   706→   706→
+   707→   707→════════════════════════════════════════════
+   708→   708→SECTION 6: CONTENT CONTROL CONNECTION
+   709→   709→════════════════════════════════════════════
+   710→   710→
+   711→   711→Admin controls all website content
+   712→   712→from admin panel.
+   713→   713→
+   714→   714→6A. BLOG CONTROL CONNECTION
+   715→   715→─────────────────────────────
+   716→   716→
+   717→   717→FLOW:
+   718→   718→Admin writes and publishes blog post
+   719→   719→→ Backend saves post
+   720→   720→→ Emits: blog:published
+   721→   721→→ Website blog page:
+   722→   722→  - New post appears instantly
+   723→   723→  - Homepage blog preview updates
+   724→   724→  - No refresh needed
+   725→   725→
+   726→   726→Admin unpublishes:
+   727→   727→→ Post disappears from website
+   728→   728→→ Anyone on that page redirected
+   729→   729→→ 404 or "Post removed" message
+   730→   730→
+   731→   731→6B. FAQ CONTROL CONNECTION
+   732→   732→────────────────────────────
+   733→   733→
+   734→   734→FLOW:
+   735→   735→Admin adds new FAQ question
+   736→   736→→ Saves in admin
+   737→   737→→ Website FAQ page updates instantly
+   738→   738→→ No rebuild needed
+   739→   739→→ No deployment needed
+   740→   740→
+   741→   741→Admin reorders FAQs:
+   742→   742→→ Drag in admin panel
+   743→   743→→ Website shows new order instantly
+   744→   744→
+   745→   745→6C. CATEGORY CONTROL CONNECTION
+   746→   746→─────────────────────────────────
+   747→   747→
+   748→   748→FLOW:
+   749→   749→Admin adds new category: "Men's Grooming"
+   750→   750→→ Backend saves category
+   751→   751→→ Website navigation updates:
+   752→   752→  - Navbar dropdown shows new category
+   753→   753→  - Category grid on homepage updates
+   754→   754→  - Category page created automatically
+   755→   755→→ Mobile app updates category list
+   756→   756→
+   757→   757→Admin deactivates category:
+   758→   758→→ Category hidden from navigation
+   759→   759→→ Products still exist (not deleted)
+   760→   760→→ Products show in "All Products"
+   761→   761→
+   762→   762→6D. BRAND CONTROL CONNECTION
+   763→   763→──────────────────────────────
+   764→   764→
+   765→   765→FLOW:
+   766→   766→Admin adds new brand: "Olay"
+   767→   767→→ Backend saves brand
+   768→   768→→ Website brand carousel updates
+   769→   769→→ Products can now be assigned to Olay
+   770→   770→→ Brand page auto-created
+   771→   771→
+   772→   772→Admin marks brand as featured:
+   773→   773→→ Brand appears in homepage carousel
+   774→   774→→ Instantly visible
+   775→   775→
+   776→   776→After completing Section 6:
+   777→   777→Report all files changed.
+   778→   778→Wait for my approval.
+   779→   779→
+   780→   780→════════════════════════════════════════════
+   781→   781→SECTION 7: DELIVERY CONTROL CONNECTION
+   782→   782→════════════════════════════════════════════
+   783→   783→
+   784→   784→Admin controls delivery in real-time.
+   785→   785→
+   786→   786→7A. DELIVERY FEE UPDATE CONNECTION
+   787→   787→────────────────────────────────────
+   788→   788→
+   789→   789→FLOW:
+   790→   790→Admin updates Musanze fee: 3000→3500 RWF
+   791→   791→→ Backend updates zone
+   792→   792→→ Clears delivery cache
+   793→   793→→ Emits: delivery:feeUpdated
+   794→   794→→ Website checkout:
+   795→   795→  - New fee shows immediately
+   796→   796→  - Any customer in checkout sees new fee
+   797→   797→  - Order summary updates
+   798→   798→→ Mobile app updates fees
+   799→   799→
+   800→   800→7B. RIDER ASSIGNMENT CONNECTION
+   801→   801→─────────────────────────────────
+   802→   802→
+   803→   803→FLOW:
+   804→   804→Admin assigns rider to order
+   805→   805→→ Backend updates delivery record
+   806→   806→→ Emits: delivery:assigned to customer
+   807→   807→→ Customer order tracking shows:
+   808→   808→  - Rider name
+   809→   809→  - Rider phone (tap to call)
+   810→   810→  - Updated ETA
+   811→   811→→ SMS to customer automatically sent
+   812→   812→→ SMS to rider with order details
+   813→   813→
+   814→   814→7C. FREE DELIVERY THRESHOLD
+   815→   815→─────────────────────────────
+   816→   816→
+   817→   817→Admin changes free delivery threshold
+   818→   818→→ Website checkout updates instantly
+   819→   819→→ Homepage announcement bar updates
+   820→   820→→ Product pages update
+   821→   821→→ "Spend X more for free delivery"
+   822→   822→   shows correct amount
+   823→   823→
+   824→   824→After completing Section 7:
+   825→   825→Report all files changed.
+   826→   826→Wait for my approval.
+   827→   827→
+   828→   828→════════════════════════════════════════════
+   829→   829→SECTION 8: SMS & NOTIFICATION CONNECTION
+   830→   830→════════════════════════════════════════════
+   831→   831→
+   832→   832→All admin actions trigger correct
+   833→   833→notifications automatically.
+   834→   834→
+   835→   835→8A. AUTOMATIC SMS TRIGGERS
+   836→   836→────────────────────────────
+   837→   837→
+   838→   838→Connect all order status changes
+   839→   839→to automatic SMS:
+   840→   840→
+   841→   841→Order CONFIRMED:
+   842→   842→"Murakoze! Itumwa #[ORDER] ryemejwe.
+   843→   843→ Turategura ibicuruzwa byanyu.
+   844→   844→ BeautyHub Rwanda ✅"
+   845→   845→
+   846→   846→Order PROCESSING:
+   847→   847→"Itumwa #[ORDER] riri gutegurwa.
+   848→   848→ Tuzabyoherekeza vuba.
+   849→   849→ BeautyHub Rwanda 📦"
+   850→   850→
+   851→   851→Order SHIPPED:
+   852→   852→"Itumwa #[ORDER] riri mu nzira!
+   853→   853→ Umuherekeza: [RIDER] - [PHONE]
+   854→   854→ Uzabibona: [TIME]
+   855→   855→ BeautyHub Rwanda 🚚"
+   856→   856→
+   857→   857→Order DELIVERED:
+   858→   858→"Itumwa #[ORDER] ryafitiwe! 🎉
+   859→   859→ Murakoze guhitamo BeautyHub Rwanda.
+   860→   860→ Tanga ibitekerezo: [LINK]"
+   861→   861→
+   862→   862→Order CANCELLED:
+   863→   863→"Itumwa #[ORDER] ravanweho.
+   864→   864→ Amafaranga [AMOUNT] RWF azagaruka.
+   865→   865→ Twifurije: +250780000000"
+   866→   866→
+   867→   867→Payment FAILED:
+   868→   868→"Kwishyura kwawe #[ORDER] ntibyanenze.
+   869→   869→ Ongera ugerageze cyangwa uvugane
+   870→   870→ natwe: +250780000000
+   871→   871→ BeautyHub Rwanda"
+   872→   872→
+   873→   873→8B. ADMIN NOTIFICATION CENTER
+   874→   874→───────────────────────────────
+   875→   875→
+   876→   876→FIND existing notification bell in admin.
+   877→   877→IMPROVE to show:
+   878→   878→
+   879→   879→Notification types with icons:
+   880→   880→🛒 New order — #BHR-045 — 35,000 RWF
+   881→   881→💳 Payment confirmed — #BHR-043
+   882→   882→❌ Payment failed — #BHR-044 — 22,000 RWF
+   883→   883→⚠️ Low stock — Nivea Lotion (3 left)
+   884→   884→⭐ New review — 5 stars — Amina U.
+   885→   885→👤 New customer — +250780000001
+   886→   886→🔄 Refund request — #BHR-040
+   887→   887→💬 WhatsApp message received
+   888→   888→
+   889→   889→Notification features:
+   890→   890→- Click → goes to related page
+   891→   891→- Mark as read (one or all)
+   892→   892→- Real-time count badge
+   893→   893→- Sound for critical (new order)
+   894→   894→- Filter by type
+   895→   895→
+   896→   896→8C. BULK SMS FROM ADMIN
+   897→   897→─────────────────────────
+   898→   898→
+   899→   899→Admin sends bulk SMS campaign
+   900→   900→→ Backend queues all SMS
+   901→   901→→ Sends via Africa's Talking
+   902→   902→→ Shows progress in admin:
+   903→   903→  Sending... 1,234/3,456 sent
+   904→   904→  ████████████░░░░░░░░ 36%
+   905→   905→  Estimated: 2 minutes remaining
+   906→   906→→ Completion report:
+   907→   907→  Sent: 3,401
+   908→   908→  Failed: 55
+   909→   909→  Cost: 34,010 RWF
+   910→   910→
+   911→   911→After completing Section 8:
+   912→   912→Report all files changed.
+   913→   913→Wait for my approval.
+   914→   914→
+   915→   915→════════════════════════════════════════════
+   916→   916→SECTION 9: CUSTOMER CONTROL CONNECTION
+   917→   917→════════════════════════════════════════════
+   918→   918→
+   919→   919→Admin has full control over 
+   920→   920→customer accounts from admin panel.
+   921→   921→
+   922→   922→9A. CUSTOMER ACCOUNT CONTROL
+   923→   923→──────────────────────────────
+   924→   924→
+   925→   925→FLOW - Admin blocks customer:
+   926→   926→→ Backend marks account blocked
+   927→   927→→ Socket emits to that customer
+   928→   928→→ Customer immediately logged out
+   929→   929→→ Shows: "Your account has been 
+   930→   930→   suspended. Contact support."
+   931→   931→→ Cannot login again until unblocked
+   932→   932→
+   933→   933→FLOW - Admin unblocks:
+   934→   934→→ Customer can login again
+   935→   935→→ Optional SMS: "Your account has 
+   936→   936→   been reactivated. BeautyHub Rwanda"
+   937→   937→
+   938→   938→FLOW - Admin adds loyalty points:
+   939→   939→→ Customer balance updates live
+   940→   940→→ Notification to customer:
+   941→   941→  "💎 500 bonus points added!
+   942→   942→   New balance: 2,950 pts"
+   943→   943→
+   944→   944→FLOW - Admin removes bad review:
+   945→   945→→ Review disappears from website
+   946→   946→→ Customer notified:
+   947→   947→  "Your review was removed for 
+   948→   948→   violating our community guidelines"
+   949→   949→
+   950→   950→9B. LIVE CUSTOMER SUPPORT
+   951→   951→───────────────────────────
+   952→   952→
+   953→   953→When customer sends WhatsApp message:
+   954→   954→→ Admin sees it in admin panel
+   955→   955→→ Admin replies from admin panel
+   956→   956→→ Customer receives in WhatsApp
+   957→   957→→ All conversation logged
+   958→   958→
+   959→   959→Admin can see:
+   960→   960→- Active customers on website NOW
+   961→   961→- What page they are on
+   962→   962→- How long they have been browsing
+   963→   963→- What is in their cart
+   964→   964→- If they are stuck at checkout
+   965→   965→
+   966→   966→Admin can proactively message:
+   967→   967→"Hi! I see you are checking out.
+   968→   968→ Need any help? 😊"
+   969→   969→
+   970→   970→After completing Section 9:
+   971→   971→Report all files changed.
+   972→   972→Wait for my approval.
+   973→   973→
+   974→   974→════════════════════════════════════════════
+   975→   975→SECTION 10: ANALYTICS CONNECTION
+   976→   976→════════════════════════════════════════════
+   977→   977→
+   978→   978→Admin sees everything happening on
+   979→   979→website in real-time.
+   980→   980→
+   981→   981→10A. REAL-TIME WEBSITE ANALYTICS
+   982→   982→──────────────────────────────────
+   983→   983→
+   984→   984→Admin dashboard shows LIVE:
+   985→   985→
+   986→   986→┌─────────────────────────────────────────┐
+   987→   987→│  🔴 LIVE WEBSITE ACTIVITY              │
+   988→   988→├─────────────────────────────────────────┤
+   989→   989→│  👥 Active visitors right now: 47      │
+   990→   990→│  🛒 Active carts: 12                   │
+   991→   991→│  💳 Checkouts in progress: 3           │
+   992→   992→│  📱 Mobile users: 38 (81%)            │
+   993→   993→│  🖥️  Desktop users: 9 (19%)           │
+   994→   994→├─────────────────────────────────────────┤
+   995→   995→│  CURRENTLY POPULAR:                    │
+   996→   996→│  1. Nivea Lotion — 8 viewing now       │
+   997→   997→│  2. L'Oréal Serum — 5 viewing now     │
+   998→   998→│  3. Dark & Lovely — 3 viewing now     │
+   999→   999→├─────────────────────────────────────────┤
+  1000→  1000→│  LIVE EVENTS:                          │
+  1001→  1001→│  Just now: User added Nivea to cart   │
+  1002→  1002→│  1 min: New user registered (+250780) │
+  1003→  1003→│  2 min: Order placed #BHR-045        │
+  1004→  1004→│  3 min: Payment confirmed #BHR-043   │
+  1005→  1005→└─────────────────────────────────────────┘
+  1006→  1006→
+  1007→  1007→10B. REVENUE LIVE TICKER
+  1008→  1008→──────────────────────────
+  1009→  1009→
+  1010→  1010→In admin header:
+  1011→  1011→"Today's Revenue: 450,000 RWF ↑"
+  1012→  1012→Updates every time new payment confirmed.
+  1013→  1013→
+  1014→  1014→10C. CONVERSION FUNNEL LIVE
+  1015→  1015→─────────────────────────────
+  1016→  1016→
+  1017→  1017→Shows live:
+  1018→  1018→Visitors: 47
+  1019→  1019→↓ Viewed product: 32 (68%)
+  1020→  1020→↓ Added to cart: 12 (25%)
+  1021→  1021→↓ Started checkout: 5 (10%)
+  1022→  1022→↓ Completed payment: 3 (6%)
+  1023→  1023→
+  1024→  1024→Updates in real-time.
+  1025→  1025→
+  1026→  1026→After completing Section 10:
+  1027→  1027→Report all files changed.
+  1028→  1028→Wait for my approval.
+  1029→  1029→
+  1030→  1030→════════════════════════════════════════════
+  1031→  1031→SECTION 11: SECURITY & ACCESS CONTROL
+  1032→  1032→════════════════════════════════════════════
+  1033→  1033→
+  1034→  1034→Secure the admin-website connection.
+  1035→  1035→
+  1036→  1036→11A. ADMIN ACTION AUTHENTICATION
+  1037→  1037→──────────────────────────────────
+  1038→  1038→
+  1039→  1039→Every admin action must:
+  1040→  1040→- Verify JWT token
+  1041→  1041→- Verify role permission
+  1042→  1042→- Log action with:
+  1043→  1043→  admin ID + name
+  1044→  1044→  action performed
+  1045→  1045→  affected resource ID
+  1046→  1046→  timestamp
+  1047→  1047→  IP address
+  1048→  1048→- Rate limit per action type
+  1049→  1049→
+  1050→  1050→Critical actions need confirmation:
+  1051→  1051→- Delete product: "Type product name"
+  1052→  1052→- Block customer: "Confirm reason"
+  1053→  1053→- Issue refund: "Enter amount + reason"
+  1054→  1054→- Send bulk SMS: "Confirm: Send to 3,456?"
+  1055→  1055→
+  1056→  1056→11B. ADMIN SESSION MANAGEMENT
+  1057→  1057→───────────────────────────────
+  1058→  1058→
+  1059→  1059→Active sessions panel in admin:
+  1060→  1060→Shows all logged-in admin sessions:
+  1061→  1061→[Device] [Location] [Last Active] [End]
+  1062→  1062→
+  1063→  1063→Admin can:
+  1064→  1064→- End other sessions remotely
+  1065→  1065→- Force all logout (security breach)
+  1066→  1066→- See suspicious login alerts
+  1067→  1067→
+  1068→  1068→11C. PERMISSION-BASED CONTROL
+  1069→  1069→───────────────────────────────
+  1070→  1070→
+  1071→  1071→What each role can control:
+  1072→  1072→
+  1073→  1073→SUPER ADMIN: Everything
+  1074→  1074→ADMIN: All except staff management
+  1075→  1075→MANAGER:
+  1076→  1076→  ✅ Products (add/edit)
+  1077→  1077→  ✅ Orders (confirm/ship)
+  1078→  1078→  ✅ Customers (view)
+  1079→  1079→  ❌ Settings
+  1080→  1080→  ❌ Staff
+  1081→  1081→  ❌ Financial reports
+  1082→  1082→SALES STAFF:
+  1083→  1083→  ✅ Orders (view/confirm)
+  1084→  1084→  ✅ Customers (view)
+  1085→  1085→  ❌ Products
+  1086→  1086→  ❌ Settings
+  1087→  1087→DELIVERY MANAGER:
+  1088→  1088→  ✅ Orders (ship/deliver)
+  1089→  1089→  ✅ Riders (manage)
+  1090→  1090→  ❌ Products
+  1091→  1091→  ❌ Settings
+  1092→  1092→CONTENT EDITOR:
+  1093→  1093→  ✅ Blog (add/edit)
+  1094→  1094→  ✅ Banners (manage)
+  1095→  1095→  ✅ FAQ (manage)
+  1096→  1096→  ❌ Orders
+  1097→  1097→  ❌ Products prices
+  1098→  1098→  ❌ Settings
+  1099→  1099→
+  1100→  1100→Implement middleware that checks
+  1101→  1101→permission before every admin action.
+  1102→  1102→Return 403 if not permitted.
+  1103→  1103→
+  1104→  1104→After completing Section 11:
+  1105→  1105→Report all files changed.
+  1106→  1106→Wait for my approval.
+  1107→  1107→
+  1108→  1108→════════════════════════════════════════════
+  1109→  1109→SECTION 12: MOBILE APP CONNECTION
+  1110→  1110→════════════════════════════════════════════
+  1111→  1111→
+  1112→  1112→Admin changes also reflect in mobile app.
+  1113→  1113→
+  1114→  1114→12A. MOBILE REAL-TIME UPDATES
+  1115→  1115→───────────────────────────────
+  1116→  1116→
+  1117→  1117→Mobile app connects to same socket:
+  1118→  1118→
+  1119→  1119→When admin updates product:
+  1120→  1120→→ Mobile product list updates
+  1121→  1121→→ Mobile product detail updates
+  1122→  1122→→ Mobile cart updates if item changed
+  1123→  1123→
+  1124→  1124→When admin starts flash sale:
+  1125→  1125→→ Mobile gets push notification:
+  1126→  1126→  "⚡ FLASH SALE! 30% OFF skincare!"
+  1127→  1127→→ Mobile homepage shows flash sale
+  1128→  1128→→ Countdown timer on mobile
+  1129→  1129→
+  1130→  1130→When admin confirms order:
+  1131→  1131→→ Mobile push notification:
+  1132→  1132→  "✅ Order confirmed! Preparing now"
+  1133→  1133→→ Mobile order tracking updates
+  1134→  1134→
+  1135→  1135→When admin marks delivered:
+  1136→  1136→→ Mobile push: "Delivered! 🎉"
+  1137→  1137→→ Review prompt on mobile
+  1138→  1138→→ Points notification on mobile
+  1139→  1139→
+  1140→  1140→12B. MOBILE ADMIN MINI-PANEL
+  1141→  1141→──────────────────────────────
+  1142→  1142→
+  1143→  1143→Admin can do quick actions from phone:
+  1144→  1144→
+  1145→  1145→Mobile admin features:
+  1146→  1146→- View pending orders
+  1147→  1147→- Confirm order with one tap
+  1148→  1148→- See today's revenue
+  1149→  1149→- Assign rider to order
+  1150→  1150→- Send quick SMS to customer
+  1151→  1151→- View low stock alerts
+  1152→  1152→- Approve/reject reviews
+  1153→  1153→
+  1154→  1154→Access: /admin on mobile
+  1155→  1155→Shows simplified mobile admin UI
+  1156→  1156→Protected with same JWT
+  1157→  1157→
+  1158→  1158→After completing Section 12:
+  1159→  1159→Report all files changed.
+  1160→  1160→Wait for my approval.
+  1161→  1161→
+  1162→  1162→════════════════════════════════════════════
+  1163→  1163→SECTION 13: FINAL CONNECTION TESTING
+  1164→  1164→════════════════════════════════════════════
+  1165→  1165→
+  1166→  1166→After ALL sections complete,
+  1167→  1167→test EVERY connection:
+  1168→  1168→
+  1169→  1169→TEST 1: Product Lifecycle
+  1170→  1170→[ ] Admin adds product
+  1171→  1171→    → Website shows it (< 1 second)
+  1172→  1172→[ ] Admin edits price
+  1173→  1173→    → Website updates price (< 1 second)
+  1174→  1174→[ ] Admin deletes product
+  1175→  1175→    → Website removes it (< 1 second)
+  1176→  1176→[ ] Stock decreases on purchase
+  1177→  1177→    → Admin sees update (< 1 second)
+  1178→  1178→
+  1179→  1179→TEST 2: Order Lifecycle
+  1180→  1180→[ ] Customer places order
+  1181→  1181→    → Admin hears alert (< 1 second)
+  1182→  1182→[ ] Admin confirms order
+  1183→  1183→    → Customer sees confirmed (< 1 second)
+  1184→  1184→    → SMS sent to customer
+  1185→  1185→[ ] Admin assigns rider + ships
+  1186→  1186→    → Customer sees rider info (< 1 second)
+  1187→  1187→    → SMS sent to customer
+  1188→  1188→[ ] Admin marks delivered
+  1189→  1189→    → Customer sees delivered (< 1 second)
+  1190→  1190→    → SMS sent to customer
+  1191→  1191→    → Points awarded (< 1 second)
+  1192→  1192→
+  1193→  1193→TEST 3: Homepage Control
+  1194→  1194→[ ] Admin uploads banner
+  1195→  1195→    → Website shows it (< 1 second)
+  1196→  1196→[ ] Admin starts flash sale
+  1197→  1197→    → Website shows sale (< 1 second)
+  1198→  1198→    → Mobile push notification sent
+  1199→  1199→[ ] Admin ends flash sale
+  1200→  1200→    → Website removes it (< 1 second)
+  1201→  1201→[ ] Admin updates announcement
+  1202→  1202→    → Website shows new text (< 1 second)
+  1203→  1203→
+  1204→  1204→TEST 4: Content Control
+  1205→  1205→[ ] Admin publishes blog
+  1206→  1206→    → Website shows it (< 1 second)
+  1207→  1207→[ ] Admin adds category
+  1208→  1208→    → Navbar updates (< 1 second)
+  1209→  1209→[ ] Admin adds brand
+  1210→  1210→    → Brand carousel updates (< 1 second)
+  1211→  1211→
+  1212→  1212→TEST 5: Customer Control
+  1213→  1213→[ ] Admin blocks customer
+  1214→  1214→    → Customer logged out (immediate)
+  1215→  1215→[ ] Admin adds points
+  1216→  1216→    → Customer balance updates (< 1 second)
+  1217→  1217→[ ] Admin deletes review
+  1218→  1218→    → Website removes it (< 1 second)
+  1219→  1219→
+  1220→  1220→TEST 6: Delivery Control
+  1221→  1221→[ ] Admin updates fee
+  1222→  1222→    → Checkout shows new fee (< 1 second)
+  1223→  1223→[ ] Admin assigns rider
+  1224→  1224→    → Customer sees rider (< 1 second)
+  1225→  1225→
+  1226→  1226→TEST 7: Security
+  1227→  1227→[ ] Non-admin cannot access admin
+  1228→  1228→[ ] Expired token rejected
+  1229→  1229→[ ] Wrong role gets 403
+  1230→  1230→[ ] All actions logged
+  1231→  1231→
+  1232→  1232→════════════════════════════════════════════
+  1233→  1233→AFTER ALL SECTIONS COMPLETE:
+  1234→  1234→════════════════════════════════════════════
+  1235→  1235→
+  1236→  1236→Give me FINAL CONNECTION REPORT:
+  1237→  1237→
+  1238→  1238→╔═════════════════════════════════════════╗
+  1239→  1239→║   BEAUTYHUB RWANDA CONNECTION REPORT   ║
+  1240→  1240→╠═════════════════════════════════════════╣
+  1241→  1241→║ Section 1:  Real-time Setup    ✅/⚠️   ║
+  1242→  1242→║ Section 2:  Products Control   ✅/⚠️   ║
+  1243→  1243→║ Section 3:  Orders Control     ✅/⚠️   ║
+  1244→  1244→║ Section 4:  Homepage Control   ✅/⚠️   ║
+  1245→  1245→║ Section 5:  Pricing Control    ✅/⚠️   ║
+  1246→  1246→║ Section 6:  Content Control    ✅/⚠️   ║
+  1247→  1247→║ Section 7:  Delivery Control   ✅/⚠️   ║
+  1248→  1248→║ Section 8:  SMS Connection     ✅/⚠️   ║
+  1249→  1249→║ Section 9:  Customer Control   ✅/⚠️   ║
+  1250→  1250→║ Section 10: Analytics Live     ✅/⚠️   ║
+  1251→  1251→║ Section 11: Security           ✅/⚠️   ║
+  1252→  1252→║ Section 12: Mobile Connection  ✅/⚠️   ║
+  1253→  1253→║ Section 13: All Tests Pass     ✅/⚠️   ║
+  1254→  1254→╠═════════════════════════════════════════╣
+  1255→  1255→║ New Files Created:   [number]          ║
+  1256→  1256→║ Files Modified:      [number]          ║
+  1257→  1257→║ Files Untouched:     [number]          ║
+  1258→  1258→║ Existing Features:   ALL INTACT ✅     ║
+  1259→  1259→╠═════════════════════════════════════════╣
+  1260→  1260→║ CONNECTION STATUS:                     ║
+  1261→  1261→║ ✅ ADMIN HAS FULL CONTROL             ║
+  1262→  1262→║ ✅ ALL CHANGES ARE REAL-TIME          ║
+  1263→  1263→║ ✅ SMS AUTO-TRIGGERS WORKING          ║
+  1264→  1264→║ ✅ MOBILE APP CONNECTED               ║
+  1265→  1265→║ ✅ SECURITY VERIFIED                  ║
+  1266→  1266→║ ✅ RWANDA FEATURES INTACT             ║
+  1267→  1267→║ 🇷🇼 BEAUTYHUB RWANDA — FULLY LIVE!   ║
+  1268→  1268→╚═════════════════════════════════════════╝
+  1269→  1269→
+  1270→  1270→Then give me commands to test
+  1271→  1271→everything locally:
+  1272→  1272→
+  1273→  1273→Terminal 1: cd backend && npm run dev
+  1274→  1274→Terminal 2: cd frontend && npm run dev
+  1275→  1275→Terminal 3: cd admin && npm run dev --port 3001
+  1276→  1276→Terminal 4: cd mobile && npx expo start
+  1277→  1277→
+  1278→  1278→Open:
+  1279→  1279→Website: http://localhost:3000
+  1280→  1280→Admin: http://localhost:3001/admin
+  1281→  1281→API: http://localhost:5000
+  1282→  1282→DB: http://localhost:5555 (Prisma Studio)

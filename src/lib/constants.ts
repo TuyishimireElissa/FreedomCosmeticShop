@@ -1,5 +1,5 @@
 /**
- * App-wide constants for Ubumwe Beauty.
+ * App-wide constants for FreedomCosmeticShop.
  *
  * These are used across the storefront, checkout, and admin dashboard.
  * Keep them here so they can be changed in one place.
@@ -126,7 +126,7 @@ export const CART = {
   /** Maximum total items in cart */
   maxItems: 50,
   /** localStorage key for cart persistence */
-  storageKey: "ubumwe-store",
+  storageKey: "freedom-store",
 } as const
 
 // ============================================================================

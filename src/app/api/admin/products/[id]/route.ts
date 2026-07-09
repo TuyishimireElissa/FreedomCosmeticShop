@@ -8,6 +8,9 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
+import { requirePermission, PERMISSIONS, rateLimit } from "@/lib/permissions"
+import { broadcastProductEvent } from "@/lib/realtime"
+import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
 
 const UpdateProductSchema = z.object({
@@ -82,7 +85,15 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole("ADMIN")
+    // Section 11: Permission check + rate limiting
+    const adminUser = await requirePermission(PERMISSIONS.PRODUCTS_UPDATE)
+    const rl = rateLimit(`admin:${adminUser.id}:product-update`, { maxActions: 60, windowMs: 60000 })
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Rate limited. Too many product updates. Try again later." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((rl.retryAfterMs || 1000) / 1000)) } }
+      )
+    }
     const { id } = await params
     const body = await req.json()
 
@@ -132,6 +143,83 @@ export async function PUT(
       include: { category: true, brand: true },
     })
 
+    // ─── Section 2: Real-time broadcast with smart event detection ───
+    // Compare old vs new values to emit specific events that the storefront
+    // can react to (price changes, stock alerts, featured toggles, etc.)
+    const changes: string[] = []
+
+    // Price change detection
+    if (parsed.data.price !== undefined && parsed.data.price !== existing.price) {
+      changes.push(`price: ${existing.price} → ${updated.price}`)
+      await broadcastProductEvent("priceChange", {
+        id: updated.id,
+        name: updated.name,
+        slug: updated.slug,
+        price: updated.price,
+        oldPrice: existing.price,
+      }, { source: adminUser.name })
+    }
+
+    // Stock change detection
+    if (parsed.data.stock !== undefined && parsed.data.stock !== existing.stock) {
+      changes.push(`stock: ${existing.stock} → ${updated.stock}`)
+      const threshold = updated.lowStockThreshold || 5
+
+      if (updated.stock === 0) {
+        // Out of stock
+        await broadcastProductEvent("outOfStock", {
+          id: updated.id,
+          name: updated.name,
+          slug: updated.slug,
+          stock: 0,
+        }, { source: adminUser.name })
+      } else if (updated.stock <= threshold && existing.stock > threshold) {
+        // Crossed below low-stock threshold
+        await broadcastProductEvent("stockLow", {
+          id: updated.id,
+          name: updated.name,
+          slug: updated.slug,
+          stock: updated.stock,
+          threshold,
+        }, { source: adminUser.name })
+      }
+    }
+
+    // Featured toggle detection
+    if (parsed.data.featured !== undefined && parsed.data.featured !== existing.featured) {
+      changes.push(`featured: ${existing.featured} → ${updated.featured}`)
+      await broadcastProductEvent("featured", {
+        id: updated.id,
+        name: updated.name,
+        slug: updated.slug,
+        featured: updated.featured,
+      }, { source: adminUser.name })
+    }
+
+    // Always emit a general "updated" event (covers name, description, images, etc.)
+    // This ensures any storefront view showing this product refreshes its data.
+    await broadcastProductEvent("updated", {
+      id: updated.id,
+      name: updated.name,
+      slug: updated.slug,
+      price: updated.price,
+      stock: updated.stock,
+      isActive: updated.isActive,
+      featured: updated.featured,
+    }, { source: adminUser.name })
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "PRODUCT_UPDATE",
+      entityType: "PRODUCT",
+      entityId: updated.id,
+      description: `Updated product: ${updated.name}${changes.length > 0 ? ` (${changes.join(", ")})` : ""}`,
+      req,
+    }).catch(() => {})
+
     return NextResponse.json({ product: serializeProduct(updated) })
   } catch (error) {
     if (error instanceof Error && "statusCode" in error) {
@@ -146,11 +234,19 @@ export async function PUT(
 }
 
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole("ADMIN")
+    // Section 11: Strict permission check (PRODUCTS_CRUD) + rate limiting (10/min)
+    const adminUser = await requirePermission(PERMISSIONS.PRODUCTS_CRUD)
+    const rl = rateLimit(`admin:${adminUser.id}:product-delete`, { maxActions: 10, windowMs: 60000 })
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Rate limited. Too many deletions. Try again later." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((rl.retryAfterMs || 1000) / 1000)) } }
+      )
+    }
     const { id } = await params
 
     const existing = await db.product.findFirst({
@@ -169,6 +265,31 @@ export async function DELETE(
         isActive: false,
       },
     })
+
+    // ─── Section 2: Real-time broadcast ──────────────────────────────
+    // Notify all connected storefront clients that this product was deleted.
+    // The storefront will remove it from all listings, product detail pages,
+    // and shopping carts immediately.
+    await broadcastProductEvent("deleted", {
+      id: existing.id,
+      name: existing.name,
+      slug: existing.slug,
+      price: existing.price,
+      stock: existing.stock,
+      isActive: false,
+    }, { source: adminUser.name })
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "PRODUCT_DELETE",
+      entityType: "PRODUCT",
+      entityId: existing.id,
+      description: `Deleted product: ${existing.name}`,
+      req,
+    }).catch(() => {})
 
     return NextResponse.json({ success: true })
   } catch (error) {

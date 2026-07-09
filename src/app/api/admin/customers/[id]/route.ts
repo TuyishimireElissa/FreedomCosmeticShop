@@ -7,6 +7,8 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
+import { broadcastLoyaltyEvent, broadcastCustomerEvent } from "@/lib/realtime"
+import { logActivity } from "@/server/services/activity"
 
 export async function GET(
   _req: Request,
@@ -83,10 +85,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole("ADMIN")
+    const adminUser = await requireRole("ADMIN")
     const { id } = await params
     const body = await req.json()
-    const { action } = body as { action: "block" | "unblock" }
+    const { action } = body as {
+      action: "block" | "unblock" | "add_points" | "subtract_points"
+      points?: number
+      reason?: string
+    }
 
     const customer = await db.user.findFirst({
       where: { id, role: "CUSTOMER" },
@@ -95,6 +101,65 @@ export async function PATCH(
       return NextResponse.json({ error: "Customer not found" }, { status: 404 })
     }
 
+    // ---- Loyalty points adjustment (with ledger entry) ----
+    if (action === "add_points" || action === "subtract_points") {
+      const delta = Number(body.points) || 0
+      if (delta <= 0) {
+        return NextResponse.json(
+          { error: "Points must be a positive integer" },
+          { status: 400 }
+        )
+      }
+      const signedDelta = action === "add_points" ? delta : -delta
+      const newBalance = Math.max(0, customer.loyaltyPoints + signedDelta)
+      const reason = (body.reason || "Admin adjustment").toString().slice(0, 200)
+
+      // Update user balance + create ledger entry atomically
+      const [updated, ledger] = await db.$transaction([
+        db.user.update({
+          where: { id },
+          data: { loyaltyPoints: newBalance },
+        }),
+        db.loyaltyPoints.create({
+          data: {
+            userId: id,
+            points: signedDelta,
+            type: "ADJUSTMENT",
+            reason,
+            balanceAfter: newBalance,
+          },
+        }),
+      ])
+
+      // ─── Section 5: Real-time loyalty broadcast ───────────────────
+      // Notify the customer's browser that their points balance changed
+      // so the account dashboard + header points display update live.
+      await broadcastLoyaltyEvent(
+        action === "add_points" ? "earned" : "redeemed",
+        {
+          userId: id,
+          points: signedDelta,
+          balance: newBalance,
+          reason,
+        },
+        { source: adminUser.name }
+      )
+
+      return NextResponse.json({
+        success: true,
+        customer: {
+          id: updated.id,
+          loyaltyPoints: updated.loyaltyPoints,
+        },
+        ledger: {
+          id: ledger.id,
+          points: ledger.points,
+          balanceAfter: ledger.balanceAfter,
+        },
+      })
+    }
+
+    // ---- Block / unblock ----
     const isDeleted = action === "block"
     const updated = await db.user.update({
       where: { id },
@@ -103,6 +168,30 @@ export async function PATCH(
         deletedAt: isDeleted ? new Date() : null,
       },
     })
+
+    // ─── Section 9: Real-time customer block/unblock broadcast ──────
+    // Notify the customer's browser so they get logged out immediately
+    // if blocked, or see a reactivation toast if unblocked.
+    await broadcastCustomerEvent(
+      isDeleted ? "blocked" : "unblocked",
+      {
+        userId: id,
+        userName: updated.name,
+      },
+      { source: adminUser.name }
+    )
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: isDeleted ? "CUSTOMER_BLOCK" : "CUSTOMER_UNBLOCK",
+      entityType: "CUSTOMER",
+      entityId: id,
+      description: `${isDeleted ? "Blocked" : "Unblocked"} customer: ${updated.name}`,
+      req,
+    }).catch(() => {})
 
     return NextResponse.json({
       success: true,

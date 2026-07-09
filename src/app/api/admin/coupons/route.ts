@@ -7,6 +7,8 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
+import { broadcastCouponEvent } from "@/lib/realtime"
+import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
 
 const CreateCouponSchema = z.object({
@@ -29,9 +31,26 @@ export async function GET() {
 
     const coupons = await db.coupon.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        orders: {
+          where: { status: { not: "CANCELLED" } },
+          select: { total: true },
+        },
+      },
     })
 
-    return NextResponse.json({ coupons })
+    // Compute revenue generated per coupon (sum of non-cancelled order totals)
+    const serialized = coupons.map((c) => {
+      const revenueGenerated = c.orders.reduce((sum, o) => sum + o.total, 0)
+      const { orders: _orders, ...couponFields } = c
+      return {
+        ...couponFields,
+        revenueGenerated,
+        redemptionCount: c.usedCount,
+      }
+    })
+
+    return NextResponse.json({ coupons: serialized })
   } catch (error) {
     if (error instanceof Error && "statusCode" in error) {
       return NextResponse.json(
@@ -46,7 +65,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    await requireRole("ADMIN")
+    const adminUser = await requireRole("ADMIN")
     const body = await req.json()
 
     const parsed = CreateCouponSchema.safeParse(body)
@@ -77,6 +96,29 @@ export async function POST(req: Request) {
         productIds: "[]",
       },
     })
+
+    // ─── Section 5: Real-time broadcast ──────────────────────────────
+    // Notify storefront that a new coupon is available — customers can
+    // use it immediately at checkout.
+    await broadcastCouponEvent("created", {
+      id: coupon.id,
+      code: coupon.code,
+      type: coupon.type,
+      value: coupon.value,
+      isActive: coupon.isActive,
+    }, { source: adminUser.name })
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "COUPON_CREATE",
+      entityType: "COUPON",
+      entityId: coupon.id,
+      description: `Created coupon: ${coupon.code} (${coupon.type === "PERCENTAGE" ? `${coupon.value}%` : coupon.type === "FIXED" ? `${coupon.value} RWF` : "Free shipping"})`,
+      req,
+    }).catch(() => {})
 
     return NextResponse.json({ coupon }, { status: 201 })
   } catch (error) {

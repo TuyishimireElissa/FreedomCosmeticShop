@@ -18,6 +18,7 @@ import { useEffect, useState, useCallback } from "react"
 import { useStore } from "@/store/useStore"
 import { Product, Category, Brand } from "@/lib/types"
 import { ProductCard } from "./ProductCard"
+import { useProductUpdates } from "@/hooks/use-realtime"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -187,6 +188,37 @@ export function CatalogView() {
   useEffect(() => {
     loadProducts()
   }, [loadProducts])
+
+  // ─── Section 2: Real-time product updates ─────────────────────────
+  // When admin creates/updates/deletes a product, update the catalog
+  // list instantly without a full page refresh.
+  useProductUpdates((event, data) => {
+    const p = data as { id: string; name: string; slug: string; price?: number; stock?: number; isActive?: boolean; featured?: boolean; oldPrice?: number }
+
+    if (event === "product:created") {
+      // New product — refetch to get it in the right sort/filter position
+      loadProducts()
+    } else if (event === "product:updated" || event === "product:priceChange" || event === "product:stockLow" || event === "product:outOfStock" || event === "product:featured") {
+      // Update the product in-place if it's in the current list
+      setProducts((prev) =>
+        prev.map((item) =>
+          item.id === p.id
+            ? {
+                ...item,
+                name: p.name ?? item.name,
+                slug: p.slug ?? item.slug,
+                price: p.price ?? item.price,
+                stock: p.stock ?? item.stock,
+                featured: p.featured ?? item.featured,
+              }
+            : item
+        )
+      )
+    } else if (event === "product:deleted") {
+      // Remove from list
+      setProducts((prev) => prev.filter((item) => item.id !== p.id))
+    }
+  })
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()

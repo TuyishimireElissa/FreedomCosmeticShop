@@ -1,5 +1,5 @@
 /**
- * Zustand store for Ubumwe Beauty storefront.
+ * Zustand store for FreedomCosmeticShop storefront.
  *
  * Because the sandbox preview only exposes the `/` route, all "pages" are
  * implemented as views controlled by client-side state. This store holds:
@@ -26,6 +26,7 @@ export type ViewKey =
   | "register"
   | "account"
   | "trackOrder"
+  | "wholesale"
 
 /** Auth user type — matches the API response */
 export interface AuthUser {
@@ -34,6 +35,11 @@ export interface AuthUser {
   phone: string
   email: string | null
   role: string
+  loyaltyPoints?: number
+  userType?: string
+  wholesaleStatus?: string | null
+  wholesaleDiscount?: number
+  businessName?: string | null
 }
 
 export interface CartItem {
@@ -288,7 +294,7 @@ export const useStore = create<StoreState>()(
       cartSubtotal: () => get().items.reduce((sum, i) => sum + i.price * i.quantity, 0),
     }),
     {
-      name: "ubumwe-store",
+      name: "freedom-store",
       storage: createJSONStorage(() => localStorage),
       // Only persist the cart items — not transient view state or auth
       partialize: (state) =>

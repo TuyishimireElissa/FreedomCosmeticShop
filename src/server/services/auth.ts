@@ -32,6 +32,7 @@ import {
 } from "@/lib/auth"
 import { normalizeRwandaPhone, PhoneValidationError } from "@/lib/phone"
 import { createOtp, verifyOtp } from "@/lib/otp"
+import { logLogin } from "@/server/services/activity"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -79,6 +80,11 @@ function toAuthUser(user: {
   phone: string
   email: string | null
   role: string
+  loyaltyPoints?: number
+  userType?: string
+  wholesaleStatus?: string | null
+  wholesaleDiscount?: number
+  businessName?: string | null
 }): AuthUser {
   return {
     id: user.id,
@@ -86,6 +92,11 @@ function toAuthUser(user: {
     phone: user.phone,
     email: user.email,
     role: user.role,
+    loyaltyPoints: user.loyaltyPoints,
+    userType: user.userType,
+    wholesaleStatus: user.wholesaleStatus,
+    wholesaleDiscount: user.wholesaleDiscount,
+    businessName: user.businessName,
   }
 }
 
@@ -247,8 +258,23 @@ export async function loginWithPassword(
 
   const passwordValid = await verifyPassword(input.password, user.passwordHash)
   if (!passwordValid) {
+    // Best-effort audit log for failed login (don't await/block)
+    void logLogin({
+      userId: user.id,
+      userName: user.name,
+      userRole: user.role,
+      success: false,
+    }).catch(() => {})
     throw new Error("Invalid phone number or password")
   }
+
+  // Best-effort audit log for successful login (don't await/block)
+  void logLogin({
+    userId: user.id,
+    userName: user.name,
+    userRole: user.role,
+    success: true,
+  }).catch(() => {})
 
   const tokens = await issueTokens(user)
   return {

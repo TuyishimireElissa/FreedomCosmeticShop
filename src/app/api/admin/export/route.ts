@@ -148,6 +148,147 @@ export async function GET(req: Request) {
       ])
 
       csv = toCsv(headers, rows)
+    } else if (type === "payments") {
+      filename = `payments-${new Date().toISOString().split("T")[0]}.csv`
+      const payments = await db.payment.findMany({
+        orderBy: { initiatedAt: "desc" },
+        include: {
+          order: {
+            select: {
+              orderNumber: true,
+              customerName: true,
+              customerPhone: true,
+            },
+          },
+        },
+        take: 5000,
+      })
+
+      const headers = [
+        "TXN ID",
+        "Provider TXN ID",
+        "Date",
+        "Order Number",
+        "Customer Name",
+        "Customer Phone",
+        "Method",
+        "Amount",
+        "Status",
+        "Phone Used",
+        "Card Last4",
+        "Card Brand",
+        "Failure Reason",
+      ]
+
+      const rows = payments.map((p) => [
+        p.id,
+        p.providerTransactionId || "",
+        new Date(p.initiatedAt).toISOString(),
+        p.order?.orderNumber || "",
+        p.order?.customerName || "",
+        p.order?.customerPhone || "",
+        p.method,
+        p.amount,
+        p.status,
+        p.phoneNumber || "",
+        p.cardLast4 || "",
+        p.cardBrand || "",
+        p.failureReason || "",
+      ])
+
+      csv = toCsv(headers, rows)
+    } else if (type === "analytics") {
+      // Summary CSV — pulls the same data as /api/admin/analytics?range=<range>
+      // and lays it out as a flat CSV report.
+      const rangeParam = searchParams.get("range") || "month"
+
+      // Compute range start (mirror analytics route logic)
+      const nowDate = new Date()
+      let rangeStart: Date
+      switch (rangeParam) {
+        case "today":
+          rangeStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate())
+          break
+        case "week": {
+          const ws = new Date(nowDate)
+          const d = nowDate.getDay()
+          const diff = d === 0 ? 6 : d - 1
+          ws.setDate(nowDate.getDate() - diff)
+          ws.setHours(0, 0, 0, 0)
+          rangeStart = ws
+          break
+        }
+        case "year":
+          rangeStart = new Date(nowDate.getFullYear(), 0, 1)
+          break
+        case "month":
+        default:
+          rangeStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1)
+      }
+
+      const [rangeAgg, paidAgg, deliveredAgg, newCustCount, totalProducts, lowStockCount] = await Promise.all([
+        db.order.aggregate({
+          where: { createdAt: { gte: rangeStart }, status: { not: "CANCELLED" } },
+          _sum: { total: true },
+          _count: true,
+        }),
+        db.payment.aggregate({
+          where: { status: "PAID", initiatedAt: { gte: rangeStart } },
+          _sum: { amount: true },
+          _count: true,
+        }),
+        db.order.count({
+          where: { createdAt: { gte: rangeStart }, status: "DELIVERED" },
+        }),
+        db.user.count({
+          where: { role: "CUSTOMER", createdAt: { gte: rangeStart }, isDeleted: false },
+        }),
+        db.product.count({ where: { isDeleted: false } }),
+        db.product.count({ where: { isDeleted: false, stock: { lte: 5 } } }),
+      ])
+
+      // Repeat customer rate
+      const customerOrderCounts = await db.order.groupBy({
+        by: ["userId"],
+        _count: true,
+        where: {
+          createdAt: { gte: rangeStart },
+          status: { not: "CANCELLED" },
+          userId: { not: null },
+        },
+      })
+      const uniqueCust = customerOrderCounts.length
+      const repeatCust = customerOrderCounts.filter((c) => c._count >= 2).length
+      const repeatRate = uniqueCust > 0 ? Math.round((repeatCust / uniqueCust) * 100) : 0
+
+      const totalRevenue = rangeAgg._sum.total || 0
+      const totalOrders = rangeAgg._count
+      const aov = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0
+
+      filename = `analytics-${rangeParam}-${new Date().toISOString().split("T")[0]}.csv`
+      const headers = ["Metric", "Value"]
+      const rows: (string | number)[][] = [
+        ["Report Range", rangeParam],
+        ["Range Start", rangeStart.toISOString()],
+        ["Range End", nowDate.toISOString()],
+        ["Generated At", new Date().toISOString()],
+        [""],
+        ["Total Revenue (RWF)", totalRevenue],
+        ["Total Orders", totalOrders],
+        ["Average Order Value (RWF)", aov],
+        ["Paid Payments Count", paidAgg._count],
+        ["Paid Payments Amount (RWF)", paidAgg._sum.amount || 0],
+        ["Delivered Orders", deliveredAgg],
+        ["New Customers", newCustCount],
+        ["Unique Customers (in range)", uniqueCust],
+        ["Repeat Customers (>=2 orders)", repeatCust],
+        ["Repeat Customer Rate (%)", repeatRate],
+        [""],
+        ["Total Products", totalProducts],
+        ["Low Stock Products", lowStockCount],
+      ]
+
+      csv = toCsv(headers, rows)
     } else {
       return NextResponse.json({ error: "Invalid export type" }, { status: 400 })
     }

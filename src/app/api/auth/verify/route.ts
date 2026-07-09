@@ -31,7 +31,7 @@ export async function POST(req: Request) {
     // Set auth cookies
     const res = NextResponse.json({
       user: result.user,
-      message: "Registration complete! Welcome to Ubumwe Beauty.",
+      message: "Registration complete! Welcome to FreedomCosmeticShop.",
     })
     return setAuthCookies(res, result.accessToken, result.refreshToken)
   } catch (error) {

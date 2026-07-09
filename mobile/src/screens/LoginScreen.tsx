@@ -93,7 +93,7 @@ export function LoginScreen() {
               <Sparkles color="#fff" size={28} />
             </View>
             <Text className="mt-3 text-2xl font-bold text-foreground">
-              Ubumwe <Text className="text-primary">Beauty</Text>
+              FreedomCosmeticShop
             </Text>
             <Text className="mt-1 text-sm text-muted-foreground">Welcome back</Text>
           </View>

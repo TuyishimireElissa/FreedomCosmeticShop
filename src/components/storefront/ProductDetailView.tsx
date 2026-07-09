@@ -51,6 +51,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { useToast } from "@/hooks/use-toast"
+import { useProductUpdates } from "@/hooks/use-realtime"
 import {
   Star,
   Minus,
@@ -78,6 +79,12 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   const { toast } = useToast()
 
   const [product, setProduct] = useState<Product | null>(null)
+  const [wholesalePricing, setWholesalePricing] = useState<{
+    isWholesale: boolean
+    tiers: Array<{ minQty: number; maxQty: number | null; pricePerUnit: number; discountPercent: number; label: string }>
+    extraDiscount: number
+    minWholesaleQty: number
+  } | null>(null)
   const [related, setRelated] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [activeImage, setActiveImage] = useState(0)
@@ -102,8 +109,10 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
         const res = await fetch(`/api/products/${encodeURIComponent(slug)}`)
         if (!res.ok) throw new Error("Not found")
         const data = await res.json()
+        const { wholesalePricing: wp, ...productData } = data.product
         if (cancelled) return
-        setProduct(data.product)
+        setProduct(productData)
+        setWholesalePricing(wp || null)
         setRelated(data.related || [])
         // Set first shade as default
         if (data.product?.shades?.length) {
@@ -119,6 +128,55 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
       cancelled = true
     }
   }, [slug])
+
+  // ─── Section 2: Real-time product detail updates ──────────────────
+  // When admin updates THIS product (price, stock, name, etc.), update
+  // the detail view live without a page refresh. If the product is
+  // deleted or deactivated, show a "no longer available" message.
+  useProductUpdates((event, data) => {
+    if (!product) return
+    const p = data as { id: string; name: string; slug: string; price?: number; stock?: number; isActive?: boolean; featured?: boolean }
+
+    // Only react to events for THIS product
+    if (p.id !== product.id && p.slug !== product.slug) return
+
+    if (event === "product:updated" || event === "product:priceChange" || event === "product:stockLow" || event === "product:outOfStock") {
+      setProduct((prev) =>
+        prev
+          ? {
+              ...prev,
+              name: p.name ?? prev.name,
+              slug: p.slug ?? prev.slug,
+              price: p.price ?? prev.price,
+              stock: p.stock ?? prev.stock,
+              featured: p.featured ?? prev.featured,
+            }
+          : prev
+      )
+      // Show a toast for price changes
+      if (event === "product:priceChange" && p.price !== undefined) {
+        toast({
+          title: "Price updated",
+          description: `${p.name} is now ${formatRWF(p.price)}`,
+        })
+      }
+      // Show a toast for out-of-stock
+      if (event === "product:outOfStock") {
+        toast({
+          title: "Out of stock",
+          description: `${p.name} is no longer available`,
+          variant: "destructive",
+        })
+      }
+    } else if (event === "product:deleted") {
+      toast({
+        title: "Product no longer available",
+        description: "This product has been removed.",
+        variant: "destructive",
+      })
+      goCatalog()
+    }
+  })
 
   const handleAddToCart = (buyNow = false) => {
     if (!product) return
@@ -146,7 +204,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   const handleShare = (platform: "whatsapp" | "instagram" | "copy") => {
     if (!product) return
     const url = typeof window !== "undefined" ? window.location.href : ""
-    const text = `Check out this product on Ubumwe Beauty:\n${product.name} - ${formatRWF(product.price)}\n${url}\nPay with MTN MoMo 💛`
+    const text = `Check out this product on FreedomCosmeticShop:\n${product.name} - ${formatRWF(product.price)}\n${url}\nPay with MTN MoMo 💛`
 
     if (platform === "whatsapp") {
       window.open(
@@ -796,6 +854,86 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           </Accordion>
         </div>
       </div>
+
+      {/* ─── Section 4: Wholesale Pricing Table ─────────────────────── */}
+      {wholesalePricing && wholesalePricing.isWholesale ? (
+        <div className="mt-8 rounded-2xl border border-violet-200 bg-violet-50 p-5">
+          <h3 className="flex items-center gap-2 text-sm font-bold text-violet-900">
+            💰 Your Wholesale Pricing
+          </h3>
+          <p className="mt-0.5 text-xs text-violet-700">
+            Approved Wholesale Account{wholesalePricing.extraDiscount > 0 ? ` · +${wholesalePricing.extraDiscount}% extra discount` : ""}
+          </p>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-violet-200 text-xs uppercase tracking-wider text-violet-700">
+                  <th className="py-2 pr-3 text-left font-medium">Quantity</th>
+                  <th className="py-2 pr-3 text-right font-medium">Unit Price</th>
+                  <th className="py-2 text-right font-medium">You Save</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-violet-100">
+                {wholesalePricing.tiers.map((tier, i) => {
+                  const savings = product.price - tier.pricePerUnit
+                  const savingsPct = product.price > 0 ? Math.round((savings / product.price) * 100) : 0
+                  return (
+                    <tr key={i} className={qty >= tier.minQty && (tier.maxQty === null || qty <= tier.maxQty) ? "bg-violet-100" : ""}>
+                      <td className="py-2 pr-3 font-medium">
+                        {tier.minQty}{tier.maxQty ? ` - ${tier.maxQty}` : "+"} units
+                      </td>
+                      <td className="py-2 pr-3 text-right font-bold">
+                        {formatRWF(tier.pricePerUnit)}
+                      </td>
+                      <td className="py-2 text-right text-violet-700">
+                        {savings > 0 ? `${formatRWF(savings)} (${savingsPct}%)` : "—"}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-3 rounded-lg bg-violet-100 p-3 text-sm">
+            <span className="text-violet-900">Quantity: {qty}</span>
+            {(() => {
+              // Find applicable tier
+              const tier = wholesalePricing.tiers.find(
+                (t) => qty >= t.minQty && (t.maxQty === null || qty <= t.maxQty)
+              )
+              if (tier) {
+                const total = tier.pricePerUnit * qty
+                return (
+                  <span className="ml-2 font-bold text-violet-900">
+                    → Total: {formatRWF(total)}
+                    {tier.discountPercent > 0 && (
+                      <span className="ml-2 text-xs text-violet-600">
+                        ({tier.discountPercent}% off retail)
+                      </span>
+                    )}
+                  </span>
+                )
+              }
+              return <span className="ml-2 text-xs text-violet-600">Add {wholesalePricing.minWholesaleQty}+ units for wholesale pricing</span>
+            })()}
+          </div>
+        </div>
+      ) : (
+        <div className="mt-8 rounded-2xl border border-violet-100 bg-violet-50/50 p-4 text-center">
+          <p className="text-sm font-medium text-violet-900">
+            💡 Buy in bulk & save up to 30%
+          </p>
+          <p className="mt-0.5 text-xs text-violet-700">
+            Available for wholesale accounts · Min. order 50,000 RWF
+          </p>
+          <button
+            onClick={() => useStore.getState().setView("wholesale" as never)}
+            className="mt-2 text-xs font-medium text-violet-600 hover:underline"
+          >
+            Apply for Wholesale →
+          </button>
+        </div>
+      )}
 
       {/* ─── Reviews ──────────────────────────────────────────────── */}
       <div id="reviews" className="mt-12 scroll-mt-24">

@@ -1,5 +1,5 @@
 /**
- * Currency & formatting helpers for Ubumwe Beauty.
+ * Currency & formatting helpers for FreedomCosmeticShop.
  * All prices are stored in RWF (Rwandan Franc) as integers.
  */
 
@@ -121,19 +121,19 @@ export type PaymentMethodKey = keyof typeof PAYMENT_METHODS
 export const BANK_ACCOUNTS = [
   {
     bank: "Bank of Kigali (BK)",
-    accountName: "Ubumwe Beauty Ltd",
+    accountName: "FreedomCosmeticShop Ltd",
     accountNumber: "0123456789",
     branch: "Head Office — Kigali",
   },
   {
     bank: "Equity Bank Rwanda",
-    accountName: "Ubumwe Beauty Ltd",
+    accountName: "FreedomCosmeticShop Ltd",
     accountNumber: "0102345678",
     branch: "Kigali Branch",
   },
   {
     bank: "I&M Bank Rwanda",
-    accountName: "Ubumwe Beauty Ltd",
+    accountName: "FreedomCosmeticShop Ltd",
     accountNumber: "0203456789",
     branch: "KN 4 Ave Branch",
   },

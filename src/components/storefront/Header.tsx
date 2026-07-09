@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Top navigation header for Ubumwe Beauty.
+ * Top navigation header for FreedomCosmeticShop.
  *
  * Features:
  *  - Sticky top, blurred background on scroll
@@ -29,10 +29,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
+import { useSettings } from "@/hooks/use-settings"
 
 export function Header() {
   const { goHome, goCatalog, goCart, goAdmin, goLogin, goAccount, cartCount, user, authLoading, logout } = useStore()
   const { toast } = useToast()
+  const { settings } = useSettings()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -79,7 +81,7 @@ export function Header() {
             <SheetHeader>
               <SheetTitle className="flex items-center gap-2">
                 <Sparkles className="text-primary h-4 w-4" />
-                Ubumwe Beauty
+                FreedomCosmeticShop
               </SheetTitle>
             </SheetHeader>
             <nav className="mt-6 flex flex-col gap-1">
@@ -144,18 +146,24 @@ export function Header() {
           </SheetContent>
         </Sheet>
 
-        {/* Logo */}
+        {/* Logo — Section 3: Dynamic logo from settings */}
         <button
           onClick={goHome}
           className="flex shrink-0 items-center gap-2"
           aria-label="Go to homepage"
         >
-          <span className="bg-primary text-primary-foreground grid h-9 w-9 place-items-center rounded-full">
-            <Sparkles className="h-4 w-4" />
-          </span>
-          <span className="hidden text-lg font-semibold tracking-tight sm:inline">
-            Ubumwe <span className="text-primary">Beauty</span>
-          </span>
+          {settings?.logoUrl ? (
+            <img src={settings.logoUrl} alt="FreedomCosmeticShop" className="max-h-10 max-w-[160px] object-contain" />
+          ) : (
+            <>
+              <span className="bg-primary text-primary-foreground grid h-9 w-9 place-items-center rounded-full">
+                <Sparkles className="h-4 w-4" />
+              </span>
+              <span className="hidden text-lg font-semibold tracking-tight sm:inline">
+                FreedomCosmeticShop
+              </span>
+            </>
+          )}
         </button>
 
         {/* Desktop nav */}

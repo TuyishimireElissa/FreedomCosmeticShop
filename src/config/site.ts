@@ -1,5 +1,5 @@
 /**
- * Site-wide configuration for Ubumwe Beauty.
+ * Site-wide configuration for FreedomCosmeticShop.
  *
  * This is the single source of truth for brand info, contact details,
  * navigation structure, and social links. Import from here instead of
@@ -7,13 +7,13 @@
  *
  * Usage:
  *   import { siteConfig } from "@/config/site"
- *   console.log(siteConfig.name) // "Ubumwe Beauty"
+ *   console.log(siteConfig.name) // "FreedomCosmeticShop"
  */
 
 export const siteConfig = {
-  name: "Ubumwe Beauty",
-  shortName: "Ubumwe",
-  tagline: "Beauty that unites us.",
+  name: "FreedomCosmeticShop",
+  shortName: "Freedom Cosmetic",
+  tagline: "Rwanda's Beauty Freedom 🇷🇼",
   description:
     "Shop authentic skincare, makeup & haircare products in Rwanda. Pay with MTN MoMo or cash on delivery. Fast delivery in Kigali and across all provinces.",
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
@@ -23,7 +23,7 @@ export const siteConfig = {
     phone: "+250788123456",
     phoneDisplay: "+250 788 123 456",
     whatsapp: "+250788123456",
-    email: "hello@ubumwe.beauty",
+    email: "hello@freedomcosmeticshop.rw",
     address: {
       street: "KN 4 Ave, Kigali Heights",
       city: "Kigali",
@@ -34,10 +34,10 @@ export const siteConfig = {
 
   // Social media
   social: {
-    instagram: "https://instagram.com/ubumwe.beauty",
-    facebook: "https://facebook.com/ubumwe.beauty",
-    twitter: "https://twitter.com/ubumwe_beauty",
-    tiktok: "https://tiktok.com/@ubumwe.beauty",
+    instagram: "https://instagram.com/freedomcosmeticshop",
+    facebook: "https://facebook.com/freedomcosmeticshop",
+    twitter: "https://twitter.com/freedomcosmeticrw",
+    tiktok: "https://tiktok.com/@freedomcosmeticshop",
   },
 
   // Primary navigation

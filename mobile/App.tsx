@@ -1,5 +1,5 @@
 /**
- * Ubumwe Beauty — React Native Mobile App (Expo)
+ * FreedomCosmeticShop — React Native Mobile App (Expo)
  *
  * Entry point. Sets up:
  *   - Splash screen

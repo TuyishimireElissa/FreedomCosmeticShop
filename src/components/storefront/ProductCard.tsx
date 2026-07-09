@@ -26,9 +26,15 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const { goProduct, addToCart } = useStore()
+  const { goProduct, addToCart, user } = useStore()
   const { toast } = useToast()
   const [added, setAdded] = useState(false)
+
+  // Section 4: Check if user is approved wholesale
+  const isWholesaleUser =
+    user &&
+    (user.userType === "WHOLESALE" || user.userType === "BOTH") &&
+    user.wholesaleStatus === "APPROVED"
 
   const images = product.images || []
   const primaryImage = images[0] || "/placeholder.svg"
@@ -141,17 +147,31 @@ export function ProductCard({ product }: ProductCardProps) {
           </p>
         )}
 
-        {/* Price */}
-        <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-foreground text-base font-semibold sm:text-lg">
-            {formatRWF(product.price)}
-          </span>
-          {hasDiscount && (
-            <span className="text-muted-foreground text-xs line-through">
-              {formatRWF(product.compareAt!)}
+        {/* Price — Section 4: Show wholesale price for wholesale users */}
+        {isWholesaleUser ? (
+          <div className="mt-2">
+            <p className="text-[10px] text-muted-foreground line-through">
+              Retail: {formatRWF(product.price)}
+            </p>
+            <p className="text-base font-bold text-violet-700 sm:text-lg">
+              {formatRWF(product.price)}
+            </p>
+            <p className="text-[10px] font-medium text-violet-600">
+              💛 Your wholesale price (min. {product.minWholesaleQty || 6} units)
+            </p>
+          </div>
+        ) : (
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-foreground text-base font-semibold sm:text-lg">
+              {formatRWF(product.price)}
             </span>
-          )}
-        </div>
+            {hasDiscount && (
+              <span className="text-muted-foreground text-xs line-through">
+                {formatRWF(product.compareAt!)}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Spacer pushes button to bottom */}
         <div className="flex-1" />

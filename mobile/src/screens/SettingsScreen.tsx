@@ -49,15 +49,15 @@ export function SettingsScreen() {
       section: "Security",
       items: [
         { icon: Fingerprint, label: "Biometric login", toggle: biometricEnabled, onToggle: setBiometricEnabled },
-        { icon: ShieldCheck, label: "Privacy policy", action: () => Linking.openURL("https://ubumwe.beauty/privacy") },
+        { icon: ShieldCheck, label: "Privacy policy", action: () => Linking.openURL("https://freedomcosmeticshop.rw/privacy") },
       ],
     },
     {
       section: "About",
       items: [
         { icon: HelpCircle, label: "Help & support", action: () => Linking.openURL("https://wa.me/250788123456") },
-        { icon: Star, label: "Rate the app", action: () => Linking.openURL("market://details?id=com.ubumwe.beauty") },
-        { icon: FileText, label: "Terms of service", action: () => Linking.openURL("https://ubumwe.beauty/terms") },
+        { icon: Star, label: "Rate the app", action: () => Linking.openURL("market://details?id=com.freedomcosmeticshop.rw") },
+        { icon: FileText, label: "Terms of service", action: () => Linking.openURL("https://freedomcosmeticshop.rw/terms") },
       ],
     },
   ]
@@ -106,7 +106,7 @@ export function SettingsScreen() {
         ))}
 
         <Text className="px-4 pb-8 text-center text-xs text-muted-foreground">
-          Ubumwe Beauty v1.0.0{"\n"}Made with 🤍 in Kigali, Rwanda
+          FreedomCosmeticShop v1.0.0{"\n"}Made with 🤍 in Kigali, Rwanda
         </Text>
       </ScrollView>
     </SafeAreaView>

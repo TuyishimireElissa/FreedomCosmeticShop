@@ -1,7 +1,7 @@
 "use client"
 
 /**
- * Ubumwe Beauty — single-page storefront entry.
+ * FreedomCosmeticShop — single-page storefront entry.
  *
  * The sandbox preview only exposes the `/` route, so all "pages" are
  * implemented as views controlled by the Zustand store. The active view
@@ -29,7 +29,10 @@ import { LoginView } from "@/components/auth/LoginView"
 import { RegisterView } from "@/components/auth/RegisterView"
 import { AccountView } from "@/components/auth/AccountView"
 import { TrackOrderView } from "@/components/storefront/TrackOrderView"
+import { WholesaleView } from "@/components/wholesale/WholesaleView"
 import { WhatsAppButton } from "@/components/ui/WhatsAppButton"
+import { ErrorBoundary } from "@/components/error-boundary"
+import { useRealtimeEvents } from "@/hooks/use-realtime"
 
 export default function Home() {
   const { view, activeProductSlug, lastOrderId, fetchUser } = useStore()
@@ -38,6 +41,9 @@ export default function Home() {
   useEffect(() => {
     fetchUser()
   }, [fetchUser])
+
+  // Section 1: establish real-time SSE connection (admin → storefront sync)
+  useRealtimeEvents()
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -57,7 +63,12 @@ export default function Home() {
           <ConfirmationView orderId={lastOrderId} />
         )}
         {view === "trackOrder" && <TrackOrderView />}
-        {view === "admin" && <AdminView />}
+        {view === "wholesale" && <WholesaleView />}
+        {view === "admin" && (
+          <ErrorBoundary>
+            <AdminView />
+          </ErrorBoundary>
+        )}
         {view === "login" && <LoginView />}
         {view === "register" && <RegisterView />}
         {view === "account" && <AccountView />}

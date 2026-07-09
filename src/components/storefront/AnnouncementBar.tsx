@@ -14,7 +14,7 @@
 import { useState, useEffect } from "react"
 import { X, Truck, Sparkles } from "lucide-react"
 
-const STORAGE_KEY = "ubumwe-announcement-dismissed"
+const STORAGE_KEY = "freedom-announcement-dismissed"
 
 export function AnnouncementBar() {
   const [visible, setVisible] = useState(false)

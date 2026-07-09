@@ -32,7 +32,7 @@ interface Suggestion {
   brands: { id: string; name: string; slug: string }[]
 }
 
-const RECENT_SEARCHES_KEY = "ubumwe-recent-searches"
+const RECENT_SEARCHES_KEY = "freedom-recent-searches"
 const MAX_RECENT = 5
 const TRENDING_SEARCHES = ["Vitamin C", "Sunscreen", "Foundation", "Hair oil", "Lipstick"]
 

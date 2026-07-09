@@ -166,7 +166,7 @@ export const useAuthStore = create<StoreState>()(
       isInWishlist: (productId) => get().wishlist.includes(productId),
     }),
     {
-      name: "ubumwe-mobile-store",
+      name: "freedom-mobile-store",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         cart: state.cart,

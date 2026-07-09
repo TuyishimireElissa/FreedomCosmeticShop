@@ -71,7 +71,7 @@ export function RegisterScreen() {
               Create account
             </Text>
             <Text className="mt-1 text-sm text-muted-foreground">
-              Join Ubumwe Beauty
+              Join FreedomCosmeticShop
             </Text>
           </View>
 

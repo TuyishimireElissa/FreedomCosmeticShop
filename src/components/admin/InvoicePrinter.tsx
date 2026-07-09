@@ -177,7 +177,7 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
   <div class="header">
     <div>
       <div class="logo">
-        Ubumwe Beauty
+        FreedomCosmeticShop
         <small>Beauty that unites us</small>
       </div>
     </div>
@@ -256,8 +256,8 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
   </div>
 
   <div class="footer">
-    <p>Thank you for shopping with Ubumwe Beauty! 🌸</p>
-    <p>KN 4 Ave, Kigali Heights, Kigali, Rwanda · +250 788 123 456 · hello@ubumwe.beauty</p>
+    <p>Thank you for shopping with FreedomCosmeticShop! 🌸</p>
+    <p>KN 4 Ave, Kigali Heights, Kigali, Rwanda · +250 788 123 456 · hello@freedomcosmeticshop.rw</p>
     <p>For support, call us or send a WhatsApp message.</p>
   </div>
 

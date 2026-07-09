@@ -77,15 +77,15 @@ export function ProductDetailScreen() {
   const handleShare = async () => {
     if (!product) return
     await Share.share({
-      message: `Check out ${product.name} on Ubumwe Beauty! ${formatRWF(product.price)}`,
-      url: `https://ubumwe.beauty/products/${product.slug}`,
+      message: `Check out ${product.name} on FreedomCosmeticShop! ${formatRWF(product.price)}`,
+      url: `https://freedomcosmeticshop.rw/products/${product.slug}`,
       title: product.name,
     })
   }
 
   const handleWhatsAppShare = () => {
     if (!product) return
-    const msg = `Check out ${product.name} on Ubumwe Beauty! ${formatRWF(product.price)}`
+    const msg = `Check out ${product.name} on FreedomCosmeticShop! ${formatRWF(product.price)}`
     // Open WhatsApp with the message
     // In React Native, use Linking.openURL
     import("react-native").then(({ Linking }) => {

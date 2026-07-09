@@ -26,7 +26,7 @@ export function useBiometric() {
   const authenticate = useCallback(async (): Promise<boolean> => {
     try {
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: "Authenticate to login to Ubumwe Beauty",
+        promptMessage: "Authenticate to login to FreedomCosmeticShop",
         fallbackLabel: "Use password",
         cancelLabel: "Cancel",
         disableDeviceFallback: false,

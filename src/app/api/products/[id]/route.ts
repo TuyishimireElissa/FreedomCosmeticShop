@@ -2,9 +2,14 @@
  * GET /api/products/[id]
  * Returns a single product by id or slug, including its category, brand,
  * and up to 4 related products from the same category.
+ *
+ * Section 2: Also returns wholesale pricing tiers if the requesting user
+ * is an approved wholesale customer.
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireAuth } from "@/lib/auth"
+import { getWholesaleTiers } from "@/server/services/wholesale"
 
 export async function GET(
   _req: Request,
@@ -57,8 +62,44 @@ export async function GET(
       ingredients: p.ingredients ? (JSON.parse(p.ingredients) as string[]) : null,
     }))
 
+    // ─── Section 2: Add wholesale pricing if user is approved wholesale ───
+    let wholesalePricing: {
+      isWholesale: boolean
+      tiers: Array<{ pricePerUnit: number; minQty: number; maxQty: number | null; discountPercent: number; label: string }>
+      extraDiscount: number
+      minWholesaleQty: number
+    } | null = null
+    try {
+      const user = await requireAuth()
+      if (
+        user &&
+        (user.userType === "WHOLESALE" || user.userType === "BOTH") &&
+        user.wholesaleStatus === "APPROVED" &&
+        product.wholesaleActive
+      ) {
+        const tiers = await getWholesaleTiers(product.id)
+        const extraDiscount = user.wholesaleDiscount || 0
+        wholesalePricing = {
+          isWholesale: true,
+          tiers: tiers.map((t) => ({
+            ...t,
+            pricePerUnit: extraDiscount > 0
+              ? Math.round(t.pricePerUnit * (1 - extraDiscount / 100))
+              : t.pricePerUnit,
+          })),
+          extraDiscount,
+          minWholesaleQty: product.minWholesaleQty,
+        }
+      }
+    } catch {
+      // Not authenticated — retail pricing only (no wholesale)
+    }
+
     return NextResponse.json({
-      product: serializeProduct(product),
+      product: {
+        ...serializeProduct(product),
+        wholesalePricing,
+      },
       related: serializedRelated,
     })
   } catch (error) {

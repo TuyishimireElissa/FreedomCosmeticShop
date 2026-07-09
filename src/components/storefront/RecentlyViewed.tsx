@@ -3,7 +3,7 @@
 /**
  * RecentlyViewed — horizontal scroller of recently viewed products.
  *
- * Tracks product slugs in localStorage (key: "ubumwe-recently-viewed").
+ * Tracks product slugs in localStorage (key: "freedom-recently-viewed").
  * Adds the current product to the list on mount.
  * Renders the most recent 8 products, excluding the current one.
  */
@@ -14,7 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { ProductCard } from "./ProductCard"
 import { Clock } from "lucide-react"
 
-const STORAGE_KEY = "ubumwe-recently-viewed"
+const STORAGE_KEY = "freedom-recently-viewed"
 const MAX_ITEMS = 8
 
 interface RecentlyViewedProps {

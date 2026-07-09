@@ -1,4 +1,4 @@
-# Ubumwe Beauty 🌸
+# FreedomCosmeticShop 🌸
 
 > Beauty that unites us — Rwanda's home for authentic skincare, makeup & haircare.
 
@@ -45,7 +45,7 @@ A production-ready cosmetics e-commerce platform built for the Rwandan market. P
 ## 📁 Project Structure
 
 ```
-ubumwe-beauty/
+freedom-cosmetic-shop/
 ├── prisma/
 │   ├── schema.prisma              # SQLite dev schema (active)
 │   ├── schema.postgres.prisma     # PostgreSQL production schema (ready to swap)
@@ -149,8 +149,8 @@ ubumwe-beauty/
 
 ```bash
 # 1. Clone the repo
-git clone <your-repo-url> ubumwe-beauty
-cd ubumwe-beauty
+git clone <your-repo-url> freedom-cosmetic-shop
+cd freedom-cosmetic-shop
 
 # 2. Install dependencies
 bun install
@@ -366,7 +366,7 @@ For managed PostgreSQL with free tier:
 ## 📞 Support
 
 - **Phone:** +250 788 123 456
-- **Email:** hello@ubumwe.beauty
+- **Email:** hello@freedomcosmeticshop.rw
 - **Address:** KN 4 Ave, Kigali Heights, Kigali, Rwanda
 
 ---

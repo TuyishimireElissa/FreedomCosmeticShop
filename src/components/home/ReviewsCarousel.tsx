@@ -39,7 +39,7 @@ const DEFAULT_REVIEWS: Review[] = [
     name: "Claudine U.",
     city: "Huye",
     rating: 5,
-    text: "Finally a foundation that matches my skin tone without looking ashy! The Mocha lipstick is my new everyday shade. Thank you Ubumwe Beauty.",
+    text: "Finally a foundation that matches my skin tone without looking ashy! The Mocha lipstick is my new everyday shade. Thank you FreedomCosmeticShop.",
     product: "Full Coverage Foundation — Deep",
   },
   {

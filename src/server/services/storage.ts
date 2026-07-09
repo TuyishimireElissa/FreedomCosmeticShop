@@ -26,7 +26,7 @@ export type UploadResult = {
  */
 export async function uploadImage(
   base64: string,
-  folder = "ubumwe/products"
+  folder = "freedom-cosmetic-shop/products"
 ): Promise<UploadResult> {
   if (!env.CLOUDINARY_CLOUD_NAME || !env.CLOUDINARY_API_KEY) {
     return {
@@ -39,7 +39,7 @@ export async function uploadImage(
     // Use Cloudinary's unsigned upload API
     const formData = new FormData()
     formData.append("file", base64)
-    formData.append("upload_preset", env.CLOUDINARY_UPLOAD_PRESET || "ubumwe_uploads")
+    formData.append("upload_preset", env.CLOUDINARY_UPLOAD_PRESET || "freedom_uploads")
     formData.append("folder", folder)
 
     const res = await fetch(

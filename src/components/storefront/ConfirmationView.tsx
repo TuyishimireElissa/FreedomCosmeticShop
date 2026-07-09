@@ -76,7 +76,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
     const items = order.items
       .map((i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`)
       .join("\n")
-    const message = `🛍️ Order ${order.orderNumber} from Ubumwe Beauty\n\n${items}\n\nTotal: ${formatRWF(order.total)}\nPayment: ${PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod}\nStatus: ${order.status}\n\nTrack at ubumwe.beauty 🌸`
+    const message = `🛍️ Order ${order.orderNumber} from FreedomCosmeticShop\n\n${items}\n\nTotal: ${formatRWF(order.total)}\nPayment: ${PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod}\nStatus: ${order.status}\n\nTrack at freedomcosmeticshop.rw 🌸`
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank")
   }
 

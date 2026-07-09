@@ -60,7 +60,9 @@ import {
   ImagePlus,
   Copy,
   Download,
+  Tag,
 } from "lucide-react"
+import { WholesalePricingPanel } from "./WholesalePricingPanel"
 
 interface AdminProductManagerProps {
   onStatsUpdate?: () => void
@@ -135,6 +137,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
 
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null)
   const [deleting, setDeleting] = useState(false)
+
+  // Section 3: Wholesale pricing modal
+  const [pricingTarget, setPricingTarget] = useState<Product | null>(null)
 
   // Load categories + brands once
   useEffect(() => {
@@ -562,6 +567,17 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                           aria-label={`Edit ${p.name}`}
                         >
                           <Pencil className="h-4 w-4" />
+                        </Button>
+                        {/* Section 3: Wholesale pricing button */}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-violet-600 hover:bg-violet-50"
+                          onClick={() => setPricingTarget(p)}
+                          aria-label={`Wholesale pricing for ${p.name}`}
+                          title="Wholesale Pricing"
+                        >
+                          <Tag className="h-4 w-4" />
                         </Button>
                         {/* NEW: Duplicate action */}
                         <Button
@@ -1042,6 +1058,24 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Section 3: Wholesale Pricing Modal */}
+      {pricingTarget && (
+        <Dialog open={!!pricingTarget} onOpenChange={(o) => !o && setPricingTarget(null)}>
+          <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Tag className="h-5 w-5 text-violet-600" />
+                Wholesale Pricing — {pricingTarget.name}
+              </DialogTitle>
+            </DialogHeader>
+            <WholesalePricingPanel
+              productId={pricingTarget.id}
+              onClose={() => setPricingTarget(null)}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }

@@ -1,5 +1,5 @@
 // =============================================================================
-// Ubumwe Beauty — Complete Prisma Schema (SQLite / Development)
+// FreedomCosmeticShop — Complete Prisma Schema (SQLite / Development)
 // =============================================================================
 //
 // 19 models for a production-ready Rwanda cosmetics e-commerce platform:
@@ -65,6 +65,22 @@ model User {
   // Email verification
   emailVerifiedAt DateTime?
 
+  // ─── Section 1: Wholesale fields ──────────────────────────────────
+  // userType: RETAIL (default) | WHOLESALE | BOTH
+  userType          String   @default("RETAIL") // UserType enum as string (SQLite)
+  wholesaleStatus   String?  // PENDING | APPROVED | REJECTED | SUSPENDED
+  businessName      String?
+  businessType      String?  // BEAUTY_SALON | HAIR_SALON | SPA | SHOP | MARKET_VENDOR | BEAUTY_SCHOOL | HOTEL | RESELLER | OTHER
+  businessPhone     String?
+  businessAddress   String?
+  businessDistrict  String?
+  tinNumber         String?  // Rwanda Tax ID
+  wholesaleApprovedAt DateTime?
+  wholesaleApprovedBy String?
+  wholesaleLimit    Int?     // Credit limit in RWF
+  wholesaleBalance  Int      @default(0) // Current credit balance in RWF
+  wholesaleDiscount Int      @default(0) // Extra % discount on top of tier
+
   // Soft delete
   isDeleted   Boolean   @default(false)
   deletedAt   DateTime?
@@ -83,11 +99,17 @@ model User {
   loyaltyTransactions LoyaltyPoints[]
   blogPosts           BlogPost[]
   staffProfile        StaffProfile?
+  activityLogs        ActivityLog[]
+  wholesaleApplication  WholesaleApplication?
+  wholesaleCredit       WholesaleCredit?
+  wholesaleInvoices     WholesaleInvoice[]
 
   @@index([phone])
   @@index([email])
   @@index([role])
   @@index([isDeleted])
+  @@index([userType])
+  @@index([wholesaleStatus])
 }
 
 // =============================================================================
@@ -241,6 +263,10 @@ model Product {
   isNew             Boolean  @default(false)
   isActive          Boolean  @default(true)
 
+  // ─── Section 1: Wholesale product fields ──────────────────────────
+  minWholesaleQty   Int      @default(6)
+  wholesaleActive   Boolean  @default(true)
+
   // Soft delete
   isDeleted         Boolean  @default(false)
   deletedAt         DateTime?
@@ -259,6 +285,7 @@ model Product {
   reviews           Review[]
   wishlistItems     Wishlist[]
   cartItems         CartItem[]
+  pricing           ProductPricing?
 
   @@index([slug])
   @@index([categoryId])
@@ -268,6 +295,7 @@ model Product {
   @@index([isDeleted])
   @@index([price])
   @@index([createdAt])
+  @@index([wholesaleActive])
 }
 
 // =============================================================================
@@ -358,6 +386,12 @@ model Order {
   // Status: PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED | RETURNED
   status        String   @default("PENDING")
 
+  // ─── Section 1: Wholesale order fields ────────────────────────────
+  orderType     String   @default("RETAIL") // RETAIL | WHOLESALE
+  priceType     String   @default("RETAIL") // RETAIL | WHOLESALE | SPECIAL
+  isCredit      Boolean  @default(false) // true if wholesale order on credit
+  creditDueDate DateTime?
+
   // Timestamps
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -367,6 +401,7 @@ model Order {
   payments      Payment[]
   delivery      Delivery?
   reviews       Review[]
+  wholesaleInvoice WholesaleInvoice?
 
   @@index([orderNumber])
   @@index([status])
@@ -374,6 +409,7 @@ model Order {
   @@index([userId])
   @@index([createdAt])
   @@index([couponId])
+  @@index([orderType])
 }
 
 // =============================================================================
@@ -845,4 +881,248 @@ model DeliveryZoneSettings {
 
   @@index([zoneCode])
   @@index([isActive])
+}
+
+// =============================================================================
+// 21. ACTIVITY LOG (audit trail for staff/admin actions)
+// =============================================================================
+// Lightweight audit log — one row per staff action (login, order update,
+// refund, customer block, coupon create, etc.). Used by the Staff & Security
+// tab in the admin dashboard.
+//
+// Note: writes are best-effort. If the table is missing or the write fails,
+// the calling operation should still succeed (we don't want audit logging
+// to break business logic). The helper `logActivity()` in src/server/services/activity.ts
+// wraps this in a try/catch.
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+
+  // Who performed the action (nullable for system/anonymized events)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Snapshot of who (denormalized for resilience — survives user deletion)
+  userName  String?
+  userRole  String?
+
+  // What happened
+  // Action categories: AUTH_LOGIN | AUTH_LOGOUT | AUTH_FAILED | ORDER_UPDATE |
+  //   PAYMENT_REFUND | CUSTOMER_BLOCK | CUSTOMER_UNBLOCK | COUPON_CREATE |
+  //   COUPON_UPDATE | COUPON_DELETE | BANNER_CREATE | BANNER_UPDATE | BANNER_DELETE |
+  //   PRODUCT_CREATE | PRODUCT_UPDATE | PRODUCT_DELETE | DELIVERY_ASSIGN |
+  //   DELIVERY_UPDATE | SMS_SEND | SETTINGS_UPDATE | STAFF_CREATE | STAFF_UPDATE
+  action    String
+
+  // Optional entity reference (e.g., order ID, customer ID, coupon code)
+  entityType String?  // ORDER | CUSTOMER | COUPON | BANNER | PRODUCT | DELIVERY | PAYMENT | STAFF
+  entityId   String?
+
+  // Human-readable description (e.g., "Updated order UB-2026-00001 to SHIPPED")
+  description String?
+
+  // IP + user agent for security forensics
+  ipAddress String?
+  userAgent String?
+
+  // Severity: info | warn | critical
+  severity  String   @default("info")
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// 22. WHOLESALE APPLICATION (businesses applying for wholesale accounts)
+// =============================================================================
+
+model WholesaleApplication {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  businessName    String
+  businessType    String   // BEAUTY_SALON | HAIR_SALON | SPA | SHOP | MARKET_VENDOR | BEAUTY_SCHOOL | HOTEL | RESELLER | OTHER
+  businessPhone   String
+  businessAddress String
+  businessDistrict String
+  tinNumber       String?
+  yearsInBusiness Int?
+  monthlyRevenue  String?  // Estimated monthly order range
+  nationalId      String?  // Rwanda National ID
+  heardFrom       String?  // How they heard about us
+  documents       String   @default("[]") // JSON array of document URLs
+  notes           String?
+
+  status          String   @default("PENDING") // PENDING | APPROVED | REJECTED | SUSPENDED
+  reviewedBy      String?
+  reviewNotes     String?
+  rejectionReason String?
+
+  appliedAt       DateTime @default(now())
+  reviewedAt      DateTime?
+
+  @@index([userId])
+  @@index([status])
+  @@index([businessDistrict])
+}
+
+// =============================================================================
+// 23. PRODUCT PRICING (wholesale tier pricing per product)
+// =============================================================================
+
+model ProductPricing {
+  id              String   @id @default(cuid())
+  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId       String   @unique
+
+  priceType       String   @default("RETAIL") // RETAIL | WHOLESALE | SPECIAL
+  retailPrice     Int      // Copy of Product.price for reference
+
+  tiers           WholesaleTier[]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// =============================================================================
+// 24. WHOLESALE TIER (quantity-based price breaks)
+// =============================================================================
+
+model WholesaleTier {
+  id              String   @id @default(cuid())
+  pricing         ProductPricing @relation(fields: [pricingId], references: [id], onDelete: Cascade)
+  pricingId       String
+
+  tierName        String   // e.g., "Buy 6+", "Buy 12+", "Buy 48+"
+  minQuantity     Int      // Minimum quantity for this tier
+  maxQuantity     Int?     // Maximum quantity (null = unlimited)
+  pricePerUnit    Int      // Price per unit in RWF at this tier
+  discountPercent Int      // Discount % off retail (e.g., 12 = 12% off)
+
+  @@index([pricingId])
+  @@index([minQuantity])
+}
+
+// =============================================================================
+// 25. WHOLESALE CREDIT (credit account for approved wholesale customers)
+// =============================================================================
+
+model WholesaleCredit {
+  id              String   @id @default(cuid())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String   @unique
+
+  creditLimit     Int      @default(0) // Maximum credit in RWF
+  usedCredit      Int      @default(0) // Currently used credit in RWF
+  availableCredit Int      @default(0) // creditLimit - usedCredit
+
+  paymentTermDays Int      @default(30) // Payment due in N days
+
+  history         CreditHistory[]
+
+  updatedAt       DateTime @updatedAt
+}
+
+// =============================================================================
+// 26. CREDIT HISTORY (ledger of credit transactions)
+// =============================================================================
+
+model CreditHistory {
+  id          String   @id @default(cuid())
+  credit      WholesaleCredit @relation(fields: [creditId], references: [id], onDelete: Cascade)
+  creditId    String
+
+  type        String   // DEBIT (order placed) | CREDIT (payment received) | ADJUSTMENT
+  amount      Int      // RWF amount
+  description String
+  orderId     String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([creditId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// 27. WHOLESALE INVOICE (professional invoice for wholesale orders)
+// =============================================================================
+
+model WholesaleInvoice {
+  id              String   @id @default(cuid())
+  invoiceNumber   String   @unique // Format: INV-WHL-YYYY-NNN
+  order           Order    @relation(fields: [orderId], references: [id])
+  orderId         String   @unique
+
+  userId          String?
+  user            User?    @relation(fields: [userId], references: [id])
+
+  businessName    String
+  businessAddress String
+  tinNumber       String?
+
+  subtotal        Int
+  tax             Int      @default(0)
+  discount        Int      @default(0)
+  totalAmount     Int
+
+  paymentTerms    String?  // e.g., "30 days"
+  dueDate         DateTime?
+  isPaid          Boolean  @default(false)
+  paidAt          DateTime?
+
+  notes           String?
+
+  issuedAt        DateTime @default(now())
+
+  @@index([invoiceNumber])
+  @@index([userId])
+  @@index([isPaid])
+  @@index([dueDate])
+}
+
+// =============================================================================
+// 28. STORE SETTINGS (logo, brand, contact, social)
+// =============================================================================
+
+model StoreSettings {
+  id              String    @id @default(cuid())
+
+  storeName       String    @default("FreedomCosmeticShop")
+  storeShortName  String    @default("Freedom Cosmetic")
+  storeTagline    String?   @default("Rwanda's Beauty Freedom")
+  storeEmail      String?   @default("hello@freedomcosmeticshop.rw")
+  storePhone      String?   @default("+250788123456")
+  storeWhatsApp   String?   @default("+250788123456")
+  storeAddress    String?   @default("Kigali, Rwanda")
+
+  logoUrl         String?
+  logoPublicId    String?
+  faviconUrl      String?
+  logoUpdatedAt   DateTime?
+
+  primaryColor    String    @default("#B76E79")
+  secondaryColor  String    @default("#1a1a1a")
+  accentColor     String    @default("#FFD700")
+
+  metaTitle       String?
+  metaDescription String?
+
+  socialInstagram String?
+  socialFacebook  String?
+  socialTikTok    String?
+  socialYoutube   String?
+  socialTwitter   String?
+
+  currency        String    @default("RWF")
+  timezone        String    @default("Africa/Kigali")
+  language        String    @default("en")
+
+  updatedAt       DateTime  @updatedAt
 }

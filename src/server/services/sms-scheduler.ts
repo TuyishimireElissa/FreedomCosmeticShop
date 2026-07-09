@@ -176,7 +176,7 @@ async function processAbandonedCarts(): Promise<void> {
     if (!hasOptedOut(cart.phone)) {
       const message = getSmsMessage("ABANDONED_CART", "en", {
         itemCount: cart.itemCount,
-        cartLink: "ubumwe.beauty/cart",
+        cartLink: "freedomcosmeticshop.rw/cart",
       })
 
       enqueueSms(cart.phone, message, {

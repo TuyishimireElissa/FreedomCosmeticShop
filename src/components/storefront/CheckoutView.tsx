@@ -56,6 +56,7 @@ import {
   RadioGroupItem,
 } from "@/components/ui/radio-group"
 import { useToast } from "@/hooks/use-toast"
+import { useDeliveryUpdates } from "@/hooks/use-realtime"
 import {
   ArrowLeft,
   ArrowRight,
@@ -208,6 +209,22 @@ export function CheckoutView() {
 
   // COD only in Kigali
   const codAvailable = province === "Kigali City"
+
+  // ─── Section 7: Real-time delivery fee updates ────────────────────
+  // When admin updates delivery zone fees, show a toast so the customer
+  // knows the fee may have changed. The actual fee recalculation happens
+  // on the next render (deliveryFeeFor reads from code defaults, but the
+  // admin can override via DeliveryZoneSettings — in a future enhancement
+  // we'd fetch the fee from /api/delivery/fee to get the DB-overridden value).
+  useDeliveryUpdates((event, data) => {
+    if (event === "delivery:feeUpdated") {
+      const d = data as { zoneCode: string; baseFee: number; freeThreshold: number }
+      toast({
+        title: "Delivery fees updated",
+        description: `Zone ${d.zoneCode}: ${d.baseFee} RWF (free above ${d.freeThreshold} RWF)`,
+      })
+    }
+  })
 
   // ─── Validation ───────────────────────────────────────────────────
   const deliveryErrors: Record<string, string> = {}
@@ -587,7 +604,7 @@ export function CheckoutView() {
                     id="c-cell"
                     value={delivery.cell}
                     onChange={(e) => setDelivery({ ...delivery, cell: e.target.value })}
-                    placeholder="e.g. Ubumwe"
+                    placeholder="e.g. Freedom"
                   />
                 </div>
 

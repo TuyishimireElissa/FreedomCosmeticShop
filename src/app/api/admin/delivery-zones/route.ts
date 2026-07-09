@@ -8,6 +8,8 @@ import { NextResponse } from "next/server"
 import { requireRole } from "@/lib/auth"
 import { getAllZones } from "@/server/services/delivery.service"
 import { db } from "@/lib/db"
+import { broadcastDeliveryEvent } from "@/lib/realtime"
+import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
 
 const UpdateZoneSchema = z.object({
@@ -64,7 +66,7 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   try {
-    await requireRole("ADMIN")
+    const adminUser = await requireRole("ADMIN")
 
     const body = await req.json()
     const parsed = UpdateZoneSchema.safeParse(body)
@@ -109,6 +111,30 @@ export async function PUT(req: Request) {
         },
       })
     }
+
+    // ─── Section 7: Real-time broadcast ──────────────────────────────
+    // Notify all connected storefront clients that delivery fees changed.
+    // Anyone in the checkout flow will see the new fee immediately.
+    await broadcastDeliveryEvent("feeUpdated", {
+      zoneCode: zone.zoneCode,
+      baseFee: zone.baseFee,
+      freeThreshold: zone.freeThreshold,
+      estimatedDays: zone.estimatedDays,
+      isSameDay: zone.isSameDay,
+      isActive: zone.isActive,
+    }, { source: adminUser.name })
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "SETTINGS_UPDATE",
+      entityType: "DELIVERY",
+      entityId: zone.zoneCode,
+      description: `Updated delivery zone ${zone.zoneName}: fee=${zone.baseFee} RWF, freeThreshold=${zone.freeThreshold} RWF`,
+      req,
+    }).catch(() => {})
 
     return NextResponse.json({ zone })
   } catch (error) {

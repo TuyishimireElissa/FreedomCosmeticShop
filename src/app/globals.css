@@ -44,7 +44,7 @@
 }
 
 /*
- * Ubumwe Beauty — Soft & feminine palette
+ * FreedomCosmeticShop — Soft & feminine palette
  *   blush pink  #fce4ec  (background tint)
  *   rose gold   #b76e79  (primary / accent)
  *   cream       #fff8f3  (page background)
@@ -181,4 +181,74 @@
   background-image:
     radial-gradient(circle at 20% 20%, oklch(0.94 0.04 25 / 0.6), transparent 50%),
     radial-gradient(circle at 80% 80%, oklch(0.9 0.05 60 / 0.4), transparent 50%);
+}
+
+/* ─── Section 12: Print styles ─────────────────────────────────────────── */
+/* When printing, hide chrome (header, nav, tabs, buttons, action bars) and
+ * show only the main content area. Used by AdminReports "Print / PDF" button.
+ */
+@media print {
+  /* Force light theme on print for readability + ink savings */
+  :root {
+    --background: oklch(1 0 0) !important;
+    --foreground: oklch(0.15 0 0) !important;
+    --card: oklch(1 0 0) !important;
+    --card-foreground: oklch(0.15 0 0) !important;
+    --border: oklch(0.85 0 0) !important;
+    --muted-foreground: oklch(0.4 0 0) !important;
+    --secondary: oklch(0.95 0 0) !important;
+  }
+
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Show only the print-target area and its descendants */
+  .print-target,
+  .print-target * {
+    visibility: visible;
+  }
+
+  /* Position the print-target at the top of the page */
+  .print-target {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Hide elements explicitly marked as no-print */
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+
+  /* Expand content to full page width */
+  .print-target {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Avoid breaking inside cards */
+  .print-target > div {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Print-friendly colors: black text on white */
+  .print-target * {
+    color: oklch(0.15 0 0) !important;
+    border-color: oklch(0.85 0 0) !important;
+  }
+
+  /* Keep chart colors intact (Recharts uses inline fills) */
+  .recharts-wrapper * {
+    visibility: visible !important;
+  }
+
+  /* Hide browser headers/footers via @page margins */
+  @page {
+    margin: 1.5cm;
+  }
 }

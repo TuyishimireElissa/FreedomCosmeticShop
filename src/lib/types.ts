@@ -59,6 +59,9 @@ export interface Product {
   featured: boolean
   isNew: boolean
   isActive: boolean
+  // Section 1: Wholesale fields
+  minWholesaleQty?: number
+  wholesaleActive?: boolean
   createdAt: string
   updatedAt: string
   categoryId: string
