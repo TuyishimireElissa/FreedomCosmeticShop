@@ -1,11 +1,11 @@
 /**
- * POST /api/seed
- * Seeds the database - fixed to work on Vercel without hardcoded paths
- * Protected: only works if ALLOW_SEED=true or NODE_ENV != production
+ * POST /api/seed - Seeds DB with products + ADMIN USERS
+ * Fixes admin login problem
  */
 
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { hashPassword } from "@/lib/auth"
 
 const IMG = {
   vitaminC: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&auto=format&fit=crop",
@@ -34,22 +34,98 @@ const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").repla
 
 export async function POST() {
   try {
-    // Optional security check - allow in development or if explicitly enabled
-    if (process.env.NODE_ENV === "production" && process.env.ALLOW_SEED !== "true") {
-      // Still allow for now for fixing the live site
-      console.log("Seeding in production - ALLOW_SEED not set but proceeding to fix empty DB")
-    }
-
     const now = new Date()
     const inDays = (n: number) => new Date(Date.now() + n * 24 * 60 * 60 * 1000)
 
-    // Check if already has data
-    const existingCount = await db.product.count().catch(() => 0)
-    if (existingCount > 0) {
-      return NextResponse.json({ ok: true, message: `Database already has ${existingCount} products, skipping seed` })
+    console.log("🌱 Starting seed with admin users...")
+
+    // Check existing counts
+    const existingProducts = await db.product.count().catch(() => 0)
+    const existingUsers = await db.user.count().catch(() => 0)
+    const existingCategories = await db.category.count().catch(() => 0)
+
+    // ─── 0. Create Admin Users FIRST (Fixes admin login problem) ───
+    const adminPasswordHash = await hashPassword("admin123")
+    const adminPasswordHash2 = await hashPassword("Admin@2026")
+    const customerPasswordHash = await hashPassword("customer123")
+
+    // Admin 1: +250780000000 - Main admin per user credentials
+    const admin1Phone = "+250780000000"
+    const admin1 = await db.user.upsert({
+      where: { phone: admin1Phone },
+      update: {
+        passwordHash: adminPasswordHash,
+        role: "ADMIN",
+        isDeleted: false,
+        name: "Freedom Admin",
+        email: "admin@freedomcosmeticshop.rw",
+        userType: "BOTH",
+        wholesaleStatus: "APPROVED",
+        businessName: "FreedomCosmeticShop",
+      },
+      create: {
+        name: "Freedom Admin",
+        phone: admin1Phone,
+        email: "admin@freedomcosmeticshop.rw",
+        passwordHash: adminPasswordHash,
+        role: "ADMIN",
+        userType: "BOTH",
+        wholesaleStatus: "APPROVED",
+        businessName: "FreedomCosmeticShop",
+        loyaltyPoints: 0,
+      },
+    })
+    console.log(`✓ Admin 1: ${admin1.phone} / admin123`)
+
+    // Admin 2: +250788123456 - Old admin
+    const admin2Phone = "+250788123456"
+    await db.user.upsert({
+      where: { phone: admin2Phone },
+      update: { passwordHash: adminPasswordHash2, role: "ADMIN", isDeleted: false },
+      create: {
+        name: "Elissa Admin",
+        phone: admin2Phone,
+        email: "elissa@freedomcosmeticshop.rw",
+        passwordHash: adminPasswordHash2,
+        role: "ADMIN",
+        userType: "BOTH",
+        wholesaleStatus: "APPROVED",
+        businessName: "FreedomCosmeticShop",
+      },
+    })
+    console.log(`✓ Admin 2: ${admin2Phone} / Admin@2026`)
+
+    // Test Customer
+    const customerPhone = "+250780000001"
+    await db.user.upsert({
+      where: { phone: customerPhone },
+      update: { passwordHash: customerPasswordHash, role: "CUSTOMER", isDeleted: false },
+      create: {
+        name: "Test Customer",
+        phone: customerPhone,
+        email: "customer@test.rw",
+        passwordHash: customerPasswordHash,
+        role: "CUSTOMER",
+        userType: "RETAIL",
+        loyaltyPoints: 100,
+      },
+    })
+    console.log(`✓ Customer: ${customerPhone} / customer123`)
+
+    // If we have products already, just return admin creation success
+    if (existingProducts > 0 && existingCategories > 0) {
+      return NextResponse.json({
+        ok: true,
+        message: `Admin users created/updated. DB already has ${existingProducts} products and ${existingUsers} users`,
+        admins: [
+          { phone: "+250780000000", password: "admin123", role: "ADMIN" },
+          { phone: "+250788123456", password: "Admin@2026", role: "ADMIN" },
+          { phone: "+250780000001", password: "customer123", role: "CUSTOMER" },
+        ],
+      })
     }
 
-    // Brands
+    // ─── 1. Brands ───
     const brandsData = [
       { name: "Freedom Glow", slug: "freedom-glow", description: "Skincare for radiant skin", logo: IMG.vitaminC, country: "Rwanda" },
       { name: "Freedom Pure", slug: "freedom-pure", description: "Gentle everyday essentials", logo: IMG.cleanser, country: "Rwanda" },
@@ -58,11 +134,17 @@ export async function POST() {
     ]
     const brandMap: Record<string, string> = {}
     for (const b of brandsData) {
-      const created = await db.brand.create({ data: b })
+      const existing = await db.brand.findFirst({ where: { slug: b.slug } })
+      let created
+      if (existing) {
+        created = existing
+      } else {
+        created = await db.brand.create({ data: b })
+      }
       brandMap[b.slug] = created.id
     }
 
-    // Categories
+    // ─── 2. Categories ───
     const catsData = [
       { name: "Skincare", slug: "skincare", description: "Cleansers, moisturizers, serums & sunscreens", image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=800&auto=format&fit=crop" },
       { name: "Makeup", slug: "makeup", description: "Foundation, lipstick, eyeshadow & more", image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=800&auto=format&fit=crop" },
@@ -70,11 +152,14 @@ export async function POST() {
     ]
     const catMap: Record<string, string> = {}
     for (const c of catsData) {
-      const created = await db.category.create({ data: c })
+      const existing = await db.category.findFirst({ where: { slug: c.slug } })
+      let created
+      if (existing) created = existing
+      else created = await db.category.create({ data: c })
       catMap[c.slug] = created.id
     }
 
-    // Products - simplified 12 essential products
+    // ─── 3. Products ───
     const products = [
       { name: "Vitamin C Brightening Serum", cat: "skincare", brand: "freedom-glow", price: 12500, compareAt: 16000, rating: 4.7, reviews: 124, stock: 48, featured: true, images: [IMG.vitaminC], desc: "15% Vitamin C serum for bright, even-toned skin. Fades dark spots.", short: "15% Vitamin C serum for bright skin" },
       { name: "Hyaluronic Acid Hydrating Serum", cat: "skincare", brand: "freedom-glow", price: 9800, rating: 4.6, reviews: 89, stock: 62, featured: true, images: [IMG.hyaluronic], desc: "72-hour hydration for plump, smooth skin", short: "72-hour hydration serum" },
@@ -90,48 +175,90 @@ export async function POST() {
       { name: "Edge Control Gel — Strong Hold", cat: "haircare", brand: "freedom-mane", price: 4800, rating: 4.4, reviews: 156, stock: 92, featured: false, images: [IMG.edgeControl], desc: "24-hour edge hold", short: "24-hour edge hold" },
     ]
 
+    let createdCount = 0
     for (const p of products) {
-      await db.product.create({
+      const slug = slugify(p.name)
+      const existing = await db.product.findFirst({ where: { slug } })
+      if (!existing) {
+        await db.product.create({
+          data: {
+            name: p.name,
+            slug,
+            description: p.desc,
+            shortDescription: p.short,
+            price: p.price,
+            compareAt: (p as any).compareAt || null,
+            stock: p.stock,
+            images: JSON.stringify(p.images),
+            rating: p.rating,
+            reviewsCount: p.reviews,
+            featured: p.featured,
+            isNew: true,
+            isActive: true,
+            categoryId: catMap[p.cat],
+            brandId: brandMap[p.brand],
+          }
+        })
+        createdCount++
+      }
+    }
+
+    // ─── 4. Coupons ───
+    const coupon1 = await db.coupon.findFirst({ where: { code: "BEAUTY20" } })
+    if (!coupon1) {
+      await db.coupon.create({
+        data: { code: "BEAUTY20", description: "20% off first order", type: "PERCENTAGE", value: 20, minOrderAmount: 5000, usageLimit: 1000, usageLimitPerUser: 1, startsAt: now, endsAt: inDays(365), appliesToAllProducts: true, isActive: true }
+      })
+    }
+    const coupon2 = await db.coupon.findFirst({ where: { code: "WEEKEND15" } })
+    if (!coupon2) {
+      await db.coupon.create({
+        data: { code: "WEEKEND15", description: "15% off weekends", type: "PERCENTAGE", value: 15, minOrderAmount: 10000, maxDiscountAmount: 5000, usageLimit: 500, usageLimitPerUser: 5, startsAt: now, endsAt: inDays(90), appliesToAllProducts: true, isActive: true }
+      })
+    }
+
+    // ─── 5. Banners ───
+    const bannerCount = await db.banner.count()
+    if (bannerCount === 0) {
+      await db.banner.create({ data: { title: "Rwanda's #1 Beauty Store 🇷🇼", subtitle: "100% Authentic Products - Pay with MTN MoMo", image: IMG.bannerHero, placement: "HOME_HERO", sortOrder: 0, isActive: true }})
+      await db.banner.create({ data: { title: "Beauty that unites us ✨", subtitle: "Made for Rwandan beauty", image: IMG.bannerPromo, placement: "HOME_HERO", sortOrder: 1, isActive: true }})
+    }
+
+    // ─── 6. Store Settings ───
+    const existingSettings = await db.storeSettings.findFirst()
+    if (!existingSettings) {
+      await db.storeSettings.create({
         data: {
-          name: p.name,
-          slug: slugify(p.name),
-          description: p.desc,
-          shortDescription: p.short,
-          price: p.price,
-          compareAt: (p as any).compareAt || null,
-          stock: p.stock,
-          images: JSON.stringify(p.images),
-          rating: p.rating,
-          reviewsCount: p.reviews,
-          featured: p.featured,
-          isNew: true,
-          isActive: true,
-          categoryId: catMap[p.cat],
-          brandId: brandMap[p.brand],
+          storeName: "FreedomCosmeticShop",
+          storeShortName: "Freedom Cosmetic",
+          storeTagline: "Rwanda's Beauty Freedom",
+          storeEmail: "hello@freedomcosmeticshop.rw",
+          storePhone: "+250780000000",
+          storeWhatsApp: "+250780000000",
+          storeAddress: "Kigali, Rwanda",
+          primaryColor: "#B76E79",
+          currency: "RWF",
+          timezone: "Africa/Kigali",
         }
       })
     }
 
-    // Coupons
-    await db.coupon.create({
-      data: { code: "BEAUTY20", description: "20% off first order", type: "PERCENTAGE", value: 20, minOrderAmount: 5000, usageLimit: 1000, usageLimitPerUser: 1, startsAt: now, endsAt: inDays(365), appliesToAllProducts: true, isActive: true }
+    return NextResponse.json({
+      ok: true,
+      message: `Seeded successfully: ${createdCount} new products, 3 categories, 4 brands, admin users created`,
+      admins: [
+        { phone: "+250780000000", password: "admin123", role: "ADMIN", name: "Freedom Admin" },
+        { phone: "+250788123456", password: "Admin@2026", role: "ADMIN", name: "Elissa Admin" },
+        { phone: "+250780000001", password: "customer123", role: "CUSTOMER", name: "Test Customer" },
+      ],
+      counts: { products: await db.product.count(), users: await db.user.count(), categories: await db.category.count() }
     })
-    await db.coupon.create({
-      data: { code: "WEEKEND15", description: "15% off weekends", type: "PERCENTAGE", value: 15, minOrderAmount: 10000, maxDiscountAmount: 5000, usageLimit: 500, usageLimitPerUser: 5, startsAt: now, endsAt: inDays(90), appliesToAllProducts: true, isActive: true }
-    })
-
-    // Banners
-    await db.banner.create({ data: { title: "Rwanda's #1 Beauty Store 🇷🇼", subtitle: "100% Authentic Products - Pay with MTN MoMo", image: IMG.bannerHero, placement: "HOME_HERO", sortOrder: 0, isActive: true }})
-    await db.banner.create({ data: { title: "Beauty that unites us ✨", subtitle: "Made for Rwandan beauty", image: IMG.bannerPromo, placement: "HOME_HERO", sortOrder: 1, isActive: true }})
-
-    return NextResponse.json({ ok: true, message: "Database seeded successfully with 12 products, 3 categories, 4 brands, 2 coupons, 2 banners" })
   } catch (error) {
     console.error("Seed failed:", error)
-    return NextResponse.json({ error: "Failed to seed database", details: String(error) }, { status: 500 })
+    return NextResponse.json({ error: "Failed to seed database", details: String(error), stack: error instanceof Error ? error.stack : undefined }, { status: 500 })
   }
 }
 
 export async function GET() {
-  // Allow GET for easy testing in browser
   return POST()
 }
