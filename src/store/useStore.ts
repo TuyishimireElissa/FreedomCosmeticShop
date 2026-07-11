@@ -107,6 +107,9 @@ interface StoreState {
   fetchUser: () => Promise<void>
   setUser: (user: AuthUser | null) => void
   logout: () => void
+  login: (phone: string, password: string) => Promise<void>
+  isAdminAuthenticated: boolean
+  setAdminAuthenticated: (val: boolean) => void
 
   /* Actions: cart */
   addToCart: (item: Omit<CartItem, "quantity">, qty?: number) => void
@@ -142,6 +145,7 @@ export const useStore = create<StoreState>()(
       catalogSearch: "",
       user: null,
       authLoading: true,
+      isAdminAuthenticated: false,
       items: [],
       savedItems: [],
       isCartOpen: false,
@@ -225,7 +229,21 @@ export const useStore = create<StoreState>()(
         }
       },
       setUser: (user) => set({ user }),
-      logout: () => set({ user: null }),
+      logout: async () => {
+        try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
+        set({ user: null, isAdminAuthenticated: false })
+      },
+      login: async (phone: string, password: string) => {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, password }),
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || "Login failed")
+        set({ user: data.user })
+      },
+      setAdminAuthenticated: (val: boolean) => set({ isAdminAuthenticated: val }),
 
       /* ---------- Cart ---------- */
       addToCart: (item, qty = 1) => {

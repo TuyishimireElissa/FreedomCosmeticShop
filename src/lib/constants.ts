@@ -1,24 +1,15 @@
 /**
  * App-wide constants for FreedomCosmeticShop.
- *
- * These are used across the storefront, checkout, and admin dashboard.
- * Keep them here so they can be changed in one place.
+ * Rwanda E-Commerce - RWF only, MTN MoMo primary
  */
 
-// ============================================================================
-// CURRENCY
-// ============================================================================
 export const CURRENCY = {
   code: "RWF",
   symbol: "RWF",
   locale: "en-RW",
-  /** Minimum price in RWF that qualifies for free delivery in Kigali */
   freeDeliveryThreshold: 50000,
 } as const
 
-// ============================================================================
-// DELIVERY
-// ============================================================================
 export const RWANDAN_PROVINCES = [
   "Kigali City",
   "Northern Province",
@@ -29,59 +20,62 @@ export const RWANDAN_PROVINCES = [
 
 export type Province = (typeof RWANDAN_PROVINCES)[number]
 
-/** Standard delivery fees per province in RWF */
+/** Standard delivery fees per province in RWF - CORRECTED */
 export const DELIVERY_FEES: Record<Province, number> = {
-  "Kigali City": 1500,
+  "Kigali City": 1000,
   "Northern Province": 3000,
   "Southern Province": 3000,
-  "Eastern Province": 3000,
-  "Western Province": 3000,
+  "Eastern Province": 3500,
+  "Western Province": 4000,
 }
 
-/** Delivery time estimate per province (in business days) */
 export const DELIVERY_TIMES: Record<Province, string> = {
-  "Kigali City": "1-2 business days",
-  "Northern Province": "3-5 business days",
-  "Southern Province": "3-5 business days",
+  "Kigali City": "Same day (if ordered before 2pm) or next day",
+  "Northern Province": "2-4 business days",
+  "Southern Province": "2-4 business days",
   "Eastern Province": "3-5 business days",
   "Western Province": "3-5 business days",
 }
 
 export function deliveryFeeFor(province: string): number {
-  return DELIVERY_FEES[province as Province] ?? 0
+  return DELIVERY_FEES[province as Province] ?? 3000
 }
 
-// ============================================================================
-// PAYMENTS
-// ============================================================================
+export function deliveryTimeFor(province: string): string {
+  return DELIVERY_TIMES[province as Province] ?? "3-5 business days"
+}
+
 export const PAYMENT_METHODS = {
   MTN_MOMO: {
     label: "MTN MoMo",
+    shortLabel: "MTN MoMo - Most Popular",
     description: "Pay with MTN Mobile Money — you'll get a prompt on your phone.",
     icon: "📱",
+    isPopular: true,
   },
   AIRTEL_MONEY: {
     label: "Airtel Money",
+    shortLabel: "Airtel Money",
     description: "Pay with Airtel Money — you'll get a prompt on your phone.",
     icon: "📲",
   },
   CARD: {
     label: "Visa / Mastercard",
-    description: "Pay securely with your debit or credit card.",
+    shortLabel: "Card",
+    description: "Pay securely with your debit or credit card via Flutterwave.",
     icon: "💳",
   },
   COD: {
     label: "Cash on Delivery",
-    description: "Pay with cash when your order is delivered to your door.",
+    shortLabel: "Cash on Delivery - Kigali Only",
+    description: "Pay with cash when delivered. Kigali districts only.",
     icon: "💵",
+    kigaliOnly: true,
   },
 } as const
 
 export type PaymentMethodKey = keyof typeof PAYMENT_METHODS
 
-// ============================================================================
-// ORDER STATUSES
-// ============================================================================
 export const ORDER_STATUSES = [
   "PENDING",
   "CONFIRMED",
@@ -89,86 +83,67 @@ export const ORDER_STATUSES = [
   "SHIPPED",
   "DELIVERED",
   "CANCELLED",
+  "RETURNED",
 ] as const
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number]
 
 export const PAYMENT_STATUSES = ["PENDING", "PAID", "FAILED", "REFUNDED"] as const
-
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number]
 
-/** Allowed status transitions (workflow). */
-export const STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  PENDING: ["CONFIRMED", "CANCELLED"],
-  CONFIRMED: ["PROCESSING", "CANCELLED"],
-  PROCESSING: ["SHIPPED", "CANCELLED"],
-  SHIPPED: ["DELIVERED"],
-  DELIVERED: [],
-  CANCELLED: [],
+export const WHOLESALE_TIERS = [
+  { minQty: 1, maxQty: 5, discount: 0, label: "1-5 units: Retail price" },
+  { minQty: 6, maxQty: 11, discount: 12, label: "6-11 units: 12% off" },
+  { minQty: 12, maxQty: 23, discount: 18, label: "12-23 units: 18% off" },
+  { minQty: 24, maxQty: 47, discount: 24, label: "24-47 units: 24% off" },
+  { minQty: 48, maxQty: null, discount: 29, label: "48+ units: 29% off" },
+]
+
+export const WHOLESALE_MIN_ORDER = 50000
+
+export const STORE_INFO = {
+  name: "FreedomCosmeticShop",
+  shortName: "Freedom Cosmetic",
+  tagline: "Rwanda's Beauty Freedom",
+  email: "hello@freedomcosmeticshop.rw",
+  phone: "+250780000000",
+  whatsapp: "+250780000000",
+  address: "Kigali, Rwanda",
+  currency: "RWF",
+  timezone: "Africa/Kigali",
+  country: "Rwanda",
 }
 
-/** Color classes for status badges (Tailwind) */
-export const STATUS_COLORS: Record<OrderStatus, string> = {
-  PENDING: "bg-amber-100 text-amber-700",
-  CONFIRMED: "bg-blue-100 text-blue-700",
-  PROCESSING: "bg-purple-100 text-purple-700",
-  SHIPPED: "bg-indigo-100 text-indigo-700",
-  DELIVERED: "bg-emerald-100 text-emerald-700",
-  CANCELLED: "bg-red-100 text-red-700",
+export const RWANDA_DISTRICTS_FULL = {
+  "Kigali City": ["Gasabo", "Kicukiro", "Nyarugenge"],
+  "Northern Province": ["Burera", "Gakenke", "Gicumbi", "Musanze", "Rulindo"],
+  "Southern Province": ["Gisagara", "Huye", "Kamonyi", "Muhanga", "Nyamagabe", "Nyanza", "Nyaruguru", "Ruhango"],
+  "Eastern Province": ["Bugesera", "Gatsibo", "Kayonza", "Kirehe", "Ngoma", "Nyagatare", "Rwamagana"],
+  "Western Province": ["Karongi", "Ngororero", "Nyabihu", "Nyamasheke", "Rubavu", "Rusizi", "Rutsiro"],
 }
 
-// ============================================================================
-// CART
-// ============================================================================
-export const CART = {
-  /** Maximum quantity of a single product in cart */
-  maxQuantityPerProduct: 99,
-  /** Maximum total items in cart */
-  maxItems: 50,
-  /** localStorage key for cart persistence */
-  storageKey: "freedom-store",
-} as const
-
-// ============================================================================
-// PAGINATION
-// ============================================================================
-export const PAGINATION = {
-  defaultPageSize: 24,
-  maxPageSize: 100,
-} as const
-
-// ============================================================================
-// SEARCH
-// ============================================================================
-export const SEARCH = {
-  minQueryLength: 2,
-  maxQueryLength: 100,
-} as const
-
-// ============================================================================
-// REGEX PATTERNS
-// ============================================================================
+// ─── VALIDATION PATTERNS (Required by validators/index.ts) ───
 export const PATTERNS = {
-  /** Rwandan phone: 07XXXXXXXX, +2507XXXXXXXX, or 2507XXXXXXXX */
-  rwandanPhone: /^(?:\+250|0)?7[0-9]{8}$/,
-  /** Email */
-  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  /** URL */
-  url: /^https?:\/\/[^\s/$.?#].[^\s]*$/i,
-  /** Slug (lowercase, hyphenated) */
   slug: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-} as const
+  rwandanPhone: /^(?:\+250|0)?7[0-9]{8}$/,
+  email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  password: /^.{6,}$/,
+  orderNumber: /^UB-\d{4}-\d{5}$/,
+  sku: /^[A-Z0-9-]+$/,
+}
 
-// ============================================================================
-// STORAGE LIMITS
-// ============================================================================
 export const LIMITS = {
   productName: 200,
-  productDescription: 2000,
-  orderNotes: 500,
-  address: 300,
+  productDescription: 5000,
   customerName: 100,
   customerPhone: 20,
-  customerEmail: 200,
+  customerEmail: 254,
+  address: 500,
   city: 100,
-} as const
+  orderNotes: 1000,
+  shortDescription: 200,
+  reviewTitle: 100,
+  reviewBody: 2000,
+  couponCode: 50,
+  bannerTitle: 100,
+}
