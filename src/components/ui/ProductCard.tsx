@@ -70,7 +70,6 @@ export default function ProductCard({
           />
         </Link>
 
-        {/* Badges */}
         <div className="absolute top-2 left-2 flex flex-col gap-1">
           {discount > 0 && (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500 text-white">
@@ -99,14 +98,12 @@ export default function ProductCard({
           )}
         </div>
 
-        {/* Authentic Badge */}
         <div className="absolute top-2 right-2">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white text-green-600 shadow-sm">
             ✅ Genuine
           </span>
         </div>
 
-        {/* Wishlist */}
         <button
           onClick={() => setIsWishlisted(!isWishlisted)}
           className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
@@ -130,7 +127,6 @@ export default function ProductCard({
           </h3>
         </Link>
 
-        {/* Rating */}
         <div className="flex items-center gap-1 mb-2">
           <div className="flex">
             {[1,2,3,4,5].map(star => (
@@ -146,7 +142,6 @@ export default function ProductCard({
           </span>
         </div>
 
-        {/* Price */}
         <div className="flex items-center gap-2 mb-3">
           <span className="font-bold text-[#B76E79] text-base">
             {formatRWF(product.price)}
@@ -158,7 +153,6 @@ export default function ProductCard({
           )}
         </div>
 
-        {/* Add to Cart */}
         <button
           onClick={handleAddToCart}
           disabled={addingToCart || product.stockQuantity === 0}
