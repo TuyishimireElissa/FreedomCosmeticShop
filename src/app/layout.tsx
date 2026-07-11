@@ -1,44 +1,44 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Inter } from "next/font/google"
 import "./globals.css"
 import { Toaster } from "@/components/ui/toaster"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
-})
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-inter",
 })
 
 export const metadata: Metadata = {
-  title: "FreedomCosmeticShop — Rwanda's Cosmetics Store",
+  title: {
+    default: "FreedomCosmeticShop | Rwanda Beauty Store",
+    template: "%s | FreedomCosmeticShop",
+  },
   description:
-    "Shop skincare, makeup & haircare products in Rwanda. Pay with MTN MoMo or cash on delivery. Fast delivery in Kigali and across all provinces.",
+    "Rwanda's #1 cosmetics store. Shop authentic skincare, makeup & haircare. Pay with MTN MoMo. Fast delivery across Rwanda.",
   keywords: [
     "cosmetics Rwanda",
-    "skincare Kigali",
-    "makeup Rwanda",
-    "haircare Rwanda",
-    "beauty products Rwanda",
+    "beauty products Kigali",
+    "MTN MoMo shopping",
+    "skincare Rwanda",
     "FreedomCosmeticShop",
-    "MTN MoMo shopping Rwanda",
   ],
   authors: [{ name: "FreedomCosmeticShop" }],
+  creator: "FreedomCosmeticShop",
   openGraph: {
-    title: "FreedomCosmeticShop — Rwanda's Cosmetics Store",
-    description:
-      "Shop skincare, makeup & haircare products in Rwanda. Pay with MTN MoMo or cash on delivery.",
-    siteName: "FreedomCosmeticShop",
     type: "website",
+    locale: "en_RW",
+    siteName: "FreedomCosmeticShop",
+    title: "FreedomCosmeticShop | Rwanda Beauty Store",
+    description: "Rwanda's #1 cosmetics store. Shop authentic skincare, makeup & haircare.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FreedomCosmeticShop — Rwanda's Cosmetics Store",
-    description:
-      "Shop skincare, makeup & haircare products in Rwanda. Pay with MTN MoMo or cash on delivery.",
+    title: "FreedomCosmeticShop",
+    description: "Rwanda's #1 cosmetics store",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 }
 
@@ -49,17 +49,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Theme initialization script — runs before React hydration to prevent FOUC */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('freedom-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}if(t==='dark'){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark'}}catch(e){}})()`,
-          }}
-        />
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-background text-foreground antialiased`}
-      >
+      <body className={`${inter.variable} bg-background text-foreground antialiased`}>
         {children}
         <Toaster />
       </body>
