@@ -1,25 +1,77 @@
 /**
  * GET /api/products
- *
- * Query params:
- *   - category: category slug
- *   - brand: brand slug
- *   - search: free-text search
- *   - featured: "true"
- *   - sort: "newest" | "price-asc" | "price-desc" | "rating" | "best-selling"
- *   - minPrice / maxPrice: integer RWF
- *   - skinType: ALL | OILY | DRY | COMBINATION | SENSITIVE | NORMAL
- *   - minRating: 1-5
- *   - inStock: "true" to only show products with stock > 0
- *   - page: page number (1-indexed, default 1)
- *   - pageSize: items per page (default 24, max 100)
- *
- * Returns:
- *   { products, pagination: { page, pageSize, total, totalPages, hasMore } }
+ * 
+ * Now with fallback data for Vercel deployment without DATABASE_URL
  */
+
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { Prisma } from "@prisma/client"
+import { fallbackProducts } from "@/lib/fallbackData"
+
+function filterAndSortFallback(params: {
+  category?: string | null
+  brand?: string | null
+  search?: string
+  featured?: boolean
+  sort?: string
+  minPrice?: string | null
+  maxPrice?: string | null
+  skinType?: string | null
+  minRating?: string | null
+  inStock?: boolean
+  page: number
+  pageSize: number
+}) {
+  let filtered = [...fallbackProducts]
+
+  if (params.category && params.category !== "all") {
+    filtered = filtered.filter(p => p.category?.slug === params.category)
+  }
+  if (params.brand) {
+    filtered = filtered.filter(p => p.brand?.slug === params.brand)
+  }
+  if (params.featured) {
+    filtered = filtered.filter(p => p.featured)
+  }
+  if (params.search) {
+    const s = params.search.toLowerCase()
+    filtered = filtered.filter(p => 
+      p.name.toLowerCase().includes(s) ||
+      p.description.toLowerCase().includes(s) ||
+      p.brand?.name.toLowerCase().includes(s)
+    )
+  }
+  if (params.minPrice) {
+    filtered = filtered.filter(p => p.price >= Number(params.minPrice))
+  }
+  if (params.maxPrice) {
+    filtered = filtered.filter(p => p.price <= Number(params.maxPrice))
+  }
+  if (params.skinType) {
+    filtered = filtered.filter(p => p.skinType?.includes(params.skinType!))
+  }
+  if (params.minRating) {
+    filtered = filtered.filter(p => p.rating >= Number(params.minRating))
+  }
+  if (params.inStock) {
+    filtered = filtered.filter(p => p.stock > 0)
+  }
+
+  // Sort
+  if (params.sort === "price-asc") filtered.sort((a,b) => a.price - b.price)
+  else if (params.sort === "price-desc") filtered.sort((a,b) => b.price - a.price)
+  else if (params.sort === "rating") filtered.sort((a,b) => b.rating - a.rating)
+  else if (params.sort === "best-selling") filtered.sort((a,b) => b.reviewsCount - a.reviewsCount)
+  else filtered.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+  const total = filtered.length
+  const totalPages = Math.ceil(total / params.pageSize)
+  const start = (params.page - 1) * params.pageSize
+  const paginated = filtered.slice(start, start + params.pageSize)
+
+  return { products: paginated, total, totalPages }
+}
 
 export async function GET(req: Request) {
   try {
@@ -78,7 +130,6 @@ export async function GET(req: Request) {
       where.stock = { gt: 0 }
     }
 
-    // Build the orderBy
     const orderBy: Prisma.ProductOrderByWithRelationInput =
       sort === "price-asc"
         ? { price: "asc" }
@@ -90,42 +141,62 @@ export async function GET(req: Request) {
         ? { reviewsCount: "desc" }
         : { createdAt: "desc" }
 
-    // Get total count for pagination
-    const total = await db.product.count({ where })
-    const totalPages = Math.ceil(total / pageSize)
+    // Try database first
+    try {
+      const total = await db.product.count({ where })
+      
+      // If DB is empty, use fallback immediately
+      if (total === 0) {
+        console.log("DB empty, using fallback products")
+        const fallback = filterAndSortFallback({ category, brand, search, featured, sort, minPrice, maxPrice, skinType, minRating, inStock, page, pageSize })
+        return NextResponse.json({
+          products: fallback.products,
+          pagination: { page, pageSize, total: fallback.total, totalPages: fallback.totalPages, hasMore: page < fallback.totalPages },
+          _source: "fallback-empty-db",
+        })
+      }
 
-    const products = await db.product.findMany({
-      where,
-      orderBy,
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      include: { category: true, brand: true },
-    })
+      const totalPages = Math.ceil(total / pageSize)
+      const products = await db.product.findMany({
+        where,
+        orderBy,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: { category: true, brand: true },
+      })
 
-    // Deserialize JSON fields
-    const serialized = products.map((p) => ({
-      ...p,
-      images: JSON.parse(p.images) as string[],
-      skinType: p.skinType ? (JSON.parse(p.skinType) as string[]) : null,
-      shades: p.shades ? (JSON.parse(p.shades) as string[]) : null,
-      ingredients: p.ingredients ? (JSON.parse(p.ingredients) as string[]) : null,
-    }))
+      const serialized = products.map((p) => ({
+        ...p,
+        images: JSON.parse(p.images) as string[],
+        skinType: p.skinType ? (JSON.parse(p.skinType) as string[]) : null,
+        shades: p.shades ? (JSON.parse(p.shades) as string[]) : null,
+        ingredients: p.ingredients ? (JSON.parse(p.ingredients) as string[]) : null,
+      }))
 
-    return NextResponse.json({
-      products: serialized,
-      pagination: {
-        page,
-        pageSize,
-        total,
-        totalPages,
-        hasMore: page < totalPages,
-      },
-    })
+      return NextResponse.json({
+        products: serialized,
+        pagination: { page, pageSize, total, totalPages, hasMore: page < totalPages },
+        _source: "database",
+      })
+    } catch (dbError) {
+      console.warn("DB failed, using fallback:", dbError)
+      const fallback = filterAndSortFallback({ category, brand, search, featured, sort, minPrice, maxPrice, skinType, minRating, inStock, page, pageSize })
+      return NextResponse.json({
+        products: fallback.products,
+        pagination: { page, pageSize, total: fallback.total, totalPages: fallback.totalPages, hasMore: page < fallback.totalPages },
+        _source: "fallback-db-error",
+      })
+    }
   } catch (error) {
-    console.error("Failed to fetch products:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch products" },
-      { status: 500 }
-    )
+    console.error("Failed to fetch products, using fallback:", error)
+    try {
+      return NextResponse.json({
+        products: fallbackProducts.slice(0, 8),
+        pagination: { page: 1, pageSize: 24, total: fallbackProducts.length, totalPages: 1, hasMore: false },
+        _source: "fallback-exception",
+      })
+    } catch {
+      return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
+    }
   }
 }

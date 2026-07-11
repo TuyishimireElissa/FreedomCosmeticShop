@@ -45,6 +45,9 @@ export default function Home() {
   // Section 1: establish real-time SSE connection (admin → storefront sync)
   useRealtimeEvents()
 
+  // Use env WhatsApp number from .env
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP?.replace("+", "") || "250780000000"
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <AnnouncementBar />
@@ -82,7 +85,7 @@ export default function Home() {
 
       {/* Floating WhatsApp button (hidden on auth pages) */}
       {view !== "login" && view !== "register" && (
-        <WhatsAppButton phone="250788123456" />
+        <WhatsAppButton phone={whatsappNumber} />
       )}
     </div>
   )
