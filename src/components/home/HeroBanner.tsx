@@ -1,24 +1,10 @@
-"use client"
+'use client'
 
-/**
- * HeroBanner — auto-sliding carousel for the home page hero.
- *
- * Features:
- *   - Auto-advance every 5 seconds (pauses on hover)
- *   - Manual navigation dots + prev/next arrows
- *   - Mobile-optimized: uses mobileImage on small screens if available
- *   - CTA buttons (Shop Now, Learn More)
- *   - Falls back to a static hero if no banners in DB
- *   - Ken Burns zoom effect on the active slide
- *   - Multi-language ready (title/subtitle can be localized in Banner model)
- */
+import { useCallback, useEffect, useState } from 'react'
+import { ArrowRight, ChevronLeft, ChevronRight, RefreshCw, ShieldCheck, Sparkles, Truck } from 'lucide-react'
+import { useStore } from '@/store/useStore'
 
-import { useEffect, useState, useCallback } from "react"
-import { useStore } from "@/store/useStore"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, ArrowRight, Sparkles } from "lucide-react"
-
-interface Banner {
+export interface HomeBanner {
   id: string
   title: string
   subtitle: string | null
@@ -30,233 +16,120 @@ interface Banner {
 }
 
 interface HeroBannerProps {
-  banners: Banner[]
+  banners: HomeBanner[]
+  loading?: boolean
+  error?: string | null
+  onRetry?: () => void
 }
 
-const AUTO_ADVANCE_MS = 5000
+const AUTO_ADVANCE_MS = 6000
 
-export function HeroBanner({ banners }: HeroBannerProps) {
-  const { goCatalog } = useStore()
+export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBannerProps) {
+  const { goCatalog, goProduct } = useStore()
   const [current, setCurrent] = useState(0)
-  const [isPaused, setIsPaused] = useState(false)
-
-  // Fallback hero if no banners in DB
-  const slides: Banner[] =
-    banners.length > 0
-      ? banners
-      : [
-          {
-            id: "fallback-1",
-            title: "Rwanda's #1 Beauty Store 🇷🇼",
-            subtitle:
-              "100% Authentic Products. Shop skincare, makeup & haircare. Pay with MTN MoMo. Delivered to your door.",
-            image:
-              "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1200&auto=format&fit=crop",
-            mobileImage:
-              "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop",
-            linkType: "CATEGORY",
-            linkUrl: "skincare",
-            placement: "HOME_HERO",
-          },
-          {
-            id: "fallback-2",
-            title: "Glow from within ✨",
-            subtitle:
-              "Vitamin C serums, mineral sunscreens & hydrating moisturizers. Formulated for Rwanda's climate.",
-            image:
-              "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=1200&auto=format&fit=crop",
-            mobileImage:
-              "https://images.unsplash.com/photo-1556228852-80b6e5eeff06?w=600&auto=format&fit=crop",
-            linkType: "CATEGORY",
-            linkUrl: "skincare",
-            placement: "HOME_HERO",
-          },
-          {
-            id: "fallback-3",
-            title: "Shades for every skin tone 💄",
-            subtitle:
-              "Foundations, lipsticks & palettes made for melanin-rich skin. No ashiness, no compromise.",
-            image:
-              "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=1200&auto=format&fit=crop",
-            mobileImage:
-              "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=600&auto=format&fit=crop",
-            linkType: "CATEGORY",
-            linkUrl: "makeup",
-            placement: "HOME_HERO",
-          },
-        ]
+  const [paused, setPaused] = useState(false)
 
   const next = useCallback(() => {
-    setCurrent((c) => (c + 1) % slides.length)
-  }, [slides.length])
+    if (banners.length > 1) setCurrent((value) => (value + 1) % banners.length)
+  }, [banners.length])
 
-  const prev = useCallback(() => {
-    setCurrent((c) => (c - 1 + slides.length) % slides.length)
-  }, [slides.length])
+  const previous = () => {
+    if (banners.length > 1) setCurrent((value) => (value - 1 + banners.length) % banners.length)
+  }
 
-  // Auto-advance
   useEffect(() => {
-    if (isPaused || slides.length <= 1) return
-    const timer = setInterval(next, AUTO_ADVANCE_MS)
-    return () => clearInterval(timer)
-  }, [isPaused, next, slides.length])
+    if (paused || banners.length < 2) return
+    const timer = window.setInterval(next, AUTO_ADVANCE_MS)
+    return () => window.clearInterval(timer)
+  }, [banners.length, next, paused])
 
-  const handleCtaClick = (banner: Banner) => {
-    if (banner.linkType === "CATEGORY" && banner.linkUrl) {
-      goCatalog(banner.linkUrl)
-    } else if (banner.linkType === "URL" && banner.linkUrl) {
-      window.open(banner.linkUrl, "_blank")
-    } else {
-      goCatalog(null)
-    }
+  useEffect(() => {
+    if (current >= banners.length) setCurrent(0)
+  }, [banners.length, current])
+
+  const followBanner = (banner: HomeBanner) => {
+    if (banner.linkType === 'CATEGORY' && banner.linkUrl) goCatalog(banner.linkUrl)
+    else if (banner.linkType === 'PRODUCT' && banner.linkUrl) goProduct(banner.linkUrl)
+    else if (banner.linkType === 'URL' && banner.linkUrl) window.location.assign(banner.linkUrl)
+    else goCatalog(null)
+  }
+
+  if (loading) {
+    return (
+      <section className="relative min-h-[520px] overflow-hidden bg-[#f4e8ea] sm:min-h-[570px] lg:min-h-[640px]" aria-label="Loading featured promotions">
+        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-[#f8edef] via-[#f4dfe3] to-[#ead0d5]" />
+        <div className="relative mx-auto flex min-h-[520px] max-w-7xl items-center px-4 sm:min-h-[570px] sm:px-6 lg:min-h-[640px] lg:px-8">
+          <div className="w-full max-w-xl space-y-4">
+            <div className="h-7 w-40 animate-pulse rounded-full bg-white/70" />
+            <div className="h-12 w-full animate-pulse rounded-xl bg-white/70 sm:h-16" />
+            <div className="h-12 w-4/5 animate-pulse rounded-xl bg-white/60" />
+            <div className="h-11 w-36 animate-pulse rounded-full bg-[#B76E79]/40" />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (error || banners.length === 0) {
+    return (
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#251d1f] via-[#4b3035] to-[#B76E79] px-4 py-24 text-white sm:px-6 sm:py-28 lg:px-8">
+        <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[#FFD700]/10 blur-3xl" />
+        <div className="relative mx-auto max-w-4xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em]"><Sparkles className="h-4 w-4 text-[#FFD700]" />Rwanda&apos;s beauty destination</span>
+          <h1 className="mt-6 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Authentic beauty, delivered across Rwanda.</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">Explore premium skincare, makeup and haircare selected for Rwanda&apos;s climate and melanin-rich skin.</p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <button type="button" onClick={() => goCatalog(null)} className="inline-flex items-center gap-2 rounded-full bg-[#B76E79] px-6 py-3 text-sm font-bold text-white shadow-xl hover:bg-[#a55d68]">Shop the collection <ArrowRight className="h-4 w-4" /></button>
+            {onRetry && <button type="button" onClick={onRetry} className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur hover:bg-white/15"><RefreshCw className="h-4 w-4" />Retry banners</button>}
+          </div>
+        </div>
+      </section>
+    )
   }
 
   return (
-    <section
-      className="relative overflow-hidden"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      aria-label="Featured promotions"
-    >
-      <div className="relative h-[480px] sm:h-[520px] lg:h-[600px]">
-        {slides.map((slide, i) => {
-          const isActive = i === current
-          // Use the main image for all breakpoints — responsive sizing
-          // is handled by the CSS layout, not by swapping src on the client.
-          // (Swapping src based on window.innerWidth causes hydration mismatch.)
-          const image = slide.image
+    <section className="relative overflow-hidden bg-[#1a1a1a]" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} aria-roledescription="carousel" aria-label="Featured beauty campaigns">
+      <div className="relative h-[520px] sm:h-[570px] lg:h-[640px]">
+        {banners.map((banner, index) => {
+          const active = index === current
           return (
-            <div
-              key={slide.id}
-              className={`absolute inset-0 transition-opacity duration-700 ${
-                isActive ? "opacity-100 z-10" : "opacity-0 z-0"
-              }`}
-              aria-hidden={!isActive}
-            >
-              {/* Background image with Ken Burns effect */}
-              <div className="absolute inset-0 overflow-hidden">
-                <img
-                  src={image}
-                  alt={slide.title}
-                  className={`h-full w-full object-cover transition-transform duration-[6000ms] ease-out ${
-                    isActive ? "scale-110" : "scale-100"
-                  }`}
-                />
-                {/* Gradient overlay for text readability */}
-                <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/30 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-transparent to-transparent" />
-              </div>
+            <article key={banner.id} className={`absolute inset-0 transition-all duration-700 ${active ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'}`} aria-hidden={!active}>
+              <picture className="absolute inset-0 block">
+                {banner.mobileImage && <source media="(max-width: 639px)" srcSet={banner.mobileImage} />}
+                <img src={banner.image} alt="" className={`h-full w-full object-cover transition-transform duration-[7000ms] ease-out ${active ? 'scale-105' : 'scale-100'}`} />
+              </picture>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/10" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
 
-              {/* Content */}
-              <div className="relative z-10 flex h-full items-center">
-                <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-                  <div className="max-w-xl">
-                    {isActive && (
-                      <>
-                        <span className="inline-flex animate-in fade-in slide-in-from-left-4 items-center gap-1.5 rounded-full bg-primary/90 px-3 py-1 text-xs font-medium text-primary-foreground backdrop-blur">
-                          <Sparkles className="h-3.5 w-3.5" />
-                          Made for Rwandan beauty
-                        </span>
-                        <h1
-                          className="mt-4 animate-in fade-in slide-in-from-bottom-4 text-3xl font-bold leading-tight tracking-tight text-background sm:text-4xl lg:text-5xl"
-                          style={{ animationDelay: "100ms" }}
-                        >
-                          {slide.title}
-                        </h1>
-                        {slide.subtitle && (
-                          <p
-                            className="mt-3 animate-in fade-in slide-in-from-bottom-4 text-sm text-background/85 sm:text-base lg:text-lg"
-                            style={{ animationDelay: "200ms" }}
-                          >
-                            {slide.subtitle}
-                          </p>
-                        )}
-                        <div
-                          className="mt-6 flex animate-in fade-in slide-in-from-bottom-4 flex-wrap gap-3"
-                          style={{ animationDelay: "300ms" }}
-                        >
-                          <Button
-                            size="lg"
-                            onClick={() => handleCtaClick(slide)}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90"
-                          >
-                            🛍️ Shop now
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="lg"
-                            variant="outline"
-                            onClick={() => goCatalog(null)}
-                            className="border-background/30 bg-background/10 text-background backdrop-blur hover:bg-background/20"
-                          >
-                            💄 Best Sellers
-                          </Button>
-                        </div>
-
-                        {/* NEW: Trust row under CTAs */}
-                        <div
-                          className="mt-6 flex animate-in fade-in slide-in-from-bottom-4 flex-wrap gap-4"
-                          style={{ animationDelay: "400ms" }}
-                        >
-                          <span className="flex items-center gap-1.5 text-xs font-medium text-background/90">
-                            ✅ 100% Genuine
-                          </span>
-                          <span className="flex items-center gap-1.5 text-xs font-medium text-background/90">
-                            🚚 Fast Delivery
-                          </span>
-                          <span className="flex items-center gap-1.5 text-xs font-medium text-background/90">
-                            💛 MTN MoMo
-                          </span>
-                          <span className="flex items-center gap-1.5 text-xs font-medium text-background/90">
-                            🔄 Easy Returns
-                          </span>
-                        </div>
-                      </>
-                    )}
+              <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
+                <div className="max-w-2xl pt-6 text-white">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/20 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] backdrop-blur sm:text-xs"><Sparkles className="h-3.5 w-3.5 text-[#FFD700]" />Premium beauty for Rwanda</span>
+                  <h1 className="mt-5 max-w-xl text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">{banner.title}</h1>
+                  {banner.subtitle && <p className="mt-4 max-w-xl text-sm leading-6 text-white/80 sm:text-base lg:text-lg">{banner.subtitle}</p>}
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    <button type="button" onClick={() => followBanner(banner)} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#B76E79] px-6 text-sm font-bold text-white shadow-xl shadow-black/20 transition-all hover:-translate-y-0.5 hover:bg-[#a55d68]">Shop now <ArrowRight className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => goCatalog(null)} className="inline-flex min-h-12 items-center rounded-full border border-white/30 bg-white/10 px-6 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20">Explore best sellers</button>
+                  </div>
+                  <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-medium text-white/80 sm:text-xs">
+                    <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-emerald-400" />100% genuine</span>
+                    <span className="flex items-center gap-1.5"><Truck className="h-4 w-4 text-[#FFD700]" />All 30 districts</span>
+                    <span>💛 MTN MoMo</span>
                   </div>
                 </div>
               </div>
-            </div>
+            </article>
           )
         })}
       </div>
 
-      {/* Navigation arrows (desktop) */}
-      {slides.length > 1 && (
+      {banners.length > 1 && (
         <>
-          <button
-            onClick={prev}
-            className="absolute left-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-background/20 p-2 text-background backdrop-blur transition-colors hover:bg-background/40 lg:block"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-          <button
-            onClick={next}
-            className="absolute right-4 top-1/2 z-20 hidden -translate-y-1/2 rounded-full bg-background/20 p-2 text-background backdrop-blur transition-colors hover:bg-background/40 lg:block"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </button>
+          <button type="button" onClick={previous} className="absolute left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/20 text-white backdrop-blur transition-colors hover:bg-black/40 sm:grid lg:left-6" aria-label="Previous banner"><ChevronLeft className="h-5 w-5" /></button>
+          <button type="button" onClick={next} className="absolute right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/20 text-white backdrop-blur transition-colors hover:bg-black/40 sm:grid lg:right-6" aria-label="Next banner"><ChevronRight className="h-5 w-5" /></button>
+          <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/20 px-3 py-2 backdrop-blur">
+            {banners.map((banner, index) => <button key={banner.id} type="button" onClick={() => setCurrent(index)} className={`h-2 rounded-full transition-all ${index === current ? 'w-8 bg-[#B76E79]' : 'w-2 bg-white/50 hover:bg-white'}`} aria-label={`Show banner ${index + 1}`} aria-current={index === current} />)}
+          </div>
         </>
-      )}
-
-      {/* Dots */}
-      {slides.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 gap-2">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`h-2 rounded-full transition-all ${
-                i === current
-                  ? "w-8 bg-primary"
-                  : "w-2 bg-background/50 hover:bg-background/80"
-              }`}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
       )}
     </section>
   )

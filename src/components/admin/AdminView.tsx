@@ -106,6 +106,7 @@ import { useOrderUpdates } from "@/hooks/use-realtime"
 import { useLiveStats } from "@/hooks/use-live-stats"
 import { useSettings } from "@/hooks/use-settings"
 import { formatRWFCompact } from "@/lib/format"
+import { type AdminTab, useOptionalAdminShell } from "./AdminShellContext"
 
 const STATUS_OPTIONS = [
   { value: "all", label: "All statuses" },
@@ -135,10 +136,16 @@ const STATUS_COLORS: Record<string, string> = {
   CANCELLED: "bg-red-100 text-red-700",
 }
 
-export function AdminView() {
+export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
   const { goHome, user } = useStore()
   const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState("overview")
+  const adminShell = useOptionalAdminShell()
+  const [localActiveTab, setLocalActiveTab] = useState("overview")
+  const activeTab = embedded && adminShell ? adminShell.activeTab : localActiveTab
+  const setActiveTab = useCallback((tab: string) => {
+    if (embedded && adminShell) adminShell.setActiveTab(tab as AdminTab)
+    else setLocalActiveTab(tab)
+  }, [adminShell, embedded])
 
   // Dynamic store settings (logo, name, etc.)
   const { settings: adminSettings } = useSettings()
@@ -220,7 +227,7 @@ export function AdminView() {
     }
     window.addEventListener("keydown", handler)
     return () => window.removeEventListener("keydown", handler)
-  }, [toggleTheme, shortcutsOpen])
+  }, [toggleTheme, shortcutsOpen, setActiveTab])
 
   // Real-time notifications
   const { notifications, enabled, setEnabled, dismiss, clearAll } = useAdminNotifications()
@@ -711,7 +718,8 @@ export function AdminView() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6 grid w-full grid-cols-4 sm:grid-cols-13">
+        {!embedded && (
+      <TabsList className="mb-6 grid w-full grid-cols-4 sm:grid-cols-13">
           <TabsTrigger value="overview" className="gap-1">
             <LayoutDashboard className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Overview</span>
@@ -770,6 +778,7 @@ export function AdminView() {
             <span className="hidden sm:inline">Wholesale</span>
           </TabsTrigger>
         </TabsList>
+      )}
 
         {/* Overview */}
         <TabsContent value="overview">

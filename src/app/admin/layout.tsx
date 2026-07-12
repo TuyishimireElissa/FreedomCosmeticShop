@@ -2,30 +2,29 @@ import type { Metadata } from 'next'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminHeader from '@/components/admin/AdminHeader'
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard'
+import { AdminShellProvider } from '@/components/admin/AdminShellContext'
 
 export const metadata: Metadata = {
   title: {
     default: 'Admin | FreedomCosmeticShop',
-    template: '%s | FCS Admin'
+    template: '%s | FCS Admin',
   },
 }
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminAuthGuard>
-      <div className="flex h-screen bg-gray-50 overflow-hidden">
-        <AdminSidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <AdminHeader />
-          <main className="flex-1 overflow-y-auto p-4 md:p-6">
-            {children}
-          </main>
+      <AdminShellProvider>
+        <div className="flex h-dvh min-h-0 overflow-hidden bg-[#f8f9fa] text-[#1a1a1a]">
+          <AdminSidebar />
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+            <AdminHeader />
+            <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
+      </AdminShellProvider>
     </AdminAuthGuard>
   )
 }

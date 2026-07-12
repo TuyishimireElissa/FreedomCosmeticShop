@@ -42,7 +42,6 @@ export function Header() {
   // Prevent hydration mismatch: cart count is 0 on server but may be >0 on client
   // (persisted in localStorage). Only show the real count after mount.
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 

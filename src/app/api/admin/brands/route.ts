@@ -64,11 +64,12 @@ export async function POST(req: Request) {
 
     const brand = await db.brand.create({
       data: {
-        ...parsed.data,
+        name: parsed.data.name!,
         slug,
         description: parsed.data.description || null,
         logo: parsed.data.logo || null,
         country: parsed.data.country || null,
+        isActive: parsed.data.isActive ?? true,
       },
     })
 

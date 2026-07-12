@@ -131,15 +131,15 @@ REQUIRED:
 - ✅ NEXT_PUBLIC_WHATSAPP = +250780000000 (FIXED from +250788123456, verified in page.tsx)
 - ⚠️ NEXT_PUBLIC_API_URL - MISSING, ADDED logic to use /api
 - ✅ NEXTAUTH_URL = https://freedom-cosmetic-shop.vercel.app (FIXED)
-- ✅ NEXTAUTH_SECRET = strong secret (freedomcosmeticshop-jwt-secret-rwanda-2024)
-- ✅ DATABASE_URL = postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@... (PROVIDED, but auth FAILS - needs reset)
+- ✅ NEXTAUTH_SECRET = strong secret ([ROTATED_JWT_SECRET])
+- ✅ DATABASE_URL = [ROTATED_DATABASE_URL] (PROVIDED, but auth FAILS - needs reset)
 - ✅ DIRECT_URL = same (PROVIDED, but should be port 6543 vs 5432 - WARN, fixed in VERCEL_ENV_SETUP)
 - ✅ NEXT_PUBLIC_SUPABASE_URL = https://hsdqahltrqjeaskhheis.supabase.co (PASS)
 - ✅ SUPABASE_PROJECT_REF = hsdqahltrqjeaskhheis (PASS)
 - ✅ NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = dohoc0tmp (PASS)
 - ✅ CLOUDINARY_CLOUD_NAME = dohoc0tmp (PASS)
 - ✅ CLOUDINARY_API_KEY = 524578837153868 (PASS)
-- ✅ CLOUDINARY_API_SECRET = ggf5-0eqMOIvtxQXokzy6-Nr1yU (PASS)
+- ✅ CLOUDINARY_API_SECRET = [ROTATED_CLOUDINARY_API_SECRET] (PASS)
 - ✅ STORE_NAME = FreedomCosmeticShop (PASS)
 - ✅ STORE_CURRENCY = RWF (PASS)
 - ✅ STORE_TIMEZONE = Africa/Kigali (PASS)
@@ -467,7 +467,7 @@ CUSTOMERS, WHOLESALE ADMIN, SETTINGS:
 ### 🔍 SCAN 13: CLOUDINARY INTEGRATION
 
 - ❌ BEFORE: /lib/cloudinary.ts MISSING
-- ✅ AFTER ADDED: cloudName dohoc0tmp, apiKey 524578837153868, apiSecret ggf5-0eqMOIvtxQXokzy6-Nr1yU, folders freedomcosmeticshop/products etc - FIXED
+- ✅ AFTER ADDED: cloudName dohoc0tmp, apiKey 524578837153868, apiSecret [ROTATED_CLOUDINARY_API_SECRET], folders freedomcosmeticshop/products etc - FIXED
 - ✅ next.config.js allows res.cloudinary.com/dohoc0tmp (FIXED)
 - ✅ storage.ts uploadImage uses fetch to api.cloudinary.com/v1_1/dohoc0tmp/image/upload, unsigned preset freedom_uploads, folder param
 - ✅ Product images use Cloudinary URLs + Unsplash fallback, optimizeUrl with w_, h_, q_auto, f_auto
@@ -512,7 +512,7 @@ SEO:
 
 - ✅ No API secrets in frontend (CLOUDINARY_API_SECRET only in server env, NEXT_PUBLIC only cloud name)
 - ✅ No hardcoded passwords (hashed via bcrypt)
-- ✅ JWT secret strong freedomcosmeticshop-jwt-secret-rwanda-2024
+- ✅ JWT secret strong [ROTATED_JWT_SECRET]
 - ✅ Admin routes protected via role check in AdminView + requireAuth in /api/admin
 - ✅ Input validation Zod in validators/index.ts
 - ✅ SQL injection prevented Prisma parameterized

@@ -1,142 +1,127 @@
-import Link from 'next/link'
+'use client'
+
 import {
-  Instagram, Facebook, Youtube,
-  Mail, Phone, MapPin,
-  MessageCircle
+  Facebook,
+  Instagram,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  ShieldCheck,
+  Truck,
+  Youtube,
 } from 'lucide-react'
+import { useStore } from '@/store/useStore'
+
+const shopLinks = [
+  { label: 'All Products', slug: null },
+  { label: 'Skincare', slug: 'skincare' },
+  { label: 'Makeup', slug: 'makeup' },
+  { label: 'Hair Care', slug: 'haircare' },
+  { label: 'Fragrance', slug: 'fragrance' },
+  { label: 'Body Care', slug: 'body-care' },
+]
+
+const trustBadges = [
+  { icon: ShieldCheck, title: '100% Authentic', subtitle: 'Genuine products' },
+  { icon: Truck, title: 'Fast Delivery', subtitle: 'All 30 districts' },
+  { icon: Phone, title: 'MTN MoMo', subtitle: 'Simple local payment' },
+  { icon: MessageCircle, title: 'Local Support', subtitle: 'Here when you need us' },
+]
 
 export default function Footer() {
+  const { goHome, goCatalog, goTrackOrder, goAdmin, setView } = useStore()
+
   return (
     <footer className="bg-[#1a1a1a] text-white">
-      <div className="max-w-7xl mx-auto px-4 py-12 lg:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 bg-[#B76E79] rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">F</span>
-              </div>
-              <div>
-                <p className="font-bold text-lg leading-none">FreedomCosmetic</p>
-                <p className="text-xs text-[#B76E79] leading-none">Rwanda's Beauty Freedom</p>
-              </div>
-            </div>
-            <p className="text-gray-400 text-sm leading-relaxed mb-4">
-              Rwanda's #1 online beauty store. 100% authentic products. Fast delivery across all 30 districts. Pay with MTN MoMo.
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          <section>
+            <button type="button" onClick={goHome} className="flex items-center gap-3 text-left" aria-label="Go to homepage">
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-[#c98892] to-[#9e5964] text-lg font-black shadow-lg shadow-black/20">F</span>
+              <span>
+                <span className="block text-lg font-extrabold leading-none">FreedomCosmetic</span>
+                <span className="mt-1 block text-xs font-medium text-[#d999a3]">Rwanda&apos;s Beauty Freedom 🇷🇼</span>
+              </span>
+            </button>
+            <p className="mt-5 max-w-sm text-sm leading-6 text-gray-400">
+              Rwanda&apos;s trusted online beauty store for authentic skincare, makeup and haircare, with fast delivery across all 30 districts.
             </p>
-            <div className="flex gap-3">
+            <div className="mt-5 flex gap-2.5">
               {[
-                { icon: Instagram, href: '#', label: 'Instagram' },
-                { icon: Facebook, href: '#', label: 'Facebook' },
-                { icon: Youtube, href: '#', label: 'YouTube' },
-              ].map(({ icon: Icon, href, label }) => (
-                <a key={label} href={href} className="w-9 h-9 bg-white/10 rounded-full flex items-center justify-center hover:bg-[#B76E79] transition-colors">
-                  <Icon size={16} />
+                { icon: Instagram, label: 'Instagram' },
+                { icon: Facebook, label: 'Facebook' },
+                { icon: Youtube, label: 'YouTube' },
+              ].map(({ icon: Icon, label }) => (
+                <a key={label} href="#" onClick={(event) => event.preventDefault()} aria-label={label} className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-gray-300 transition-all hover:-translate-y-0.5 hover:bg-[#B76E79] hover:text-white">
+                  <Icon className="h-4 w-4" />
                 </a>
               ))}
             </div>
-          </div>
+          </section>
 
-          <div>
-            <h3 className="font-bold text-base mb-4">Shop</h3>
-            <ul className="space-y-2.5">
-              {[
-                { label: 'All Products', href: '/products' },
-                { label: 'Skincare', href: '/products?category=skincare' },
-                { label: 'Makeup', href: '/products?category=makeup' },
-                { label: 'Hair Care', href: '/products?category=hair-care' },
-                { label: 'Fragrance', href: '/products?category=fragrance' },
-                { label: 'Body Care', href: '/products?category=body-care' },
-                { label: 'Wholesale (30% Off)', href: '/wholesale' },
-              ].map(item => (
-                <li key={item.href}>
-                  <Link href={item.href} className="text-gray-400 text-sm hover:text-white transition-colors">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-bold text-base mb-4">Help</h3>
-            <ul className="space-y-2.5">
-              {[
-                { label: 'Contact Us', href: '/contact' },
-                { label: 'Track Order', href: '/account/orders' },
-                { label: 'FAQ', href: '/faq' },
-                { label: 'Shipping: Kigali 1000 RWF', href: '/shipping' },
-                { label: 'North/South 3000 RWF', href: '/shipping' },
-                { label: 'East 3500 RWF, West 4000 RWF', href: '/shipping' },
-                { label: 'Free >50,000 RWF', href: '/shipping' },
-              ].map(item => (
+          <section>
+            <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-white">Shop</h2>
+            <ul className="mt-5 space-y-3">
+              {shopLinks.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-gray-400 text-sm hover:text-white transition-colors">
+                  <button type="button" onClick={() => goCatalog(item.slug)} className="text-sm text-gray-400 transition-colors hover:text-[#e6a6b0]">
                     {item.label}
-                  </Link>
+                  </button>
                 </li>
               ))}
+              <li>
+                <button type="button" onClick={() => setView('wholesale')} className="text-sm font-semibold text-[#e6a6b0] transition-colors hover:text-white">
+                  Wholesale beauty
+                </button>
+              </li>
             </ul>
-          </div>
+          </section>
 
-          <div>
-            <h3 className="font-bold text-base mb-4">Contact Us</h3>
-            <div className="space-y-3">
-              <a href="tel:+250780000000" className="flex items-center gap-3 text-gray-400 text-sm hover:text-white">
-                <Phone size={16} className="text-[#B76E79]" />
-                +250 780 000 000
-              </a>
-              <a href="mailto:hello@freedomcosmeticshop.rw" className="flex items-center gap-3 text-gray-400 text-sm hover:text-white">
-                <Mail size={16} className="text-[#B76E79]" />
-                hello@freedomcosmeticshop.rw
-              </a>
-              <div className="flex items-center gap-3 text-gray-400 text-sm">
-                <MapPin size={16} className="text-[#B76E79]" />
-                Kigali, Rwanda 🇷🇼
-              </div>
-              <a href="https://wa.me/250780000000?text=Hello FreedomCosmeticShop!" target="_blank" rel="noreferrer" className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-green-700 transition-colors mt-2 w-fit">
-                <MessageCircle size={16} />
-                WhatsApp Chat
-              </a>
+          <section>
+            <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-white">Help</h2>
+            <ul className="mt-5 space-y-3 text-sm">
+              <li><button type="button" onClick={() => goTrackOrder()} className="text-gray-400 transition-colors hover:text-white">Track your order</button></li>
+              <li><span className="text-gray-400">Delivery: 1–3 days in Kigali</span></li>
+              <li><span className="text-gray-400">Provinces: 3–5 days</span></li>
+              <li><span className="text-gray-400">Returns within 7 days</span></li>
+              <li><button type="button" onClick={goAdmin} className="text-gray-400 transition-colors hover:text-white">Admin Dashboard</button></li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-white">Contact Us</h2>
+            <div className="mt-5 space-y-4">
+              <a href="tel:+250780000000" className="flex items-center gap-3 text-sm text-gray-400 transition-colors hover:text-white"><Phone className="h-4 w-4 shrink-0 text-[#d999a3]" />+250 780 000 000</a>
+              <a href="mailto:hello@freedomcosmeticshop.rw" className="flex items-start gap-3 break-all text-sm text-gray-400 transition-colors hover:text-white"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#d999a3]" />hello@freedomcosmeticshop.rw</a>
+              <p className="flex items-center gap-3 text-sm text-gray-400"><MapPin className="h-4 w-4 shrink-0 text-[#d999a3]" />Kigali, Rwanda 🇷🇼</p>
+              <a href="https://wa.me/250780000000?text=Hello%20FreedomCosmeticShop!" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#20bd5a]"><MessageCircle className="h-4 w-4" />WhatsApp Chat</a>
             </div>
             <div className="mt-6">
-              <p className="text-xs text-gray-500 mb-2">We Accept:</p>
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-gray-500">We accept</p>
               <div className="flex flex-wrap gap-2">
-                {['💛 MTN MoMo', '🔴 Airtel', '💳 Visa', '💵 COD'].map(p => (
-                  <span key={p} className="bg-white/10 text-xs px-2 py-1 rounded text-gray-300">
-                    {p}
-                  </span>
-                ))}
+                {['💛 MTN MoMo', '🔴 Airtel', '💳 Visa', '💵 COD'].map((payment) => <span key={payment} className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[11px] text-gray-300">{payment}</span>)}
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            {[
-              { icon: '✅', title: '100% Authentic', sub: 'Genuine products' },
-              { icon: '🚚', title: 'Fast Delivery', sub: '1-3 days Kigali, 3-5 provinces' },
-              { icon: '💛', title: 'MTN MoMo', sub: 'Primary - Easy payment' },
-              { icon: '🔄', title: 'Easy Returns', sub: '30-day policy' },
-            ].map(badge => (
-              <div key={badge.title} className="flex flex-col items-center">
-                <span className="text-2xl mb-1">{badge.icon}</span>
-                <p className="text-sm font-medium">{badge.title}</p>
-                <p className="text-xs text-gray-400">{badge.sub}</p>
-              </div>
-            ))}
-          </div>
+      <div className="border-y border-white/10 bg-white/[0.025]">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px px-4 py-6 sm:px-6 md:grid-cols-4 lg:px-8">
+          {trustBadges.map(({ icon: Icon, title, subtitle }) => (
+            <div key={title} className="flex flex-col items-center px-2 py-3 text-center sm:flex-row sm:items-start sm:justify-center sm:gap-3 sm:text-left">
+              <Icon className="mb-2 h-6 w-6 shrink-0 text-[#d999a3] sm:mb-0" />
+              <span><span className="block text-xs font-bold sm:text-sm">{title}</span><span className="mt-0.5 block text-[10px] text-gray-500 sm:text-xs">{subtitle}</span></span>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="border-t border-white/10 bg-black/30">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-2 text-xs text-gray-500">
-            <p>© 2024 FreedomCosmeticShop. All rights reserved. RWF only. 30 districts.</p>
-            <p className="flex items-center gap-1">Made with ❤️ in Rwanda 🇷🇼 | Cloudinary dohoc0tmp | Supabase hsdqahltrqjeaskhheis</p>
-          </div>
+      <div className="bg-black/30">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-center text-xs text-gray-500 sm:px-6 md:flex-row md:text-left lg:px-8">
+          <p>© {new Date().getFullYear()} FreedomCosmeticShop. All rights reserved.</p>
+          <p>Made with ❤️ in Rwanda 🇷🇼</p>
         </div>
       </div>
     </footer>

@@ -41,18 +41,18 @@ Use the Vercel Dashboard (easiest):
 
 | Variable | Value | Environments |
 |----------|-------|-------------|
-| DATABASE_URL | postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:5432/postgres | Production |
-| DIRECT_URL | postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:5432/postgres | Production |
+| DATABASE_URL | [ROTATED_DATABASE_URL] | Production |
+| DIRECT_URL | [ROTATED_DATABASE_URL] | Production |
 | CLOUDINARY_CLOUD_NAME | dohoc0tmp | All |
 | CLOUDINARY_API_KEY | 524578837153868 | Production |
-| CLOUDINARY_API_SECRET | ggf5-0eqMOIvtxQXokzy6-Nr1yU | Production |
+| CLOUDINARY_API_SECRET | [ROTATED_CLOUDINARY_API_SECRET] | Production |
 | NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME | dohoc0tmp | All |
 | NEXT_PUBLIC_APP_URL | https://freedomcosmeticshop.vercel.app | All |
 | NEXT_PUBLIC_CURRENCY | RWF | All |
 | NEXT_PUBLIC_WHATSAPP | +250780000000 | All |
 | NEXT_PUBLIC_SUPABASE_URL | https://hsdqahltrqjeaskhheis.supabase.co | All |
-| JWT_SECRET | freedomcosmeticshop-jwt-secret-rwanda-2024-very-strong | Production |
-| JWT_REFRESH_SECRET | freedomcosmeticshop-refresh-secret-rwanda-2024 | Production |
+| JWT_SECRET | [GENERATE_A_RANDOM_JWT_SECRET] | Production |
+| JWT_REFRESH_SECRET | [GENERATE_A_RANDOM_REFRESH_SECRET] | Production |
 | STORE_NAME | FreedomCosmeticShop | All |
 | STORE_CURRENCY | RWF | All |
 | STORE_TIMEZONE | Africa/Kigali | All |
@@ -69,8 +69,8 @@ After deployment, run from your local machine:
 
 ```bash
 cd /home/z/my-project
-export DATABASE_URL="postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:5432/postgres"
-export DIRECT_URL="postgresql://postgres.hsdqahltrqjeaskhheis:Mama%23%23311%4020@aws-1-eu-central-1.pooler.supabase.com:5432/postgres"
+export DATABASE_URL="[ROTATED_DATABASE_URL]"
+export DIRECT_URL="[ROTATED_DATABASE_URL]"
 npx prisma db push
 npx prisma generate
 ```

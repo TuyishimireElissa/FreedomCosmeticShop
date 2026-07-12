@@ -1,36 +1,20 @@
-"use client"
+'use client'
 
-/**
- * ProductSection — reusable section for displaying a grid of products.
- *
- * Used for:
- *   - Best Sellers (sort by rating)
- *   - New Arrivals (sort by createdAt)
- *   - Featured Products
- *
- * Features:
- *   - Section header with title + subtitle + "View all" link
- *   - Responsive grid (2 cols mobile, 4 cols desktop)
- *   - Loading skeletons
- *   - Empty state
- */
-
-import { Product } from "@/lib/types"
-import { ProductCard } from "@/components/storefront/ProductCard"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, PackageOpen, RefreshCw } from 'lucide-react'
+import type { Product } from '@/lib/types'
+import { ProductCard } from '@/components/storefront/ProductCard'
 
 interface ProductSectionProps {
   title: string
   subtitle?: string
   products: Product[]
   loading?: boolean
+  error?: string | null
+  onRetry?: () => void
   onViewAll?: () => void
-  /** Number of skeleton loaders to show while loading */
   skeletonCount?: number
-  /** Optional badge/icon for the section header */
   badge?: string
+  tone?: 'white' | 'soft'
 }
 
 export function ProductSection({
@@ -38,55 +22,52 @@ export function ProductSection({
   subtitle,
   products,
   loading = false,
+  error,
+  onRetry,
   onViewAll,
   skeletonCount = 8,
   badge,
+  tone = 'white',
 }: ProductSectionProps) {
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-6 flex items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            {badge && (
-              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-primary">
-                {badge}
-              </span>
-            )}
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              {title}
-            </h2>
+    <section className={tone === 'soft' ? 'bg-[#f8f9fa]' : 'bg-white'}>
+      <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="mb-7 flex items-end justify-between gap-4">
+          <div>
+            {badge && <span className="inline-flex rounded-full bg-[#B76E79]/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#B76E79]">{badge}</span>}
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-[#1a1a1a] sm:text-3xl">{title}</h2>
+            {subtitle && <p className="mt-1.5 max-w-xl text-sm leading-6 text-gray-500">{subtitle}</p>}
           </div>
-          {subtitle && (
-            <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
-          )}
+          {onViewAll && <button type="button" onClick={onViewAll} className="hidden shrink-0 items-center gap-2 rounded-full border border-rose-100 bg-white px-4 py-2 text-sm font-bold text-[#B76E79] shadow-sm transition-all hover:border-[#B76E79] hover:shadow-md sm:flex">View all <ArrowRight className="h-4 w-4" /></button>}
         </div>
-        {onViewAll && (
-          <Button variant="ghost" size="sm" onClick={onViewAll} className="shrink-0">
-            View all
-            <ArrowRight className="ml-1.5 h-4 w-4" />
-          </Button>
+
+        {loading ? (
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: skeletonCount }).map((_, index) => (
+              <div key={index} className="overflow-hidden rounded-2xl border border-gray-100 bg-white">
+                <div className="aspect-square animate-pulse bg-gray-100" />
+                <div className="space-y-2.5 p-3 sm:p-4"><div className="h-3 w-1/3 animate-pulse rounded bg-gray-100" /><div className="h-4 w-full animate-pulse rounded bg-gray-100" /><div className="h-4 w-2/3 animate-pulse rounded bg-gray-100" /><div className="h-10 w-full animate-pulse rounded-xl bg-rose-100" /></div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="rounded-3xl border border-dashed border-rose-200 bg-white px-5 py-12 text-center shadow-sm">
+            <PackageOpen className="mx-auto h-9 w-9 text-[#B76E79]" />
+            <p className="mt-3 text-sm font-semibold text-gray-800">We couldn&apos;t load these products.</p>
+            <p className="mt-1 text-xs text-gray-500">Your beauty collection is safe—please try again.</p>
+            {onRetry && <button type="button" onClick={onRetry} className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white"><RefreshCw className="h-3.5 w-3.5" />Retry products</button>}
+          </div>
+        ) : products.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-gray-200 bg-white px-5 py-12 text-center"><PackageOpen className="mx-auto h-9 w-9 text-gray-300" /><p className="mt-3 text-sm font-semibold text-gray-700">Fresh products are coming soon.</p></div>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+              {products.map((product) => <ProductCard key={product.id} product={product} />)}
+            </div>
+            {onViewAll && <button type="button" onClick={onViewAll} className="mx-auto mt-7 flex items-center gap-2 rounded-full border border-[#B76E79] px-5 py-2.5 text-sm font-bold text-[#B76E79] sm:hidden">View all <ArrowRight className="h-4 w-4" /></button>}
+          </>
         )}
       </div>
-
-      {/* Grid */}
-      {loading ? (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: skeletonCount }).map((_, i) => (
-            <Skeleton key={i} className="aspect-[3/4] rounded-2xl" />
-          ))}
-        </div>
-      ) : products.length === 0 ? (
-        <div className="rounded-2xl border border-dashed py-12 text-center">
-          <p className="text-sm text-muted-foreground">No products found.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
     </section>
   )
 }

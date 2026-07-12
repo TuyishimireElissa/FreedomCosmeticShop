@@ -65,7 +65,13 @@ export async function POST(req: Request) {
       )
     }
 
-    const banner = await db.banner.create({ data: parsed.data })
+    const banner = await db.banner.create({
+      data: {
+        ...parsed.data,
+        title: parsed.data.title!,
+        image: parsed.data.image!,
+      },
+    })
 
     // ─── Section 4: Real-time broadcast ──────────────────────────────
     // Notify storefront to refresh banners instantly

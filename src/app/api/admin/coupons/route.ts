@@ -89,8 +89,17 @@ export async function POST(req: Request) {
 
     const coupon = await db.coupon.create({
       data: {
-        ...parsed.data,
         code: parsed.data.code.toUpperCase(),
+        description: parsed.data.description,
+        type: parsed.data.type!,
+        value: parsed.data.value!,
+        minOrderAmount: parsed.data.minOrderAmount,
+        maxDiscountAmount: parsed.data.maxDiscountAmount,
+        usageLimit: parsed.data.usageLimit,
+        usageLimitPerUser: parsed.data.usageLimitPerUser ?? 1,
+        startsAt: parsed.data.startsAt!,
+        endsAt: parsed.data.endsAt,
+        isActive: parsed.data.isActive ?? true,
         appliesToAllProducts: true,
         categoryIds: "[]",
         productIds: "[]",

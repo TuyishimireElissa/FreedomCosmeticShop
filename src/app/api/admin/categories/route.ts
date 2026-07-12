@@ -66,12 +66,14 @@ export async function POST(req: Request) {
 
     const category = await db.category.create({
       data: {
-        ...parsed.data,
+        name: parsed.data.name!,
         slug,
         description: parsed.data.description || null,
         image: parsed.data.image || null,
         icon: parsed.data.icon || null,
         parentId: parsed.data.parentId || null,
+        sortOrder: parsed.data.sortOrder ?? 0,
+        isActive: parsed.data.isActive ?? true,
       },
     })
 

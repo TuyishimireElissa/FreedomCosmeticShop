@@ -3,6 +3,19 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --muted: 210 17% 98%;
+    --muted-foreground: 215 14% 42%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 351 32% 57%;
+    --radius: 0.75rem;
+  }
+
   * {
     box-sizing: border-box;
     margin: 0;
@@ -52,12 +65,40 @@
     @apply bg-secondary text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-all duration-200 active:scale-95;
   }
 
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-500 px-6 py-3 rounded-lg font-semibold hover:bg-primary-500 hover:text-white transition-all duration-200;
+  }
+
   .card {
     @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-200;
   }
 
+  .input-field {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-900 placeholder-gray-400 bg-white;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .section-title {
+    @apply text-2xl md:text-3xl font-bold text-gray-900 mb-2;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
   .price-rwf {
-    @apply font-bold text-primary;
+    @apply font-bold text-primary-600;
+  }
+
+  .price-original {
+    @apply text-gray-400 line-through text-sm;
+  }
+
+  .loading-skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
   }
 }
 
@@ -68,5 +109,17 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }

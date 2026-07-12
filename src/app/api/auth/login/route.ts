@@ -16,16 +16,17 @@ import { setAuthCookies } from "@/lib/auth"
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { phone, password } = body
+    const identifier = body.identifier || body.phone
+    const { password } = body
 
-    if (!phone || !password) {
+    if (!identifier || !password) {
       return NextResponse.json(
-        { error: "Phone and password are required" },
+        { error: "Phone/email and password are required" },
         { status: 400 }
       )
     }
 
-    const result = await loginWithPassword({ phone, password })
+    const result = await loginWithPassword({ identifier, password })
 
     const res = NextResponse.json({
       user: result.user,
@@ -33,7 +34,12 @@ export async function POST(req: Request) {
     })
     return setAuthCookies(res, result.accessToken, result.refreshToken)
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Login failed"
+    console.error("Login failed:", error)
+    const message =
+      error instanceof Error &&
+      (error.message.startsWith("Invalid") || error.message.includes("required"))
+        ? error.message
+        : "Login is temporarily unavailable. Please try again."
     return NextResponse.json({ error: message }, { status: 400 })
   }
 }

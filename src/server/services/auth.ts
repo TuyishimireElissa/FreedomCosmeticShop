@@ -44,7 +44,8 @@ export interface RegisterInput {
 }
 
 export interface LoginPasswordInput {
-  phone: string
+  phone?: string
+  identifier?: string
   password: string
 }
 
@@ -237,23 +238,30 @@ export async function verifyRegistration(
 export async function loginWithPassword(
   input: LoginPasswordInput
 ): Promise<AuthResult> {
-  let phone: string
-  try {
-    phone = normalizeRwandaPhone(input.phone)
-  } catch (e) {
-    if (e instanceof PhoneValidationError) {
-      throw new Error(e.message)
+  const identifier = (input.identifier || input.phone || "").trim()
+  if (!identifier) throw new Error("Phone or email is required")
+
+  let user
+  if (identifier.includes("@")) {
+    user = await db.user.findFirst({
+      where: { email: identifier.toLowerCase(), isDeleted: false },
+    })
+  } else {
+    let phone: string
+    try {
+      phone = normalizeRwandaPhone(identifier)
+    } catch (e) {
+      if (e instanceof PhoneValidationError) {
+        throw new Error("Invalid phone/email or password")
+      }
+      throw e
     }
-    throw e
+    user = await db.user.findFirst({ where: { phone, isDeleted: false } })
   }
 
-  const user = await db.user.findFirst({
-    where: { phone, isDeleted: false },
-  })
-
-  // Don't reveal whether the phone exists (security)
+  // Don't reveal whether the account exists (security)
   if (!user || !user.passwordHash) {
-    throw new Error("Invalid phone number or password")
+    throw new Error("Invalid phone/email or password")
   }
 
   const passwordValid = await verifyPassword(input.password, user.passwordHash)
@@ -265,7 +273,7 @@ export async function loginWithPassword(
       userRole: user.role,
       success: false,
     }).catch(() => {})
-    throw new Error("Invalid phone number or password")
+    throw new Error("Invalid phone/email or password")
   }
 
   // Best-effort audit log for successful login (don't await/block)

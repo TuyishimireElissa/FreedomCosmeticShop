@@ -33,10 +33,10 @@ export function LogoUploader() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch("/api/settings/store")
+      const res = await fetch("/api/admin/logo")
       if (!res.ok) return
       const data = await res.json()
-      setCurrentLogo(data.settings?.logoUrl || null)
+      setCurrentLogo(data.data?.logoUrl ?? data.logoUrl ?? null)
     } catch {
       // ignore
     } finally {
@@ -49,9 +49,9 @@ export function LogoUploader() {
   }, [load])
 
   const validateFile = (file: File): string | null => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"]
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"]
     if (!allowedTypes.includes(file.type)) {
-      return `Invalid file type: ${file.type}. Only JPG, PNG, WebP, and SVG are allowed.`
+      return `Invalid file type: ${file.type}. Only JPG, PNG, and WebP are allowed.`
     }
     if (file.size > 5 * 1024 * 1024) {
       return `File too large: ${(file.size / 1024 / 1024).toFixed(1)}MB. Maximum size is 5MB.`
@@ -88,7 +88,7 @@ export function LogoUploader() {
       const formData = new FormData()
       formData.append("logo", selectedFile)
 
-      const res = await fetch("/api/settings/logo", {
+      const res = await fetch("/api/admin/logo", {
         method: "POST",
         body: formData,
       })
@@ -99,7 +99,7 @@ export function LogoUploader() {
         title: "✅ Logo uploaded successfully!",
         description: "Your logo is now live on the website and admin panel.",
       })
-      setCurrentLogo(data.logoUrl)
+      setCurrentLogo(data.data?.logoUrl ?? data.logoUrl)
       setSelectedFile(null)
       setPreviewUrl(null)
     } catch (e) {
@@ -117,7 +117,7 @@ export function LogoUploader() {
     if (!confirm("Remove the current logo? The store name will show as text instead.")) return
     setUploading(true)
     try {
-      const res = await fetch("/api/settings/logo", { method: "DELETE" })
+      const res = await fetch("/api/admin/logo", { method: "DELETE" })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed")
 
@@ -195,7 +195,7 @@ export function LogoUploader() {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/webp,image/svg+xml"
+            accept="image/jpeg,image/png,image/webp"
             onChange={handleInputChange}
             className="hidden"
           />
@@ -252,7 +252,7 @@ export function LogoUploader() {
       <div className="mt-3 rounded-lg bg-secondary/20 p-3 text-[10px] text-muted-foreground">
         <p className="font-medium text-foreground">Requirements:</p>
         <ul className="mt-1 space-y-0.5">
-          <li>✅ JPG, PNG, WebP, or SVG format</li>
+          <li>✅ JPG, PNG, or WebP format</li>
           <li>✅ Maximum size: 5MB</li>
           <li>✅ Recommended: 500×500px square</li>
           <li>✅ White or transparent background works best</li>

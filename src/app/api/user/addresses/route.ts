@@ -62,7 +62,19 @@ export async function POST(req: Request) {
     }
 
     const address = await db.address.create({
-      data: { ...parsed.data, userId: user.id },
+      data: {
+        userId: user.id,
+        label: parsed.data.label!,
+        recipientName: parsed.data.recipientName!,
+        recipientPhone: parsed.data.recipientPhone!,
+        province: parsed.data.province!,
+        district: parsed.data.district!,
+        sector: parsed.data.sector!,
+        cell: parsed.data.cell,
+        village: parsed.data.village,
+        streetAddress: parsed.data.streetAddress,
+        isDefault: parsed.data.isDefault ?? false,
+      },
     })
 
     return NextResponse.json({ address }, { status: 201 })

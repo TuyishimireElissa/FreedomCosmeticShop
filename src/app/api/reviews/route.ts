@@ -29,22 +29,20 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
     const productId = searchParams.get("productId")
-
-    if (!productId) {
-      return NextResponse.json(
-        { error: "productId is required" },
-        { status: 400 }
-      )
-    }
+    const limit = Math.min(50, Math.max(1, Number(searchParams.get("limit") || "50")))
 
     const reviews = await db.review.findMany({
       where: {
-        productId,
+        ...(productId ? { productId } : {}),
         isApproved: true,
         isDeleted: false,
       },
       orderBy: [{ helpfulVotes: "desc" }, { createdAt: "desc" }],
-      take: 50,
+      take: limit,
+      include: {
+        user: { select: { name: true, avatar: true } },
+        product: { select: { name: true, slug: true } },
+      },
     })
 
     // Deserialize photos

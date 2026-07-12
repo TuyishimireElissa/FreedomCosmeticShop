@@ -55,7 +55,6 @@ export function useRwandaDistricts() {
 
   useEffect(() => {
     if (districtsCache) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setData(districtsCache)
       setLoading(false)
       return
@@ -84,7 +83,6 @@ export function useDistrictSectors(district: string | null) {
 
   useEffect(() => {
     if (!district) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSectors([])
       return
     }
@@ -92,7 +90,6 @@ export function useDistrictSectors(district: string | null) {
     // Check cache
     const cached = sectorsCache.get(district)
     if (cached) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSectors(cached)
       return
     }
@@ -121,7 +118,6 @@ export function useDeliveryFee(district: string | null, orderTotal: number) {
 
   useEffect(() => {
     if (!district) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCalculation(null)
       return
     }
@@ -132,7 +128,6 @@ export function useDeliveryFee(district: string | null, orderTotal: number) {
 
     // Check cache
     const cached = calculationCache.get(cacheKey)
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (cached) {
       setCalculation(cached)
       return

@@ -1,55 +1,49 @@
 'use client'
-import { Bell, Search, Menu } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+
+import { Bell, Menu } from 'lucide-react'
+import { useAdminShell } from '@/components/admin/AdminShellContext'
+import { useStore } from '@/store/useStore'
+
+const tabTitles: Record<string, string> = {
+  overview: 'Overview',
+  orders: 'Orders',
+  products: 'Products',
+  customers: 'Customers',
+  deliveries: 'Deliveries',
+  analytics: 'Analytics',
+  reports: 'Reports',
+  settings: 'Settings',
+  staff: 'Staff & Security',
+  sms: 'SMS Campaigns',
+  payments: 'Payments',
+  marketing: 'Marketing',
+  wholesale: 'Wholesale',
+}
 
 export default function AdminHeader() {
-  const { data: session } = useSession()
+  const { activeTab, setMobileOpen } = useAdminShell()
+  const user = useStore((state) => state.user)
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 md:px-6 h-16 flex items-center justify-between flex-shrink-0">
-
-      {/* Mobile Menu */}
-      <button className="md:hidden p-2 rounded-lg hover:bg-gray-100">
-        <Menu size={20} />
-      </button>
-
-      {/* Search */}
-      <div className="hidden md:flex items-center gap-2 flex-1 max-w-md">
-        <div className="relative flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search orders, products, customers..."
-            className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#B76E79]"
-          />
+    <header className="flex h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-3 shadow-sm md:hidden">
+      <div className="flex min-w-0 items-center gap-2.5">
+        <button type="button" onClick={() => setMobileOpen(true)} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-gray-200 text-[#1a1a1a] hover:border-rose-200 hover:bg-rose-50" aria-label="Open admin navigation">
+          <Menu className="h-5 w-5" />
+        </button>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-bold text-[#1a1a1a]">{tabTitles[activeTab] || 'Admin'}</p>
+          <p className="truncate text-[10px] font-medium uppercase tracking-wider text-gray-400">FCS Admin Workspace</p>
         </div>
       </div>
 
-      {/* Right */}
-      <div className="flex items-center gap-3">
-        
-        {/* Notifications */}
-        <button className="relative p-2 rounded-lg hover:bg-gray-100">
-          <Bell size={20} />
-          <span className="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-            3
-          </span>
+      <div className="flex items-center gap-1.5">
+        <button type="button" className="relative grid h-10 w-10 place-items-center rounded-xl text-gray-600 hover:bg-gray-100" aria-label="Notifications">
+          <Bell className="h-5 w-5" />
+          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
         </button>
-
-        {/* Admin Info */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#B76E79] rounded-full flex items-center justify-center text-white font-bold text-sm">
-            {session?.user?.name?.[0] || 'A'}
-          </div>
-          <div className="hidden md:block">
-            <p className="text-sm font-medium leading-none">
-              {session?.user?.name || 'Admin'}
-            </p>
-            <p className="text-xs text-gray-400 leading-none mt-0.5">
-              {(session?.user as any)?.role || 'ADMIN'}
-            </p>
-          </div>
-        </div>
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-[#B76E79] text-xs font-bold text-white">
+          {user?.name?.charAt(0).toUpperCase() || 'A'}
+        </span>
       </div>
     </header>
   )

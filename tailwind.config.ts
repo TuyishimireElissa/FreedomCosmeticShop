@@ -22,9 +22,16 @@ const config: Config = {
           700: '#8a4a55',
           800: '#733f49',
           900: '#633742',
+          foreground: '#ffffff',
         },
-        secondary: '#1a1a1a',
-        accent: '#FFD700',
+        secondary: {
+          DEFAULT: '#1a1a1a',
+          foreground: '#ffffff',
+        },
+        accent: {
+          DEFAULT: '#FFD700',
+          foreground: '#1a1a1a',
+        },
         rwanda: {
           blue: '#20603D',
           yellow: '#FAD201',

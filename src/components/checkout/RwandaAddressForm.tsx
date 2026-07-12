@@ -87,7 +87,6 @@ export function RwandaAddressForm({
   // Reset district when province changes
   useEffect(() => {
     if (province && district && !availableDistricts.includes(district)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDistrict("")
       setSector("")
     }

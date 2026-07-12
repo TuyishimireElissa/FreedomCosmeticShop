@@ -55,3 +55,8 @@ server.log
 /skills/.env
 db/
 upload/
+
+# Local recovery deliverables (not production source)
+/FreedomCosmeticShop-*-files.zip
+/*_RECOVERY_REPORT.md
+/*_COMPLETION_REPORT.md

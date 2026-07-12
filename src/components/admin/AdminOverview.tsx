@@ -169,7 +169,6 @@ export function AdminOverview() {
       if (prevOrderCount > 0 && currentCount > prevOrderCount) {
         playOrderSound()
       }
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPrevOrderCount(currentCount)
     } catch (e) {
       console.error(e)

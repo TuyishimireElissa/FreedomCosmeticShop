@@ -45,12 +45,12 @@ export async function broadcastProductEvent(
   options?: BroadcastOptions
 ): Promise<void> {
   // Bust Next.js cache
-  revalidateTag("products", "max")
-  revalidateTag("products:featured", "max")
-  revalidateTag("products:bestsellers", "max")
-  revalidateTag("products:new-arrivals", "max")
-  revalidateTag(`product:${product.slug}`, "max")
-  revalidateTag(`product:${product.id}`, "max")
+  revalidateTag("products")
+  revalidateTag("products:featured")
+  revalidateTag("products:bestsellers")
+  revalidateTag("products:new-arrivals")
+  revalidateTag(`product:${product.slug}`)
+  revalidateTag(`product:${product.id}`)
 
   // Emit real-time event
   emitRealtimeEvent(`product:${action}`, product, options)
@@ -63,8 +63,8 @@ export async function broadcastOrderEvent(
   order: { id: string; orderNumber: string; userId?: string | null; customerPhone: string; status: string; total: number; customerName?: string; [key: string]: unknown },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("orders", "max")
-  revalidateTag(`order:${order.id}`, "max")
+  revalidateTag("orders")
+  revalidateTag(`order:${order.id}`)
 
   emitRealtimeEvent(`order:${action}`, order, options)
 
@@ -82,8 +82,8 @@ export async function broadcastPaymentEvent(
   payment: { id: string; orderId: string; orderNumber: string; amount: number; method: string; status: string; userId?: string | null },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("payments", "max")
-  revalidateTag(`order:${payment.orderId}`, "max")
+  revalidateTag("payments")
+  revalidateTag(`order:${payment.orderId}`)
 
   emitRealtimeEvent(`payment:${action}`, payment, options)
 
@@ -99,8 +99,8 @@ export async function broadcastBannerEvent(
   banner: { id: string; title: string; placement: string; isActive: boolean },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("banners", "max")
-  revalidateTag("banners:homepage", "max")
+  revalidateTag("banners")
+  revalidateTag("banners:homepage")
 
   emitRealtimeEvent(`banner:${action}`, banner, options)
 }
@@ -112,7 +112,7 @@ export async function broadcastCouponEvent(
   coupon: { id: string; code: string; type: string; value: number; isActive: boolean },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("coupons", "max")
+  revalidateTag("coupons")
 
   emitRealtimeEvent(`coupon:${action}`, coupon, options)
 }
@@ -122,8 +122,8 @@ export async function broadcastPromotionEvent(
   promotion: { id: string; name: string; type: string; products?: string[] },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("promotions", "max")
-  revalidateTag("promotions:active", "max")
+  revalidateTag("promotions")
+  revalidateTag("promotions:active")
 
   emitRealtimeEvent(`promotion:${action}`, promotion, options)
 }
@@ -135,8 +135,8 @@ export async function broadcastBlogEvent(
   post: { id: string; title: string; slug: string; status: string },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("blog", "max")
-  revalidateTag(`blog:${post.slug}`, "max")
+  revalidateTag("blog")
+  revalidateTag(`blog:${post.slug}`)
 
   emitRealtimeEvent(`blog:${action}`, post, options)
 }
@@ -148,7 +148,7 @@ export async function broadcastCategoryEvent(
   category: { id: string; name: string; slug: string; isActive: boolean },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("categories", "max")
+  revalidateTag("categories")
 
   emitRealtimeEvent(`category:${action}`, category, options)
 }
@@ -158,7 +158,7 @@ export async function broadcastBrandEvent(
   brand: { id: string; name: string; slug: string },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("brands", "max")
+  revalidateTag("brands")
 
   emitRealtimeEvent(`brand:${action}`, brand, options)
 }
@@ -170,8 +170,8 @@ export async function broadcastDeliveryEvent(
   data: { orderId?: string; orderNumber?: string; userId?: string | null; zoneCode?: string; riderName?: string; riderPhone?: string; baseFee?: number; freeThreshold?: number; estimatedDays?: number; isSameDay?: boolean; isActive?: boolean; [key: string]: unknown },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("delivery", "max")
-  revalidateTag("delivery:zones", "max")
+  revalidateTag("delivery")
+  revalidateTag("delivery:zones")
 
   emitRealtimeEvent(`delivery:${action}`, data, options)
 
@@ -196,7 +196,7 @@ export async function broadcastAnnouncementEvent(
   announcement: { text: string; textRw?: string; bgColor: string; textColor: string; isActive: boolean; link?: string },
   options?: BroadcastOptions
 ): Promise<void> {
-  revalidateTag("announcement", "max")
+  revalidateTag("announcement")
 
   emitRealtimeEvent("announcement:updated", announcement, options)
 }

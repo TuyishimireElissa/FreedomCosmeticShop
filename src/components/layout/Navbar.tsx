@@ -1,162 +1,321 @@
 'use client'
-import { useState } from 'react'
-import Link from 'next/link'
-import { useSession, signOut } from 'next-auth/react'
+
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
-  Search, ShoppingCart, Heart, Menu,
-  X, User, ChevronDown,
-  Phone
+  ChevronDown,
+  Globe,
+  Heart,
+  LogOut,
+  Menu,
+  Package,
+  Phone,
+  Search,
+  Shield,
+  ShoppingCart,
+  User,
+  X,
 } from 'lucide-react'
-import { useCart } from '@/hooks/useCart'
+import { SearchWithSuggestions } from '@/components/storefront/SearchWithSuggestions'
+import { useSettings } from '@/hooks/use-settings'
+import { useToast } from '@/hooks/use-toast'
+import { useStore } from '@/store/useStore'
 
 const categories = [
   { name: 'Skincare', slug: 'skincare', icon: '🧴' },
   { name: 'Makeup', slug: 'makeup', icon: '💄' },
-  { name: 'Hair Care', slug: 'hair-care', icon: '💇' },
+  { name: 'Hair Care', slug: 'haircare', icon: '💇' },
   { name: 'Fragrance', slug: 'fragrance', icon: '🌸' },
   { name: 'Body Care', slug: 'body-care', icon: '🧼' },
   { name: "Men's", slug: 'mens-grooming', icon: '🧔' },
 ]
 
 export default function Navbar() {
+  const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const { data: session } = useSession()
-  const { cartCount } = useCart()
+  const [accountOpen, setAccountOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const accountRef = useRef<HTMLDivElement>(null)
+  const { settings } = useSettings()
+  const { toast } = useToast()
+  const {
+    user,
+    authLoading,
+    cartCount,
+    goHome,
+    goCatalog,
+    goLogin,
+    goRegister,
+    goAccount,
+    goAdmin,
+    setView,
+    logout,
+  } = useStore()
+
+  useEffect(() => setMounted(true), [])
+
+  useEffect(() => {
+    const closeAccount = (event: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(event.target as Node)) {
+        setAccountOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', closeAccount)
+    return () => document.removeEventListener('mousedown', closeAccount)
+  }, [])
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileOpen])
+
+  const count = mounted ? cartCount() : 0
+
+  const navigate = (action: () => void) => {
+    action()
+    setMobileOpen(false)
+    setSearchOpen(false)
+    setAccountOpen(false)
+  }
+
+  const handleLogout = async () => {
+    await logout()
+    goHome()
+    setAccountOpen(false)
+    setMobileOpen(false)
+    toast({ title: 'Signed out successfully' })
+  }
+
+  const handleWishlist = () => {
+    if (!user) {
+      toast({ title: 'Sign in to save your favourite products.' })
+      goLogin()
+      return
+    }
+    toast({ title: 'Wishlist', description: 'Your saved beauty favourites will appear here.' })
+  }
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
-      <div className="bg-[#fff8e7] py-1.5 px-4 border-b border-yellow-100">
-        <div className="max-w-7xl mx-auto flex items-center justify-center gap-4 text-xs text-gray-600 overflow-x-auto scrollbar-hide">
-          <span className="flex items-center gap-1 whitespace-nowrap"><span>💛</span> MTN MoMo</span>
-          <span className="text-gray-300">|</span>
-          <span className="flex items-center gap-1 whitespace-nowrap"><span>🔴</span> Airtel Money</span>
-          <span className="text-gray-300 hidden sm:inline">|</span>
-          <span className="flex items-center gap-1 whitespace-nowrap hidden sm:flex"><span>💳</span> Visa/Card</span>
-          <span className="text-gray-300 hidden sm:inline">|</span>
-          <span className="flex items-center gap-1 whitespace-nowrap hidden sm:flex"><span>💵</span> Cash on Delivery</span>
+    <header className="sticky top-0 z-50 border-b border-rose-100/70 bg-white/95 shadow-[0_4px_20px_rgba(26,26,26,0.05)] backdrop-blur-xl">
+      <div className="border-b border-[#FFD700]/20 bg-[#fff8e7] px-3 py-1.5">
+        <div className="scrollbar-hide mx-auto flex max-w-7xl items-center justify-start gap-3 overflow-x-auto text-[10px] font-medium text-gray-600 sm:justify-center sm:gap-5 sm:text-xs">
+          <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">💛</span> MTN MoMo</span>
+          <span className="text-gray-300" aria-hidden="true">|</span>
+          <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">🔴</span> Airtel Money</span>
+          <span className="text-gray-300" aria-hidden="true">|</span>
+          <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">💳</span> Visa / Card</span>
+          <span className="text-gray-300" aria-hidden="true">|</span>
+          <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">💵</span> Cash on Delivery</span>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-8 h-8 bg-[#B76E79] rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-bold">F</span>
-          </div>
-          <div className="hidden sm:block">
-            <p className="font-bold text-base text-[#1a1a1a] leading-none">FreedomCosmetic</p>
-            <p className="text-xs text-[#B76E79] leading-none">Rwanda's Beauty Freedom 🇷🇼</p>
-          </div>
-        </Link>
+      <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-3 sm:h-[72px] sm:gap-4 sm:px-6 lg:px-8">
+        <button
+          type="button"
+          onClick={() => navigate(goHome)}
+          className="flex min-w-0 shrink-0 items-center gap-2 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]"
+          aria-label="FreedomCosmeticShop home"
+        >
+          {settings?.logoUrl ? (
+            <img
+              src={settings.logoUrl}
+              alt="FreedomCosmeticShop"
+              className="h-10 w-auto max-w-[150px] object-contain sm:max-w-[190px]"
+            />
+          ) : (
+            <>
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#c98892] to-[#9e5964] text-base font-black text-white shadow-md shadow-[#B76E79]/20">
+                F
+              </span>
+              <span className="hidden text-left sm:block">
+                <span className="block text-[15px] font-extrabold leading-none tracking-tight text-[#1a1a1a] lg:text-base">
+                  FreedomCosmetic
+                </span>
+                <span className="mt-1 block text-[10px] font-medium leading-none text-[#B76E79] lg:text-[11px]">
+                  Rwanda&apos;s Beauty Freedom 🇷🇼
+                </span>
+              </span>
+            </>
+          )}
+        </button>
 
-        <div className="hidden md:flex flex-1 max-w-xl mx-4 relative">
-          <input
-            type="text"
-            placeholder="Search skincare, makeup, haircare..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-4 pr-12 py-2.5 border-2 border-gray-200 rounded-full text-sm focus:border-[#B76E79] focus:outline-none transition-colors"
-          />
-          <button className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-[#B76E79] rounded-full flex items-center justify-center text-white hover:bg-[#a55d68]">
-            <Search size={14} />
-          </button>
+        <div className="mx-auto hidden w-full max-w-xl md:block">
+          <SearchWithSuggestions placeholder="Search skincare, makeup, haircare..." />
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          <button onClick={() => setSearchOpen(!searchOpen)} className="md:hidden p-2 hover:bg-gray-100 rounded-full">
-            <Search size={20} />
+        <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
+          <button
+            type="button"
+            onClick={() => setSearchOpen((open) => !open)}
+            className="grid h-10 w-10 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 md:hidden"
+            aria-label={searchOpen ? 'Close search' : 'Open search'}
+            aria-expanded={searchOpen}
+          >
+            {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </button>
-          <a href="https://wa.me/250780000000" target="_blank" rel="noreferrer" className="hidden lg:flex items-center gap-1 text-xs text-gray-600 hover:text-green-600 px-2 py-1 rounded-full hover:bg-green-50 transition-colors">
-            <Phone size={14} />
-            <span>Help</span>
+
+          <a
+            href="https://wa.me/250780000000"
+            target="_blank"
+            rel="noreferrer"
+            className="hidden items-center gap-1.5 rounded-full px-2.5 py-2 text-xs font-medium text-gray-600 transition-colors hover:bg-green-50 hover:text-green-700 lg:flex"
+          >
+            <Phone className="h-4 w-4" /> Help
           </a>
-          <Link href="/account/wishlist" className="p-2 hover:bg-gray-100 rounded-full relative hidden sm:flex">
-            <Heart size={20} />
-          </Link>
-          <Link href="/cart" className="p-2 hover:bg-gray-100 rounded-full relative">
-            <ShoppingCart size={20} />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#B76E79] text-white text-xs rounded-full flex items-center justify-center font-bold">
-                {cartCount}
+
+          <button
+            type="button"
+            onClick={handleWishlist}
+            className="hidden h-10 w-10 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-[#B76E79] sm:grid"
+            aria-label="Wishlist"
+          >
+            <Heart className="h-5 w-5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => router.push('/cart')}
+            className="relative grid h-10 w-10 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-[#B76E79]"
+            aria-label={`Shopping cart with ${count} items`}
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {count > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-[#B76E79] px-1 text-[10px] font-bold text-white ring-2 ring-white">
+                {count > 99 ? '99+' : count}
               </span>
             )}
-          </Link>
-          {session ? (
-            <div className="relative group">
-              <button className="flex items-center gap-1 p-2 hover:bg-gray-100 rounded-full">
-                <User size={20} />
-                <ChevronDown size={14} className="hidden sm:block" />
+          </button>
+
+          {authLoading ? (
+            <div className="hidden h-9 w-20 animate-pulse rounded-full bg-gray-100 sm:block" />
+          ) : user ? (
+            <div ref={accountRef} className="relative hidden sm:block">
+              <button
+                type="button"
+                onClick={() => setAccountOpen((open) => !open)}
+                className="flex h-10 items-center gap-1 rounded-full px-2 transition-colors hover:bg-rose-50"
+                aria-label="Account menu"
+                aria-expanded={accountOpen}
+              >
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-[#B76E79] text-xs font-bold text-white">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${accountOpen ? 'rotate-180' : ''}`} />
               </button>
-              <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-100 rounded-xl shadow-lg p-1 hidden group-hover:block z-50">
-                <Link href="/account" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 rounded-lg">My Account</Link>
-                <Link href="/account/orders" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 rounded-lg">My Orders</Link>
-                {(session.user as any)?.role === 'ADMIN' && (
-                  <Link href="/admin" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 rounded-lg text-[#B76E79]">Admin Panel</Link>
-                )}
-                <hr className="my-1" />
-                <button onClick={() => signOut()} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 rounded-lg w-full text-left text-red-600">Sign Out</button>
-              </div>
+              {accountOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-2xl border border-gray-100 bg-white p-1.5 shadow-2xl shadow-black/10">
+                  <div className="border-b border-gray-100 px-3 py-2.5">
+                    <p className="truncate text-sm font-semibold">{user.name}</p>
+                    <p className="truncate text-xs text-gray-500">{user.phone}</p>
+                  </div>
+                  <button type="button" onClick={() => navigate(goAccount)} className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-gray-50">
+                    <User className="h-4 w-4" /> My Account
+                  </button>
+                  <button type="button" onClick={() => navigate(() => goCatalog(null))} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-gray-50">
+                    <Package className="h-4 w-4" /> Continue Shopping
+                  </button>
+                  {user.role === 'ADMIN' && (
+                    <button type="button" onClick={() => navigate(goAdmin)} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm text-[#B76E79] hover:bg-rose-50">
+                      <Shield className="h-4 w-4" /> Admin Panel
+                    </button>
+                  )}
+                  <button type="button" onClick={handleLogout} className="mt-1 flex w-full items-center gap-2 border-t border-gray-100 px-3 py-2.5 text-left text-sm text-red-600 hover:bg-red-50">
+                    <LogOut className="h-4 w-4" /> Sign Out
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
-            <Link href="/login" className="hidden sm:flex items-center gap-1 bg-[#B76E79] text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#a55d68] transition-colors">Login</Link>
+            <button
+              type="button"
+              onClick={goLogin}
+              className="hidden rounded-full bg-[#B76E79] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#a55d68] hover:shadow-md sm:block"
+            >
+              Login
+            </button>
           )}
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2 hover:bg-gray-100 rounded-full">
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+
+          <button
+            type="button"
+            onClick={() => setMobileOpen((open) => !open)}
+            className="grid h-10 w-10 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 md:hidden"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      <div className="hidden md:block border-t border-gray-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-6 overflow-x-auto scrollbar-hide">
-            <Link href="/products" className="py-3 text-sm font-medium text-gray-600 hover:text-[#B76E79] whitespace-nowrap border-b-2 border-transparent hover:border-[#B76E79] transition-all">All Products</Link>
-            {categories.map(cat => (
-              <Link key={cat.slug} href={`/products?category=${cat.slug}`} className="py-3 text-sm font-medium text-gray-600 hover:text-[#B76E79] whitespace-nowrap border-b-2 border-transparent hover:border-[#B76E79] transition-all flex items-center gap-1">
-                <span>{cat.icon}</span>{cat.name}
-              </Link>
-            ))}
-            <Link href="/wholesale" className="py-3 text-sm font-medium text-[#B76E79] hover:text-[#a55d68] whitespace-nowrap border-b-2 border-transparent hover:border-[#B76E79] transition-all ml-auto">🏪 Wholesale</Link>
-          </div>
-        </div>
+      <div className="hidden border-t border-gray-100 md:block">
+        <nav className="scrollbar-hide mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-6 lg:px-8" aria-label="Product categories">
+          <button type="button" onClick={() => goCatalog(null)} className="shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-semibold text-gray-600 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
+            All Products
+          </button>
+          {categories.map((category) => (
+            <button key={category.slug} type="button" onClick={() => goCatalog(category.slug)} className="flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-3 py-3 text-sm font-medium text-gray-600 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
+              <span aria-hidden="true">{category.icon}</span>{category.name}
+            </button>
+          ))}
+          <button type="button" onClick={() => setView('wholesale')} className="ml-auto shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-[#B76E79] transition-colors hover:border-[#B76E79] hover:text-[#9e5964]">
+            🏪 Wholesale
+          </button>
+        </nav>
       </div>
 
       {searchOpen && (
-        <div className="md:hidden px-4 py-3 border-t border-gray-100">
-          <div className="relative">
-            <input type="text" placeholder="Search products..." className="w-full pl-4 pr-10 py-2.5 border border-gray-200 rounded-full text-sm focus:border-[#B76E79] focus:outline-none" autoFocus />
-            <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <div className="border-t border-gray-100 bg-white px-3 py-3 md:hidden">
+          <div className="mx-auto max-w-xl">
+            <SearchWithSuggestions placeholder="Search products..." />
           </div>
         </div>
       )}
 
       {mobileOpen && (
-        <div className="md:hidden border-t border-gray-100 bg-white pb-4 max-h-[80vh] overflow-y-auto">
-          <div className="px-4 py-2">
-            <p className="text-xs text-gray-400 font-medium uppercase tracking-wide mb-2 mt-2">Categories</p>
-            {categories.map(cat => (
-              <Link key={cat.slug} href={`/products?category=${cat.slug}`} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 py-3 border-b border-gray-50 text-gray-700 hover:text-[#B76E79]">
-                <span className="text-xl">{cat.icon}</span><span className="font-medium">{cat.name}</span>
-              </Link>
-            ))}
-            <Link href="/products" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 py-3 border-b border-gray-50 text-gray-700 hover:text-[#B76E79]"><span className="text-xl">🛍️</span><span className="font-medium">All Products</span></Link>
-            <Link href="/wholesale" onClick={() => setMobileOpen(false)} className="flex items-center gap-3 py-3 border-b border-gray-50 text-[#B76E79]"><span className="text-xl">🏪</span><span className="font-medium">Wholesale - Up to 30% Off</span></Link>
-            <div className="mt-4 space-y-2">
-              {!session ? (
+        <div className="absolute inset-x-0 top-full z-50 max-h-[calc(100dvh-7rem)] overflow-y-auto border-t border-gray-100 bg-white shadow-2xl md:hidden">
+          <nav className="mx-auto max-w-lg px-4 py-5" aria-label="Mobile navigation">
+            <div className="mb-5 flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400">Shop by category</p>
+              <button type="button" onClick={() => setMobileOpen(false)} className="rounded-full bg-gray-100 p-2" aria-label="Close menu"><X className="h-4 w-4" /></button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" onClick={() => navigate(() => goCatalog(null))} className="col-span-2 flex items-center gap-3 rounded-2xl border border-gray-100 bg-[#f8f9fa] px-4 py-3 text-left font-semibold">
+                <span className="text-xl">🛍️</span> All Products
+              </button>
+              {categories.map((category) => (
+                <button key={category.slug} type="button" onClick={() => navigate(() => goCatalog(category.slug))} className="flex min-h-16 items-center gap-2 rounded-2xl border border-gray-100 px-3 py-3 text-left text-sm font-medium transition-colors hover:border-rose-200 hover:bg-rose-50">
+                  <span className="text-xl" aria-hidden="true">{category.icon}</span>{category.name}
+                </button>
+              ))}
+            </div>
+
+            <button type="button" onClick={() => navigate(() => setView('wholesale'))} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#fff8e7] px-4 py-3 font-bold text-[#9e5964] ring-1 ring-[#FFD700]/30">
+              🏪 Wholesale beauty — save up to 30%
+            </button>
+
+            <div className="mt-5 space-y-2 border-t border-gray-100 pt-5">
+              {user ? (
                 <>
-                  <Link href="/login" onClick={() => setMobileOpen(false)} className="block w-full text-center bg-[#B76E79] text-white py-3 rounded-full font-medium">Login</Link>
-                  <Link href="/register" onClick={() => setMobileOpen(false)} className="block w-full text-center border-2 border-[#B76E79] text-[#B76E79] py-3 rounded-full font-medium">Register</Link>
+                  <button type="button" onClick={() => navigate(goAccount)} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-medium hover:bg-gray-50"><User className="h-5 w-5" /> My Account</button>
+                  {user.role === 'ADMIN' && <button type="button" onClick={() => navigate(goAdmin)} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-medium text-[#B76E79] hover:bg-rose-50"><Shield className="h-5 w-5" /> Admin Panel</button>}
+                  <button type="button" onClick={handleLogout} className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-red-100 py-3 font-semibold text-red-600"><LogOut className="h-4 w-4" /> Sign Out</button>
                 </>
               ) : (
-                <button onClick={() => signOut()} className="block w-full text-center border-2 border-red-200 text-red-600 py-3 rounded-full font-medium">Sign Out</button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => navigate(goLogin)} className="rounded-full bg-[#B76E79] py-3 font-semibold text-white">Login</button>
+                  <button type="button" onClick={() => navigate(goRegister)} className="rounded-full border-2 border-[#B76E79] py-3 font-semibold text-[#B76E79]">Register</button>
+                </div>
               )}
-              <a href="https://wa.me/250780000000" target="_blank" className="block w-full text-center bg-green-600 text-white py-3 rounded-full font-medium">💬 WhatsApp Help</a>
             </div>
-            <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500">
-              <p>📍 Kigali, Rwanda • 📞 +250780000000</p>
-              <p className="mt-1">💛 MTN MoMo • 🔴 Airtel • 💳 Card • 💵 COD</p>
+
+            <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#1a1a1a] p-4 text-xs text-white">
+              <a href="https://wa.me/250780000000" target="_blank" rel="noreferrer" className="flex items-center gap-2 font-semibold text-green-300"><Phone className="h-4 w-4" /> WhatsApp Help</a>
+              <span className="flex items-center gap-1 text-white/70"><Globe className="h-4 w-4" /> RW</span>
             </div>
-          </div>
+          </nav>
         </div>
       )}
     </header>

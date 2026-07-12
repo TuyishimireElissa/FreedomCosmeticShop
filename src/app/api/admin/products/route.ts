@@ -9,7 +9,7 @@
  *                  images (array), skinType?, shades?, ingredients?, size?, etc.
  */
 import { NextResponse } from "next/server"
-import { db } from "@/lib/db"
+import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 import { requireRole } from "@/lib/auth"
 import { broadcastProductEvent } from "@/lib/realtime"
@@ -66,14 +66,14 @@ export async function GET(req: Request) {
     }
 
     const [products, total] = await Promise.all([
-      db.product.findMany({
+      prisma.product.findMany({
         where,
         include: { category: true, brand: true },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
-      db.product.count({ where }),
+      prisma.product.count({ where }),
     ])
 
     const serialized = products.map((p) => ({
@@ -85,23 +85,25 @@ export async function GET(req: Request) {
     }))
 
     return NextResponse.json({
-      products: serialized,
-      pagination: {
+      success: true,
+      data: { products: serialized, pagination: {
         page,
         pageSize,
         total,
         totalPages: Math.ceil(total / pageSize),
-      },
+      } },
+      products: serialized,
+      pagination: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) },
     })
   } catch (error) {
     if (error instanceof Error && "statusCode" in error) {
       return NextResponse.json(
-        { error: error.message },
+        { success: false, error: error.message },
         { status: (error as { statusCode: number }).statusCode }
       )
     }
     console.error("Admin products GET error:", error)
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 })
+    return NextResponse.json({ success: false, error: "Failed to fetch products" }, { status: 500 })
   }
 }
 
@@ -113,7 +115,7 @@ export async function POST(req: Request) {
     const parsed = CreateProductSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid product data", details: parsed.error.flatten() },
+        { success: false, error: "Invalid product data", details: parsed.error.flatten() },
         { status: 400 }
       )
     }
@@ -121,12 +123,12 @@ export async function POST(req: Request) {
 
     // Generate unique slug
     let slug = slugify(data.name)
-    const existing = await db.product.findFirst({ where: { slug } })
+    const existing = await prisma.product.findFirst({ where: { slug } })
     if (existing) {
       slug = `${slug}-${Date.now().toString(36)}`
     }
 
-    const product = await db.product.create({
+    const product = await prisma.product.create({
       data: {
         name: data.name,
         slug,
@@ -188,17 +190,17 @@ export async function POST(req: Request) {
     }).catch(() => {})
 
     return NextResponse.json(
-      { product: serializedProduct },
+      { success: true, data: { product: serializedProduct }, product: serializedProduct },
       { status: 201 }
     )
   } catch (error) {
     if (error instanceof Error && "statusCode" in error) {
       return NextResponse.json(
-        { error: error.message },
+        { success: false, error: error.message },
         { status: (error as { statusCode: number }).statusCode }
       )
     }
     console.error("Admin product POST error:", error)
-    return NextResponse.json({ error: "Failed to create product" }, { status: 500 })
+    return NextResponse.json({ success: false, error: "Failed to create product" }, { status: 500 })
   }
 }

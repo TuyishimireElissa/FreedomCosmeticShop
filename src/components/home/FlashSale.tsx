@@ -1,141 +1,62 @@
-"use client"
+'use client'
 
-/**
- * FlashSale — flash sale section with live countdown timer.
- *
- * Features:
- *   - Countdown timer (hours:minutes:seconds)
- *   - Products with discounts from the database
- *   - Horizontal scroll on mobile
- *   - "View all" link to catalog
- *
- * Placed between categories and best sellers on the homepage.
- */
+import { useEffect, useState } from 'react'
+import { ArrowRight, RefreshCw, Zap } from 'lucide-react'
+import type { Product } from '@/lib/types'
+import { ProductCard } from '@/components/storefront/ProductCard'
+import { useStore } from '@/store/useStore'
 
-import { useEffect, useState } from "react"
-import { useStore } from "@/store/useStore"
-import { Product } from "@/lib/types"
-import { ProductCard } from "@/components/storefront/ProductCard"
-import { Skeleton } from "@/components/ui/skeleton"
-import { formatRWF } from "@/lib/format"
-import { Zap, ArrowRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+interface FlashSaleProps {
+  products?: Product[]
+  loading?: boolean
+  error?: string | null
+  onRetry?: () => void
+}
 
-export function FlashSale() {
-  const { goCatalog, goProduct } = useStore()
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+export function FlashSale({ products = [], loading = false, error, onRetry }: FlashSaleProps) {
+  const goCatalog = useStore((state) => state.goCatalog)
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 })
 
-  // Countdown timer — counts down to end of day
   useEffect(() => {
-    const calculateTimeLeft = () => {
+    const update = () => {
       const now = new Date()
-      const endOfDay = new Date()
-      endOfDay.setHours(23, 59, 59, 999)
-      const diff = endOfDay.getTime() - now.getTime()
-
-      return {
-        hours: Math.floor(diff / (1000 * 60 * 60)),
-        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((diff % (1000 * 60)) / 1000),
-      }
+      const end = new Date(now)
+      end.setHours(23, 59, 59, 999)
+      const difference = Math.max(0, end.getTime() - now.getTime())
+      setTimeLeft({
+        hours: Math.floor(difference / 3_600_000),
+        minutes: Math.floor((difference % 3_600_000) / 60_000),
+        seconds: Math.floor((difference % 60_000) / 1_000),
+      })
     }
-
-    setTimeLeft(calculateTimeLeft())
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft())
-    }, 1000)
-
-    return () => clearInterval(timer)
+    update()
+    const timer = window.setInterval(update, 1000)
+    return () => window.clearInterval(timer)
   }, [])
 
-  // Fetch products with discounts (compareAt > price)
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      try {
-        const res = await fetch("/api/products?limit=8&sort=price-desc")
-        const data = await res.json()
-        if (cancelled) return
-        // Filter products that have a discount
-        const discounted = (data.products || []).filter(
-          (p: Product) => p.compareAt && p.compareAt > p.price
-        )
-        setProducts(discounted.slice(0, 4))
-      } catch {
-        // ignore
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  const pad = (n: number) => String(n).padStart(2, "0")
-
-  // Don't render if no discounted products
-  if (!loading && products.length === 0) return null
+  const saleProducts = products.filter((product) => product.compareAt && product.compareAt > product.price).slice(0, 4)
+  const pad = (value: number) => String(value).padStart(2, '0')
 
   return (
-    <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header with countdown */}
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-orange-500">
-            <Zap className="h-5 w-5 text-white" />
-          </span>
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-              ⚡ Flash Sale
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Limited time deals — grab them before they're gone!
-            </p>
+    <section className="bg-gradient-to-b from-[#fff8e7] to-white">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div className="mb-7 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+          <div className="flex items-center gap-3">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[#1a1a1a] text-[#FFD700] shadow-lg"><Zap className="h-6 w-6 fill-current" /></span>
+            <div><span className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-amber-700">Today only</span><h2 className="mt-1 text-2xl font-black text-[#1a1a1a] sm:text-3xl">Flash beauty sale</h2><p className="mt-1 text-sm text-gray-500">Premium favourites at limited-time prices.</p></div>
           </div>
+          <div className="flex items-center gap-2"><span className="mr-1 text-xs font-bold uppercase tracking-wider text-gray-500">Ends in</span>{[pad(timeLeft.hours), pad(timeLeft.minutes), pad(timeLeft.seconds)].map((value, index) => <span key={index} className="flex items-center gap-2"><span className="grid h-11 min-w-11 place-items-center rounded-xl bg-[#1a1a1a] px-2 font-mono text-lg font-black text-white shadow-md">{value}</span>{index < 2 && <span className="font-black text-[#B76E79]">:</span>}</span>)}</div>
         </div>
 
-        {/* Countdown timer */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-muted-foreground">Ends in</span>
-          <div className="flex items-center gap-1">
-            <span className="grid h-10 w-10 place-items-center rounded-lg bg-foreground font-mono text-lg font-bold text-background">
-              {pad(timeLeft.hours)}
-            </span>
-            <span className="text-lg font-bold">:</span>
-            <span className="grid h-10 w-10 place-items-center rounded-lg bg-foreground font-mono text-lg font-bold text-background">
-              {pad(timeLeft.minutes)}
-            </span>
-            <span className="text-lg font-bold">:</span>
-            <span className="grid h-10 w-10 place-items-center rounded-lg bg-foreground font-mono text-lg font-bold text-background">
-              {pad(timeLeft.seconds)}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Products */}
-      {loading ? (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-          {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} className="aspect-[3/4] rounded-2xl" />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
-
-      {/* View all */}
-      <div className="mt-4 text-center">
-        <Button variant="outline" size="sm" onClick={() => goCatalog(null)}>
-          View all deals <ArrowRight className="ml-1.5 h-4 w-4" />
-        </Button>
+        {loading ? (
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">{[0, 1, 2, 3].map((index) => <div key={index} className="aspect-[3/4] animate-pulse rounded-2xl bg-white shadow-sm" />)}</div>
+        ) : error ? (
+          <div className="rounded-3xl border border-dashed border-amber-200 bg-white px-5 py-10 text-center"><p className="text-sm font-semibold text-gray-800">Sale products could not be loaded.</p>{onRetry && <button type="button" onClick={onRetry} className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white"><RefreshCw className="h-3.5 w-3.5" />Retry sale</button>}</div>
+        ) : saleProducts.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-amber-200 bg-white px-5 py-10 text-center"><Zap className="mx-auto h-8 w-8 text-amber-400" /><p className="mt-3 text-sm font-semibold text-gray-700">The next flash sale is being prepared.</p><button type="button" onClick={() => goCatalog(null)} className="mt-3 inline-flex items-center gap-2 text-xs font-bold text-[#B76E79]">Browse current offers <ArrowRight className="h-3.5 w-3.5" /></button></div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">{saleProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div>
+        )}
       </div>
     </section>
   )

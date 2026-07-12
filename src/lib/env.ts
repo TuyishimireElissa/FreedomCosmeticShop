@@ -56,7 +56,7 @@ const envSchema = z.object({
   // Cloudinary - dohoc0tmp
   CLOUDINARY_CLOUD_NAME: z.string().default("dohoc0tmp"),
   CLOUDINARY_API_KEY: z.string().default("524578837153868"),
-  CLOUDINARY_API_SECRET: z.string().default("ggf5-0eqMOIvtxQXokzy6-Nr1yU"),
+  CLOUDINARY_API_SECRET: z.string().min(1),
   CLOUDINARY_UPLOAD_PRESET: z.string().default("freedom_uploads"),
   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().default("dohoc0tmp"),
 
@@ -109,7 +109,7 @@ function loadEnv(): Env {
           CLOUDINARY_CLOUD_NAME: "dohoc0tmp",
           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "dohoc0tmp",
           CLOUDINARY_API_KEY: "524578837153868",
-          CLOUDINARY_API_SECRET: "ggf5-0eqMOIvtxQXokzy6-Nr1yU",
+          CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
           CLOUDINARY_UPLOAD_PRESET: "freedom_uploads",
           STORE_NAME: "FreedomCosmeticShop",
           STORE_CURRENCY: "RWF",
@@ -141,7 +141,7 @@ function loadEnv(): Env {
       CLOUDINARY_CLOUD_NAME: "dohoc0tmp",
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "dohoc0tmp",
       CLOUDINARY_API_KEY: "524578837153868",
-      CLOUDINARY_API_SECRET: "ggf5-0eqMOIvtxQXokzy6-Nr1yU",
+      CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
       CLOUDINARY_UPLOAD_PRESET: "freedom_uploads",
       ALGOLIA_INDEX_NAME: "freedom_products",
       PAYPACK_ENVIRONMENT: "sandbox" as const,
