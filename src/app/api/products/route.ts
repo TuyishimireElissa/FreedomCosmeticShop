@@ -84,7 +84,7 @@ export async function GET(request: Request) {
     }
     if (search) where.OR = [{ name: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }, { brand: { name: { contains: search, mode: 'insensitive' } } }]
 
-    const orderBy: Prisma.ProductOrderByWithRelationInput = sort === 'price-asc' ? { price: 'asc' } : sort === 'price-desc' ? { price: 'desc' } : sort === 'rating' ? { rating: 'desc' } : sort === 'best-selling' ? { reviewsCount: 'desc' } : { createdAt: 'desc' }
+    const orderBy: Prisma.ProductOrderByWithRelationInput = sort === 'price-asc' ? { price: 'asc' } : sort === 'price-desc' ? { price: 'desc' } : sort === 'rating' ? { rating: 'desc' } : sort === 'best-selling' ? { featured: 'desc' } : { createdAt: 'desc' }
     const [rows, total] = await Promise.all([
       prisma.product.findMany({
         where,

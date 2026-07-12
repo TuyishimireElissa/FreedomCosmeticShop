@@ -129,17 +129,19 @@ export function ProductCard({ product }: ProductCardProps) {
         </h3>
 
         {/* Rating */}
-        <div className="text-muted-foreground mt-1 flex items-center gap-1 text-xs">
-          <div className="flex" aria-hidden="true">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={`h-3 w-3 ${star <= Math.round(product.rating) ? "fill-amber-400 text-amber-400" : "fill-gray-200 text-gray-200"}`}
-              />
-            ))}
-          </div>
-          <span className="text-foreground/80 font-medium">{product.rating.toFixed(1)}</span>
-          <span>({product.reviewsCount})</span>
+        <div className="text-muted-foreground mt-1 flex min-h-4 items-center gap-1 text-xs">
+          {product.reviewsCount > 0 ? <>
+            <div className="flex" aria-hidden="true">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  className={`h-3 w-3 ${star <= Math.round(product.rating) ? "fill-amber-400 text-amber-400" : "fill-gray-200 text-gray-200"}`}
+                />
+              ))}
+            </div>
+            <span className="text-foreground/80 font-medium">{product.rating.toFixed(1)}</span>
+            <span>({product.reviewsCount})</span>
+          </> : <span className="text-[11px]">New · no reviews yet</span>}
         </div>
 
         {/* NEW: Skin type badge */}
