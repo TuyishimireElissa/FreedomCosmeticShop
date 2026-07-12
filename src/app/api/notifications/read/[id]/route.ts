@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * Notification Read API — mark a single notification as read.
  *

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * Loyalty Points API — get user's current points balance.
  *

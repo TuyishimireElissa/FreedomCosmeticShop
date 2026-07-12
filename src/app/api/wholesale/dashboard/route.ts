@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /** GET /api/wholesale/dashboard — wholesale customer dashboard data */
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth"

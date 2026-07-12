@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * Delivery Fee API — calculate delivery fee for a district.
  *

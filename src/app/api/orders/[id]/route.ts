@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/orders/[id]
  * Returns a single order by id (or order number) including items, payments, delivery.

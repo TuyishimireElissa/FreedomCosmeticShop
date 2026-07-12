@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * Loyalty History API — user's loyalty transaction history.
  *

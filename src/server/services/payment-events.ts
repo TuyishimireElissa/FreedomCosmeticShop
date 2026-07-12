@@ -72,32 +72,44 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
     return
   }
 
-  // Update payment
-  await db.payment.update({
-    where: { id: paymentId },
-    data: {
-      status: "PAID",
-      completedAt: new Date(),
-      providerTransactionId: providerTransactionId || payment.providerTransactionId,
-      cardLast4: cardLast4 || payment.cardLast4,
-      cardBrand: cardBrand || payment.cardBrand,
-    },
-  })
-
-  // Update order status (PENDING → CONFIRMED) if not already confirmed
   const order = payment.order
-  if (order.status === "PENDING") {
-    await db.order.update({
+  const processed = await db.$transaction(async (tx) => {
+    // Atomic idempotency gate prevents duplicate webhook deliveries from
+    // deducting inventory or awarding order state more than once.
+    const claimed = await tx.payment.updateMany({
+      where: { id: paymentId, status: { not: "PAID" } },
+      data: {
+        status: "PAID",
+        completedAt: new Date(),
+        providerTransactionId: providerTransactionId || payment.providerTransactionId,
+        cardLast4: cardLast4 || payment.cardLast4,
+        cardBrand: cardBrand || payment.cardBrand,
+      },
+    })
+    if (claimed.count !== 1) return false
+
+    for (const item of order.items) {
+      if (!item.productId) continue
+      const stock = await tx.product.updateMany({
+        where: { id: item.productId, stock: { gte: item.quantity } },
+        data: { stock: { decrement: item.quantity } },
+      })
+      if (stock.count !== 1) {
+        throw new Error(`Insufficient stock while confirming order ${order.orderNumber}`)
+      }
+    }
+
+    await tx.order.update({
       where: { id: orderId },
       data: { status: "CONFIRMED" },
     })
-  }
-
-  // Update delivery status
-  await db.delivery.updateMany({
-    where: { orderId },
-    data: { status: "ASSIGNED", assignedAt: new Date() },
+    await tx.delivery.updateMany({
+      where: { orderId },
+      data: { status: "ASSIGNED", assignedAt: new Date() },
+    })
+    return true
   })
+  if (!processed) return
 
   // Award loyalty points (if user is authenticated)
   if (order.userId && order.loyaltyPointsEarned > 0) {

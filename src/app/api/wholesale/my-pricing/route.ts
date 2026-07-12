@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /** GET /api/wholesale/my-pricing — get wholesale prices for all products (approved only) */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"

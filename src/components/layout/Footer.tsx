@@ -1,17 +1,14 @@
 'use client'
 
 import {
-  Facebook,
-  Instagram,
   Mail,
   MapPin,
   MessageCircle,
   Phone,
   ShieldCheck,
   Truck,
-  Youtube,
 } from 'lucide-react'
-import { useStore } from '@/store/useStore'
+import Link from 'next/link'
 
 const shopLinks = [
   { label: 'All Products', slug: null },
@@ -30,34 +27,21 @@ const trustBadges = [
 ]
 
 export default function Footer() {
-  const { goHome, goCatalog, goTrackOrder, goAdmin, setView } = useStore()
-
   return (
     <footer className="bg-[#1a1a1a] text-white">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           <section>
-            <button type="button" onClick={goHome} className="flex items-center gap-3 text-left" aria-label="Go to homepage">
+            <Link href="/" className="flex items-center gap-3 text-left" aria-label="Go to homepage">
               <span className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br from-[#c98892] to-[#9e5964] text-lg font-black shadow-lg shadow-black/20">F</span>
               <span>
                 <span className="block text-lg font-extrabold leading-none">FreedomCosmetic</span>
                 <span className="mt-1 block text-xs font-medium text-[#d999a3]">Rwanda&apos;s Beauty Freedom 🇷🇼</span>
               </span>
-            </button>
+            </Link>
             <p className="mt-5 max-w-sm text-sm leading-6 text-gray-400">
               Rwanda&apos;s trusted online beauty store for authentic skincare, makeup and haircare, with fast delivery across all 30 districts.
             </p>
-            <div className="mt-5 flex gap-2.5">
-              {[
-                { icon: Instagram, label: 'Instagram' },
-                { icon: Facebook, label: 'Facebook' },
-                { icon: Youtube, label: 'YouTube' },
-              ].map(({ icon: Icon, label }) => (
-                <a key={label} href="#" onClick={(event) => event.preventDefault()} aria-label={label} className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-gray-300 transition-all hover:-translate-y-0.5 hover:bg-[#B76E79] hover:text-white">
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
           </section>
 
           <section>
@@ -65,15 +49,15 @@ export default function Footer() {
             <ul className="mt-5 space-y-3">
               {shopLinks.map((item) => (
                 <li key={item.label}>
-                  <button type="button" onClick={() => goCatalog(item.slug)} className="text-sm text-gray-400 transition-colors hover:text-[#e6a6b0]">
+                  <Link href={item.slug ? `/products?category=${item.slug}` : '/products'} className="text-sm text-gray-400 transition-colors hover:text-[#e6a6b0]">
                     {item.label}
-                  </button>
+                  </Link>
                 </li>
               ))}
               <li>
-                <button type="button" onClick={() => setView('wholesale')} className="text-sm font-semibold text-[#e6a6b0] transition-colors hover:text-white">
+                <Link href="/wholesale" className="text-sm font-semibold text-[#e6a6b0] transition-colors hover:text-white">
                   Wholesale beauty
-                </button>
+                </Link>
               </li>
             </ul>
           </section>
@@ -81,11 +65,14 @@ export default function Footer() {
           <section>
             <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-white">Help</h2>
             <ul className="mt-5 space-y-3 text-sm">
-              <li><button type="button" onClick={() => goTrackOrder()} className="text-gray-400 transition-colors hover:text-white">Track your order</button></li>
+              <li><Link href="/track-order" className="text-gray-400 transition-colors hover:text-white">Track your order</Link></li>
               <li><span className="text-gray-400">Delivery: 1–3 days in Kigali</span></li>
               <li><span className="text-gray-400">Provinces: 3–5 days</span></li>
-              <li><span className="text-gray-400">Returns within 7 days</span></li>
-              <li><button type="button" onClick={goAdmin} className="text-gray-400 transition-colors hover:text-white">Admin Dashboard</button></li>
+              <li><Link href="/shipping" className="text-gray-400 transition-colors hover:text-white">Shipping policy</Link></li>
+              <li><Link href="/returns" className="text-gray-400 transition-colors hover:text-white">Returns & refunds</Link></li>
+              <li><Link href="/faq" className="text-gray-400 transition-colors hover:text-white">FAQ</Link></li>
+              <li><Link href="/privacy" className="text-gray-400 transition-colors hover:text-white">Privacy policy</Link></li>
+              <li><Link href="/terms" className="text-gray-400 transition-colors hover:text-white">Terms & conditions</Link></li>
             </ul>
           </section>
 

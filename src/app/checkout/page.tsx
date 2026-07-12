@@ -72,7 +72,7 @@ export default function CheckoutPage() {
     if (!addressValid || !momoValid || items.length === 0) return
     setPlacing(true); setCheckoutError(null)
     try {
-      const orderResponse = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customerName: address.fullName.trim(), customerPhone: address.phone.trim(), address: `${address.address.trim()}${address.landmark ? ` (Landmark: ${address.landmark})` : ''}`, city: address.sector, province: address.province, district: address.district, sector: address.sector, landmark: address.landmark || undefined, paymentMethod, couponCode: appliedCoupon?.code, items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })) }) })
+      const orderResponse = await fetch('/api/orders/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customerName: address.fullName.trim(), customerPhone: address.phone.trim(), address: `${address.address.trim()}${address.landmark ? ` (Landmark: ${address.landmark})` : ''}`, city: address.sector, province: address.province, district: address.district, sector: address.sector, landmark: address.landmark || undefined, paymentMethod, couponCode: appliedCoupon?.code, items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })) }) })
       const orderData = await orderResponse.json()
       if (!orderResponse.ok) throw new Error(orderData.error || 'Order could not be created')
       const order = { id: orderData.order.id, orderNumber: orderData.order.orderNumber, total: orderData.order.total }

@@ -116,7 +116,7 @@ export async function POST(req: Request) {
           email: order.customerEmail || "customer@freedomcosmeticshop.rw",
           phone: order.customerPhone,
         },
-        redirectUrl: `${process.env.APP_URL || "http://localhost:3000"}/checkout?tx_ref=${txRef}`,
+        redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || "http://localhost:3000"}/checkout/payment-return?paymentId=${encodeURIComponent(payment.id)}&orderId=${encodeURIComponent(order.id)}`,
       })
 
       return NextResponse.json({

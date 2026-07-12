@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { ArrowRight, RefreshCw, Zap } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { ProductCard } from '@/components/storefront/ProductCard'
-import { useStore } from '@/store/useStore'
+import { useRouter } from 'next/navigation'
 
 interface FlashSaleProps {
   products?: Product[]
@@ -14,7 +14,7 @@ interface FlashSaleProps {
 }
 
 export function FlashSale({ products = [], loading = false, error, onRetry }: FlashSaleProps) {
-  const goCatalog = useStore((state) => state.goCatalog)
+  const router = useRouter()
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 })
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export function FlashSale({ products = [], loading = false, error, onRetry }: Fl
         ) : error ? (
           <div className="rounded-3xl border border-dashed border-amber-200 bg-white px-5 py-10 text-center"><p className="text-sm font-semibold text-gray-800">Sale products could not be loaded.</p>{onRetry && <button type="button" onClick={onRetry} className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white"><RefreshCw className="h-3.5 w-3.5" />Retry sale</button>}</div>
         ) : saleProducts.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-amber-200 bg-white px-5 py-10 text-center"><Zap className="mx-auto h-8 w-8 text-amber-400" /><p className="mt-3 text-sm font-semibold text-gray-700">The next flash sale is being prepared.</p><button type="button" onClick={() => goCatalog(null)} className="mt-3 inline-flex items-center gap-2 text-xs font-bold text-[#B76E79]">Browse current offers <ArrowRight className="h-3.5 w-3.5" /></button></div>
+          <div className="rounded-3xl border border-dashed border-amber-200 bg-white px-5 py-10 text-center"><Zap className="mx-auto h-8 w-8 text-amber-400" /><p className="mt-3 text-sm font-semibold text-gray-700">The next flash sale is being prepared.</p><button type="button" onClick={() => router.push('/products')} className="mt-3 inline-flex items-center gap-2 text-xs font-bold text-[#B76E79]">Browse current offers <ArrowRight className="h-3.5 w-3.5" /></button></div>
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">{saleProducts.map((product) => <ProductCard key={product.id} product={product} />)}</div>
         )}

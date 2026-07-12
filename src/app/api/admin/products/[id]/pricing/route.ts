@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * GET  /api/admin/products/[id]/pricing — get wholesale pricing tiers for a product
  * PUT  /api/admin/products/[id]/pricing — set wholesale pricing tiers

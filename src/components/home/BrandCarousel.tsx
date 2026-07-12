@@ -12,7 +12,7 @@
  */
 
 import { useRef } from "react"
-import { useStore } from "@/store/useStore"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
@@ -31,7 +31,7 @@ interface BrandCarouselProps {
 }
 
 export function BrandCarousel({ brands }: BrandCarouselProps) {
-  const { goCatalog } = useStore()
+  const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const scroll = (direction: "left" | "right") => {
@@ -88,7 +88,7 @@ export function BrandCarousel({ brands }: BrandCarouselProps) {
         {brands.map((brand) => (
           <button
             key={brand.id}
-            onClick={() => goCatalog(null)} // Future: filter by brand
+            onClick={() => router.push(`/products?brand=${encodeURIComponent(brand.slug)}`)}
             className="group flex w-64 shrink-0 flex-col items-center rounded-2xl border bg-card p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
             style={{ scrollSnapAlign: "start" }}
           >

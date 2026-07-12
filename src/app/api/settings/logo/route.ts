@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * POST   /api/settings/logo — admin uploads a logo image file
  * DELETE /api/settings/logo — admin removes the current logo

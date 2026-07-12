@@ -712,12 +712,12 @@ AFTER FIX (Commit 7508835 pushed, Commit cf126c9 pushed, Vercel redeploying):
 3. Update Vercel env vars DATABASE_URL (Transaction Pooler 6543) and DIRECT_URL (Session Pooler 5432)
 4. Redeploy → visit /api/seed → DB populated
 5. Add PAYPACK credentials for live MoMo payments
-6. Delete GitHub token ghp_rqLC... and VERCEL_ENV_SETUP.txt (contains secrets)
+6. Delete GitHub token [ROTATED_GITHUB_TOKEN] and VERCEL_ENV_SETUP.txt (contains secrets)
 
 **ADMIN LOGIN:**
-URL: https://freedom-cosmetic-shop.vercel.app/ → view admin → phone +250780000000 password admin123 (after seeding creates admin - currently needs manual creation via scripts/check-admins.ts)
+URL: https://freedom-cosmetic-shop.vercel.app/ → view admin → phone +250780000000 password [ROTATED_ADMIN_PASSWORD] (after seeding creates admin - currently needs manual creation via scripts/check-admins.ts)
 
 **TEST CUSTOMER:**
-Phone +250780000001 password customer123 OTP 123456
+Phone +250780000001 password [ROTATED_TEST_PASSWORD] OTP 123456
 
 🇷🇼 FREEDOMCOSMETICSHOP - Rwanda's Beauty Freedom 🛍️

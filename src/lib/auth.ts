@@ -22,9 +22,6 @@ import { SignJWT, jwtVerify } from "jose"
 import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
-import type { NextAuthOptions } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import { normalizeRwandaPhone } from "@/lib/phone"
 
 const ACCESS_TOKEN_NAME = "ub_access"
 const REFRESH_TOKEN_NAME = "ub_refresh"
@@ -293,85 +290,4 @@ export class AuthError extends Error {
     this.name = "AuthError"
     this.statusCode = statusCode
   }
-}
-
-/**
- * NextAuth configuration for route-based clients and third-party integrations.
- * The existing short-lived access/refresh cookie flow remains available to the
- * storefront APIs; both systems use the same users and password hashes.
- */
-export const authOptions: NextAuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
-  },
-  pages: {
-    signIn: "/login",
-  },
-  providers: [
-    CredentialsProvider({
-      name: "Phone or email",
-      credentials: {
-        identifier: { label: "Phone or email", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const identifier = credentials?.identifier?.trim()
-        const password = credentials?.password
-        if (!identifier || !password) return null
-
-        let user
-        if (identifier.includes("@")) {
-          user = await db.user.findFirst({
-            where: { email: identifier.toLowerCase(), isDeleted: false },
-          })
-        } else {
-          let phone: string
-          try {
-            phone = normalizeRwandaPhone(identifier)
-          } catch {
-            return null
-          }
-          user = await db.user.findFirst({ where: { phone, isDeleted: false } })
-        }
-
-        if (!user?.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
-          return null
-        }
-
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          role: user.role,
-        } as never
-      },
-    }),
-  ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        const authenticatedUser = user as typeof user & { id: string; phone: string; role: string }
-        token.userId = authenticatedUser.id
-        token.phone = authenticatedUser.phone
-        token.role = authenticatedUser.role
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        const sessionUser = session.user as typeof session.user & {
-          id: string
-          phone: string
-          role: string
-        }
-        sessionUser.id = String(token.userId || token.sub || "")
-        sessionUser.phone = String(token.phone || "")
-        sessionUser.role = String(token.role || "CUSTOMER")
-      }
-      return session
-    },
-  },
 }

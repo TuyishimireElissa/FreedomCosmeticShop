@@ -4,7 +4,7 @@
  * Usage: npx tsx scripts/reset-admin-password.ts
  *
  * This script finds the existing admin user (Test User, +250788123456)
- * and sets their password to "Admin@2026" so you can log in.
+ * and sets a password supplied through the ADMIN_NEW_PASSWORD environment variable.
  *
  * After first login, change the password via the admin profile.
  */
@@ -12,7 +12,10 @@
 import { db } from "@/lib/db"
 import { hashPassword } from "@/lib/auth"
 
-const NEW_PASSWORD = "Admin@2026"
+const NEW_PASSWORD = process.env.ADMIN_NEW_PASSWORD
+if (!NEW_PASSWORD || NEW_PASSWORD.length < 12) {
+  throw new Error("Set ADMIN_NEW_PASSWORD to a unique password of at least 12 characters")
+}
 const ADMIN_PHONE = "+250788123456"
 
 async function main() {

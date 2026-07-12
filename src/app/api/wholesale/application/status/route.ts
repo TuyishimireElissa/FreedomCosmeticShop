@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /** GET /api/wholesale/application/status — check own application status */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"

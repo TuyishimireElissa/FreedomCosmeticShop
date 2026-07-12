@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /** GET /api/admin/wholesale/orders — list all wholesale orders */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"

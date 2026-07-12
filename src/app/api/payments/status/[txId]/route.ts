@@ -30,8 +30,6 @@ export async function GET(
             orderNumber: true,
             status: true,
             total: true,
-            customerName: true,
-            customerPhone: true,
             province: true,
           },
         },

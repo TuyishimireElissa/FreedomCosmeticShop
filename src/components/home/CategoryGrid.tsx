@@ -2,7 +2,7 @@
 
 import { ArrowRight, RefreshCw, Shapes } from 'lucide-react'
 import type { Category } from '@/lib/types'
-import { useStore } from '@/store/useStore'
+import { useRouter } from 'next/navigation'
 
 interface CategoryGridProps {
   categories: Category[]
@@ -23,7 +23,7 @@ const categoryIcons: Record<string, string> = {
 }
 
 export function CategoryGrid({ categories, loading = false, error, onRetry }: CategoryGridProps) {
-  const goCatalog = useStore((state) => state.goCatalog)
+  const router = useRouter()
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
@@ -33,7 +33,7 @@ export function CategoryGrid({ categories, loading = false, error, onRetry }: Ca
           <h2 className="mt-2 text-2xl font-black tracking-tight text-[#1a1a1a] sm:text-3xl">Shop by category</h2>
           <p className="mt-1.5 max-w-xl text-sm leading-6 text-gray-500">Discover authentic beauty essentials selected for every routine, skin tone and hair texture.</p>
         </div>
-        <button type="button" onClick={() => goCatalog(null)} className="hidden shrink-0 items-center gap-2 text-sm font-bold text-[#B76E79] hover:text-[#9e5964] sm:flex">View all <ArrowRight className="h-4 w-4" /></button>
+        <button type="button" onClick={() => router.push('/products')} className="hidden shrink-0 items-center gap-2 text-sm font-bold text-[#B76E79] hover:text-[#9e5964] sm:flex">View all <ArrowRight className="h-4 w-4" /></button>
       </div>
 
       {loading ? (
@@ -52,7 +52,7 @@ export function CategoryGrid({ categories, loading = false, error, onRetry }: Ca
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
           {categories.slice(0, 6).map((category) => (
-            <button key={category.id} type="button" onClick={() => goCatalog(category.slug)} className="group relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#f4e8ea] text-left shadow-[0_7px_24px_rgba(26,26,26,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(183,110,121,0.18)] sm:aspect-square">
+            <button key={category.id} type="button" onClick={() => router.push(`/products?category=${encodeURIComponent(category.slug)}`)} className="group relative aspect-[4/5] overflow-hidden rounded-2xl bg-[#f4e8ea] text-left shadow-[0_7px_24px_rgba(26,26,26,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(183,110,121,0.18)] sm:aspect-square">
               {category.image ? <img src={category.image} alt={category.name} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" /> : <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#f9edef] to-[#e8cdd2]"><span className="text-5xl" aria-hidden="true">{categoryIcons[category.slug] || '✨'}</span></div>}
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-3.5 sm:p-4">

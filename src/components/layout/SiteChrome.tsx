@@ -1,24 +1,30 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 import { useStore } from '@/store/useStore'
 import AnnouncementBar from '@/components/layout/AnnouncementBar'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
+import { CartDrawer } from '@/components/storefront/CartDrawer'
 
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  const view = useStore((state) => state.view)
-  const hideSupportChrome = view === 'login' || view === 'register'
+  const fetchUser = useStore((state) => state.fetchUser)
 
-  if (
+  useEffect(() => {
+    fetchUser()
+  }, [fetchUser])
+
+  const isolatedRoute =
     pathname.startsWith('/admin') ||
     pathname === '/login' ||
     pathname === '/register' ||
     pathname === '/forgot-password'
-  ) return <>{children}</>
+
+  if (isolatedRoute) return <>{children}</>
+
   const whatsappNumber =
     process.env.NEXT_PUBLIC_WHATSAPP?.replace(/\D/g, '') || '250780000000'
 
@@ -27,8 +33,9 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
       <AnnouncementBar />
       <Navbar />
       <main className="min-h-[50vh] flex-1">{children}</main>
-      {!hideSupportChrome && <Footer />}
-      {!hideSupportChrome && <WhatsAppButton phone={whatsappNumber} />}
+      <Footer />
+      <WhatsAppButton phone={whatsappNumber} />
+      <CartDrawer />
     </div>
   )
 }

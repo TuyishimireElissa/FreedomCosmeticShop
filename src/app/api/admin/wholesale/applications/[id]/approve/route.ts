@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /** PUT /api/admin/wholesale/applications/[id]/approve — approve a wholesale application */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"

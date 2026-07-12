@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * Notifications API — user's in-app notifications.
  *

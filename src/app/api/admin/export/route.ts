@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/admin/export?type=orders|products|customers&format=csv
  *

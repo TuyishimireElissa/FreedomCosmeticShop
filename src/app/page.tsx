@@ -1,22 +1,9 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { RefreshCw, ShieldCheck, Sparkles, Smartphone, Truck } from "lucide-react"
 import type { Category, Product } from "@/lib/types"
-import { useStore } from "@/store/useStore"
-import { CartDrawer } from "@/components/storefront/CartDrawer"
-import { CatalogView } from "@/components/storefront/CatalogView"
-import { ProductDetailView } from "@/components/storefront/ProductDetailView"
-import { CartView } from "@/components/storefront/CartView"
-import { CheckoutView } from "@/components/storefront/CheckoutView"
-import { ConfirmationView } from "@/components/storefront/ConfirmationView"
-import { AdminView } from "@/components/admin/AdminView"
-import { LoginView } from "@/components/auth/LoginView"
-import { RegisterView } from "@/components/auth/RegisterView"
-import { AccountView } from "@/components/auth/AccountView"
-import { TrackOrderView } from "@/components/storefront/TrackOrderView"
-import { WholesaleView } from "@/components/wholesale/WholesaleView"
-import { ErrorBoundary } from "@/components/error-boundary"
 import { HeroBanner, type HomeBanner } from "@/components/home/HeroBanner"
 import { CategoryGrid } from "@/components/home/CategoryGrid"
 import { ProductSection } from "@/components/home/ProductSection"
@@ -99,10 +86,10 @@ function useApiResource<T>(url: string): ApiResource<T> {
 }
 
 function Homepage() {
-  const goCatalog = useStore((state) => state.goCatalog)
+  const router = useRouter()
   const banners = useApiResource<{ banners: HomeBanner[] }>("/api/banners?placement=HOME_HERO")
   const categories = useApiResource<{ categories: Category[] }>("/api/categories")
-  const bestSellers = useApiResource<{ products: Product[] }>("/api/products?sort=best-selling&pageSize=8&inStock=true")
+  const bestSellers = useApiResource<{ products: Product[] }>("/api/products?featured=true&sort=newest&pageSize=8&inStock=true")
   const flashSale = useApiResource<{ products: Product[] }>("/api/products?sort=price-desc&pageSize=16&inStock=true")
   const newArrivals = useApiResource<{ products: Product[] }>("/api/products?sort=newest&pageSize=8&inStock=true")
   const brands = useApiResource<{ brands: Brand[] }>("/api/brands")
@@ -140,11 +127,11 @@ function Homepage() {
 
       <CategoryGrid categories={categories.data?.categories || []} loading={categories.loading} error={categories.error} onRetry={categories.retry} />
 
-      <ProductSection title="Rwanda's best sellers" subtitle="The products customers return for—top-rated skincare, makeup and haircare." badge="★ Community favourites" products={bestSellers.data?.products || []} loading={bestSellers.loading} error={bestSellers.error} onRetry={bestSellers.retry} onViewAll={() => goCatalog(null)} />
+      <ProductSection title="Featured beauty essentials" subtitle="A curated selection of skincare, makeup and haircare available across Rwanda." badge="Freedom favourites" products={bestSellers.data?.products || []} loading={bestSellers.loading} error={bestSellers.error} onRetry={bestSellers.retry} onViewAll={() => router.push("/products")} />
 
       <FlashSale products={flashSale.data?.products || []} loading={flashSale.loading} error={flashSale.error} onRetry={flashSale.retry} />
 
-      <ProductSection title="Just arrived" subtitle="Fresh formulas, trending shades and new beauty discoveries now available in Rwanda." badge="New this week" products={newArrivals.data?.products || []} loading={newArrivals.loading} error={newArrivals.error} onRetry={newArrivals.retry} onViewAll={() => goCatalog(null)} tone="soft" />
+      <ProductSection title="Just arrived" subtitle="Fresh formulas, trending shades and new beauty discoveries now available in Rwanda." badge="New this week" products={newArrivals.data?.products || []} loading={newArrivals.loading} error={newArrivals.error} onRetry={newArrivals.retry} onViewAll={() => router.push("/products")} tone="soft" />
 
       <section className="bg-white">
         {brands.loading ? (
@@ -203,29 +190,6 @@ function SectionEmpty({ message }: { message: string }) {
 }
 
 export default function Home() {
-  const { view, activeProductSlug, lastOrderId, fetchUser } = useStore()
-
-  useEffect(() => {
-    fetchUser()
-  }, [fetchUser])
-
   useRealtimeEvents()
-
-  return (
-    <>
-      {view === "home" && <Homepage />}
-      {view === "catalog" && <CatalogView />}
-      {view === "product" && activeProductSlug && <ProductDetailView slug={activeProductSlug} />}
-      {view === "cart" && <CartView />}
-      {view === "checkout" && <CheckoutView />}
-      {view === "confirmation" && lastOrderId && <ConfirmationView orderId={lastOrderId} />}
-      {view === "trackOrder" && <TrackOrderView />}
-      {view === "wholesale" && <WholesaleView />}
-      {view === "admin" && <ErrorBoundary><AdminView /></ErrorBoundary>}
-      {view === "login" && <LoginView />}
-      {view === "register" && <RegisterView />}
-      {view === "account" && <AccountView />}
-      <CartDrawer />
-    </>
-  )
+  return <Homepage />
 }

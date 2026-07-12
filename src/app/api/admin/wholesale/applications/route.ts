@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /** GET /api/admin/wholesale/applications — list all applications with filters */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"

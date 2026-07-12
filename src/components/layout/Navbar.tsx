@@ -43,13 +43,6 @@ export default function Navbar() {
     user,
     authLoading,
     cartCount,
-    goHome,
-    goCatalog,
-    goLogin,
-    goRegister,
-    goAccount,
-    goAdmin,
-    setView,
     logout,
   } = useStore()
 
@@ -83,7 +76,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await logout()
-    goHome()
+    router.push('/')
     setAccountOpen(false)
     setMobileOpen(false)
     toast({ title: 'Signed out successfully' })
@@ -92,10 +85,10 @@ export default function Navbar() {
   const handleWishlist = () => {
     if (!user) {
       toast({ title: 'Sign in to save your favourite products.' })
-      goLogin()
+      router.push('/login')
       return
     }
-    toast({ title: 'Wishlist', description: 'Your saved beauty favourites will appear here.' })
+    router.push('/account/wishlist')
   }
 
   return (
@@ -115,7 +108,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-3 sm:h-[72px] sm:gap-4 sm:px-6 lg:px-8">
         <button
           type="button"
-          onClick={() => navigate(goHome)}
+          onClick={() => navigate(() => router.push('/'))}
           className="flex min-w-0 shrink-0 items-center gap-2 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]"
           aria-label="FreedomCosmeticShop home"
         >
@@ -211,14 +204,14 @@ export default function Navbar() {
                     <p className="truncate text-sm font-semibold">{user.name}</p>
                     <p className="truncate text-xs text-gray-500">{user.phone}</p>
                   </div>
-                  <button type="button" onClick={() => navigate(goAccount)} className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-gray-50">
+                  <button type="button" onClick={() => navigate(() => router.push('/account'))} className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-gray-50">
                     <User className="h-4 w-4" /> My Account
                   </button>
-                  <button type="button" onClick={() => navigate(() => goCatalog(null))} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-gray-50">
+                  <button type="button" onClick={() => navigate(() => router.push('/products'))} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-gray-50">
                     <Package className="h-4 w-4" /> Continue Shopping
                   </button>
                   {user.role === 'ADMIN' && (
-                    <button type="button" onClick={() => navigate(goAdmin)} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm text-[#B76E79] hover:bg-rose-50">
+                    <button type="button" onClick={() => navigate(() => router.push('/admin'))} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm text-[#B76E79] hover:bg-rose-50">
                       <Shield className="h-4 w-4" /> Admin Panel
                     </button>
                   )}
@@ -231,7 +224,7 @@ export default function Navbar() {
           ) : (
             <button
               type="button"
-              onClick={goLogin}
+              onClick={() => router.push('/login')}
               className="hidden rounded-full bg-[#B76E79] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#a55d68] hover:shadow-md sm:block"
             >
               Login
@@ -252,15 +245,15 @@ export default function Navbar() {
 
       <div className="hidden border-t border-gray-100 md:block">
         <nav className="scrollbar-hide mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-6 lg:px-8" aria-label="Product categories">
-          <button type="button" onClick={() => goCatalog(null)} className="shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-semibold text-gray-600 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
+          <button type="button" onClick={() => router.push('/products')} className="shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-semibold text-gray-600 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
             All Products
           </button>
           {categories.map((category) => (
-            <button key={category.slug} type="button" onClick={() => goCatalog(category.slug)} className="flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-3 py-3 text-sm font-medium text-gray-600 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
+            <button key={category.slug} type="button" onClick={() => router.push(`/products?category=${category.slug}`)} className="flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-3 py-3 text-sm font-medium text-gray-600 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
               <span aria-hidden="true">{category.icon}</span>{category.name}
             </button>
           ))}
-          <button type="button" onClick={() => setView('wholesale')} className="ml-auto shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-[#B76E79] transition-colors hover:border-[#B76E79] hover:text-[#9e5964]">
+          <button type="button" onClick={() => router.push('/wholesale')} className="ml-auto shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-[#B76E79] transition-colors hover:border-[#B76E79] hover:text-[#9e5964]">
             🏪 Wholesale
           </button>
         </nav>
@@ -282,31 +275,31 @@ export default function Navbar() {
               <button type="button" onClick={() => setMobileOpen(false)} className="rounded-full bg-gray-100 p-2" aria-label="Close menu"><X className="h-4 w-4" /></button>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => navigate(() => goCatalog(null))} className="col-span-2 flex items-center gap-3 rounded-2xl border border-gray-100 bg-[#f8f9fa] px-4 py-3 text-left font-semibold">
+              <button type="button" onClick={() => navigate(() => router.push('/products'))} className="col-span-2 flex items-center gap-3 rounded-2xl border border-gray-100 bg-[#f8f9fa] px-4 py-3 text-left font-semibold">
                 <span className="text-xl">🛍️</span> All Products
               </button>
               {categories.map((category) => (
-                <button key={category.slug} type="button" onClick={() => navigate(() => goCatalog(category.slug))} className="flex min-h-16 items-center gap-2 rounded-2xl border border-gray-100 px-3 py-3 text-left text-sm font-medium transition-colors hover:border-rose-200 hover:bg-rose-50">
+                <button key={category.slug} type="button" onClick={() => navigate(() => router.push(`/products?category=${category.slug}`))} className="flex min-h-16 items-center gap-2 rounded-2xl border border-gray-100 px-3 py-3 text-left text-sm font-medium transition-colors hover:border-rose-200 hover:bg-rose-50">
                   <span className="text-xl" aria-hidden="true">{category.icon}</span>{category.name}
                 </button>
               ))}
             </div>
 
-            <button type="button" onClick={() => navigate(() => setView('wholesale'))} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#fff8e7] px-4 py-3 font-bold text-[#9e5964] ring-1 ring-[#FFD700]/30">
+            <button type="button" onClick={() => navigate(() => router.push('/wholesale'))} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#fff8e7] px-4 py-3 font-bold text-[#9e5964] ring-1 ring-[#FFD700]/30">
               🏪 Wholesale beauty — save up to 30%
             </button>
 
             <div className="mt-5 space-y-2 border-t border-gray-100 pt-5">
               {user ? (
                 <>
-                  <button type="button" onClick={() => navigate(goAccount)} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-medium hover:bg-gray-50"><User className="h-5 w-5" /> My Account</button>
-                  {user.role === 'ADMIN' && <button type="button" onClick={() => navigate(goAdmin)} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-medium text-[#B76E79] hover:bg-rose-50"><Shield className="h-5 w-5" /> Admin Panel</button>}
+                  <button type="button" onClick={() => navigate(() => router.push('/account'))} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-medium hover:bg-gray-50"><User className="h-5 w-5" /> My Account</button>
+                  {user.role === 'ADMIN' && <button type="button" onClick={() => navigate(() => router.push('/admin'))} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-medium text-[#B76E79] hover:bg-rose-50"><Shield className="h-5 w-5" /> Admin Panel</button>}
                   <button type="button" onClick={handleLogout} className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-red-100 py-3 font-semibold text-red-600"><LogOut className="h-4 w-4" /> Sign Out</button>
                 </>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
-                  <button type="button" onClick={() => navigate(goLogin)} className="rounded-full bg-[#B76E79] py-3 font-semibold text-white">Login</button>
-                  <button type="button" onClick={() => navigate(goRegister)} className="rounded-full border-2 border-[#B76E79] py-3 font-semibold text-[#B76E79]">Register</button>
+                  <button type="button" onClick={() => navigate(() => router.push('/login'))} className="rounded-full bg-[#B76E79] py-3 font-semibold text-white">Login</button>
+                  <button type="button" onClick={() => navigate(() => router.push('/register'))} className="rounded-full border-2 border-[#B76E79] py-3 font-semibold text-[#B76E79]">Register</button>
                 </div>
               )}
             </div>

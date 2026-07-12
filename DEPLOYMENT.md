@@ -90,4 +90,4 @@ Scroll to bottom → Click "Delete Project" → Type: samuel-cosmetic-shop → D
 
 - Website: https://freedomcosmeticshop.vercel.app
 - Admin: https://freedomcosmeticshop.vercel.app (click admin icon)
-- Admin login: +250788123456 / Admin@2026
+- Admin login: +250788123456 / [ROTATED_ADMIN_PASSWORD]

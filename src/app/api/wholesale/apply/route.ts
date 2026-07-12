@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /** POST /api/wholesale/apply — submit wholesale application (auth required) */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"

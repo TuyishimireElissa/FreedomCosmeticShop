@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { Heart, PackageOpen, RefreshCw, ShoppingBag, Star } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
@@ -16,7 +18,34 @@ interface ProductGridProps {
 
 export default function ProductGrid({ products, loading = false, error, onRetry }: ProductGridProps) {
   const addToCart = useStore((state) => state.addToCart)
+  const user = useStore((state) => state.user)
+  const router = useRouter()
   const { toast } = useToast()
+  const [wishlisted, setWishlisted] = useState<Set<string>>(new Set())
+
+  const toggleWishlist = async (productId: string) => {
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    const active = wishlisted.has(productId)
+    const response = await fetch('/api/wishlist', {
+      method: active ? 'DELETE' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId }),
+    })
+    if (!response.ok) {
+      toast({ title: 'Wishlist update failed', variant: 'destructive' })
+      return
+    }
+    setWishlisted((current) => {
+      const next = new Set(current)
+      if (active) next.delete(productId)
+      else next.add(productId)
+      return next
+    })
+    toast({ title: active ? 'Removed from wishlist' : 'Saved to wishlist' })
+  }
 
   if (loading) {
     return <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">{Array.from({ length: 9 }).map((_, index) => <div key={index} className="overflow-hidden rounded-2xl border border-gray-100 bg-white"><div className="aspect-square animate-pulse bg-gray-100" /><div className="space-y-2.5 p-3 sm:p-4"><div className="h-3 w-1/3 animate-pulse rounded bg-gray-100" /><div className="h-4 w-full animate-pulse rounded bg-gray-100" /><div className="h-5 w-1/2 animate-pulse rounded bg-rose-100" /><div className="h-10 animate-pulse rounded-xl bg-gray-100" /></div></div>)}</div>
@@ -43,7 +72,7 @@ export default function ProductGrid({ products, loading = false, error, onRetry 
                 {image ? <img src={image} alt={product.name} className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`} loading="lazy" /> : <div className="grid h-full place-items-center text-xs text-gray-400">No image</div>}
               </Link>
               <div className="absolute left-2 top-2 flex flex-col gap-1">{discount > 0 && <span className="rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">-{discount}%</span>}{product.isNew && <span className="rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white">New</span>}{outOfStock && <span className="rounded-full bg-[#1a1a1a] px-2 py-1 text-[10px] font-bold text-white">Sold out</span>}</div>
-              <button type="button" className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-white/95 text-gray-500 shadow-sm hover:text-red-500" aria-label={`Save ${product.name}`}><Heart className="h-4 w-4" /></button>
+              <button type="button" onClick={() => toggleWishlist(product.id)} className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-white/95 text-gray-500 shadow-sm hover:text-red-500" aria-label={`Save ${product.name}`} aria-pressed={wishlisted.has(product.id)}><Heart className={`h-4 w-4 ${wishlisted.has(product.id) ? 'fill-red-500 text-red-500' : ''}`} /></button>
             </div>
             <div className="flex flex-1 flex-col p-3 sm:p-4">
               <p className="truncate text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400">{product.brand?.name || product.category?.name || 'Freedom Beauty'}</p>

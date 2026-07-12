@@ -12,9 +12,18 @@
 import { NextResponse } from "next/server"
 import { loginWithPassword } from "@/server/services/auth"
 import { setAuthCookies } from "@/lib/auth"
+import { rateLimit } from "@/lib/permissions"
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const limit = rateLimit(`login:${ip}`, { maxActions: 8, windowMs: 15 * 60 * 1000 })
+    if (!limit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many login attempts. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(Math.ceil((limit.retryAfterMs || 60000) / 1000)) } },
+      )
+    }
     const body = await req.json()
     const identifier = body.identifier || body.phone
     const { password } = body

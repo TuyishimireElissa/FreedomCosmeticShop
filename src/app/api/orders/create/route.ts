@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
@@ -23,22 +25,55 @@ export async function POST(request: Request) {
     if (products.length !== ids.length) return NextResponse.json({ success: false, error: 'One or more products are unavailable' }, { status: 400 })
     const orderItems = input.items.map((item) => { const product = products.find((value) => value.id === item.productId)!; if (product.stock < item.quantity) throw new Error(`Insufficient stock for ${product.name}`); return { productId: product.id, name: product.name, price: product.price, quantity: item.quantity, image: firstImage(product.images) } })
     const subtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-    let discountAmount = 0; let couponId: string | null = null
-    if (input.couponCode?.toUpperCase() === 'BEAUTY20') discountAmount = Math.round(subtotal * 0.2)
-    else if (input.couponCode) {
-      const coupon = await prisma.coupon.findFirst({ where: { code: input.couponCode.toUpperCase(), isActive: true } })
-      if (coupon && (!coupon.startsAt || coupon.startsAt <= new Date()) && (!coupon.endsAt || coupon.endsAt >= new Date()) && (!coupon.minOrderAmount || subtotal >= coupon.minOrderAmount)) { couponId = coupon.id; discountAmount = coupon.type === 'PERCENTAGE' ? Math.round(subtotal * coupon.value / 100) : coupon.type === 'FIXED' ? coupon.value : 0 }
-    }
-    const delivery = calculateDelivery(input.district, subtotal - discountAmount)
-    const total = Math.max(0, subtotal - discountAmount + delivery.fee)
     const user = await requireAuth().catch(() => null)
+    let discountAmount = 0
+    let couponId: string | null = null
+    let freeShipping = false
+    if (input.couponCode) {
+      const code = input.couponCode.toUpperCase().trim()
+      const coupon = await prisma.coupon.findFirst({ where: { code, isActive: true } })
+      if (!coupon) {
+        if (code !== 'BEAUTY20') return NextResponse.json({ success: false, error: 'Invalid coupon code' }, { status: 400 })
+        discountAmount = Math.round(subtotal * 0.2)
+      } else {
+        const now = new Date()
+        const validWindow = coupon.startsAt <= now && (!coupon.endsAt || coupon.endsAt >= now)
+        const usageAvailable = !coupon.usageLimit || coupon.usedCount < coupon.usageLimit
+        const minimumMet = !coupon.minOrderAmount || subtotal >= coupon.minOrderAmount
+        const customerUses = await prisma.order.count({
+          where: { couponId: coupon.id, customerPhone: input.customerPhone, status: { not: 'CANCELLED' } },
+        })
+        if (!validWindow || !usageAvailable || !minimumMet || customerUses >= coupon.usageLimitPerUser) {
+          return NextResponse.json({ success: false, error: 'Coupon is expired, unavailable, or already used' }, { status: 400 })
+        }
+        couponId = coupon.id
+        discountAmount = coupon.type === 'PERCENTAGE'
+          ? Math.round(subtotal * coupon.value / 100)
+          : coupon.type === 'FIXED' ? coupon.value : 0
+        if (coupon.maxDiscountAmount) discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount)
+        freeShipping = coupon.type === 'FREE_SHIPPING'
+      }
+    }
+    const calculatedDelivery = calculateDelivery(input.district, subtotal - discountAmount)
+    const delivery = freeShipping ? { ...calculatedDelivery, fee: 0, feeFormatted: 'FREE', isFreeDelivery: true } : calculatedDelivery
+    const total = Math.max(0, subtotal - discountAmount + delivery.fee)
     const orderNumber = `FCS-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}`
 
     const order = await prisma.$transaction(async (tx) => {
-      const created = await tx.order.create({ data: { orderNumber, customerName: input.customerName, customerPhone: input.customerPhone, customerEmail: input.customerEmail || null, userId: user?.id || null, address: input.address, city: input.sector, district: input.district, sector: input.sector, province, notes: input.notes || null, subtotal, discountAmount, deliveryFee: delivery.fee, total, couponId, loyaltyPointsEarned: Math.floor(total / 1000), items: { create: orderItems } }, include: { items: true } })
+      const created = await tx.order.create({ data: { orderNumber, customerName: input.customerName, customerPhone: input.customerPhone, customerEmail: input.customerEmail || null, userId: user?.id || null, address: input.address, city: input.sector, district: input.district, sector: input.sector, province, notes: input.notes || null, subtotal, discountAmount, deliveryFee: delivery.fee, total, couponId, loyaltyPointsEarned: Math.floor(total / 1000), status: input.paymentMethod === 'COD' ? 'CONFIRMED' : 'PENDING', items: { create: orderItems } }, include: { items: true } })
       await tx.payment.create({ data: { orderId: created.id, method: input.paymentMethod, amount: total, status: 'PENDING', phoneNumber: input.paymentMethod.includes('MONEY') || input.paymentMethod === 'MTN_MOMO' ? input.customerPhone : null } })
       await tx.delivery.create({ data: { orderId: created.id, status: 'PENDING', estimatedArrival: new Date(Date.now() + (delivery.isSameDay ? 1 : 4) * 86400000) } })
-      for (const item of orderItems) await tx.product.update({ where: { id: item.productId }, data: { stock: { decrement: item.quantity } } })
+      // Prepaid inventory is deducted only after a verified payment webhook.
+      // Cash-on-delivery orders are confirmed immediately and deduct here.
+      if (input.paymentMethod === 'COD') {
+        for (const item of orderItems) {
+          const updated = await tx.product.updateMany({
+            where: { id: item.productId, stock: { gte: item.quantity } },
+            data: { stock: { decrement: item.quantity } },
+          })
+          if (updated.count !== 1) throw new Error(`Insufficient stock for ${item.name}`)
+        }
+      }
       if (couponId) await tx.coupon.update({ where: { id: couponId }, data: { usedCount: { increment: 1 } } })
       return created
     })

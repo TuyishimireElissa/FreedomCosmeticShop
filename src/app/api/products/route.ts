@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { NextResponse } from 'next/server'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
@@ -7,8 +9,50 @@ function parseJsonArray(value: string | null): unknown[] | null {
   try { const parsed = JSON.parse(value); return Array.isArray(parsed) ? parsed : [] } catch { return [] }
 }
 
-function serializeProduct<T extends { images: string; skinType: string | null; shades: string | null; ingredients: string | null }>(product: T) {
-  return { ...product, images: parseJsonArray(product.images) || [], skinType: parseJsonArray(product.skinType), shades: parseJsonArray(product.shades), ingredients: parseJsonArray(product.ingredients) }
+function serializeProduct<T extends {
+  images: string
+  skinType: string | null
+  shades: string | null
+  ingredients: string | null
+  reviews?: Array<{ rating: number }>
+  costPrice?: number | null
+  isDeleted?: boolean
+  deletedAt?: Date | null
+  lowStockThreshold?: number
+  wholesaleActive?: boolean
+  description?: string
+  usageInstructions?: string | null
+  warnings?: string | null
+  videoUrl?: string | null
+  barcode?: string | null
+}>(product: T) {
+  const {
+    reviews = [],
+    costPrice: _costPrice,
+    isDeleted: _isDeleted,
+    deletedAt: _deletedAt,
+    lowStockThreshold: _lowStockThreshold,
+    wholesaleActive: _wholesaleActive,
+    description: _description,
+    usageInstructions: _usageInstructions,
+    warnings: _warnings,
+    ingredients: _ingredients,
+    videoUrl: _videoUrl,
+    barcode: _barcode,
+    ...publicProduct
+  } = product
+  const reviewCount = reviews.length
+  const rating = reviewCount
+    ? Math.round((reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount) * 10) / 10
+    : 0
+  return {
+    ...publicProduct,
+    images: parseJsonArray(product.images) || [],
+    skinType: parseJsonArray(product.skinType),
+    shades: parseJsonArray(product.shades),
+    rating,
+    reviewsCount: reviewCount,
+  }
 }
 
 export async function GET(request: Request) {
@@ -42,12 +86,27 @@ export async function GET(request: Request) {
 
     const orderBy: Prisma.ProductOrderByWithRelationInput = sort === 'price-asc' ? { price: 'asc' } : sort === 'price-desc' ? { price: 'desc' } : sort === 'rating' ? { rating: 'desc' } : sort === 'best-selling' ? { reviewsCount: 'desc' } : { createdAt: 'desc' }
     const [rows, total] = await Promise.all([
-      prisma.product.findMany({ where, include: { category: true, brand: true }, orderBy, skip: (page - 1) * pageSize, take: pageSize }),
+      prisma.product.findMany({
+        where,
+        include: {
+          category: { select: { id: true, name: true, slug: true, image: true } },
+          brand: { select: { id: true, name: true, slug: true, logo: true } },
+          reviews: {
+            where: { isApproved: true, isDeleted: false },
+            select: { rating: true },
+          },
+        },
+        orderBy,
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
       prisma.product.count({ where }),
     ])
     const products = rows.map(serializeProduct)
     const pagination = { page, pageSize, total, totalPages: Math.ceil(total / pageSize), hasMore: page * pageSize < total }
-    return NextResponse.json({ success: true, data: { products, pagination }, products, pagination })
+    const response = NextResponse.json({ success: true, data: { products, pagination }, products, pagination })
+    response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
+    return response
   } catch (error) {
     console.error('Products API error:', error)
     return NextResponse.json({ success: false, error: 'Failed to fetch products' }, { status: 500 })

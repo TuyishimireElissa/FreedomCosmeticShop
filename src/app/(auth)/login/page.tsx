@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, type FormEvent } from 'react'
-import { ArrowRight, CheckCircle2, Eye, EyeOff, Loader2, Lock, ShieldCheck, Star, User } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Eye, EyeOff, Loader2, Lock, ShieldCheck, User } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 
 export default function LoginPage() {
@@ -50,7 +50,7 @@ export default function LoginPage() {
             </form>
             <p className="mt-5 text-center text-sm text-gray-500">New to FreedomCosmeticShop? <Link href="/register" className="font-black text-[#B76E79] hover:underline">Create an account</Link></p><p className="mt-5 flex items-center justify-center gap-1.5 text-[10px] font-semibold text-gray-400"><ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />Secure encrypted login</p>
           </div>
-          <div className="mt-6 flex items-center justify-center gap-2 text-center text-xs text-gray-500"><div className="flex">{[1,2,3,4,5].map((star) => <Star key={star} className="h-3.5 w-3.5 fill-[#FFD700] text-[#FFD700]" />)}</div><strong className="text-gray-700">4.8/5</strong><span>from Rwanda beauty shoppers</span></div>
+          <div className="mt-6 flex items-center justify-center gap-2 text-center text-xs text-gray-500"><ShieldCheck className="h-4 w-4 text-emerald-600" /><strong className="text-gray-700">Secure shopping</strong><span>with delivery across all 30 districts</span></div>
         </div>
       </section>
     </main>

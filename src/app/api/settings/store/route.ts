@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /**
  * GET  /api/settings/store — public, returns store settings (name, logo, etc.)
  * PUT  /api/settings/store — admin only, updates text fields

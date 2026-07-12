@@ -13,7 +13,7 @@
  * Future: navigate to /blog/[slug] view.
  */
 
-import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import { Clock, ArrowRight, BookOpen } from "lucide-react"
 
 interface BlogPost {
@@ -115,14 +115,13 @@ export function BeautyTips({ posts }: BeautyTipsProps) {
                 </span>
               </div>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                className="mt-2 justify-start p-0 text-primary hover:bg-transparent hover:underline"
+              <Link
+                href={`/blog/${post.slug}`}
+                className="mt-3 inline-flex items-center text-sm font-bold text-primary hover:underline"
               >
                 Read more
                 <ArrowRight className="ml-1 h-3.5 w-3.5" />
-              </Button>
+              </Link>
             </div>
           </article>
         ))}

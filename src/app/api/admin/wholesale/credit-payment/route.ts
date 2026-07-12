@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 /** POST /api/admin/wholesale/credit-payment — record a credit payment for a wholesale customer */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"

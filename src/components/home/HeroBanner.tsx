@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowRight, ChevronLeft, ChevronRight, RefreshCw, ShieldCheck, Sparkles, Truck } from 'lucide-react'
-import { useStore } from '@/store/useStore'
+import { useRouter } from 'next/navigation'
 
 export interface HomeBanner {
   id: string
@@ -25,7 +25,7 @@ interface HeroBannerProps {
 const AUTO_ADVANCE_MS = 6000
 
 export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBannerProps) {
-  const { goCatalog, goProduct } = useStore()
+  const router = useRouter()
   const [current, setCurrent] = useState(0)
   const [paused, setPaused] = useState(false)
 
@@ -48,10 +48,10 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
   }, [banners.length, current])
 
   const followBanner = (banner: HomeBanner) => {
-    if (banner.linkType === 'CATEGORY' && banner.linkUrl) goCatalog(banner.linkUrl)
-    else if (banner.linkType === 'PRODUCT' && banner.linkUrl) goProduct(banner.linkUrl)
+    if (banner.linkType === 'CATEGORY' && banner.linkUrl) router.push(`/products?category=${encodeURIComponent(banner.linkUrl)}`)
+    else if (banner.linkType === 'PRODUCT' && banner.linkUrl) router.push(`/products/${encodeURIComponent(banner.linkUrl)}`)
     else if (banner.linkType === 'URL' && banner.linkUrl) window.location.assign(banner.linkUrl)
-    else goCatalog(null)
+    else router.push('/products')
   }
 
   if (loading) {
@@ -79,7 +79,7 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
           <h1 className="mt-6 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Authentic beauty, delivered across Rwanda.</h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">Explore premium skincare, makeup and haircare selected for Rwanda&apos;s climate and melanin-rich skin.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <button type="button" onClick={() => goCatalog(null)} className="inline-flex items-center gap-2 rounded-full bg-[#B76E79] px-6 py-3 text-sm font-bold text-white shadow-xl hover:bg-[#a55d68]">Shop the collection <ArrowRight className="h-4 w-4" /></button>
+            <button type="button" onClick={() => router.push('/products')} className="inline-flex items-center gap-2 rounded-full bg-[#B76E79] px-6 py-3 text-sm font-bold text-white shadow-xl hover:bg-[#a55d68]">Shop the collection <ArrowRight className="h-4 w-4" /></button>
             {onRetry && <button type="button" onClick={onRetry} className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur hover:bg-white/15"><RefreshCw className="h-4 w-4" />Retry banners</button>}
           </div>
         </div>
@@ -108,7 +108,7 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
                   {banner.subtitle && <p className="mt-4 max-w-xl text-sm leading-6 text-white/80 sm:text-base lg:text-lg">{banner.subtitle}</p>}
                   <div className="mt-7 flex flex-wrap gap-3">
                     <button type="button" onClick={() => followBanner(banner)} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#B76E79] px-6 text-sm font-bold text-white shadow-xl shadow-black/20 transition-all hover:-translate-y-0.5 hover:bg-[#a55d68]">Shop now <ArrowRight className="h-4 w-4" /></button>
-                    <button type="button" onClick={() => goCatalog(null)} className="inline-flex min-h-12 items-center rounded-full border border-white/30 bg-white/10 px-6 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20">Explore best sellers</button>
+                    <button type="button" onClick={() => router.push('/products')} className="inline-flex min-h-12 items-center rounded-full border border-white/30 bg-white/10 px-6 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20">Explore best sellers</button>
                   </div>
                   <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-medium text-white/80 sm:text-xs">
                     <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-emerald-400" />100% genuine</span>

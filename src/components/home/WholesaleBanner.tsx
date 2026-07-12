@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ArrowRight, RefreshCw, Store, Users } from 'lucide-react'
 import { useStore } from '@/store/useStore'
+import { useRouter } from 'next/navigation'
 
 interface WholesaleBenefit {
   icon: string
@@ -18,7 +19,8 @@ interface WholesaleInfo {
 }
 
 export function WholesaleBanner() {
-  const { user, setView } = useStore()
+  const user = useStore((state) => state.user)
+  const router = useRouter()
   const [info, setInfo] = useState<WholesaleInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -55,7 +57,7 @@ export function WholesaleBanner() {
             <p className="mt-3 max-w-xl text-sm leading-6 text-gray-300 sm:text-base">Built for Rwanda&apos;s salons, spas, shops and resellers—with professional support and reliable delivery nationwide.</p>
             {loading ? <div className="mt-5 h-5 w-64 animate-pulse rounded bg-white/10" /> : info ? <p className="mt-5 text-sm font-semibold text-[#e6a6b0]">Save up to {info.maxDiscount}% · Minimum order {info.minimumOrderFormatted}</p> : null}
             <div className="mt-7 flex flex-wrap gap-3">
-              <button type="button" onClick={() => setView('wholesale')} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#B76E79] px-6 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#a55d68]">Apply for wholesale <ArrowRight className="h-4 w-4" /></button>
+              <button type="button" onClick={() => router.push('/wholesale')} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#B76E79] px-6 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#a55d68]">Apply for wholesale <ArrowRight className="h-4 w-4" /></button>
               <span className="inline-flex items-center gap-2 px-2 text-xs text-gray-400"><Users className="h-4 w-4 text-[#FFD700]" />For registered Rwanda businesses</span>
             </div>
           </div>
