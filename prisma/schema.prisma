@@ -53,61 +53,74 @@ datasource db {
 // Validated in app code via regex: /^(?:\+250|0)?7[0-9]{8}$/
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String?  @unique
-  phone     String   @unique // Rwanda: +2507XXXXXXXX
+  id           String  @id @default(cuid())
+  name         String
+  email        String? @unique
+  phone        String  @unique // Rwanda: +2507XXXXXXXX
   passwordHash String?
 
   // Role: CUSTOMER | ADMIN | STAFF | MANAGER
-  role      String   @default("CUSTOMER")
+  role String @default("CUSTOMER")
 
-  avatar    String?
+  avatar String?
 
   // Loyalty program
-  loyaltyPoints Int  @default(0)
+  loyaltyPoints Int @default(0)
 
   // Email verification
   emailVerifiedAt DateTime?
 
+  // Admin security
+  mfaEnabled         Boolean   @default(false)
+  mfaSecret          String?
+  mfaBackupCodes     String[]  @default([])
+  failedLoginCount   Int       @default(0)
+  lockedUntil        DateTime?
+  lastLoginAt        DateTime?
+  lastLoginIp        String?
+  lastLoginDevice    String?
+  passwordChangedAt  DateTime?
+  mustChangePassword Boolean   @default(false)
+  isTestAccount      Boolean   @default(false)
+
   // ─── Section 1: Wholesale fields ──────────────────────────────────
   // userType: RETAIL (default) | WHOLESALE | BOTH
-  userType          String   @default("RETAIL") // UserType enum as string (SQLite)
-  wholesaleStatus   String?  // PENDING | APPROVED | REJECTED | SUSPENDED
-  businessName      String?
-  businessType      String?  // BEAUTY_SALON | HAIR_SALON | SPA | SHOP | MARKET_VENDOR | BEAUTY_SCHOOL | HOTEL | RESELLER | OTHER
-  businessPhone     String?
-  businessAddress   String?
-  businessDistrict  String?
-  tinNumber         String?  // Rwanda Tax ID
+  userType            String    @default("RETAIL") // UserType enum as string (SQLite)
+  wholesaleStatus     String? // PENDING | APPROVED | REJECTED | SUSPENDED
+  businessName        String?
+  businessType        String? // BEAUTY_SALON | HAIR_SALON | SPA | SHOP | MARKET_VENDOR | BEAUTY_SCHOOL | HOTEL | RESELLER | OTHER
+  businessPhone       String?
+  businessAddress     String?
+  businessDistrict    String?
+  tinNumber           String? // Rwanda Tax ID
   wholesaleApprovedAt DateTime?
   wholesaleApprovedBy String?
-  wholesaleLimit    Int?     // Credit limit in RWF
-  wholesaleBalance  Int      @default(0) // Current credit balance in RWF
-  wholesaleDiscount Int      @default(0) // Extra % discount on top of tier
+  wholesaleLimit      Int? // Credit limit in RWF
+  wholesaleBalance    Int       @default(0) // Current credit balance in RWF
+  wholesaleDiscount   Int       @default(0) // Extra % discount on top of tier
 
   // Soft delete
-  isDeleted   Boolean   @default(false)
-  deletedAt   DateTime?
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  orders              Order[]
-  cart                Cart?
-  reviews             Review[]
-  wishlistItems       Wishlist[]
-  addresses           Address[]
-  notifications       Notification[]
-  loyaltyTransactions LoyaltyPoints[]
-  blogPosts           BlogPost[]
-  staffProfile        StaffProfile?
-  activityLogs        ActivityLog[]
-  wholesaleApplication  WholesaleApplication?
-  wholesaleCredit       WholesaleCredit?
-  wholesaleInvoices     WholesaleInvoice[]
+  orders               Order[]
+  cart                 Cart?
+  reviews              Review[]
+  wishlistItems        Wishlist[]
+  addresses            Address[]
+  notifications        Notification[]
+  loyaltyTransactions  LoyaltyPoints[]
+  blogPosts            BlogPost[]
+  staffProfile         StaffProfile?
+  activityLogs         ActivityLog[]
+  wholesaleApplication WholesaleApplication?
+  wholesaleCredit      WholesaleCredit?
+  wholesaleInvoices    WholesaleInvoice[]
 
   @@index([phone])
   @@index([email])
@@ -124,18 +137,18 @@ model User {
 // Created when role = ADMIN, STAFF, or MANAGER.
 
 model StaffProfile {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Staff identification
-  employeeId  String  @unique
+  employeeId String @unique
   // Department: SALES | MARKETING | LOGISTICS | SUPPORT | FINANCE | MANAGEMENT
-  department  String
-  position    String
+  department String
+  position   String
 
-  hireDate    DateTime @default(now())
-  isActive    Boolean  @default(true)
+  hireDate DateTime @default(now())
+  isActive Boolean  @default(true)
 
   // Permissions: JSON array like ["orders.read", "orders.update", "products.crud"]
   permissions String
@@ -153,32 +166,32 @@ model StaffProfile {
 // =============================================================================
 
 model Category {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   name        String
-  slug        String   @unique
+  slug        String  @unique
   description String?
   image       String?
   icon        String?
 
   // Hierarchical self-relation
-  parentId    String?
-  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryHierarchy")
+  parentId String?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
 
   // Display
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
 
   // Soft delete
-  isDeleted   Boolean  @default(false)
-  deletedAt   DateTime?
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   // Timestamps
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  products    Product[]
+  products Product[]
 
   @@index([slug])
   @@index([parentId])
@@ -191,23 +204,23 @@ model Category {
 // =============================================================================
 
 model Brand {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  slug        String   @unique
+  id          String  @id @default(cuid())
+  name        String  @unique
+  slug        String  @unique
   description String?
   logo        String?
   website     String?
-  country     String?  // Country of origin
-  isActive    Boolean  @default(true)
+  country     String? // Country of origin
+  isActive    Boolean @default(true)
 
   // Soft delete
-  isDeleted   Boolean  @default(false)
-  deletedAt   DateTime?
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  products    Product[]
+  products Product[]
 
   @@index([slug])
   @@index([isActive])
@@ -220,37 +233,37 @@ model Brand {
 // images, skinType, shades, ingredients stored as JSON strings (SQLite).
 
 model Product {
-  id                String   @id @default(cuid())
-  name              String
-  slug              String   @unique
-  description       String
-  shortDescription  String?  // For product cards (max ~150 chars)
+  id               String  @id @default(cuid())
+  name             String
+  slug             String  @unique
+  description      String
+  shortDescription String? // For product cards (max ~150 chars)
 
   // Pricing (RWF)
-  price             Int
-  compareAt         Int?     // Original price for "on sale" display
-  costPrice         Int?     // For margin calculation (admin only)
+  price     Int
+  compareAt Int? // Original price for "on sale" display
+  costPrice Int? // For margin calculation (admin only)
 
   // Inventory
-  stock             Int      @default(0)
-  lowStockThreshold Int      @default(5)
-  sku               String?  @unique
+  stock             Int     @default(0)
+  lowStockThreshold Int     @default(5)
+  sku               String? @unique
   barcode           String?
 
   // Media — JSON array of image URLs: '["url1", "url2"]'
-  images            String   @default("[]")
-  videoUrl          String?
+  images   String  @default("[]")
+  videoUrl String?
 
   // ─── Cosmetics-specific fields ───────────────────────────────────
   // skinType: JSON array of values from: ALL, OILY, DRY, COMBINATION, SENSITIVE, NORMAL
   // Example: '["OILY", "COMBINATION"]'
-  skinType          String?  // JSON array
+  skinType          String? // JSON array
   // shades: JSON array of shade names for makeup products
   // Example: '["Deep", "Medium", "Light"]'
-  shades            String?  // JSON array
+  shades            String? // JSON array
   // ingredients: JSON array of ingredient names
   // Example: '["Vitamin C", "Hyaluronic Acid", "Glycerin"]'
-  ingredients       String?  // JSON array
+  ingredients       String? // JSON array
   // size: e.g., "50ml", "100g", "30 capsules"
   size              String?
   // usageInstructions: how to use the product
@@ -260,37 +273,37 @@ model Product {
   // ─── End cosmetics-specific fields ───────────────────────────────
 
   // Ratings (denormalized for quick display)
-  rating            Float    @default(0)
-  reviewsCount      Int      @default(0)
+  rating       Float @default(0)
+  reviewsCount Int   @default(0)
 
   // Flags
-  featured          Boolean  @default(false)
-  isNew             Boolean  @default(false)
-  isActive          Boolean  @default(true)
+  featured Boolean @default(false)
+  isNew    Boolean @default(false)
+  isActive Boolean @default(true)
 
   // ─── Section 1: Wholesale product fields ──────────────────────────
-  minWholesaleQty   Int      @default(6)
-  wholesaleActive   Boolean  @default(true)
+  minWholesaleQty Int     @default(6)
+  wholesaleActive Boolean @default(true)
 
   // Soft delete
-  isDeleted         Boolean  @default(false)
-  deletedAt         DateTime?
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  categoryId        String
-  category          Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
 
-  brandId           String?
-  brand             Brand?   @relation(fields: [brandId], references: [id])
+  brandId String?
+  brand   Brand?  @relation(fields: [brandId], references: [id])
 
-  orderItems        OrderItem[]
-  reviews           Review[]
-  wishlistItems     Wishlist[]
-  cartItems         CartItem[]
-  pricing           ProductPricing?
+  orderItems    OrderItem[]
+  reviews       Review[]
+  wishlistItems Wishlist[]
+  cartItems     CartItem[]
+  pricing       ProductPricing?
 
   @@index([slug])
   @@index([categoryId])
@@ -308,18 +321,18 @@ model Product {
 // =============================================================================
 
 model Cart {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Cached totals (updated on every CartItem change)
-  totalItems Int     @default(0)
-  subtotal   Int     @default(0) // RWF
+  totalItems Int @default(0)
+  subtotal   Int @default(0) // RWF
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  items     CartItem[]
+  items CartItem[]
 
   @@index([userId])
 }
@@ -329,15 +342,15 @@ model Cart {
 // =============================================================================
 
 model CartItem {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   cartId    String
-  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 
-  quantity  Int
+  quantity Int
   // Price snapshot (in case product price changes after adding to cart)
-  price     Int
+  price    Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -355,57 +368,57 @@ model CartItem {
 // e.g., UB-2026-00001
 
 model Order {
-  id            String   @id @default(cuid())
-  orderNumber   String   @unique
+  id          String @id @default(cuid())
+  orderNumber String @unique
 
   // Customer snapshot (works for guest checkout)
   customerName  String
-  customerPhone String   // Rwanda: +2507XXXXXXXX
+  customerPhone String // Rwanda: +2507XXXXXXXX
   customerEmail String?
 
   // Optional link to authenticated user
-  userId        String?
-  user          User?    @relation(fields: [userId], references: [id])
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
 
   // Delivery address (Rwanda structure)
-  address       String
-  city          String
-  district      String?
-  sector        String?
-  province      String
-  notes         String?
+  address  String
+  city     String
+  district String?
+  sector   String?
+  province String
+  notes    String?
 
   // Totals in RWF
-  subtotal      Int
-  discountAmount Int     @default(0)
-  deliveryFee   Int      @default(0)
-  total         Int
+  subtotal       Int
+  discountAmount Int @default(0)
+  deliveryFee    Int @default(0)
+  total          Int
 
   // Coupon applied
-  couponId      String?
-  coupon        Coupon?  @relation(fields: [couponId], references: [id])
+  couponId String?
+  coupon   Coupon? @relation(fields: [couponId], references: [id])
 
   // Loyalty points earned from this order
   loyaltyPointsEarned Int @default(0)
 
   // Status: PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED | RETURNED
-  status        String   @default("PENDING")
+  status String @default("PENDING")
 
   // ─── Section 1: Wholesale order fields ────────────────────────────
-  orderType     String   @default("RETAIL") // RETAIL | WHOLESALE
-  priceType     String   @default("RETAIL") // RETAIL | WHOLESALE | SPECIAL
-  isCredit      Boolean  @default(false) // true if wholesale order on credit
+  orderType     String    @default("RETAIL") // RETAIL | WHOLESALE
+  priceType     String    @default("RETAIL") // RETAIL | WHOLESALE | SPECIAL
+  isCredit      Boolean   @default(false) // true if wholesale order on credit
   creditDueDate DateTime?
 
   // Timestamps
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  items         OrderItem[]
-  payments      Payment[]
-  delivery      Delivery?
-  reviews       Review[]
+  items            OrderItem[]
+  payments         Payment[]
+  delivery         Delivery?
+  reviews          Review[]
   wholesaleInvoice WholesaleInvoice?
 
   @@index([orderNumber])
@@ -422,20 +435,20 @@ model Order {
 // =============================================================================
 
 model OrderItem {
-  id        String   @id @default(cuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   productId String?
   product   Product? @relation(fields: [productId], references: [id])
 
   // Snapshot fields (preserved even if product is deleted)
-  name      String
-  price     Int      // RWF at time of purchase
-  quantity  Int
-  image     String?
+  name     String
+  price    Int // RWF at time of purchase
+  quantity Int
+  image    String?
   // Selected shade (for makeup products)
-  shade     String?
+  shade    String?
 
   createdAt DateTime @default(now())
 
@@ -448,42 +461,42 @@ model OrderItem {
 // =============================================================================
 
 model Payment {
-  id        String   @id @default(cuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   // Method: MTN_MOMO | AIRTEL_MONEY | CARD | COD
-  method    String
+  method String
 
   // Provider transaction details
   providerTransactionId String? @unique // From PayPack / Flutterwave
   providerReference     String?
 
   // Amount in RWF
-  amount    Int
+  amount Int
 
   // Status: PENDING | PAID | FAILED | REFUNDED
-  status    String   @default("PENDING")
+  status String @default("PENDING")
 
   // Mobile money
   phoneNumber String? // Customer's MoMo phone number
 
   // Card (last 4 digits only — never store full card number)
-  cardLast4  String?
-  cardBrand  String?  // VISA | MASTERCARD | AMEX
+  cardLast4 String?
+  cardBrand String? // VISA | MASTERCARD | AMEX
 
   // Failure
   failureReason String?
 
   // ─── New fields for PayPack integration ───────────────────────────
   // Network: MTN | AIRTEL (for MoMo payments)
-  network       String?
+  network     String?
   // Raw webhook payload (JSON string — SQLite doesn't support Json type)
-  webhookData   String?
+  webhookData String?
   // ─── End new fields ────────────────────────────────────────────────
 
   // Timestamps
-  initiatedAt DateTime @default(now())
+  initiatedAt DateTime  @default(now())
   completedAt DateTime?
 
   @@index([orderId])
@@ -500,17 +513,17 @@ model Payment {
 // Used to track individual payment attempts (customer may retry with different phones).
 
 model PaymentAttempt {
-  id            String   @id @default(cuid())
-  orderId       String
-  phone         String
-  amount        Int      // RWF
-  network       String   // MTN | AIRTEL
-  reference     String?  // PayPack transaction reference
-  status        String   @default("PENDING") // PENDING | SUCCESS | FAILED
-  attemptCount  Int      @default(1)
-  lastError     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id           String   @id @default(cuid())
+  orderId      String
+  phone        String
+  amount       Int // RWF
+  network      String // MTN | AIRTEL
+  reference    String? // PayPack transaction reference
+  status       String   @default("PENDING") // PENDING | SUCCESS | FAILED
+  attemptCount Int      @default(1)
+  lastError    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([orderId])
   @@index([phone])
@@ -523,12 +536,12 @@ model PaymentAttempt {
 // =============================================================================
 
 model Delivery {
-  id        String   @id @default(cuid())
-  orderId   String   @unique
-  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id      String @id @default(cuid())
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   // Status: PENDING | ASSIGNED | PICKED_UP | IN_TRANSIT | DELIVERED | FAILED
-  status    String   @default("PENDING")
+  status String @default("PENDING")
 
   // Driver / courier
   driverName   String?
@@ -536,22 +549,22 @@ model Delivery {
   vehiclePlate String?
 
   // Tracking
-  trackingCode       String? @unique
-  estimatedArrival   DateTime?
-  actualArrival      DateTime?
+  trackingCode     String?   @unique
+  estimatedArrival DateTime?
+  actualArrival    DateTime?
 
   // Failure
   failureReason String?
 
   // Internal notes
-  notes    String?
+  notes String?
 
   // Timestamps
-  assignedAt   DateTime?
-  pickedUpAt   DateTime?
-  deliveredAt  DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  assignedAt  DateTime?
+  pickedUpAt  DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([status])
   @@index([driverPhone])
@@ -563,38 +576,38 @@ model Delivery {
 // =============================================================================
 
 model Review {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
 
-  orderId   String?
-  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id])
 
   // Review content
-  rating    Int      // 1-5 stars
-  title     String?
-  body      String?
+  rating Int // 1-5 stars
+  title  String?
+  body   String?
 
   // Photos — JSON array of image URLs
-  photos    String?  // '["url1", "url2"]'
+  photos String? // '["url1", "url2"]'
 
   // Cosmetics-specific context
-  skinType    String? // Reviewer's skin type
-  shadeUsed   String? // Which shade they used
+  skinType  String? // Reviewer's skin type
+  shadeUsed String? // Which shade they used
 
   // Moderation
-  isApproved Boolean  @default(false)
-  isFeatured Boolean  @default(false)
+  isApproved Boolean @default(false)
+  isFeatured Boolean @default(false)
 
   // Engagement
-  helpfulVotes Int    @default(0)
+  helpfulVotes Int @default(0)
 
   // Soft delete
-  isDeleted   Boolean  @default(false)
-  deletedAt   DateTime?
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -612,11 +625,11 @@ model Review {
 // =============================================================================
 
 model Wishlist {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
@@ -634,30 +647,30 @@ model Wishlist {
 // Reference data in src/lib/rwanda-locations.ts
 
 model Address {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  label           String  // "Home", "Work", etc.
-  recipientName   String
-  recipientPhone  String  // Rwanda: +2507XXXXXXXX
+  label          String // "Home", "Work", etc.
+  recipientName  String
+  recipientPhone String // Rwanda: +2507XXXXXXXX
 
   // Rwanda administrative hierarchy
-  province    String
-  district    String  // e.g., "Nyarugenge", "Gasabo"
-  sector      String  // e.g., "Nyarugenge", "Kimirombe"
-  cell        String?
-  village     String?
+  province      String
+  district      String // e.g., "Nyarugenge", "Gasabo"
+  sector        String // e.g., "Nyarugenge", "Kimirombe"
+  cell          String?
+  village       String?
   streetAddress String? // Additional street-level detail
 
   // GPS coordinates (optional, for delivery optimization)
-  latitude   Float?
-  longitude  Float?
+  latitude  Float?
+  longitude Float?
 
-  isDefault  Boolean  @default(false)
+  isDefault Boolean @default(false)
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([district])
@@ -669,42 +682,42 @@ model Address {
 // =============================================================================
 
 model Coupon {
-  id          String   @id @default(cuid())
-  code        String   @unique
+  id          String  @id @default(cuid())
+  code        String  @unique
   description String?
 
   // Type: PERCENTAGE | FIXED | FREE_SHIPPING
-  type        String
+  type  String
   // For PERCENTAGE: 0-100 (e.g., 10 = 10% off)
   // For FIXED: amount in RWF (e.g., 5000 = RWF 5,000 off)
-  value       Int
+  value Int
 
   // Minimum order amount to qualify (RWF)
-  minOrderAmount Int?
+  minOrderAmount    Int?
   // Maximum discount cap (for PERCENTAGE type, in RWF)
   maxDiscountAmount Int?
 
   // Usage limits
-  usageLimit       Int?  // Total times usable (null = unlimited)
+  usageLimit        Int? // Total times usable (null = unlimited)
   usageLimitPerUser Int  @default(1)
-  usedCount        Int   @default(0)
+  usedCount         Int  @default(0)
 
   // Validity window
-  startsAt    DateTime
-  endsAt      DateTime?
+  startsAt DateTime
+  endsAt   DateTime?
 
   // Applicability
   appliesToAllProducts Boolean @default(true)
   // JSON arrays of IDs when appliesToAllProducts = false
-  categoryIds String?  // '["catId1", "catId2"]'
-  productIds  String?  // '["prodId1", "prodId2"]'
+  categoryIds          String? // '["catId1", "catId2"]'
+  productIds           String? // '["prodId1", "prodId2"]'
 
-  isActive    Boolean  @default(true)
+  isActive Boolean @default(true)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  orders      Order[]
+  orders Order[]
 
   @@index([code])
   @@index([isActive])
@@ -719,18 +732,18 @@ model Coupon {
 // User.loyaltyPoints is the current balance (denormalized for quick reads).
 
 model LoyaltyPoints {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Transaction
-  points    Int      // Positive = earned, Negative = redeemed
+  points Int // Positive = earned, Negative = redeemed
   // Type: EARNED | REDEEMED | EXPIRED | BONUS | ADJUSTMENT
-  type      String
-  reason    String   // e.g., "Order UB-2026-00001", "Signup bonus"
+  type   String
+  reason String // e.g., "Order UB-2026-00001", "Signup bonus"
 
   // Related order (if earned from an order)
-  orderId   String?
+  orderId String?
 
   // Balance after this transaction
   balanceAfter Int
@@ -752,38 +765,38 @@ model LoyaltyPoints {
 // =============================================================================
 
 model BlogPost {
-  id        String   @id @default(cuid())
-  title     String
-  slug      String   @unique
-  excerpt   String?
-  content   String   // Markdown or HTML
+  id      String  @id @default(cuid())
+  title   String
+  slug    String  @unique
+  excerpt String?
+  content String // Markdown or HTML
 
   coverImage String?
 
   // Author
-  authorId  String?
-  author    User?    @relation(fields: [authorId], references: [id])
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id])
 
   // SEO
   metaTitle       String?
   metaDescription String?
 
   // Tags — JSON array: '["skincare", "rutine", "kigali"]'
-  tags       String?
+  tags String?
 
   // Status: DRAFT | PUBLISHED | ARCHIVED
-  status     String   @default("DRAFT")
+  status      String    @default("DRAFT")
   publishedAt DateTime?
 
   // Metrics
-  viewCount  Int      @default(0)
+  viewCount Int @default(0)
 
   // Soft delete
-  isDeleted  Boolean  @default(false)
-  deletedAt  DateTime?
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([slug])
   @@index([status])
@@ -796,27 +809,27 @@ model BlogPost {
 // =============================================================================
 
 model Banner {
-  id        String   @id @default(cuid())
-  title     String
-  subtitle  String?
-  image     String   // Desktop image URL
+  id          String  @id @default(cuid())
+  title       String
+  subtitle    String?
+  image       String // Desktop image URL
   mobileImage String? // Mobile-optimized image
 
   // CTA link
   // linkType: PRODUCT | CATEGORY | URL | BLOG_POST | NONE
-  linkType  String?
-  linkUrl   String?
+  linkType String?
+  linkUrl  String?
 
   // Placement: HOME_HERO | HOME_PROMO | SIDEBAR | CATEGORY_TOP | CHECKOUT_BANNER
-  placement String   @default("HOME_HERO")
+  placement String @default("HOME_HERO")
 
   // Scheduling
-  startsAt  DateTime?
-  endsAt    DateTime?
+  startsAt DateTime?
+  endsAt   DateTime?
 
   // Display
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -831,30 +844,30 @@ model Banner {
 // =============================================================================
 
 model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Type: ORDER_UPDATE | PROMOTION | REVIEW_REQUEST | SYSTEM | LOW_STOCK
-  type      String
-  title     String
-  body      String
+  type  String
+  title String
+  body  String
 
   // Additional context — JSON: '{"orderId": "abc123", "status": "SHIPPED"}'
-  data      String?
+  data String?
 
   // Deep link
   // linkType: ORDER | PRODUCT | CATEGORY | URL | NONE
-  linkType  String?
-  linkUrl   String?
+  linkType String?
+  linkUrl  String?
 
   // Status
-  isRead    Boolean  @default(false)
-  readAt    DateTime?
+  isRead Boolean   @default(false)
+  readAt DateTime?
 
   // Channel: IN_APP | SMS | EMAIL | PUSH
-  channel   String   @default("IN_APP")
-  sentAt    DateTime?
+  channel String    @default("IN_APP")
+  sentAt  DateTime?
 
   createdAt DateTime @default(now())
 
@@ -872,17 +885,17 @@ model Notification {
 // Admin can edit fees, toggle same-day, set cutoff times.
 
 model DeliveryZoneSettings {
-  id              String   @id @default(cuid())
-  zoneName        String   // "Kigali Same Day", "Northern Province", etc.
-  zoneCode        String   @unique // "KIGALI_SAME_DAY", "NORTHERN", etc.
-  baseFee         Int      // RWF
-  freeThreshold   Int      @default(50000) // Orders above this = free delivery
-  estimatedDays   Int      @default(3) // Business days
-  isSameDay       Boolean  @default(false)
-  sameDayCutoff   String?  // "14:00" — orders before 2PM get same-day
-  isActive        Boolean  @default(true)
-  updatedAt       DateTime @updatedAt
-  createdAt       DateTime @default(now())
+  id            String   @id @default(cuid())
+  zoneName      String // "Kigali Same Day", "Northern Province", etc.
+  zoneCode      String   @unique // "KIGALI_SAME_DAY", "NORTHERN", etc.
+  baseFee       Int // RWF
+  freeThreshold Int      @default(50000) // Orders above this = free delivery
+  estimatedDays Int      @default(3) // Business days
+  isSameDay     Boolean  @default(false)
+  sameDayCutoff String? // "14:00" — orders before 2PM get same-day
+  isActive      Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
 
   @@index([zoneCode])
   @@index([isActive])
@@ -901,15 +914,15 @@ model DeliveryZoneSettings {
 // wraps this in a try/catch.
 
 model ActivityLog {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // Who performed the action (nullable for system/anonymized events)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   // Snapshot of who (denormalized for resilience — survives user deletion)
-  userName  String?
-  userRole  String?
+  userName String?
+  userRole String?
 
   // What happened
   // Action categories: AUTH_LOGIN | AUTH_LOGOUT | AUTH_FAILED | ORDER_UPDATE |
@@ -917,10 +930,10 @@ model ActivityLog {
   //   COUPON_UPDATE | COUPON_DELETE | BANNER_CREATE | BANNER_UPDATE | BANNER_DELETE |
   //   PRODUCT_CREATE | PRODUCT_UPDATE | PRODUCT_DELETE | DELIVERY_ASSIGN |
   //   DELIVERY_UPDATE | SMS_SEND | SETTINGS_UPDATE | STAFF_CREATE | STAFF_UPDATE
-  action    String
+  action String
 
   // Optional entity reference (e.g., order ID, customer ID, coupon code)
-  entityType String?  // ORDER | CUSTOMER | COUPON | BANNER | PRODUCT | DELIVERY | PAYMENT | STAFF
+  entityType String? // ORDER | CUSTOMER | COUPON | BANNER | PRODUCT | DELIVERY | PAYMENT | STAFF
   entityId   String?
 
   // Human-readable description (e.g., "Updated order UB-2026-00001 to SHIPPED")
@@ -931,7 +944,7 @@ model ActivityLog {
   userAgent String?
 
   // Severity: info | warn | critical
-  severity  String   @default("info")
+  severity String @default("info")
 
   createdAt DateTime @default(now())
 
@@ -947,30 +960,30 @@ model ActivityLog {
 // =============================================================================
 
 model WholesaleApplication {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  businessName    String
-  businessType    String   // BEAUTY_SALON | HAIR_SALON | SPA | SHOP | MARKET_VENDOR | BEAUTY_SCHOOL | HOTEL | RESELLER | OTHER
-  businessPhone   String
-  businessAddress String
+  businessName     String
+  businessType     String // BEAUTY_SALON | HAIR_SALON | SPA | SHOP | MARKET_VENDOR | BEAUTY_SCHOOL | HOTEL | RESELLER | OTHER
+  businessPhone    String
+  businessAddress  String
   businessDistrict String
-  tinNumber       String?
-  yearsInBusiness Int?
-  monthlyRevenue  String?  // Estimated monthly order range
-  nationalId      String?  // Rwanda National ID
-  heardFrom       String?  // How they heard about us
-  documents       String   @default("[]") // JSON array of document URLs
-  notes           String?
+  tinNumber        String?
+  yearsInBusiness  Int?
+  monthlyRevenue   String? // Estimated monthly order range
+  nationalId       String? // Rwanda National ID
+  heardFrom        String? // How they heard about us
+  documents        String  @default("[]") // JSON array of document URLs
+  notes            String?
 
-  status          String   @default("PENDING") // PENDING | APPROVED | REJECTED | SUSPENDED
+  status          String  @default("PENDING") // PENDING | APPROVED | REJECTED | SUSPENDED
   reviewedBy      String?
   reviewNotes     String?
   rejectionReason String?
 
-  appliedAt       DateTime @default(now())
-  reviewedAt      DateTime?
+  appliedAt  DateTime  @default(now())
+  reviewedAt DateTime?
 
   @@index([userId])
   @@index([status])
@@ -982,17 +995,17 @@ model WholesaleApplication {
 // =============================================================================
 
 model ProductPricing {
-  id              String   @id @default(cuid())
-  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId       String   @unique
+  id        String  @id @default(cuid())
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @unique
 
-  priceType       String   @default("RETAIL") // RETAIL | WHOLESALE | SPECIAL
-  retailPrice     Int      // Copy of Product.price for reference
+  priceType   String @default("RETAIL") // RETAIL | WHOLESALE | SPECIAL
+  retailPrice Int // Copy of Product.price for reference
 
-  tiers           WholesaleTier[]
+  tiers WholesaleTier[]
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // =============================================================================
@@ -1000,15 +1013,15 @@ model ProductPricing {
 // =============================================================================
 
 model WholesaleTier {
-  id              String   @id @default(cuid())
-  pricing         ProductPricing @relation(fields: [pricingId], references: [id], onDelete: Cascade)
-  pricingId       String
+  id        String         @id @default(cuid())
+  pricing   ProductPricing @relation(fields: [pricingId], references: [id], onDelete: Cascade)
+  pricingId String
 
-  tierName        String   // e.g., "Buy 6+", "Buy 12+", "Buy 48+"
-  minQuantity     Int      // Minimum quantity for this tier
-  maxQuantity     Int?     // Maximum quantity (null = unlimited)
-  pricePerUnit    Int      // Price per unit in RWF at this tier
-  discountPercent Int      // Discount % off retail (e.g., 12 = 12% off)
+  tierName        String // e.g., "Buy 6+", "Buy 12+", "Buy 48+"
+  minQuantity     Int // Minimum quantity for this tier
+  maxQuantity     Int? // Maximum quantity (null = unlimited)
+  pricePerUnit    Int // Price per unit in RWF at this tier
+  discountPercent Int // Discount % off retail (e.g., 12 = 12% off)
 
   @@index([pricingId])
   @@index([minQuantity])
@@ -1019,19 +1032,19 @@ model WholesaleTier {
 // =============================================================================
 
 model WholesaleCredit {
-  id              String   @id @default(cuid())
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId          String   @unique
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
 
-  creditLimit     Int      @default(0) // Maximum credit in RWF
-  usedCredit      Int      @default(0) // Currently used credit in RWF
-  availableCredit Int      @default(0) // creditLimit - usedCredit
+  creditLimit     Int @default(0) // Maximum credit in RWF
+  usedCredit      Int @default(0) // Currently used credit in RWF
+  availableCredit Int @default(0) // creditLimit - usedCredit
 
-  paymentTermDays Int      @default(30) // Payment due in N days
+  paymentTermDays Int @default(30) // Payment due in N days
 
-  history         CreditHistory[]
+  history CreditHistory[]
 
-  updatedAt       DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 // =============================================================================
@@ -1039,16 +1052,16 @@ model WholesaleCredit {
 // =============================================================================
 
 model CreditHistory {
-  id          String   @id @default(cuid())
-  credit      WholesaleCredit @relation(fields: [creditId], references: [id], onDelete: Cascade)
-  creditId    String
+  id       String          @id @default(cuid())
+  credit   WholesaleCredit @relation(fields: [creditId], references: [id], onDelete: Cascade)
+  creditId String
 
-  type        String   // DEBIT (order placed) | CREDIT (payment received) | ADJUSTMENT
-  amount      Int      // RWF amount
+  type        String // DEBIT (order placed) | CREDIT (payment received) | ADJUSTMENT
+  amount      Int // RWF amount
   description String
   orderId     String?
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([creditId])
   @@index([type])
@@ -1060,31 +1073,31 @@ model CreditHistory {
 // =============================================================================
 
 model WholesaleInvoice {
-  id              String   @id @default(cuid())
-  invoiceNumber   String   @unique // Format: INV-WHL-YYYY-NNN
-  order           Order    @relation(fields: [orderId], references: [id])
-  orderId         String   @unique
+  id            String @id @default(cuid())
+  invoiceNumber String @unique // Format: INV-WHL-YYYY-NNN
+  order         Order  @relation(fields: [orderId], references: [id])
+  orderId       String @unique
 
-  userId          String?
-  user            User?    @relation(fields: [userId], references: [id])
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
 
   businessName    String
   businessAddress String
   tinNumber       String?
 
-  subtotal        Int
-  tax             Int      @default(0)
-  discount        Int      @default(0)
-  totalAmount     Int
+  subtotal    Int
+  tax         Int @default(0)
+  discount    Int @default(0)
+  totalAmount Int
 
-  paymentTerms    String?  // e.g., "30 days"
-  dueDate         DateTime?
-  isPaid          Boolean  @default(false)
-  paidAt          DateTime?
+  paymentTerms String? // e.g., "30 days"
+  dueDate      DateTime?
+  isPaid       Boolean   @default(false)
+  paidAt       DateTime?
 
-  notes           String?
+  notes String?
 
-  issuedAt        DateTime @default(now())
+  issuedAt DateTime @default(now())
 
   @@index([invoiceNumber])
   @@index([userId])
@@ -1097,24 +1110,24 @@ model WholesaleInvoice {
 // =============================================================================
 
 model StoreSettings {
-  id              String    @id @default(cuid())
+  id String @id @default(cuid())
 
-  storeName       String    @default("FreedomCosmeticShop")
-  storeShortName  String    @default("Freedom Cosmetic")
-  storeTagline    String?   @default("Rwanda's Beauty Freedom")
-  storeEmail      String?   @default("hello@freedomcosmeticshop.rw")
-  storePhone      String?   @default("+250788123456")
-  storeWhatsApp   String?   @default("+250788123456")
-  storeAddress    String?   @default("Kigali, Rwanda")
+  storeName      String  @default("FreedomCosmeticShop")
+  storeShortName String  @default("Freedom Cosmetic")
+  storeTagline   String? @default("Rwanda's Beauty Freedom")
+  storeEmail     String? @default("hello@freedomcosmeticshop.rw")
+  storePhone     String? @default("+250788123456")
+  storeWhatsApp  String? @default("+250788123456")
+  storeAddress   String? @default("Kigali, Rwanda")
 
-  logoUrl         String?
-  logoPublicId    String?
-  faviconUrl      String?
-  logoUpdatedAt   DateTime?
+  logoUrl       String?
+  logoPublicId  String?
+  faviconUrl    String?
+  logoUpdatedAt DateTime?
 
-  primaryColor    String    @default("#B76E79")
-  secondaryColor  String    @default("#1a1a1a")
-  accentColor     String    @default("#FFD700")
+  primaryColor   String @default("#B76E79")
+  secondaryColor String @default("#1a1a1a")
+  accentColor    String @default("#FFD700")
 
   metaTitle       String?
   metaDescription String?
@@ -1125,9 +1138,106 @@ model StoreSettings {
   socialYoutube   String?
   socialTwitter   String?
 
-  currency        String    @default("RWF")
-  timezone        String    @default("Africa/Kigali")
-  language        String    @default("en")
+  currency String @default("RWF")
+  timezone String @default("Africa/Kigali")
+  language String @default("en")
 
-  updatedAt       DateTime  @updatedAt
+  updatedAt DateTime @updatedAt
+}
+
+// =============================================================================
+// ADMIN SECURITY
+// =============================================================================
+
+model AdminActivityLog {
+  id         String   @id @default(cuid())
+  userId     String
+  userName   String
+  userRole   String
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  status     String   @default("SUCCESS")
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+  @@index([resource])
+}
+
+model FailedLoginAttempt {
+  id        String   @id @default(cuid())
+  phone     String?
+  email     String?
+  ipAddress String?
+  userAgent String?
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+  @@index([ipAddress])
+  @@index([createdAt])
+}
+
+model SecurityAlert {
+  id         String    @id @default(cuid())
+  type       String
+  severity   String    @default("HIGH")
+  title      String
+  message    String
+  userId     String?
+  ipAddress  String?
+  isResolved Boolean   @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+  metadata   Json?
+  createdAt  DateTime  @default(now())
+
+  @@index([type])
+  @@index([isResolved])
+  @@index([createdAt])
+}
+
+model StaffAccount {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  employeeName   String
+  employeePhone  String
+  department     String?
+  createdBy      String
+  isActive       Boolean   @default(true)
+  lastActivityAt DateTime?
+  permissions    Json?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model PasswordResetLog {
+  id            String    @id @default(cuid())
+  userId        String
+  requestedAt   DateTime  @default(now())
+  completedAt   DateTime?
+  ipAddress     String?
+  wasSuccessful Boolean   @default(false)
+
+  @@index([userId])
+}
+
+model MFAVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String
+  type      String   @default("TOTP")
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
