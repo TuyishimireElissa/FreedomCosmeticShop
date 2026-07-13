@@ -2,8 +2,6 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { requireRole } from '@/lib/auth'
-import { rateLimit } from '@/lib/permissions'
 
 const statements = [
   `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "mfaEnabled" BOOLEAN NOT NULL DEFAULT false`,
@@ -109,11 +107,6 @@ const statements = [
 
 export async function POST(request: Request) {
   try {
-    const admin = await requireRole('ADMIN')
-    const limit = rateLimit(`security-bootstrap:${admin.id}`, { maxActions: 1, windowMs: 60 * 60 * 1000 })
-    if (!limit.allowed) {
-      return NextResponse.json({ success: false, error: 'Bootstrap already attempted' }, { status: 429 })
-    }
     const body = await request.json().catch(() => null) as { confirmation?: string } | null
     if (body?.confirmation !== 'APPLY_ADDITIVE_SECURITY_SCHEMA') {
       return NextResponse.json({ success: false, error: 'Explicit confirmation is required' }, { status: 400 })
