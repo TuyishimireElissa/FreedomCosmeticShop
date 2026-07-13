@@ -153,7 +153,9 @@ export async function POST(request: Request) {
     console.error('Security schema bootstrap failed:', error)
     return NextResponse.json({
       success: false,
-      error: status === 500 ? 'Security schema bootstrap failed' : (error as Error).message,
+      error: status === 500
+        ? `Security schema bootstrap failed: ${error instanceof Error ? error.message : 'Unknown database error'}`
+        : (error as Error).message,
     }, { status })
   }
 }
