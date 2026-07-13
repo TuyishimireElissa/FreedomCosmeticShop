@@ -1,7 +1,10 @@
 export const dynamic = 'force-dynamic'
 
+import { createHash, timingSafeEqual } from 'crypto'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+
+const BOOTSTRAP_TOKEN_HASH = 'a9b094b434a6c055419c3a0fef0bab998ab6be171bca1d0ea04d7bdf1369cca6'
 
 const statements = [
   `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "mfaEnabled" BOOLEAN NOT NULL DEFAULT false`,
@@ -107,6 +110,12 @@ const statements = [
 
 export async function POST(request: Request) {
   try {
+    const suppliedToken = request.headers.get('x-security-bootstrap-token') || ''
+    const suppliedHash = createHash('sha256').update(suppliedToken).digest()
+    const expectedHash = Buffer.from(BOOTSTRAP_TOKEN_HASH, 'hex')
+    if (suppliedHash.length !== expectedHash.length || !timingSafeEqual(suppliedHash, expectedHash)) {
+      return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 })
+    }
     const body = await request.json().catch(() => null) as { confirmation?: string } | null
     if (body?.confirmation !== 'APPLY_ADDITIVE_SECURITY_SCHEMA') {
       return NextResponse.json({ success: false, error: 'Explicit confirmation is required' }, { status: 400 })
@@ -153,9 +162,7 @@ export async function POST(request: Request) {
     console.error('Security schema bootstrap failed:', error)
     return NextResponse.json({
       success: false,
-      error: status === 500
-        ? `Security schema bootstrap failed: ${error instanceof Error ? error.message : 'Unknown database error'}`
-        : (error as Error).message,
+      error: status === 500 ? 'Security schema bootstrap failed' : (error as Error).message,
     }, { status })
   }
 }
