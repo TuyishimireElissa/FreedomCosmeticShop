@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Star, Plus, Check, ShieldCheck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from "@/lib/i18n/LanguageContext"
 
 interface ProductCardProps {
   product: Product
@@ -30,6 +31,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const { addToCart, user } = useStore()
   const router = useRouter()
   const { toast } = useToast()
+  const t = useT()
   const [added, setAdded] = useState(false)
 
   // Section 4: Check if user is approved wholesale
@@ -59,7 +61,7 @@ export function ProductCard({ product }: ProductCardProps) {
     })
     setAdded(true)
     toast({
-      title: "Added to cart",
+      title: t('product.added'),
       description: product.name,
     })
     setTimeout(() => setAdded(false), 1500)
@@ -83,7 +85,7 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         ) : (
           <div className="text-muted-foreground grid h-full w-full place-items-center">
-            No image
+            {t('product.no_image')}
           </div>
         )}
 
@@ -92,7 +94,7 @@ export function ProductCard({ product }: ProductCardProps) {
           {hasDiscount && (
             <Badge className="bg-primary text-primary-foreground shadow">-{discountPercent}%</Badge>
           )}
-          {product.featured && <Badge className="bg-orange-500 text-white shadow">🔥 Best Seller</Badge>}
+          {product.featured && <Badge className="bg-orange-500 text-white shadow">🔥 {t('categories.best_sellers')}</Badge>}
         </div>
 
         {/* Top-right: Authentic badge + Wishlist heart */}
@@ -100,10 +102,10 @@ export function ProductCard({ product }: ProductCardProps) {
           <Badge
             variant="outline"
             className="border-emerald-500/30 bg-background/90 text-emerald-700 shadow backdrop-blur"
-            title="100% authentic product"
+            title={t('product.authentic_guarantee')}
           >
             <ShieldCheck className="mr-1 h-3 w-3" />
-            Genuine
+            {t('common.authentic')}
           </Badge>
         </div>
 
@@ -111,7 +113,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {outOfStock && (
           <div className="bg-background/40 absolute inset-0 grid place-items-center">
             <span className="bg-foreground/80 text-background rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase">
-              Sold out
+              {t('common.sold_out')}
             </span>
           </div>
         )}
@@ -141,7 +143,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
             <span className="text-foreground/80 font-medium">{product.rating.toFixed(1)}</span>
             <span>({product.reviewsCount})</span>
-          </> : <span className="text-[11px]">New · no reviews yet</span>}
+          </> : <span className="text-[11px]">{t('product.no_reviews')}</span>}
         </div>
 
         {/* NEW: Skin type badge */}
@@ -154,7 +156,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* NEW: Low stock indicator */}
         {product.stock > 0 && product.stock <= 5 && (
           <p className="mt-1 text-[10px] font-semibold text-amber-600">
-            ⚡ Only {product.stock} left!
+            ⚡ {t('common.low_stock', { count: product.stock })}
           </p>
         )}
 
@@ -162,13 +164,13 @@ export function ProductCard({ product }: ProductCardProps) {
         {isWholesaleUser ? (
           <div className="mt-2">
             <p className="text-[10px] text-muted-foreground line-through">
-              Retail: {formatRWF(product.price)}
+              {t('product.retail_price', { price: formatRWF(product.price) })}
             </p>
             <p className="text-base font-bold text-violet-700 sm:text-lg">
               {formatRWF(product.price)}
             </p>
             <p className="text-[10px] font-medium text-violet-600">
-              💛 Your wholesale price (min. {product.minWholesaleQty || 6} units)
+              💛 {t('product.wholesale_price', { count: product.minWholesaleQty || 6 })}
             </p>
           </div>
         ) : (
@@ -197,11 +199,11 @@ export function ProductCard({ product }: ProductCardProps) {
         >
           {added ? (
             <>
-              <Check className="mr-1.5 h-4 w-4" /> Added
+              <Check className="mr-1.5 h-4 w-4" /> {t('product.added')}
             </>
           ) : (
             <>
-              <Plus className="mr-1.5 h-4 w-4" /> Add to cart
+              <Plus className="mr-1.5 h-4 w-4" /> {t('product.add_to_cart')}
             </>
           )}
         </Button>

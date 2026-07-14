@@ -52,6 +52,7 @@ import {
 } from "@/components/ui/accordion"
 import { useToast } from "@/hooks/use-toast"
 import { useProductUpdates } from "@/hooks/use-realtime"
+import { useT } from "@/lib/i18n/LanguageContext"
 import {
   Star,
   Minus,
@@ -75,6 +76,7 @@ interface ProductDetailViewProps {
 }
 
 export function ProductDetailView({ slug }: ProductDetailViewProps) {
+  const t = useT()
   const { goHome, goCatalog, goCheckout, addToCart } = useStore()
   const { toast } = useToast()
 
@@ -156,22 +158,22 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
       // Show a toast for price changes
       if (event === "product:priceChange" && p.price !== undefined) {
         toast({
-          title: "Price updated",
+          title: t('product.price_updated'),
           description: `${p.name} is now ${formatRWF(p.price)}`,
         })
       }
       // Show a toast for out-of-stock
       if (event === "product:outOfStock") {
         toast({
-          title: "Out of stock",
+          title: t('product.out_of_stock_update'),
           description: `${p.name} is no longer available`,
           variant: "destructive",
         })
       }
     } else if (event === "product:deleted") {
       toast({
-        title: "Product no longer available",
-        description: "This product has been removed.",
+        title: t('product.product_removed'),
+        description: t('product.product_removed_hint'),
         variant: "destructive",
       })
       goCatalog()
@@ -215,12 +217,12 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
       // Instagram doesn't support web share URLs — copy link + show instructions
       navigator.clipboard?.writeText(url)
       toast({
-        title: "Link copied!",
-        description: "Paste it in your Instagram story or DM.",
+        title: t('product.link_copied'),
+        description: t('product.instagram_copy_hint'),
       })
     } else if (platform === "copy") {
       navigator.clipboard?.writeText(url)
-      toast({ title: "Link copied!", description: "Share it anywhere." })
+      toast({ title: t('product.link_copied'), description: t('product.share_anywhere') })
     }
   }
 
@@ -271,7 +273,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
   if (!product) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold">Product not found</h1>
+        <h1 className="text-2xl font-bold">{t('product.product_not_found')}</h1>
         <p className="mt-2 text-muted-foreground">
           The product you&apos;re looking for doesn&apos;t exist or is no longer available.
         </p>
@@ -462,7 +464,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           {/* Badges: stock + skin type + authentic */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {outOfStock ? (
-              <Badge variant="destructive">Out of stock</Badge>
+              <Badge variant="destructive">{t('common.sold_out')}</Badge>
             ) : lowStock ? (
               <Badge className="bg-amber-100 text-amber-700">
                 Only {product.stock} left!
@@ -517,7 +519,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           {/* Size */}
           {product.size && (
             <div className="mt-3 flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Size:</span>
+              <span className="text-muted-foreground">{t('product.size_label')}:</span>
               <span className="font-medium">{product.size}</span>
             </div>
           )}
@@ -538,7 +540,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
                   className="h-10 w-10 rounded-r-none"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
                   disabled={outOfStock || qty <= 1}
-                  aria-label="Decrease quantity"
+                  aria-label={t('product.decrease_quantity')}
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -563,7 +565,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
                     setQty((q) => Math.min(product.stock || 1, q + 1))
                   }
                   disabled={outOfStock || qty >= product.stock}
-                  aria-label="Increase quantity"
+                  aria-label={t('product.increase_quantity')}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -593,7 +595,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
               variant="outline"
               className="px-3"
               onClick={handleWishlist}
-              aria-label="Add to wishlist"
+              aria-label={t('product.add_to_wishlist')}
             >
               <Heart
                 className={`h-5 w-5 ${isWishlisted ? "fill-primary text-primary" : ""}`}
@@ -636,7 +638,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
           <div className="mt-6 rounded-2xl border bg-secondary/30 p-4">
             <div className="flex items-center gap-2">
               <Truck className="h-5 w-5 text-primary" />
-              <h3 className="text-sm font-semibold">Delivery estimator</h3>
+              <h3 className="text-sm font-semibold">{t('product.delivery_estimator')}</h3>
             </div>
             <div className="mt-3 flex flex-wrap items-end gap-3">
               <div className="flex-1 min-w-[180px]">
@@ -695,46 +697,46 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
             <div className="flex items-start gap-2">
               <Truck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-medium">Fast delivery</p>
-                <p className="text-xs text-muted-foreground">Kigali 1-2 days, provinces 3-5 days</p>
+                <p className="text-sm font-medium">{t('product.fast_delivery')}</p>
+                <p className="text-xs text-muted-foreground">{t('product.delivery_times_short')}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <Smartphone className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-medium">Pay your way</p>
-                <p className="text-xs text-muted-foreground">MTN MoMo or cash on delivery</p>
+                <p className="text-sm font-medium">{t('product.payment_flexible')}</p>
+                <p className="text-xs text-muted-foreground">{t('product.payment_methods_short')}</p>
               </div>
             </div>
             <div className="flex items-start gap-2">
               <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-medium">100% authentic</p>
-                <p className="text-xs text-muted-foreground">Sourced from authorized distributors</p>
+                <p className="text-sm font-medium">{t('common.authentic')}</p>
+                <p className="text-xs text-muted-foreground">{t('product.authorized_distributors')}</p>
               </div>
             </div>
             {/* NEW: Easy Returns badge */}
             <div className="flex items-start gap-2">
               <ArrowLeft className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
               <div>
-                <p className="text-sm font-medium">Easy Returns</p>
-                <p className="text-xs text-muted-foreground">7-day return policy, no questions asked</p>
+                <p className="text-sm font-medium">{t('product.easy_returns')}</p>
+                <p className="text-xs text-muted-foreground">{t('product.return_policy_short')}</p>
               </div>
             </div>
             {/* NEW: Rwanda Official badge */}
             <div className="flex items-start gap-2">
               <span className="mt-0.5 text-lg shrink-0">🇷🇼</span>
               <div>
-                <p className="text-sm font-medium">Officially in Rwanda</p>
-                <p className="text-xs text-muted-foreground">Local business, Kigali-based</p>
+                <p className="text-sm font-medium">{t('product.officially_rwanda')}</p>
+                <p className="text-xs text-muted-foreground">{t('product.local_business')}</p>
               </div>
             </div>
             {/* NEW: MTN MoMo Accepted badge */}
             <div className="flex items-start gap-2">
               <span className="mt-0.5 text-lg shrink-0">📱</span>
               <div>
-                <p className="text-sm font-medium">MTN MoMo Accepted</p>
-                <p className="text-xs text-muted-foreground">Pay instantly with Mobile Money</p>
+                <p className="text-sm font-medium">{t('checkout.mtn_momo')}</p>
+                <p className="text-xs text-muted-foreground">{t('product.pay_mobile_short')}</p>
               </div>
             </div>
           </div>
@@ -745,7 +747,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
       <div className="mt-12 grid gap-8 lg:grid-cols-2">
         {/* Description */}
         <div>
-          <h2 className="text-lg font-semibold">About this product</h2>
+          <h2 className="text-lg font-semibold">{t('product.description')}</h2>
           <div className="prose prose-sm mt-3 max-w-none text-foreground/85">
             <p className="whitespace-pre-line leading-relaxed">{product.description}</p>
           </div>
@@ -808,46 +810,46 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
                   <table className="w-full text-xs">
                     <thead className="bg-secondary/50 text-muted-foreground">
                       <tr>
-                        <th className="px-3 py-2 text-left font-medium">Zone</th>
-                        <th className="px-3 py-2 text-right font-medium">Fee</th>
-                        <th className="px-3 py-2 text-right font-medium">Time</th>
+                        <th className="px-3 py-2 text-left font-medium">{t('product.zone')}</th>
+                        <th className="px-3 py-2 text-right font-medium">{t('product.fee')}</th>
+                        <th className="px-3 py-2 text-right font-medium">{t('product.time')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
                       <tr>
                         <td className="px-3 py-2">Kigali City</td>
                         <td className="px-3 py-2 text-right font-medium">1,000 RWF</td>
-                        <td className="px-3 py-2 text-right">Same day</td>
+                        <td className="px-3 py-2 text-right">{t('product.same_day')}</td>
                       </tr>
                       <tr>
                         <td className="px-3 py-2">Northern Province</td>
                         <td className="px-3 py-2 text-right font-medium">3,000 RWF</td>
-                        <td className="px-3 py-2 text-right">2-3 days</td>
+                        <td className="px-3 py-2 text-right">{t('product.days_2_3')}</td>
                       </tr>
                       <tr>
                         <td className="px-3 py-2">Southern Province</td>
                         <td className="px-3 py-2 text-right font-medium">3,000 RWF</td>
-                        <td className="px-3 py-2 text-right">2-3 days</td>
+                        <td className="px-3 py-2 text-right">{t('product.days_2_3')}</td>
                       </tr>
                       <tr>
                         <td className="px-3 py-2">Eastern Province</td>
                         <td className="px-3 py-2 text-right font-medium">3,500 RWF</td>
-                        <td className="px-3 py-2 text-right">2-3 days</td>
+                        <td className="px-3 py-2 text-right">{t('product.days_2_3')}</td>
                       </tr>
                       <tr>
                         <td className="px-3 py-2">Western Province</td>
                         <td className="px-3 py-2 text-right font-medium">4,000 RWF</td>
-                        <td className="px-3 py-2 text-right">3-4 days</td>
+                        <td className="px-3 py-2 text-right">{t('product.days_3_4')}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
                 <ul className="space-y-1 text-sm text-foreground/85">
-                  <li>• 🎉 Free delivery on orders above 50,000 RWF</li>
-                  <li>• 📦 Delivery to all 30 districts of Rwanda</li>
-                  <li>• 🔄 Returns accepted within 7 days (unopened only)</li>
-                  <li>• 💛 Pay with MTN MoMo, Airtel Money, or Cash on Delivery</li>
-                  <li>• ✅ 100% authentic — sourced from authorized distributors</li>
+                  <li>• 🎉 {t('policies.free_delivery_summary')}</li>
+                  <li>• 📦 {t('footer.all_districts')}</li>
+                  <li>• 🔄 {t('product.return_policy_short')}</li>
+                  <li>• 💛 {t('nav.payment_methods')}</li>
+                  <li>• ✅ {t('policies.authentic_summary')}</li>
                 </ul>
               </AccordionContent>
             </AccordionItem>
@@ -868,9 +870,9 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-violet-200 text-xs uppercase tracking-wider text-violet-700">
-                  <th className="py-2 pr-3 text-left font-medium">Quantity</th>
-                  <th className="py-2 pr-3 text-right font-medium">Unit Price</th>
-                  <th className="py-2 text-right font-medium">You Save</th>
+                  <th className="py-2 pr-3 text-left font-medium">{t('product.quantity_label')}</th>
+                  <th className="py-2 pr-3 text-right font-medium">{t('product.unit_price')}</th>
+                  <th className="py-2 text-right font-medium">{t('product.you_save_label')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-violet-100">

@@ -3,6 +3,7 @@
 import { ArrowRight, RefreshCw, Shapes } from 'lucide-react'
 import type { Category } from '@/lib/types'
 import { useRouter } from 'next/navigation'
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface CategoryGridProps {
   categories: Category[]
@@ -23,17 +24,18 @@ const categoryIcons: Record<string, string> = {
 }
 
 export function CategoryGrid({ categories, loading = false, error, onRetry }: CategoryGridProps) {
+  const t = useT()
   const router = useRouter()
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
       <div className="mb-7 flex items-end justify-between gap-4">
         <div>
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#B76E79]">Curated collections</span>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[#1a1a1a] sm:text-3xl">Shop by category</h2>
-          <p className="mt-1.5 max-w-xl text-sm leading-6 text-gray-500">Discover authentic beauty essentials selected for every routine, skin tone and hair texture.</p>
+          <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#B76E79]">{t('home.curated_collections')}</span>
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-[#1a1a1a] sm:text-3xl">{t('home.shop_category')}</h2>
+          <p className="mt-1.5 max-w-xl text-sm leading-6 text-gray-500">{t('home.category_subtitle')}</p>
         </div>
-        <button type="button" onClick={() => router.push('/products')} className="hidden shrink-0 items-center gap-2 text-sm font-bold text-[#B76E79] hover:text-[#9e5964] sm:flex">View all <ArrowRight className="h-4 w-4" /></button>
+        <button type="button" onClick={() => router.push('/products')} className="hidden shrink-0 items-center gap-2 text-sm font-bold text-[#B76E79] hover:text-[#9e5964] sm:flex">{t('common.view')} {t('categories.all')} <ArrowRight className="h-4 w-4" /></button>
       </div>
 
       {loading ? (
@@ -43,12 +45,12 @@ export function CategoryGrid({ categories, loading = false, error, onRetry }: Ca
       ) : error ? (
         <div className="rounded-3xl border border-dashed border-rose-200 bg-rose-50/50 px-5 py-10 text-center">
           <Shapes className="mx-auto h-8 w-8 text-[#B76E79]" />
-          <p className="mt-3 text-sm font-semibold text-gray-800">Categories are temporarily unavailable.</p>
-          <p className="mt-1 text-xs text-gray-500">Please try loading the collections again.</p>
-          {onRetry && <button type="button" onClick={onRetry} className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white"><RefreshCw className="h-3.5 w-3.5" />Retry</button>}
+          <p className="mt-3 text-sm font-semibold text-gray-800">{t('home.categories_unavailable')}</p>
+          <p className="mt-1 text-xs text-gray-500">{t('home.retry_collections_hint')}</p>
+          {onRetry && <button type="button" onClick={onRetry} className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white"><RefreshCw className="h-3.5 w-3.5" />{t('common.retry')}</button>}
         </div>
       ) : categories.length === 0 ? (
-        <div className="rounded-3xl bg-[#f8f9fa] px-5 py-10 text-center text-sm text-gray-500">New beauty collections are coming soon.</div>
+        <div className="rounded-3xl bg-[#f8f9fa] px-5 py-10 text-center text-sm text-gray-500">{t('home.collections_coming')}</div>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
           {categories.slice(0, 6).map((category) => (
@@ -59,7 +61,7 @@ export function CategoryGrid({ categories, loading = false, error, onRetry }: Ca
                 <span className="text-xl drop-shadow" aria-hidden="true">{categoryIcons[category.slug] || category.icon || '✨'}</span>
                 <h3 className="mt-1 text-sm font-extrabold text-white sm:text-base">{category.name}</h3>
                 <div className="mt-1 flex items-center justify-between gap-2">
-                  <span className="truncate text-[10px] text-white/70">{category._count?.products ?? 0} products</span>
+                  <span className="truncate text-[10px] text-white/70">{t('home.products_count', { count: category._count?.products ?? 0 })}</span>
                   <ArrowRight className="h-3.5 w-3.5 text-white transition-transform group-hover:translate-x-1" />
                 </div>
               </div>

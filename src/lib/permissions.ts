@@ -77,11 +77,12 @@ export async function requirePermission(
   ...allowedRoles: string[]
 ): Promise<AuthUser> {
   // Default to ADMIN/STAFF/MANAGER if no roles specified
-  const roles = allowedRoles.length > 0 ? allowedRoles : ["ADMIN", "STAFF", "MANAGER"]
+  const roles = allowedRoles.length > 0 ? allowedRoles : ["SUPER_ADMIN", "ADMIN", "STAFF", "MANAGER"]
   const user = await requireRole(...roles)
 
-  // ADMIN role always has full access
-  if (user.role === "ADMIN") {
+  // ADMIN and SUPER_ADMIN retain full access. SUPER_ADMIN is the highest
+  // privilege role and must never be rejected by the legacy permission helper.
+  if (user.role === "ADMIN" || user.role === "SUPER_ADMIN") {
     return user
   }
 
@@ -113,6 +114,87 @@ export async function requirePermission(
   }
 
   return user
+}
+
+// ─── Destructive-operation policies ─────────────────────────────────────────
+
+export const DESTRUCTIVE_OPERATIONS = {
+  ORDER_CANCEL_OR_RETURN: "ORDER_CANCEL_OR_RETURN",
+  PAYMENT_STATUS_CHANGE: "PAYMENT_STATUS_CHANGE",
+  PAYMENT_REFUND: "PAYMENT_REFUND",
+  PRODUCT_DELETE: "PRODUCT_DELETE",
+  CUSTOMER_DISABLE: "CUSTOMER_DISABLE",
+  CONTENT_DELETE: "CONTENT_DELETE",
+  MARKETING_DELETE: "MARKETING_DELETE",
+  STORE_BRANDING_DELETE: "STORE_BRANDING_DELETE",
+  BACKUP_RESTORE: "BACKUP_RESTORE",
+} as const
+
+export type DestructiveOperation =
+  (typeof DESTRUCTIVE_OPERATIONS)[keyof typeof DESTRUCTIVE_OPERATIONS]
+
+interface DestructivePolicy {
+  roles: readonly string[]
+  permission: PermissionKey
+}
+
+/**
+ * Central, deny-by-default policy for operations that remove data, disable an
+ * account, cancel an order, or alter/refund a payment. Route handlers must call
+ * this after validating enough input to identify the requested operation.
+ */
+export const DESTRUCTIVE_OPERATION_POLICIES: Record<DestructiveOperation, DestructivePolicy> = {
+  ORDER_CANCEL_OR_RETURN: {
+    roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+    permission: PERMISSIONS.ORDERS_UPDATE,
+  },
+  PAYMENT_STATUS_CHANGE: {
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: PERMISSIONS.ORDERS_UPDATE,
+  },
+  PAYMENT_REFUND: {
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: PERMISSIONS.ORDERS_REFUND,
+  },
+  PRODUCT_DELETE: {
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: PERMISSIONS.PRODUCTS_CRUD,
+  },
+  CUSTOMER_DISABLE: {
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: PERMISSIONS.CUSTOMERS_CRUD,
+  },
+  CONTENT_DELETE: {
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: PERMISSIONS.SETTINGS_UPDATE,
+  },
+  MARKETING_DELETE: {
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: PERMISSIONS.COUPONS_CRUD,
+  },
+  STORE_BRANDING_DELETE: {
+    roles: ["SUPER_ADMIN", "ADMIN"],
+    permission: PERMISSIONS.SETTINGS_UPDATE,
+  },
+  BACKUP_RESTORE: {
+    roles: ["SUPER_ADMIN"],
+    permission: PERMISSIONS.SETTINGS_UPDATE,
+  },
+}
+
+export function isRoleAllowedForDestructiveOperation(
+  operation: DestructiveOperation,
+  role: string,
+): boolean {
+  return DESTRUCTIVE_OPERATION_POLICIES[operation].roles.includes(role)
+}
+
+export async function requireDestructiveOperation(
+  operation: DestructiveOperation,
+): Promise<AuthUser> {
+  const policy = DESTRUCTIVE_OPERATION_POLICIES[operation]
+  if (!policy) throw new AuthError("Forbidden: unknown destructive operation", 403)
+  return requirePermission(policy.permission, ...policy.roles)
 }
 
 // ─── Rate limiter (in-memory token bucket) ───────────────────────────────────

@@ -34,6 +34,7 @@ import {
   RefreshCw,
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface DashboardData {
   credit: {
@@ -68,6 +69,7 @@ interface DashboardData {
 }
 
 export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () => void; onCatalog: () => void }) {
+  const t = useT()
   const { toast } = useToast()
   const { goHome } = useStore()
   const [data, setData] = useState<DashboardData | null>(null)
@@ -103,8 +105,8 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
   if (!data) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <p className="text-sm text-muted-foreground">Failed to load dashboard.</p>
-        <Button variant="outline" className="mt-3" onClick={load}>Retry</Button>
+        <p className="text-sm text-muted-foreground">{t('wholesale.dashboard_failed')}</p>
+        <Button variant="outline" className="mt-3" onClick={load}>{t('common.retry')}</Button>
       </div>
     )
   }
@@ -123,7 +125,7 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
           </button>
           <div>
             <h1 className="flex items-center gap-2 text-xl font-bold">
-              🏪 Wholesale Dashboard
+              🏪 {t('wholesale.dashboard')}
             </h1>
             <p className="text-xs text-muted-foreground">{data.user.businessName}</p>
           </div>
@@ -135,17 +137,17 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
         <div className="rounded-2xl border bg-card p-4">
           <CreditCard className="h-4 w-4 text-violet-500" />
           <p className="mt-1 text-lg font-bold">{data.credit ? formatRWFCompact(data.credit.available) : "N/A"}</p>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Credit Available</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.credit_available')}</p>
         </div>
         <div className="rounded-2xl border bg-card p-4">
           <TrendingDown className="h-4 w-4 text-emerald-500" />
           <p className="mt-1 text-lg font-bold text-emerald-600">{formatRWFCompact(data.totalSaved)}</p>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Total Saved</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.total_saved')}</p>
         </div>
         <div className="rounded-2xl border bg-card p-4 col-span-2 sm:col-span-1">
           <Package className="h-4 w-4 text-sky-500" />
           <p className="mt-1 text-lg font-bold text-sky-600">{formatRWFCompact(data.thisMonthSaved)}</p>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Saved This Month</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.saved_month')}</p>
         </div>
       </div>
 
@@ -153,9 +155,9 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
       {data.credit && (
         <div className="mt-4 rounded-2xl border bg-card p-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="font-semibold">Credit Usage</span>
+            <span className="font-semibold">{t('wholesale.credit_usage')}</span>
             <span className="text-muted-foreground">
-              Used: {formatRWF(data.credit.used)} / {formatRWF(data.credit.limit)}
+              {t('wholesale.credit_used', { used: formatRWF(data.credit.used), limit: formatRWF(data.credit.limit) })}
             </span>
           </div>
           <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-secondary">
@@ -165,8 +167,8 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
             />
           </div>
           <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
-            <span>{creditPct}% used</span>
-            <span>Payment terms: {data.credit.paymentTermDays} days</span>
+            <span>{t('wholesale.percent_used', { percent: creditPct })}</span>
+            <span>{t('wholesale.payment_terms_days', { days: data.credit.paymentTermDays })}</span>
           </div>
         </div>
       )}
@@ -175,7 +177,7 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
         <Button variant="outline" className="h-auto flex-col gap-1 py-3" onClick={onCatalog}>
           <ShoppingBag className="h-5 w-5 text-primary" />
-          <span className="text-xs">New Order</span>
+          <span className="text-xs">{t('wholesale.new_order')}</span>
         </Button>
         {/* Section 9B: Quick Reorder — adds last order items to cart */}
         {data.recentOrders.length > 0 && (
@@ -199,39 +201,39 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
                     stock: 999,
                   }, item.quantity)
                 }
-                toast({ title: "🛒 Items added to cart", description: `${items.length} items from ${lastOrder.orderNumber}` })
+                toast({ title: `🛒 ${t('wholesale.items_added')}`, description: t('wholesale.items_from_order', { count: items.length, order: lastOrder.orderNumber }) })
                 onCatalog()
               } catch {
-                toast({ title: "Reorder failed", variant: "destructive" })
+                toast({ title: t('wholesale.reorder_failed'), variant: "destructive" })
               }
             }}
           >
             <RefreshCw className="h-5 w-5 text-violet-500" />
-            <span className="text-xs">Quick Reorder</span>
+            <span className="text-xs">{t('wholesale.quick_reorder')}</span>
           </Button>
         )}
         <Button variant="outline" className="h-auto flex-col gap-1 py-3" onClick={onInvoices}>
           <FileText className="h-5 w-5 text-primary" />
-          <span className="text-xs">My Invoices</span>
+          <span className="text-xs">{t('wholesale.my_invoices')}</span>
         </Button>
         <Button variant="outline" className="h-auto flex-col gap-1 py-3" onClick={() => useStore.getState().setView("trackOrder")}>
           <Truck className="h-5 w-5 text-primary" />
-          <span className="text-xs">Track Orders</span>
+          <span className="text-xs">{t('orders.track')}</span>
         </Button>
         <a href="https://wa.me/250780000000" target="_blank" rel="noopener noreferrer">
           <Button variant="outline" className="h-auto w-full flex-col gap-1 py-3">
             <MessageCircle className="h-5 w-5 text-emerald-500" />
-            <span className="text-xs">Support</span>
+            <span className="text-xs">{t('footer.help')}</span>
           </Button>
         </a>
       </div>
 
       {/* Recent orders */}
       <div className="mt-6">
-        <h2 className="mb-2 text-sm font-semibold">Recent Wholesale Orders</h2>
+        <h2 className="mb-2 text-sm font-semibold">{t('wholesale.recent_orders')}</h2>
         {data.recentOrders.length === 0 ? (
           <p className="rounded-xl border border-dashed p-4 text-center text-xs text-muted-foreground">
-            No wholesale orders yet. <button onClick={onCatalog} className="text-primary hover:underline">Place your first order →</button>
+            {t('wholesale.no_orders')} <button onClick={onCatalog} className="text-primary hover:underline">{t('wholesale.place_first_order')} →</button>
           </p>
         ) : (
           <div className="space-y-2">
@@ -241,7 +243,7 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
                   <p className="font-mono text-xs font-bold">{o.orderNumber}</p>
                   <p className="text-xs text-muted-foreground">
                     {new Date(o.createdAt).toLocaleDateString("en-RW", { day: "numeric", month: "short" })}
-                    {o.isCredit && <span className="ml-2 text-violet-600">· 💳 Credit</span>}
+                    {o.isCredit && <span className="ml-2 text-violet-600">· 💳 {t('wholesale.credit')}</span>}
                   </p>
                 </div>
                 <div className="text-right">
@@ -261,12 +263,12 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
       {/* Recent invoices */}
       <div className="mt-6">
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Recent Invoices</h2>
-          <button onClick={onInvoices} className="text-xs text-primary hover:underline">View All →</button>
+          <h2 className="text-sm font-semibold">{t('wholesale.recent_invoices')}</h2>
+          <button onClick={onInvoices} className="text-xs text-primary hover:underline">{t('home.view_all')} →</button>
         </div>
         {data.recentInvoices.length === 0 ? (
           <p className="rounded-xl border border-dashed p-4 text-center text-xs text-muted-foreground">
-            No invoices yet. Invoices are generated automatically when you place a wholesale order.
+            {t('wholesale.no_invoices_auto')}
           </p>
         ) : (
           <div className="space-y-2">
@@ -277,14 +279,14 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
                   <p className="text-xs text-muted-foreground">
                     {new Date(inv.issuedAt).toLocaleDateString("en-RW", { day: "numeric", month: "short" })}
                     {inv.dueDate && !inv.isPaid && (
-                      <span className="ml-2 text-amber-600">· Due: {new Date(inv.dueDate).toLocaleDateString("en-RW", { day: "numeric", month: "short" })}</span>
+                      <span className="ml-2 text-amber-600">· {t('wholesale.due')}: {new Date(inv.dueDate).toLocaleDateString("en-RW", { day: "numeric", month: "short" })}</span>
                     )}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="font-bold">{formatRWF(inv.totalAmount)}</p>
                   <span className={`text-[10px] font-medium ${inv.isPaid ? "text-emerald-600" : "text-amber-600"}`}>
-                    {inv.isPaid ? "✅ PAID" : "⏳ DUE"}
+                    {inv.isPaid ? `✅ ${t('wholesale.paid')}` : `⏳ ${t('wholesale.due')}`}
                   </span>
                 </div>
               </div>
@@ -295,11 +297,11 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
 
       {/* Account manager */}
       <div className="mt-6 rounded-2xl border bg-secondary/20 p-4">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Your Account Manager</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t('wholesale.account_manager')}</h3>
         <div className="mt-2 flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium">Jean Paul — Wholesale Manager</p>
-            <p className="text-xs text-muted-foreground">Mon-Fri, 8AM - 6PM CAT</p>
+            <p className="text-sm font-medium">Jean Paul — {t('wholesale.manager')}</p>
+            <p className="text-xs text-muted-foreground">{t('wholesale.manager_hours')}</p>
           </div>
           <div className="flex gap-2">
             <a href="tel:+250789000001">

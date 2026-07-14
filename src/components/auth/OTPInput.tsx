@@ -17,6 +17,7 @@
 
 import { useRef, useCallback, useEffect, type KeyboardEvent, type ClipboardEvent } from "react"
 import { Input } from "@/components/ui/input"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface OTPInputProps {
   /** Current code value (up to 6 digits) */
@@ -41,6 +42,7 @@ export function OTPInput({
   disabled = false,
   autoFocus = true,
 }: OTPInputProps) {
+  const t = useT()
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   // Auto-focus the first input on mount
@@ -108,7 +110,7 @@ export function OTPInput({
   }
 
   return (
-    <div className="flex gap-2 sm:gap-3" role="group" aria-label="Verification code input">
+    <div className="flex gap-2 sm:gap-3" role="group" aria-label={t('auth.verification_code_input')}>
       {Array.from({ length }).map((_, i) => (
         <Input
           key={i}
@@ -124,7 +126,7 @@ export function OTPInput({
           onKeyDown={(e) => handleKeyDown(i, e)}
           onPaste={handlePaste}
           disabled={disabled}
-          aria-label={`Digit ${i + 1} of ${length}`}
+          aria-label={t('auth.digit_of_length', { digit: i + 1, length })}
           className="h-12 w-10 sm:h-14 sm:w-12 text-center text-lg font-semibold sm:text-xl"
         />
       ))}

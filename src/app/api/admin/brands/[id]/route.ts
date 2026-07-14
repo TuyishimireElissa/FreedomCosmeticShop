@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
+import { DESTRUCTIVE_OPERATIONS, requireDestructiveOperation } from "@/lib/permissions"
 import { broadcastBrandEvent } from "@/lib/realtime"
 import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
@@ -91,7 +92,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const adminUser = await requireRole("ADMIN")
+    const adminUser = await requireDestructiveOperation(DESTRUCTIVE_OPERATIONS.CONTENT_DELETE)
     const { id } = await params
     const existing = await db.brand.findUnique({ where: { id } })
     if (!existing) {

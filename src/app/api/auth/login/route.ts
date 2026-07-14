@@ -13,6 +13,8 @@ import { NextResponse } from "next/server"
 import { loginWithPassword } from "@/server/services/auth"
 import { setAuthCookies } from "@/lib/auth"
 import { rateLimit } from "@/lib/permissions"
+import { MFAService } from "@/lib/mfa"
+import { AccountLockout, LOCKOUT_DURATION_MINUTES } from "@/lib/account-lockout"
 
 export async function POST(req: Request) {
   try {
@@ -35,7 +37,50 @@ export async function POST(req: Request) {
       )
     }
 
-    const result = await loginWithPassword({ identifier, password })
+    const userAgent = req.headers.get('user-agent') || 'unknown'
+    const lockStatus = await AccountLockout.isLocked(identifier)
+    if (lockStatus.locked) {
+      return NextResponse.json(
+        { error: `Account temporarily locked. Try again in ${lockStatus.minutesLeft} minutes.` },
+        { status: 423, headers: { 'Retry-After': String(lockStatus.minutesLeft * 60) } },
+      )
+    }
+
+    let result
+    try {
+      result = await loginWithPassword({ identifier, password })
+    } catch (authenticationError) {
+      if (!(authenticationError instanceof Error) || !authenticationError.message.startsWith('Invalid')) {
+        throw authenticationError
+      }
+      const failed = await AccountLockout.recordFailedAttempt(identifier, {
+        ipAddress: ip,
+        userAgent,
+        reason: 'Invalid credentials',
+      })
+      if (failed.isLocked) {
+        return NextResponse.json(
+          { error: `Account temporarily locked for ${LOCKOUT_DURATION_MINUTES} minutes after repeated failed attempts.` },
+          { status: 423, headers: { 'Retry-After': String(LOCKOUT_DURATION_MINUTES * 60) } },
+        )
+      }
+      return NextResponse.json({ error: 'Invalid phone/email or password' }, { status: 400 })
+    }
+
+    await AccountLockout.resetFailedAttempts(identifier, { ipAddress: ip, userAgent })
+
+    if (
+      result.user.mfaEnabled &&
+      ['ADMIN', 'STAFF', 'MANAGER', 'SUPER_ADMIN'].includes(result.user.role)
+    ) {
+      const challengeToken = await MFAService.createLoginChallenge(result.user.id)
+      return NextResponse.json({
+        success: true,
+        mfaRequired: true,
+        challengeToken,
+        message: 'Enter your authenticator code to continue.',
+      })
+    }
 
     const res = NextResponse.json({
       user: result.user,

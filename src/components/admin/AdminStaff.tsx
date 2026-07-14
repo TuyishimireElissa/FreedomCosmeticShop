@@ -372,6 +372,10 @@ function StaffTab() {
       toast({ title: "Name, phone, password, and position are required", variant: "destructive" })
       return
     }
+    if (createForm.password.length < 12 || !/[a-z]/.test(createForm.password) || !/[A-Z]/.test(createForm.password) || !/\d/.test(createForm.password) || !/[^A-Za-z0-9]/.test(createForm.password)) {
+      toast({ title: "Use a stronger temporary password", description: "At least 12 characters with uppercase, lowercase, number, and symbol.", variant: "destructive" })
+      return
+    }
     setSaving(true)
     try {
       const res = await fetch("/api/admin/staff", {
@@ -423,6 +427,10 @@ function StaffTab() {
 
   const handleSaveEdit = async () => {
     if (!editing) return
+    if (editForm.resetPassword && (editForm.resetPassword.length < 12 || !/[a-z]/.test(editForm.resetPassword) || !/[A-Z]/.test(editForm.resetPassword) || !/\d/.test(editForm.resetPassword) || !/[^A-Za-z0-9]/.test(editForm.resetPassword))) {
+      toast({ title: "Use a stronger temporary password", description: "At least 12 characters with uppercase, lowercase, number, and symbol.", variant: "destructive" })
+      return
+    }
     setSaving(true)
     try {
       const body: Record<string, unknown> = {
@@ -617,7 +625,7 @@ function StaffTab() {
                   type={showPassword ? "text" : "password"}
                   value={createForm.password}
                   onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
-                  placeholder="Min. 8 characters"
+                  placeholder="12+ chars, upper/lower, number, symbol"
                 />
                 <button
                   type="button"
@@ -627,8 +635,8 @@ function StaffTab() {
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                The staff member can change this after first login.
+              <p className="mt-1 text-xs text-muted-foreground">
+                The account is forced to change this temporary password after first login. Credentials are sent by SMS only when the production SMS provider is enabled.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -821,7 +829,7 @@ function StaffTab() {
                       type="password"
                       value={editForm.resetPassword}
                       onChange={(e) => setEditForm({ ...editForm, resetPassword: e.target.value })}
-                      placeholder="New password (min. 8 chars)"
+                      placeholder="12+ chars, upper/lower, number, symbol"
                     />
                     <p className="mt-1 text-[10px] text-amber-600">
                       ⚠️ This will force a password reset for {editing.name}.

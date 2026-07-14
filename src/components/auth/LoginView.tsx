@@ -37,10 +37,12 @@ import {
   KeyRound,
   MessageSquare,
 } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 type Mode = "password" | "otp" | "forgot"
 
 export function LoginView() {
+  const t = useT()
   const { goHome, goCatalog, setUser, setView } = useStore()
   const { toast } = useToast()
 
@@ -82,14 +84,14 @@ export function LoginView() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Login failed")
+        setError(data.error || t('auth.login_failed'))
         return
       }
       setUser(data.user)
-      toast({ title: "Welcome back! 🌸", description: data.message })
+      toast({ title: t('auth.welcome_back_flower'), description: data.message })
       goCatalog(null)
     } catch {
-      setError("Network error. Please try again.")
+      setError(t('errors.network_error'))
     } finally {
       setLoading(false)
     }
@@ -98,7 +100,7 @@ export function LoginView() {
   // ─── Send OTP for OTP login ─────────────────────────────────────────
   const handleSendOtp = async () => {
     if (!phone) {
-      setError("Please enter your phone number")
+      setError(t('auth.enter_phone'))
       return
     }
     setLoading(true)
@@ -111,14 +113,14 @@ export function LoginView() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Failed to send code")
+        setError(data.error || t('auth.code_send_failed'))
         return
       }
       setResendCountdown(30)
       if (data.code) setDevOtpHint(data.code)
-      toast({ title: "Code sent", description: "Check your phone." })
+      toast({ title: t('auth.code_sent'), description: t('auth.check_phone') })
     } catch {
-      setError("Network error. Please try again.")
+      setError(t('errors.network_error'))
     } finally {
       setLoading(false)
     }
@@ -136,15 +138,15 @@ export function LoginView() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Verification failed")
+        setError(data.error || t('auth.verification_failed'))
         setOtpCode("")
         return
       }
       setUser(data.user)
-      toast({ title: "Welcome back! 🌸" })
+      toast({ title: t('auth.welcome_back_flower') })
       goCatalog(null)
     } catch {
-      setError("Network error. Please try again.")
+      setError(t('errors.network_error'))
     } finally {
       setLoading(false)
     }
@@ -154,7 +156,7 @@ export function LoginView() {
   const handleForgotSendOtp = async (ev: FormEvent) => {
     ev.preventDefault()
     if (!phone) {
-      setError("Please enter your phone number")
+      setError(t('auth.enter_phone'))
       return
     }
     setLoading(true)
@@ -167,15 +169,15 @@ export function LoginView() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Failed")
+        setError(data.error || t('auth.failed'))
         return
       }
       setMode("forgot")
       setResendCountdown(30)
       if (data.code) setDevOtpHint(data.code)
-      toast({ title: "Code sent", description: "Check your phone." })
+      toast({ title: t('auth.code_sent'), description: t('auth.check_phone') })
     } catch {
-      setError("Network error")
+      setError(t('errors.network_error'))
     } finally {
       setLoading(false)
     }
@@ -184,11 +186,11 @@ export function LoginView() {
   // ─── Reset password ─────────────────────────────────────────────────
   const handleResetPassword = async () => {
     if (otpCode.length !== 6) {
-      setError("Enter the 6-digit code")
+      setError(t('auth.enter_six_digit_code'))
       return
     }
     if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters")
+      setError(t('auth.weak_password'))
       return
     }
     setLoading(true)
@@ -201,15 +203,15 @@ export function LoginView() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || "Reset failed")
+        setError(data.error || t('auth.reset_failed'))
         setOtpCode("")
         return
       }
       setUser(data.user)
-      toast({ title: "Password reset! 🌸", description: "You're now logged in." })
+      toast({ title: t('auth.password_reset_flower'), description: t('auth.now_logged_in') })
       goCatalog(null)
     } catch {
-      setError("Network error")
+      setError(t('errors.network_error'))
     } finally {
       setLoading(false)
     }
@@ -242,7 +244,7 @@ export function LoginView() {
                 mode === "password" ? "bg-background shadow-sm" : "text-muted-foreground"
               }`}
             >
-              <KeyRound className="h-4 w-4" /> Password
+              <KeyRound className="h-4 w-4" /> {t('auth.password')}
             </button>
             <button
               onClick={() => {
@@ -255,7 +257,7 @@ export function LoginView() {
                 mode === "otp" ? "bg-background shadow-sm" : "text-muted-foreground"
               }`}
             >
-              <MessageSquare className="h-4 w-4" /> OTP
+              <MessageSquare className="h-4 w-4" /> {t('auth.otp_label')}
             </button>
           </div>
         ) : null}
@@ -269,14 +271,14 @@ export function LoginView() {
         {/* ─── Password Login ─────────────────────────────────────── */}
         {mode === "password" && (
           <>
-            <h1 className="text-2xl font-bold">Welcome back</h1>
+            <h1 className="text-2xl font-bold">{t('auth.login_title')}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Log in with your phone and password.
+              {t('auth.login_phone_password')}
             </p>
 
             <form onSubmit={handlePasswordLogin} className="mt-6 space-y-4">
               <div>
-                <Label htmlFor="login-phone">Phone number</Label>
+                <Label htmlFor="login-phone">{t('auth.phone')}</Label>
                 <div className="relative mt-1">
                   <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -295,7 +297,7 @@ export function LoginView() {
 
               <div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password">{t('auth.password')}</Label>
                   <button
                     type="button"
                     onClick={() => {
@@ -307,7 +309,7 @@ export function LoginView() {
                     }}
                     className="text-xs font-medium text-primary hover:underline"
                   >
-                    Forgot password?
+                    {t('auth.forgot_password')}
                   </button>
                 </div>
                 <div className="relative mt-1">
@@ -317,7 +319,7 @@ export function LoginView() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Your password"
+                    placeholder={t('auth.password_placeholder')}
                     className="pl-9 pr-9"
                     autoComplete="current-password"
                     disabled={loading}
@@ -327,7 +329,7 @@ export function LoginView() {
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -339,7 +341,7 @@ export function LoginView() {
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <>
-                    Log in <ArrowRight className="ml-2 h-4 w-4" />
+                    {t('auth.login_button')} <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
               </Button>
@@ -350,9 +352,9 @@ export function LoginView() {
         {/* ─── OTP Login ──────────────────────────────────────────── */}
         {mode === "otp" && (
           <>
-            <h1 className="text-2xl font-bold">Login with OTP</h1>
+            <h1 className="text-2xl font-bold">{t('auth.login_otp')}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              No password needed — we&apos;ll send a code to your phone.
+              {t('auth.otp_login_hint')}
             </p>
 
             {!devOtpHint ? (
@@ -364,7 +366,7 @@ export function LoginView() {
                 className="mt-6 space-y-4"
               >
                 <div>
-                  <Label htmlFor="otp-phone">Phone number</Label>
+                  <Label htmlFor="otp-phone">{t('auth.phone')}</Label>
                   <div className="relative mt-1">
                     <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
@@ -381,17 +383,17 @@ export function LoginView() {
                   </div>
                 </div>
                 <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send code"}
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('auth.send_code')}
                 </Button>
               </form>
             ) : (
               <>
                 <p className="mt-4 text-sm text-muted-foreground">
-                  Code sent to <span className="font-medium text-foreground">{phone}</span>
+                  {t('auth.code_sent_to')} <span className="font-medium text-foreground">{phone}</span>
                 </p>
                 {devOtpHint && (
                   <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-center">
-                    <p className="text-xs font-medium text-amber-700">Dev mode (SMS disabled)</p>
+                    <p className="text-xs font-medium text-amber-700">{t('auth.dev_mode_sms_disabled')}</p>
                     <p className="mt-1 text-2xl font-bold tracking-[0.3em] text-amber-900">
                       {devOtpHint}
                     </p>
@@ -413,14 +415,14 @@ export function LoginView() {
                     }}
                     className="text-muted-foreground hover:text-foreground"
                   >
-                    ← Change phone
+                    ← {t('auth.change_phone')}
                   </button>
                   <button
                     onClick={handleSendOtp}
                     disabled={resendCountdown > 0 || loading}
                     className="font-medium text-primary hover:underline disabled:opacity-50"
                   >
-                    {resendCountdown > 0 ? `Resend in ${resendCountdown}s` : "Resend code"}
+                    {resendCountdown > 0 ? t('auth.otp_resend_in', { seconds: resendCountdown }) : t('auth.otp_resend')}
                   </button>
                 </div>
               </>
@@ -431,15 +433,15 @@ export function LoginView() {
         {/* ─── Forgot Password ────────────────────────────────────── */}
         {mode === "forgot" && (
           <>
-            <h1 className="text-2xl font-bold">Reset password</h1>
+            <h1 className="text-2xl font-bold">{t('auth.reset_password')}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Enter your phone, the code we sent, and a new password.
+              {t('auth.reset_instructions')}
             </p>
 
             {!devOtpHint ? (
               <form onSubmit={handleForgotSendOtp} className="mt-6 space-y-4">
                 <div>
-                  <Label htmlFor="forgot-phone">Phone number</Label>
+                  <Label htmlFor="forgot-phone">{t('auth.phone')}</Label>
                   <div className="relative mt-1">
                     <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
@@ -456,7 +458,7 @@ export function LoginView() {
                   </div>
                 </div>
                 <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send reset code"}
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('auth.forgot_send')}
                 </Button>
                 <button
                   type="button"
@@ -466,27 +468,27 @@ export function LoginView() {
                   }}
                   className="w-full text-center text-sm text-muted-foreground hover:text-foreground"
                 >
-                  ← Back to login
+                  ← {t('auth.back_to_login')}
                 </button>
               </form>
             ) : (
               <div className="mt-6 space-y-4">
                 {devOtpHint && (
                   <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center">
-                    <p className="text-xs font-medium text-amber-700">Dev mode (SMS disabled)</p>
+                    <p className="text-xs font-medium text-amber-700">{t('auth.dev_mode_sms_disabled')}</p>
                     <p className="mt-1 text-2xl font-bold tracking-[0.3em] text-amber-900">
                       {devOtpHint}
                     </p>
                   </div>
                 )}
                 <div>
-                  <Label>Verification code</Label>
+                  <Label>{t('auth.otp_verify')}</Label>
                   <div className="mt-2">
                     <OTPInput value={otpCode} onChange={setOtpCode} disabled={loading} />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="new-password">New password</Label>
+                  <Label htmlFor="new-password">{t('auth.new_password')}</Label>
                   <div className="relative mt-1">
                     <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
@@ -494,7 +496,7 @@ export function LoginView() {
                       type={showNewPassword ? "text" : "password"}
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="At least 8 characters"
+                      placeholder={t('auth.password_hint')}
                       className="pl-9 pr-9"
                       autoComplete="new-password"
                       disabled={loading}
@@ -509,7 +511,7 @@ export function LoginView() {
                   </div>
                 </div>
                 <Button size="lg" className="w-full" disabled={loading} onClick={handleResetPassword}>
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Reset & log in"}
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('auth.reset_and_login')}
                 </Button>
               </div>
             )}
@@ -518,12 +520,12 @@ export function LoginView() {
       </div>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        {t('auth.no_account')} {" "}
         <button
           onClick={() => setView("register")}
           className="font-medium text-primary hover:underline"
         >
-          Register
+          {t('auth.register_link')}
         </button>
       </p>
     </div>

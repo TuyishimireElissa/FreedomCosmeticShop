@@ -30,6 +30,7 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
+import { DESTRUCTIVE_OPERATIONS, requireDestructiveOperation } from "@/lib/permissions"
 import { logActivity } from "@/server/services/activity"
 import { Prisma } from "@prisma/client"
 
@@ -56,7 +57,7 @@ interface BackupSnapshot {
 
 export async function GET(req: Request) {
   try {
-    const adminUser = await requireRole("ADMIN")
+    const adminUser = await requireRole("SUPER_ADMIN", "ADMIN")
 
     // Fetch all tables in parallel (with sensible limits)
     const [
@@ -164,12 +165,15 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const adminUser = await requireRole("ADMIN")
+    let adminUser = await requireRole("SUPER_ADMIN", "ADMIN")
     const body = await req.json()
 
     // Accept either { backup: {...} } or raw {...}
     const snapshot: BackupSnapshot = body.backup || body
     const mode: "preview" | "apply" = body.mode === "apply" ? "apply" : "preview"
+    if (mode === "apply") {
+      adminUser = await requireDestructiveOperation(DESTRUCTIVE_OPERATIONS.BACKUP_RESTORE)
+    }
 
     if (!snapshot.metadata || !snapshot.metadata.version) {
       return NextResponse.json(

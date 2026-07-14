@@ -13,6 +13,7 @@ import { Product } from "@/lib/types"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ProductCard } from "./ProductCard"
 import { Clock } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 const STORAGE_KEY = "freedom-recently-viewed"
 const MAX_ITEMS = 8
@@ -23,6 +24,7 @@ interface RecentlyViewedProps {
 }
 
 export function RecentlyViewed({ currentSlug }: RecentlyViewedProps) {
+  const t = useT()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -84,7 +86,7 @@ export function RecentlyViewed({ currentSlug }: RecentlyViewedProps) {
     <section className="mt-12">
       <div className="mb-4 flex items-center gap-2">
         <Clock className="h-5 w-5 text-primary" />
-        <h2 className="text-xl font-bold tracking-tight sm:text-2xl">Recently viewed</h2>
+        <h2 className="text-xl font-bold tracking-tight sm:text-2xl">{t('search.recently_viewed')}</h2>
       </div>
 
       {loading ? (

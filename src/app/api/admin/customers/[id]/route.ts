@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
+import { DESTRUCTIVE_OPERATIONS, requireDestructiveOperation } from "@/lib/permissions"
 import { broadcastLoyaltyEvent, broadcastCustomerEvent } from "@/lib/realtime"
 import { logActivity } from "@/server/services/activity"
 
@@ -17,7 +18,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireRole("ADMIN")
+    await requireRole("SUPER_ADMIN", "ADMIN")
     const { id } = await params
 
     const customer = await db.user.findFirst({
@@ -87,13 +88,19 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const adminUser = await requireRole("ADMIN")
+    let adminUser = await requireRole("SUPER_ADMIN", "ADMIN")
     const { id } = await params
     const body = await req.json()
     const { action } = body as {
       action: "block" | "unblock" | "add_points" | "subtract_points"
       points?: number
       reason?: string
+    }
+    if (!(["block", "unblock", "add_points", "subtract_points"] as const).includes(action)) {
+      return NextResponse.json({ error: "Invalid customer action" }, { status: 400 })
+    }
+    if (action === "block") {
+      adminUser = await requireDestructiveOperation(DESTRUCTIVE_OPERATIONS.CUSTOMER_DISABLE)
     }
 
     const customer = await db.user.findFirst({

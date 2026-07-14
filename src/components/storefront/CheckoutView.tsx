@@ -74,6 +74,7 @@ import {
   MapPin,
   Clock,
 } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 // Map districts to provinces
 const DISTRICT_TO_PROVINCE: Record<string, string> = {}
@@ -109,6 +110,7 @@ interface PaymentForm {
 }
 
 export function CheckoutView() {
+  const t = useT()
   const {
     items,
     cartSubtotal,
@@ -181,19 +183,19 @@ export function CheckoutView() {
   useEffect(() => {
     if (polling.status === "paid") {
       setPayStatus("paid")
-      toast({ title: "Payment confirmed!", description: "Placing your order..." })
+      toast({ title: t('checkout.payment_confirmed_title'), description: t('checkout.placing_order') })
     } else if (polling.status === "failed") {
       setPayStatus("failed")
       toast({
-        title: "Payment failed",
-        description: polling.error || "Please try again.",
+        title: t('checkout.payment_failed_title'),
+        description: polling.error || t('checkout.please_try_again'),
         variant: "destructive",
       })
     } else if (polling.status === "timeout") {
       setPayStatus("failed")
       toast({
-        title: "Payment timeout",
-        description: "We didn't receive payment confirmation. Please try again.",
+        title: t('checkout.payment_timeout_title'),
+        description: t('checkout.payment_timeout_hint'),
         variant: "destructive",
       })
     }
@@ -220,8 +222,8 @@ export function CheckoutView() {
     if (event === "delivery:feeUpdated") {
       const d = data as { zoneCode: string; baseFee: number; freeThreshold: number }
       toast({
-        title: "Delivery fees updated",
-        description: `Zone ${d.zoneCode}: ${d.baseFee} RWF (free above ${d.freeThreshold} RWF)`,
+        title: t('checkout.delivery_fees_updated'),
+        description: t('checkout.delivery_zone_update', { zone: d.zoneCode, fee: d.baseFee, threshold: d.freeThreshold }),
       })
     }
   })
@@ -229,14 +231,14 @@ export function CheckoutView() {
   // ─── Validation ───────────────────────────────────────────────────
   const deliveryErrors: Record<string, string> = {}
   if (delivery.customerName.trim().length < 2)
-    deliveryErrors.customerName = "Name is required"
+    deliveryErrors.customerName = t('checkout.name_required')
   if (!/^(?:\+250|0)?7[2389][0-9]{7}$/.test(delivery.customerPhone.replace(/[\s-]/g, "")))
-    deliveryErrors.customerPhone = "Enter a valid Rwandan phone (e.g. 0788123456)"
+    deliveryErrors.customerPhone = t('checkout.rwanda_phone_example')
   if (delivery.customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(delivery.customerEmail))
-    deliveryErrors.customerEmail = "Invalid email"
+    deliveryErrors.customerEmail = t('checkout.invalid_email')
   if (delivery.address.trim().length < 5)
-    deliveryErrors.address = "Street address is required"
-  if (!delivery.district) deliveryErrors.district = "Select your district"
+    deliveryErrors.address = t('checkout.street_required')
+  if (!delivery.district) deliveryErrors.district = t('delivery.select_district')
 
   const deliveryValid = Object.keys(deliveryErrors).length === 0
 
@@ -245,29 +247,29 @@ export function CheckoutView() {
     (payment.method === "MTN_MOMO" || payment.method === "AIRTEL_MONEY") &&
     !/^(?:\+250|0)?7[2389][0-9]{7}$/.test(payment.momoPhone.replace(/[\s-]/g, ""))
   ) {
-    paymentErrors.momoPhone = "Enter a valid phone number"
+    paymentErrors.momoPhone = t('checkout.valid_phone')
   }
   // MTN: 078/079, Airtel: 072/073
   if (payment.method === "MTN_MOMO") {
     const cleanPhone = payment.momoPhone.replace(/[\s\-+]/g, "")
     const prefix = cleanPhone.replace(/^250|^0/, "").slice(0, 2)
     if (!["78", "79"].includes(prefix)) {
-      paymentErrors.momoPhone = "MTN numbers start with 078 or 079"
+      paymentErrors.momoPhone = t('checkout.mtn_prefix_error')
     }
   }
   if (payment.method === "AIRTEL_MONEY") {
     const cleanPhone = payment.momoPhone.replace(/[\s\-+]/g, "")
     const prefix = cleanPhone.replace(/^250|^0/, "").slice(0, 2)
     if (!["72", "73"].includes(prefix)) {
-      paymentErrors.momoPhone = "Airtel numbers start with 072 or 073"
+      paymentErrors.momoPhone = t('checkout.airtel_prefix_error')
     }
   }
   if (payment.method === "CARD") {
     if (payment.cardNumber.replace(/\s/g, "").length < 16)
-      paymentErrors.cardNumber = "Enter 16-digit card number"
+      paymentErrors.cardNumber = t('checkout.card_16_digits')
     if (!/^\d{2}\/\d{2}$/.test(payment.cardExpiry))
-      paymentErrors.cardExpiry = "MM/YY format"
-    if (payment.cardCvv.length < 3) paymentErrors.cardCvv = "3-digit CVV"
+      paymentErrors.cardExpiry = t('checkout.expiry_format')
+    if (payment.cardCvv.length < 3) paymentErrors.cardCvv = t('checkout.cvv_digits')
   }
 
   const paymentValid = Object.keys(paymentErrors).length === 0
@@ -299,14 +301,14 @@ export function CheckoutView() {
 
       if (!res.ok) {
         setPayStatus("failed")
-        toast({ title: "Payment failed", description: data.error, variant: "destructive" })
+        toast({ title: t('checkout.payment_failed_title'), description: data.error, variant: "destructive" })
         return false
       }
 
       setPayStatus("waiting")
       toast({
-        title: "Payment prompt sent!",
-        description: `Approve the ${network} prompt on ${payment.momoPhone}.`,
+        title: t('checkout.payment_prompt_sent'),
+        description: t('checkout.approve_prompt_phone', { network, phone: payment.momoPhone }),
       })
 
       // Start polling for UI feedback (progress bar, elapsed time)
@@ -328,14 +330,14 @@ export function CheckoutView() {
 
           if (statusData.status === "PAID") {
             setPayStatus("paid")
-            toast({ title: "Payment confirmed!", description: "Placing your order..." })
+            toast({ title: t('checkout.payment_confirmed_title'), description: t('checkout.placing_order') })
             return true
           }
           if (statusData.status === "FAILED") {
             setPayStatus("failed")
             toast({
-              title: "Payment failed",
-              description: statusData.payment?.failureReason || "Please try again.",
+              title: t('checkout.payment_failed_title'),
+              description: statusData.payment?.failureReason || t('checkout.please_try_again'),
               variant: "destructive",
             })
             return false
@@ -349,14 +351,14 @@ export function CheckoutView() {
       // Timeout
       setPayStatus("failed")
       toast({
-        title: "Payment timeout",
-        description: "We didn't receive payment confirmation. Please try again.",
+        title: t('checkout.payment_timeout_title'),
+        description: t('checkout.payment_timeout_hint'),
         variant: "destructive",
       })
       return false
     } catch {
       setPayStatus("failed")
-      toast({ title: "Payment failed", description: "Network error", variant: "destructive" })
+      toast({ title: t('checkout.payment_failed_title'), description: t('errors.network_error'), variant: "destructive" })
       return false
     }
   }
@@ -364,7 +366,7 @@ export function CheckoutView() {
   // ─── Place order ──────────────────────────────────────────────────
   const handlePlaceOrder = async () => {
     if (items.length === 0) {
-      toast({ title: "Cart is empty", variant: "destructive" })
+      toast({ title: t('cart.empty'), variant: "destructive" })
       goCatalog(null)
       return
     }
@@ -398,8 +400,8 @@ export function CheckoutView() {
       })
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "Order failed" }))
-        throw new Error(err.error || "Failed to place order")
+        const err = await res.json().catch(() => ({ error: t('checkout.order_failed') }))
+        throw new Error(err.error || t('checkout.place_order_failed'))
       }
 
       const data = await res.json()
@@ -411,8 +413,8 @@ export function CheckoutView() {
         if (!paid) {
           // Order was created but payment failed — user can retry from track page
           toast({
-            title: "Payment failed",
-            description: "Your order was placed but payment failed. You can retry from the order tracking page.",
+            title: t('checkout.payment_failed_title'),
+            description: t('checkout.order_placed_payment_failed'),
             variant: "destructive",
           })
           clearCart()
@@ -425,8 +427,8 @@ export function CheckoutView() {
       clearCart()
       goConfirmation(orderId)
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to place order"
-      toast({ title: "Order failed", description: msg, variant: "destructive" })
+      const msg = err instanceof Error ? err.message : t('checkout.place_order_failed')
+      toast({ title: t('checkout.order_failed'), description: msg, variant: "destructive" })
     } finally {
       setSubmitting(false)
     }
@@ -436,10 +438,10 @@ export function CheckoutView() {
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold">Your cart is empty</h1>
-        <p className="mt-2 text-muted-foreground">Add products before checking out.</p>
+        <h1 className="text-2xl font-bold">{t('cart.empty')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('checkout.add_before_checkout')}</p>
         <Button className="mt-6" onClick={() => goCatalog(null)}>
-          Browse products
+          {t('cart.browse_products')}
         </Button>
       </div>
     )
@@ -449,18 +451,18 @@ export function CheckoutView() {
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Checkout</h1>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('checkout.title')}</h1>
         <Button variant="ghost" size="sm" onClick={goCart}>
-          <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to cart
+          <ArrowLeft className="mr-1.5 h-4 w-4" /> {t('checkout.back_to_cart')}
         </Button>
       </div>
 
       {/* Step indicator */}
       <div className="mb-8 flex items-center justify-center">
         {[
-          { num: 1, label: "Delivery", icon: Truck },
-          { num: 2, label: "Payment", icon: CreditCard },
-          { num: 3, label: "Review", icon: Check },
+          { num: 1, label: t('cart.delivery'), icon: Truck },
+          { num: 2, label: t('checkout.step_payment'), icon: CreditCard },
+          { num: 3, label: t('checkout.step_review'), icon: Check },
         ].map((s, i) => (
           <div key={s.num} className="flex items-center">
             <div
@@ -494,22 +496,22 @@ export function CheckoutView() {
             <div className="space-y-4 rounded-2xl border bg-card p-5">
               <div>
                 <h2 className="flex items-center gap-2 text-lg font-semibold">
-                  <Truck className="h-5 w-5 text-primary" /> Delivery information
+                  <Truck className="h-5 w-5 text-primary" /> {t('delivery.title')}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Where should we deliver your order?
+                  {t('checkout.where_deliver')}
                 </p>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 {/* Name */}
                 <div className="sm:col-span-2">
-                  <Label htmlFor="c-name">Full name *</Label>
+                  <Label htmlFor="c-name">{t('checkout.full_name')} *</Label>
                   <Input
                     id="c-name"
                     value={delivery.customerName}
                     onChange={(e) => setDelivery({ ...delivery, customerName: e.target.value })}
-                    placeholder="e.g. Aline Mugisha"
+                    placeholder={t('checkout.full_name_example_mugisha')}
                     className={deliveryErrors.customerName ? "border-destructive" : ""}
                   />
                   {deliveryErrors.customerName && (
@@ -519,7 +521,7 @@ export function CheckoutView() {
 
                 {/* Phone */}
                 <div>
-                  <Label htmlFor="c-phone">Phone number *</Label>
+                  <Label htmlFor="c-phone">{t('checkout.phone')} *</Label>
                   <div className="relative mt-1">
                     <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
@@ -538,7 +540,7 @@ export function CheckoutView() {
 
                 {/* Email */}
                 <div>
-                  <Label htmlFor="c-email">Email (optional)</Label>
+                  <Label htmlFor="c-email">{t('checkout.email_optional')}</Label>
                   <Input
                     id="c-email"
                     type="email"
@@ -554,7 +556,7 @@ export function CheckoutView() {
 
                 {/* District */}
                 <div>
-                  <Label htmlFor="c-district">District *</Label>
+                  <Label htmlFor="c-district">{t('checkout.district')} *</Label>
                   <Select
                     value={delivery.district}
                     onValueChange={(v) =>
@@ -573,19 +575,19 @@ export function CheckoutView() {
                     </SelectContent>
                   </Select>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Province: <span className="font-medium">{province}</span>
+                    {t('checkout.province')}: <span className="font-medium">{province}</span>
                   </p>
                 </div>
 
                 {/* Sector */}
                 <div>
-                  <Label htmlFor="c-sector">Sector</Label>
+                  <Label htmlFor="c-sector">{t('checkout.sector')}</Label>
                   <Select
                     value={delivery.sector}
                     onValueChange={(v) => setDelivery({ ...delivery, sector: v })}
                   >
                     <SelectTrigger id="c-sector">
-                      <SelectValue placeholder="Select sector" />
+                      <SelectValue placeholder={t('checkout.select_sector')} />
                     </SelectTrigger>
                     <SelectContent>
                       {availableSectors.map((s) => (
@@ -599,34 +601,34 @@ export function CheckoutView() {
 
                 {/* Cell */}
                 <div>
-                  <Label htmlFor="c-cell">Cell (optional)</Label>
+                  <Label htmlFor="c-cell">{t('checkout.cell_optional')}</Label>
                   <Input
                     id="c-cell"
                     value={delivery.cell}
                     onChange={(e) => setDelivery({ ...delivery, cell: e.target.value })}
-                    placeholder="e.g. Freedom"
+                    placeholder={t('checkout.cell_example_freedom')}
                   />
                 </div>
 
                 {/* Landmark */}
                 <div>
-                  <Label htmlFor="c-landmark">Landmark (optional)</Label>
+                  <Label htmlFor="c-landmark">{t('checkout.landmark_optional')}</Label>
                   <Input
                     id="c-landmark"
                     value={delivery.landmark}
                     onChange={(e) => setDelivery({ ...delivery, landmark: e.target.value })}
-                    placeholder="e.g. Near KBC"
+                    placeholder={t('checkout.landmark_kbc_example')}
                   />
                 </div>
 
                 {/* Street address */}
                 <div className="sm:col-span-2">
-                  <Label htmlFor="c-address">Street address *</Label>
+                  <Label htmlFor="c-address">{t('checkout.street_address')} *</Label>
                   <Textarea
                     id="c-address"
                     value={delivery.address}
                     onChange={(e) => setDelivery({ ...delivery, address: e.target.value })}
-                    placeholder="House number, street name, apartment..."
+                    placeholder={t('checkout.street_placeholder')}
                     rows={2}
                     className={deliveryErrors.address ? "border-destructive" : ""}
                   />
@@ -637,12 +639,12 @@ export function CheckoutView() {
 
                 {/* Notes */}
                 <div className="sm:col-span-2">
-                  <Label htmlFor="c-notes">Delivery notes (optional)</Label>
+                  <Label htmlFor="c-notes">{t('checkout.notes')}</Label>
                   <Textarea
                     id="c-notes"
                     value={delivery.notes}
                     onChange={(e) => setDelivery({ ...delivery, notes: e.target.value })}
-                    placeholder="e.g. Call when you arrive at the gate"
+                    placeholder={t('checkout.notes_gate_example')}
                     rows={2}
                   />
                 </div>
@@ -654,7 +656,7 @@ export function CheckoutView() {
                   <MapPin className="h-4 w-4 text-primary" />
                   <div>
                     <p className="text-sm font-medium">
-                      Delivery to {delivery.district}, {province}
+                      {t('checkout.delivery_to_area', { district: delivery.district, province })}
                     </p>
                     <p className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Clock className="h-3 w-3" />
@@ -664,7 +666,7 @@ export function CheckoutView() {
                 </div>
                 <span className="text-lg font-bold">
                   {appliedCoupon?.freeShipping ? (
-                    <span className="text-emerald-600">FREE</span>
+                    <span className="text-emerald-600">{t('common.free')}</span>
                   ) : (
                     formatRWF(deliveryFee)
                   )}
@@ -678,7 +680,7 @@ export function CheckoutView() {
                 onClick={goNext}
                 disabled={!deliveryValid}
               >
-                Continue to payment <ArrowRight className="ml-2 h-4 w-4" />
+                {t('checkout.continue_payment')} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           )}
@@ -688,10 +690,10 @@ export function CheckoutView() {
             <div className="space-y-4 rounded-2xl border bg-card p-5">
               <div>
                 <h2 className="flex items-center gap-2 text-lg font-semibold">
-                  <CreditCard className="h-5 w-5 text-primary" /> Payment method
+                  <CreditCard className="h-5 w-5 text-primary" /> {t('checkout.payment_method')}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Choose how you want to pay.
+                  {t('checkout.choose_how_pay')}
                 </p>
               </div>
 
@@ -709,13 +711,13 @@ export function CheckoutView() {
                   current={payment.method}
                   icon={Smartphone}
                   iconColor="text-yellow-600"
-                  label="MTN Mobile Money"
-                  description="Pay instantly with MTN — get a prompt on your phone."
-                  badge="Most popular"
+                  label={t('checkout.mtn_momo')}
+                  description={t('checkout.mtn_instant_prompt_period')}
+                  badge={t('checkout.mtn_popular')}
                 >
                   {payment.method === "MTN_MOMO" && (
                     <div className="mt-3">
-                      <Label htmlFor="momo-phone">MTN phone number</Label>
+                      <Label htmlFor="momo-phone">{t('checkout.mtn_number')}</Label>
                       <Input
                         id="momo-phone"
                         type="tel"
@@ -728,7 +730,7 @@ export function CheckoutView() {
                         <p className="mt-1 text-xs text-destructive">{paymentErrors.momoPhone}</p>
                       )}
                       <p className="mt-1 text-xs text-muted-foreground">
-                        You&apos;ll receive a USSD prompt to approve the payment.
+                        {t('checkout.ussd_prompt_hint')}
                       </p>
                     </div>
                   )}
@@ -740,12 +742,12 @@ export function CheckoutView() {
                   current={payment.method}
                   icon={Smartphone}
                   iconColor="text-red-600"
-                  label="Airtel Money"
-                  description="Pay instantly with Airtel — get a prompt on your phone."
+                  label={t('checkout.airtel_money')}
+                  description={t('checkout.airtel_instant_prompt')}
                 >
                   {payment.method === "AIRTEL_MONEY" && (
                     <div className="mt-3">
-                      <Label htmlFor="airtel-phone">Airtel phone number</Label>
+                      <Label htmlFor="airtel-phone">{t('checkout.airtel_number')}</Label>
                       <Input
                         id="airtel-phone"
                         type="tel"
@@ -767,13 +769,13 @@ export function CheckoutView() {
                   current={payment.method}
                   icon={CreditCard}
                   iconColor="text-foreground"
-                  label="Visa / Mastercard"
-                  description="Secure card payment via Flutterwave (3D Secure)."
+                  label={t('checkout.card_payment')}
+                  description={t('checkout.card_secure_3d')}
                 >
                   {payment.method === "CARD" && (
                     <div className="mt-3 space-y-3">
                       <div>
-                        <Label htmlFor="card-num">Card number</Label>
+                        <Label htmlFor="card-num">{t('checkout.card_number')}</Label>
                         <Input
                           id="card-num"
                           value={payment.cardNumber}
@@ -795,7 +797,7 @@ export function CheckoutView() {
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label htmlFor="card-exp">Expiry</Label>
+                          <Label htmlFor="card-exp">{t('checkout.expiry')}</Label>
                           <Input
                             id="card-exp"
                             value={payment.cardExpiry}
@@ -835,7 +837,7 @@ export function CheckoutView() {
                       </div>
                       <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                        You&apos;ll be redirected to Flutterwave&apos;s secure payment page.
+                        {t('checkout.flutterwave_redirect')}
                       </p>
                     </div>
                   )}
@@ -847,18 +849,18 @@ export function CheckoutView() {
                   current={payment.method}
                   icon={Banknote}
                   iconColor="text-emerald-600"
-                  label="Cash on Delivery"
-                  description={codAvailable ? "Pay with cash when your order arrives." : "Kigali only"}
+                  label={t('checkout.cod')}
+                  description={codAvailable ? t('checkout.pay_cash_arrival_period') : t('checkout.cod_kigali_only')}
                   disabled={!codAvailable}
                 >
                   {payment.method === "COD" && codAvailable && (
                     <div className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
                       <p className="flex items-center gap-1.5 font-medium">
-                        <AlertCircle className="h-4 w-4" /> Amount to pay on delivery:
+                        <AlertCircle className="h-4 w-4" /> {t('checkout.amount_on_delivery')}
                       </p>
                       <p className="mt-1 text-xl font-bold text-amber-900">{formatRWF(total)}</p>
                       <p className="mt-1 text-xs">
-                        Please have the exact amount ready for the delivery driver.
+                        {t('checkout.exact_amount_ready')}
                       </p>
                     </div>
                   )}
@@ -870,8 +872,8 @@ export function CheckoutView() {
                   current={payment.method}
                   icon={Building}
                   iconColor="text-blue-600"
-                  label="Bank Transfer"
-                  description="Transfer to our bank account. Order ships after confirmation."
+                  label={t('checkout.bank_transfer')}
+                  description={t('checkout.bank_transfer_hint')}
                 >
                   {payment.method === "BANK_TRANSFER" && (
                     <div className="mt-3 space-y-2">
@@ -880,16 +882,15 @@ export function CheckoutView() {
                           <p className="font-semibold">{bank.bank}</p>
                           <p className="text-muted-foreground">{bank.accountName}</p>
                           <p className="mt-1">
-                            <span className="text-muted-foreground">A/C: </span>
+                            <span className="text-muted-foreground">{t('checkout.account_abbreviation')}: </span>
                             <span className="font-mono font-medium">{bank.accountNumber}</span>
                           </p>
                           <p className="text-xs text-muted-foreground">{bank.branch}</p>
                         </div>
                       ))}
                       <p className="text-xs text-muted-foreground">
-                        After transferring, send the receipt to{" "}
-                        <span className="font-medium">+250 788 123 456</span> via WhatsApp.
-                        Your order ships once we confirm payment.
+                        {t('checkout.send_receipt_prefix')} {" "}
+                        <span className="font-medium">+250 788 123 456</span> {t('checkout.receipt_whatsapp_suffix')}
                       </p>
                     </div>
                   )}
@@ -902,16 +903,16 @@ export function CheckoutView() {
                   <div className="flex items-center gap-3">
                     <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     <div className="flex-1">
-                      <p className="font-medium">Waiting for payment approval...</p>
+                      <p className="font-medium">{t('checkout.waiting_approval_dots')}</p>
                       <p className="text-sm text-muted-foreground">
-                        Check your phone and approve the prompt.
+                        {t('checkout.check_phone_approve')}
                       </p>
                     </div>
                     <div className="text-right text-xs text-muted-foreground">
                       <p className="font-mono font-medium text-primary">
                         {Math.floor(polling.elapsed / 60)}:{String(polling.elapsed % 60).padStart(2, "0")}
                       </p>
-                      <p>elapsed</p>
+                      <p>{t('checkout.elapsed')}</p>
                     </div>
                   </div>
                   {/* Progress bar */}
@@ -924,7 +925,7 @@ export function CheckoutView() {
                     />
                   </div>
                   <p className="mt-1.5 text-center text-xs text-muted-foreground">
-                    Auto-timeout in {Math.floor(polling.remaining / 60)}:{String(polling.remaining % 60).padStart(2, "0")}
+                    {t('checkout.auto_timeout', { time: `${Math.floor(polling.remaining / 60)}:${String(polling.remaining % 60).padStart(2, "0")}` })}
                   </p>
                 </div>
               )}
@@ -932,8 +933,8 @@ export function CheckoutView() {
                 <div className="flex items-center gap-3 rounded-xl bg-emerald-50 p-4">
                   <Check className="h-6 w-6 text-emerald-600" />
                   <div>
-                    <p className="font-medium text-emerald-800">Payment confirmed!</p>
-                    <p className="text-sm text-emerald-600">Placing your order...</p>
+                    <p className="font-medium text-emerald-800">{t('checkout.payment_confirmed_title')}</p>
+                    <p className="text-sm text-emerald-600">{t('checkout.placing_order')}</p>
                   </div>
                 </div>
               )}
@@ -941,7 +942,7 @@ export function CheckoutView() {
               {/* Navigation */}
               <div className="flex gap-3">
                 <Button variant="outline" size="lg" onClick={goBack} className="flex-1">
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Back
+                  <ArrowLeft className="mr-2 h-4 w-4" /> {t('common.back')}
                 </Button>
                 <Button
                   size="lg"
@@ -949,7 +950,7 @@ export function CheckoutView() {
                   disabled={!paymentValid || payStatus === "waiting" || payStatus === "initiating"}
                   className="flex-1"
                 >
-                  Review order <ArrowRight className="ml-2 h-4 w-4" />
+                  {t('checkout.review_order')} <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
             </div>
@@ -960,35 +961,35 @@ export function CheckoutView() {
             <div className="space-y-4 rounded-2xl border bg-card p-5">
               <div>
                 <h2 className="flex items-center gap-2 text-lg font-semibold">
-                  <Check className="h-5 w-5 text-primary" /> Review your order
+                  <Check className="h-5 w-5 text-primary" /> {t('checkout.review_your_order')}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Please confirm everything looks correct.
+                  {t('checkout.confirm_correct')}
                 </p>
               </div>
 
               {/* Delivery info summary */}
               <div className="rounded-xl border p-4">
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold">Delivery to</h3>
+                  <h3 className="text-sm font-semibold">{t('checkout.deliver_to')}</h3>
                   <button
                     onClick={() => setStep(1)}
                     className="text-xs font-medium text-primary hover:underline"
                   >
-                    Edit
+                    {t('common.edit')}
                   </button>
                 </div>
                 <p className="text-sm font-medium">{delivery.customerName}</p>
                 <p className="text-sm text-muted-foreground">{delivery.customerPhone}</p>
                 <p className="mt-1 text-sm">
                   {delivery.address}
-                  {delivery.landmark && ` (Landmark: ${delivery.landmark})`}
+                  {delivery.landmark && ` (${t('checkout.landmark')}: ${delivery.landmark})`}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {delivery.sector || delivery.cell}, {delivery.district}, {province}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  🕐 {deliveryTimeFor(province)} · Delivery fee:{" "}
+                  🕐 {deliveryTimeFor(province)} · {t('checkout.delivery_fee')}:{" "}
                   {appliedCoupon?.freeShipping ? "FREE" : formatRWF(deliveryFee)}
                 </p>
               </div>
@@ -996,12 +997,12 @@ export function CheckoutView() {
               {/* Payment method summary */}
               <div className="rounded-xl border p-4">
                 <div className="mb-2 flex items-center justify-between">
-                  <h3 className="text-sm font-semibold">Payment method</h3>
+                  <h3 className="text-sm font-semibold">{t('checkout.payment_method')}</h3>
                   <button
                     onClick={() => setStep(2)}
                     className="text-xs font-medium text-primary hover:underline"
                   >
-                    Edit
+                    {t('common.edit')}
                   </button>
                 </div>
                 <p className="text-sm font-medium">
@@ -1015,7 +1016,7 @@ export function CheckoutView() {
               {/* Items summary */}
               <div className="rounded-xl border p-4">
                 <h3 className="mb-2 text-sm font-semibold">
-                  Items ({items.length})
+                  {t('checkout.items_count', { count: items.length })}
                 </h3>
                 <ul className="space-y-2">
                   {items.map((item) => (
@@ -1046,27 +1047,27 @@ export function CheckoutView() {
               {/* Totals */}
               <div className="space-y-2 rounded-xl bg-secondary/30 p-4 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-muted-foreground">{t('cart.subtotal')}</span>
                   <span>{formatRWF(subtotal)}</span>
                 </div>
                 {couponDiscount > 0 && (
                   <div className="flex justify-between text-emerald-600">
-                    <span>Coupon ({appliedCoupon?.code})</span>
+                    <span>{t('checkout.coupon_code', { code: appliedCoupon?.code || '' })}</span>
                     <span>−{formatRWF(couponDiscount)}</span>
                   </div>
                 )}
                 {loyaltyDiscount > 0 && (
                   <div className="flex justify-between text-emerald-600">
-                    <span>Loyalty points</span>
+                    <span>{t('cart.loyalty_points')}</span>
                     <span>−{formatRWF(loyaltyDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Delivery</span>
+                  <span className="text-muted-foreground">{t('cart.delivery')}</span>
                   <span>{appliedCoupon?.freeShipping ? "FREE" : formatRWF(deliveryFee)}</span>
                 </div>
                 <div className="flex items-baseline justify-between border-t pt-2">
-                  <span className="font-semibold">Total</span>
+                  <span className="font-semibold">{t('cart.total')}</span>
                   <span className="text-xl font-bold">{formatRWF(total)}</span>
                 </div>
               </div>
@@ -1082,26 +1083,26 @@ export function CheckoutView() {
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     {payStatus === "waiting"
-                      ? "Waiting for payment..."
+                      ? t('checkout.waiting_payment')
                       : payStatus === "initiating"
-                      ? "Initiating payment..."
-                      : "Placing order..."}
+                      ? t('checkout.initiating_payment')
+                      : t('checkout.placing_order')}
                   </>
                 ) : (
-                  <>Place order · {formatRWF(total)}</>
+                  <>{t('checkout.place_order_amount', { amount: formatRWF(total) })}</>
                 )}
               </Button>
               <Button variant="outline" size="sm" className="w-full" onClick={goBack}>
-                <ArrowLeft className="mr-1.5 h-4 w-4" /> Back to payment
+                <ArrowLeft className="mr-1.5 h-4 w-4" /> {t('checkout.back_to_payment')}
               </Button>
               <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
                 <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-                Your information is encrypted and secure.
+                {t('checkout.information_secure')}
               </p>
               {/* NEW: PayPack security badge + MoMo/Airtel logos */}
               <div className="mt-3 flex flex-col items-center gap-2">
                 <p className="text-xs text-muted-foreground">
-                  🔒 Your payment is secured by <span className="font-medium text-foreground">PayPack Rwanda</span>
+                  🔒 {t('checkout.payment_secured_by')} <span className="font-medium text-foreground">PayPack Rwanda</span>
                 </p>
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1 rounded-md bg-yellow-400/10 px-2 py-1 text-xs font-medium">
@@ -1119,12 +1120,11 @@ export function CheckoutView() {
         {/* ─── Sticky order summary ────────────────────────────────── */}
         <aside className="lg:col-span-1">
           <div className="sticky top-24 rounded-2xl border bg-card p-5 shadow-sm">
-            <h2 className="text-lg font-semibold">Order summary</h2>
+            <h2 className="text-lg font-semibold">{t('checkout.order_summary')}</h2>
 
             {/* Items count */}
             <p className="mt-1 text-sm text-muted-foreground">
-              {items.length} item{items.length !== 1 ? "s" : ""} ·{" "}
-              {items.reduce((s, i) => s + i.quantity, 0)} units
+              {t('checkout.sidebar_counts', { items: items.length, units: items.reduce((s, i) => s + i.quantity, 0) })}
             </p>
 
             {/* Item list (compact) */}
@@ -1153,27 +1153,27 @@ export function CheckoutView() {
             {/* Totals */}
             <div className="mt-4 space-y-2 border-t pt-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground">{t('cart.subtotal')}</span>
                 <span>{formatRWF(subtotal)}</span>
               </div>
               {couponDiscount > 0 && (
                 <div className="flex justify-between text-emerald-600">
-                  <span>Coupon</span>
+                  <span>{t('cart.coupon')}</span>
                   <span>−{formatRWF(couponDiscount)}</span>
                 </div>
               )}
               {loyaltyDiscount > 0 && (
                 <div className="flex justify-between text-emerald-600">
-                  <span>Loyalty</span>
+                  <span>{t('checkout.loyalty')}</span>
                   <span>−{formatRWF(loyaltyDiscount)}</span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Delivery</span>
+                <span className="text-muted-foreground">{t('cart.delivery')}</span>
                 <span>{appliedCoupon?.freeShipping ? "FREE" : formatRWF(deliveryFee)}</span>
               </div>
               <div className="flex items-baseline justify-between border-t pt-2">
-                <span className="font-semibold">Total</span>
+                <span className="font-semibold">{t('cart.total')}</span>
                 <span className="text-xl font-bold">{formatRWF(total)}</span>
               </div>
             </div>

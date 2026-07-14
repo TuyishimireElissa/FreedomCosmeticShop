@@ -16,9 +16,11 @@
  */
 
 import { useStore } from "@/store/useStore"
+import { useT } from "@/lib/i18n/LanguageContext"
 import { Sparkles, Phone, Mail, MapPin, Instagram, Facebook, MessageCircle, ShieldCheck, Truck, Smartphone, Lock } from "lucide-react"
 
 export function Footer() {
+  const t = useT()
   const { goCatalog, goHome, goAdmin } = useStore()
 
   return (
@@ -102,7 +104,7 @@ export function Footer() {
                   onClick={() => goCatalog(null)}
                   className="text-muted-foreground hover:text-primary"
                 >
-                  All products
+                  {t('categories.all')}
                 </button>
               </li>
             </ul>
@@ -116,7 +118,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <span className="text-muted-foreground">
-                  Delivery: 1-3 days Kigali, 3-5 days provinces
+                  {t('footer.delivery_kigali')}; {t('footer.delivery_provinces')}
                 </span>
               </li>
               <li>
@@ -124,11 +126,11 @@ export function Footer() {
                   onClick={() => useStore.getState().goTrackOrder()}
                   className="text-muted-foreground hover:text-primary"
                 >
-                  Track your order
+                  {t('footer.track_order')}
                 </button>
               </li>
               <li>
-                <span className="text-muted-foreground">Returns within 7 days</span>
+                <span className="text-muted-foreground">{t('footer.returns_days', { days: 7 })}</span>
               </li>
               <li>
                 <button onClick={goAdmin} className="text-muted-foreground hover:text-primary">
@@ -141,7 +143,7 @@ export function Footer() {
           {/* Contact */}
           <div className="space-y-3">
             <h3 className="text-foreground/70 text-sm font-semibold tracking-wider uppercase">
-              Contact
+              {t('footer.contact')}
             </h3>
             <ul className="text-muted-foreground space-y-2 text-sm">
               <li className="flex items-start gap-2">
@@ -169,22 +171,22 @@ export function Footer() {
           <div className="flex flex-col items-center gap-1 text-center">
             <ShieldCheck className="h-6 w-6 text-primary" />
             <p className="text-xs font-semibold">100% Genuine</p>
-            <p className="text-[10px] text-muted-foreground">Authentic products</p>
+            <p className="text-[10px] text-muted-foreground">{t('footer.genuine_products')}</p>
           </div>
           <div className="flex flex-col items-center gap-1 text-center">
             <Truck className="h-6 w-6 text-primary" />
-            <p className="text-xs font-semibold">Fast Delivery</p>
-            <p className="text-[10px] text-muted-foreground">All 30 districts</p>
+            <p className="text-xs font-semibold">{t('footer.fast_delivery')}</p>
+            <p className="text-[10px] text-muted-foreground">{t('footer.all_districts')}</p>
           </div>
           <div className="flex flex-col items-center gap-1 text-center">
             <Smartphone className="h-6 w-6 text-primary" />
             <p className="text-xs font-semibold">MTN MoMo</p>
-            <p className="text-[10px] text-muted-foreground">Mobile Money accepted</p>
+            <p className="text-[10px] text-muted-foreground">{t('footer.mobile_money_accepted')}</p>
           </div>
           <div className="flex flex-col items-center gap-1 text-center">
             <Lock className="h-6 w-6 text-primary" />
-            <p className="text-xs font-semibold">Safe Pay</p>
-            <p className="text-[10px] text-muted-foreground">Secured by PayPack</p>
+            <p className="text-xs font-semibold">{t('footer.safe_pay')}</p>
+            <p className="text-[10px] text-muted-foreground">{t('footer.secured_by', { provider: 'PayPack' })}</p>
           </div>
         </div>
 
@@ -192,13 +194,13 @@ export function Footer() {
         <div className="mt-8 flex flex-col items-start gap-4 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
-              We accept:
+              {t('footer.we_accept')}:
             </span>
             <span className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-semibold shadow-sm">
-              MTN MoMo
+              {t('checkout.mtn_momo')}
             </span>
             <span className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-semibold shadow-sm">
-              Airtel Money
+              {t('checkout.airtel_money')}
             </span>
             <span className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-semibold shadow-sm">
               Visa
@@ -207,15 +209,15 @@ export function Footer() {
               Mastercard
             </span>
             <span className="bg-background text-foreground rounded-md px-2.5 py-1 text-xs font-semibold shadow-sm">
-              Cash on Delivery
+              {t('checkout.cod')}
             </span>
           </div>
         </div>
 
         {/* Bottom */}
         <div className="text-muted-foreground mt-6 border-t pt-6 text-center text-xs sm:flex sm:justify-between sm:text-left">
-          <p>© {new Date().getFullYear()} FreedomCosmeticShop. All rights reserved. Made with ❤️ in Rwanda 🇷🇼</p>
-          <p className="mt-2 sm:mt-0">FreedomCosmeticShop — Rwanda's Beauty Freedom.</p>
+          <p>© {new Date().getFullYear()} FreedomCosmeticShop. {t('footer.all_rights_reserved')} {t('footer.made_in_rwanda')}</p>
+          <p className="mt-2 sm:mt-0">FreedomCosmeticShop — {t('footer.description')}</p>
         </div>
       </div>
     </footer>

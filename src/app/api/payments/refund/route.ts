@@ -20,7 +20,8 @@ export const dynamic = 'force-dynamic'
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { requireRole } from "@/lib/auth"
+import { DESTRUCTIVE_OPERATIONS, requireDestructiveOperation } from "@/lib/permissions"
+import { logActivity } from "@/server/services/activity"
 import { cashout, PaypackError } from "@/server/services/paypack"
 import { enqueueSms } from "@/server/services/sms-queue"
 import { getSmsMessage } from "@/server/services/sms-templates"
@@ -34,7 +35,7 @@ const RefundSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    await requireRole("ADMIN")
+    const adminUser = await requireDestructiveOperation(DESTRUCTIVE_OPERATIONS.PAYMENT_REFUND)
 
     const body = await req.json()
     const parsed = RefundSchema.safeParse(body)
@@ -122,6 +123,18 @@ export async function POST(req: Request) {
           })
         }
 
+        await logActivity({
+          userId: adminUser.id,
+          userName: adminUser.name,
+          userRole: adminUser.role,
+          action: "REFUND_ISSUED",
+          entityType: "PAYMENT",
+          entityId: payment.id,
+          description: `Issued ${payment.amount} RWF refund for order ${order.orderNumber}`,
+          severity: "critical",
+          req,
+        })
+
         return NextResponse.json({
           success: true,
           refundReference: refundResult.transactionId,
@@ -158,6 +171,18 @@ export async function POST(req: Request) {
       await db.order.update({
         where: { id: orderId },
         data: { status: "CANCELLED" },
+      })
+
+      await logActivity({
+        userId: adminUser.id,
+        userName: adminUser.name,
+        userRole: adminUser.role,
+        action: "ORDER_CANCELLED",
+        entityType: "ORDER",
+        entityId: order.id,
+        description: `Cancelled COD order ${order.orderNumber}; no funds transferred`,
+        severity: "critical",
+        req,
       })
 
       return NextResponse.json({

@@ -16,6 +16,7 @@ import { useStore } from "@/store/useStore"
 import { Button } from "@/components/ui/button"
 import { Tag, Copy, Check, ArrowRight, Sparkles } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface SpecialOffersProps {
   /** Coupon code to display (e.g., "WEEKEND15") */
@@ -28,9 +29,12 @@ interface SpecialOffersProps {
 
 export function SpecialOffers({
   code = "WELCOME10",
-  description = "10% off your first order. Pay with MTN MoMo or cash on delivery.",
-  discount = "10% OFF",
+  description,
+  discount,
 }: SpecialOffersProps) {
+  const t = useT()
+  const offerDescription = description || t('home.default_offer_description')
+  const offerDiscount = discount || t('home.default_offer_discount')
   const { goCatalog } = useStore()
   const { toast } = useToast()
   const [copied, setCopied] = useState(false)
@@ -40,14 +44,14 @@ export function SpecialOffers({
       await navigator.clipboard.writeText(code)
       setCopied(true)
       toast({
-        title: "Code copied!",
-        description: `${code} is ready to paste at checkout.`,
+        title: t('home.code_copied'),
+        description: t('home.code_ready', { code }),
       })
       setTimeout(() => setCopied(false), 2000)
     } catch {
       toast({
-        title: "Copy failed",
-        description: `Write down the code: ${code}`,
+        title: t('home.copy_failed'),
+        description: t('home.write_code', { code }),
         variant: "destructive",
       })
     }
@@ -66,12 +70,12 @@ export function SpecialOffers({
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/20 px-3 py-1 text-xs font-medium backdrop-blur">
               <Sparkles className="h-3.5 w-3.5" />
-              Special offer
+              {t('home.special_offer')}
             </span>
             <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-              {discount}
+              {offerDiscount}
             </h2>
-            <p className="mt-2 text-primary-foreground/85">{description}</p>
+            <p className="mt-2 text-primary-foreground/85">{offerDescription}</p>
 
             <div className="mt-5 flex flex-wrap items-center gap-3">
               <Button
@@ -79,7 +83,7 @@ export function SpecialOffers({
                 size="lg"
                 onClick={() => goCatalog(null)}
               >
-                Shop now
+                {t('home.shop_now')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
 
@@ -87,7 +91,7 @@ export function SpecialOffers({
               <button
                 onClick={handleCopyCode}
                 className="flex items-center gap-2 rounded-lg border-2 border-dashed border-primary-foreground/40 bg-primary-foreground/10 px-4 py-2 font-mono text-sm font-bold backdrop-blur transition-colors hover:bg-primary-foreground/20"
-                aria-label={`Copy coupon code ${code}`}
+                aria-label={t('home.copy_coupon', { code })}
               >
                 <Tag className="h-4 w-4" />
                 {code}
@@ -105,22 +109,22 @@ export function SpecialOffers({
             <div className="rounded-2xl bg-primary-foreground/10 p-4 backdrop-blur">
               <p className="text-2xl font-bold">📱</p>
               <p className="mt-1 text-sm font-semibold">MTN MoMo</p>
-              <p className="text-xs text-primary-foreground/70">Pay instantly</p>
+              <p className="text-xs text-primary-foreground/70">{t('home.pay_instantly')}</p>
             </div>
             <div className="rounded-2xl bg-primary-foreground/10 p-4 backdrop-blur">
               <p className="text-2xl font-bold">💵</p>
-              <p className="mt-1 text-sm font-semibold">Cash on Delivery</p>
-              <p className="text-xs text-primary-foreground/70">Pay when you get it</p>
+              <p className="mt-1 text-sm font-semibold">{t('checkout.cod')}</p>
+              <p className="text-xs text-primary-foreground/70">{t('home.pay_when_received')}</p>
             </div>
             <div className="rounded-2xl bg-primary-foreground/10 p-4 backdrop-blur">
               <p className="text-2xl font-bold">🚚</p>
-              <p className="mt-1 text-sm font-semibold">Fast Delivery</p>
-              <p className="text-xs text-primary-foreground/70">1-5 days nationwide</p>
+              <p className="mt-1 text-sm font-semibold">{t('footer.fast_delivery')}</p>
+              <p className="text-xs text-primary-foreground/70">{t('home.days_nationwide')}</p>
             </div>
             <div className="rounded-2xl bg-primary-foreground/10 p-4 backdrop-blur">
               <p className="text-2xl font-bold">✨</p>
-              <p className="mt-1 text-sm font-semibold">100% Authentic</p>
-              <p className="text-xs text-primary-foreground/70">Genuine products</p>
+              <p className="mt-1 text-sm font-semibold">{t('common.authentic')}</p>
+              <p className="text-xs text-primary-foreground/70">{t('footer.genuine_products')}</p>
             </div>
           </div>
         </div>

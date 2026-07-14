@@ -4,28 +4,49 @@ import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import Providers from '@/components/Providers'
 import SiteChrome from '@/components/layout/SiteChrome'
+import { BUSINESS } from '@/lib/business-config'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
 export const metadata: Metadata = {
   title: {
-    default: 'FreedomCosmeticShop | Rwanda Beauty Store 🇷🇼',
-    template: '%s | FreedomCosmeticShop',
+    default: `${BUSINESS.name} | Rwanda Beauty Store 🇷🇼`,
+    template: `%s | ${BUSINESS.name}`,
   },
-  description:
-    "Rwanda's #1 cosmetics store. Shop authentic skincare, makeup & haircare. Pay with MTN MoMo. Fast delivery to all 30 districts.",
+  description: BUSINESS.description,
   keywords: [
     'cosmetics Rwanda',
-    'beauty Kigali',
-    'MTN MoMo shopping',
+    'beauty products Kigali',
+    'MTN MoMo shopping Rwanda',
     'skincare Rwanda',
+    BUSINESS.name,
+    'authentic beauty products',
+    'online beauty store Rwanda',
   ],
+  authors: [{ name: BUSINESS.name }],
+  creator: BUSINESS.name,
+  publisher: BUSINESS.name,
+  metadataBase: new URL(BUSINESS.url),
   openGraph: {
     type: 'website',
-    siteName: 'FreedomCosmeticShop',
-    title: 'FreedomCosmeticShop | Rwanda Beauty Store',
-    description: "Rwanda's #1 cosmetics store",
     locale: 'en_RW',
+    siteName: BUSINESS.name,
+    title: `${BUSINESS.name} | Rwanda Beauty Store`,
+    description: BUSINESS.description,
+    url: BUSINESS.url,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: BUSINESS.name,
+    description: BUSINESS.description,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
 }
 

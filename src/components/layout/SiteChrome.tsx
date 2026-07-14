@@ -21,12 +21,10 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
     pathname.startsWith('/admin') ||
     pathname === '/login' ||
     pathname === '/register' ||
-    pathname === '/forgot-password'
+    pathname === '/forgot-password' ||
+    pathname === '/change-password'
 
   if (isolatedRoute) return <>{children}</>
-
-  const whatsappNumber =
-    process.env.NEXT_PUBLIC_WHATSAPP?.replace(/\D/g, '') || '250780000000'
 
   return (
     <div className="flex min-h-dvh flex-col bg-white text-[#1a1a1a]">
@@ -34,7 +32,7 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
       <Navbar />
       <main className="min-h-[50vh] flex-1">{children}</main>
       <Footer />
-      <WhatsAppButton phone={whatsappNumber} />
+      <WhatsAppButton />
       <CartDrawer />
     </div>
   )

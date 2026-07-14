@@ -37,10 +37,12 @@ import {
   Loader2,
   ShieldCheck,
 } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 type Step = "form" | "otp"
 
 export function RegisterView() {
+  const t = useT()
   const { goHome, goCatalog, setUser } = useStore()
   const { toast } = useToast()
 
@@ -73,12 +75,12 @@ export function RegisterView() {
   // ─── Validation ─────────────────────────────────────────────────────
   const validateForm = (): boolean => {
     const e: Record<string, string> = {}
-    if (name.trim().length < 2) e.name = "Please enter your full name"
+    if (name.trim().length < 2) e.name = t('auth.enter_full_name')
     if (!/^(?:\+250|0)?7[2389][0-9]{7}$/.test(phone.replace(/[\s-]/g, "")))
-      e.phone = "Enter a valid Rwandan phone (e.g. 0788123456)"
-    if (password.length < 8) e.password = "Password must be at least 8 characters"
+      e.phone = t('auth.rwanda_phone_example')
+    if (password.length < 8) e.password = t('auth.weak_password')
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      e.email = "Enter a valid email or leave blank"
+      e.email = t('auth.valid_email_optional')
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -99,7 +101,7 @@ export function RegisterView() {
       const data = await res.json()
 
       if (!res.ok) {
-        setErrors({ form: data.error || "Registration failed" })
+        setErrors({ form: data.error || t('auth.registration_failed') })
         return
       }
 
@@ -110,11 +112,11 @@ export function RegisterView() {
         setDevOtpHint(data.code) // Dev mode: show the OTP code
       }
       toast({
-        title: "Code sent",
-        description: "Enter the 6-digit code we sent to your phone.",
+        title: t('auth.code_sent'),
+        description: t('auth.enter_sent_code'),
       })
     } catch {
-      setErrors({ form: "Network error. Please try again." })
+      setErrors({ form: t('errors.network_error') })
     } finally {
       setLoading(false)
     }
@@ -134,7 +136,7 @@ export function RegisterView() {
 
       if (!res.ok) {
         toast({
-          title: "Verification failed",
+          title: t('auth.verification_failed'),
           description: data.error,
           variant: "destructive",
         })
@@ -145,14 +147,14 @@ export function RegisterView() {
       // Success — user is logged in
       setUser(data.user)
       toast({
-        title: "Welcome to FreedomCosmeticShop! 🌸",
-        description: "Your account has been created.",
+        title: t('auth.welcome_shop'),
+        description: t('auth.account_created'),
       })
       goCatalog(null)
     } catch {
       toast({
-        title: "Network error",
-        description: "Please try again.",
+        title: t('errors.network_error'),
+        description: t('checkout.please_try_again'),
         variant: "destructive",
       })
     } finally {
@@ -174,9 +176,9 @@ export function RegisterView() {
       if (res.ok) {
         setResendCountdown(30)
         if (data.code) setDevOtpHint(data.code)
-        toast({ title: "Code resent", description: "Check your phone." })
+        toast({ title: t('auth.code_resent'), description: t('auth.check_phone') })
       } else {
-        toast({ title: "Failed", description: data.error, variant: "destructive" })
+        toast({ title: t('auth.failed'), description: data.error, variant: "destructive" })
       }
     } finally {
       setLoading(false)
@@ -198,9 +200,9 @@ export function RegisterView() {
       <div className="rounded-2xl border bg-card p-6 shadow-sm sm:p-8">
         {step === "form" ? (
           <>
-            <h1 className="text-2xl font-bold">Create your account</h1>
+            <h1 className="text-2xl font-bold">{t('auth.register_title')}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Join FreedomCosmeticShop for faster checkout and order tracking.
+              {t('auth.join_benefits')}
             </p>
 
             <form onSubmit={handleSubmitForm} className="mt-6 space-y-4">
@@ -212,7 +214,7 @@ export function RegisterView() {
 
               {/* Name */}
               <div>
-                <Label htmlFor="reg-name">Full name *</Label>
+                <Label htmlFor="reg-name">{t('auth.full_name')} *</Label>
                 <div className="relative mt-1">
                   <UserIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -230,7 +232,7 @@ export function RegisterView() {
 
               {/* Phone */}
               <div>
-                <Label htmlFor="reg-phone">Phone number *</Label>
+                <Label htmlFor="reg-phone">{t('auth.phone')} *</Label>
                 <div className="relative mt-1">
                   <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -246,13 +248,13 @@ export function RegisterView() {
                 </div>
                 {errors.phone && <p className="mt-1 text-xs text-destructive">{errors.phone}</p>}
                 <p className="mt-1 text-xs text-muted-foreground">
-                  We&apos;ll send a verification code via SMS.
+                  {t('auth.sms_verification_hint')}
                 </p>
               </div>
 
               {/* Email (optional) */}
               <div>
-                <Label htmlFor="reg-email">Email (optional)</Label>
+                <Label htmlFor="reg-email">{t('auth.email_optional')}</Label>
                 <div className="relative mt-1">
                   <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -271,7 +273,7 @@ export function RegisterView() {
 
               {/* Password */}
               <div>
-                <Label htmlFor="reg-password">Password *</Label>
+                <Label htmlFor="reg-password">{t('auth.password')} *</Label>
                 <div className="relative mt-1">
                   <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -279,7 +281,7 @@ export function RegisterView() {
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 8 characters"
+                    placeholder={t('auth.password_hint')}
                     className="pl-9 pr-9"
                     autoComplete="new-password"
                     disabled={loading}
@@ -288,7 +290,7 @@ export function RegisterView() {
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
@@ -301,11 +303,11 @@ export function RegisterView() {
               <Button type="submit" size="lg" className="w-full" disabled={loading}>
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending code...
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('auth.sending_code')}
                   </>
                 ) : (
                   <>
-                    Continue <ArrowRight className="ml-2 h-4 w-4" />
+                    {t('common.next')} <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
               </Button>
@@ -313,7 +315,7 @@ export function RegisterView() {
 
             <p className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
               <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-              Your password is securely hashed. We never store it in plain text.
+              {t('auth.password_security_full')}
             </p>
           </>
         ) : (
@@ -327,19 +329,19 @@ export function RegisterView() {
               }}
               className="mb-4 flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="h-4 w-4" /> Back
+              <ArrowLeft className="h-4 w-4" /> {t('common.back')}
             </button>
 
-            <h1 className="text-2xl font-bold">Verify your phone</h1>
+            <h1 className="text-2xl font-bold">{t('auth.verify_phone')}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Enter the 6-digit code we sent to{" "}
+              {t('auth.enter_sent_code_prefix')} {" "}
               <span className="font-medium text-foreground">{phone}</span>
             </p>
 
             {devOtpHint && (
               <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-center">
                 <p className="text-xs font-medium text-amber-700">
-                  Dev mode (SMS disabled)
+                  {t('auth.dev_mode_sms_disabled')}
                 </p>
                 <p className="mt-1 text-2xl font-bold tracking-[0.3em] text-amber-900">
                   {devOtpHint}
@@ -357,19 +359,19 @@ export function RegisterView() {
             </div>
 
             <div className="mt-6 flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Didn&apos;t receive a code?</span>
+              <span className="text-muted-foreground">{t('auth.didnt_receive_code')}</span>
               <button
                 onClick={handleResend}
                 disabled={resendCountdown > 0 || loading}
                 className="font-medium text-primary hover:underline disabled:opacity-50"
               >
-                {resendCountdown > 0 ? `Resend in ${resendCountdown}s` : "Resend code"}
+                {resendCountdown > 0 ? t('auth.otp_resend_in', { seconds: resendCountdown }) : t('auth.otp_resend')}
               </button>
             </div>
 
             {loading && (
               <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" /> Verifying...
+                <Loader2 className="h-4 w-4 animate-spin" /> {t('auth.otp_verifying')}
               </div>
             )}
           </>
@@ -377,12 +379,12 @@ export function RegisterView() {
       </div>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        {t('auth.have_account')} {" "}
         <button
           onClick={() => useStore.getState().setView("login")}
           className="font-medium text-primary hover:underline"
         >
-          Log in
+          {t('auth.login_button')}
         </button>
       </p>
     </div>

@@ -69,10 +69,12 @@ import { AdminPayments } from "./AdminPayments"
 import { AdminMarketing } from "./AdminMarketing"
 import { AdminReports } from "./AdminReports"
 import { AdminStaff } from "./AdminStaff"
+import { AdminSecurityDashboard } from "./AdminSecurityDashboard"
 import { AdminMobilePanel } from "./AdminMobilePanel"
 import { AdminWholesale } from "./AdminWholesale"
 import {
   Shield,
+  ShieldAlert,
   Package,
   Users,
   Truck,
@@ -174,7 +176,7 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
         e.preventDefault()
         const tabOrder = [
           "overview", "orders", "products", "customers", "deliveries",
-          "analytics", "reports", "settings", "staff", "sms", "payments", "marketing",
+          "analytics", "reports", "settings", "staff", "security", "sms", "payments", "marketing",
         ]
         const idx = Number(e.key) - 1
         if (idx < tabOrder.length) {
@@ -758,6 +760,12 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
             <Shield className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Staff</span>
           </TabsTrigger>
+          {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
+            <TabsTrigger value="security" className="gap-1">
+              <ShieldAlert className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Security</span>
+            </TabsTrigger>
+          )}
           <TabsTrigger value="sms" className="gap-1">
             <Bell className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">SMS</span>
@@ -1034,6 +1042,11 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
         {/* NEW: Staff & Security */}
         <TabsContent value="staff">
           <AdminStaff />
+        </TabsContent>
+
+        {/* Security telemetry — server API also enforces ADMIN/SUPER_ADMIN */}
+        <TabsContent value="security">
+          <AdminSecurityDashboard />
         </TabsContent>
 
         {/* SMS */}

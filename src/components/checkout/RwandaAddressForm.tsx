@@ -38,6 +38,7 @@ import {
 import { useRwandaDistricts, useDistrictSectors } from "@/hooks/useDelivery"
 import { RWANDA_PROVINCES } from "@/lib/rwanda-locations"
 import { User, Phone, MapPin, Landmark, MessageSquare, Save } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 export interface RwandaAddressData {
   fullName: string
@@ -66,6 +67,7 @@ export function RwandaAddressForm({
   showSaveCheckbox = true,
   className = "",
 }: RwandaAddressFormProps) {
+  const t = useT()
   const [fullName, setFullName] = useState(initialData?.fullName || "")
   const [phone, setPhone] = useState(initialData?.phone || "")
   const [province, setProvince] = useState(initialData?.province || "")
@@ -118,13 +120,13 @@ export function RwandaAddressForm({
       {/* Full Name */}
       <div>
         <Label htmlFor="addr-name" className="flex items-center gap-1.5">
-          <User className="h-3.5 w-3.5" /> Full Name *
+          <User className="h-3.5 w-3.5" /> {t('checkout.full_name')} *
         </Label>
         <Input
           id="addr-name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          placeholder="Amina Uwase"
+          placeholder={t('checkout.full_name_sample')}
           className="mt-1"
         />
       </div>
@@ -132,7 +134,7 @@ export function RwandaAddressForm({
       {/* Phone */}
       <div>
         <Label htmlFor="addr-phone" className="flex items-center gap-1.5">
-          <Phone className="h-3.5 w-3.5" /> Phone Number *
+          <Phone className="h-3.5 w-3.5" /> {t('checkout.phone')} *
         </Label>
         <Input
           id="addr-phone"
@@ -147,11 +149,11 @@ export function RwandaAddressForm({
       {/* Province */}
       <div>
         <Label htmlFor="addr-province" className="flex items-center gap-1.5">
-          <MapPin className="h-3.5 w-3.5" /> Province *
+          <MapPin className="h-3.5 w-3.5" /> {t('checkout.province')} *
         </Label>
         <Select value={province} onValueChange={setProvince}>
           <SelectTrigger id="addr-province" className="mt-1">
-            <SelectValue placeholder="Select province" />
+            <SelectValue placeholder={t('checkout.province_select')} />
           </SelectTrigger>
           <SelectContent>
             {RWANDA_PROVINCES.map((p) => (
@@ -166,7 +168,7 @@ export function RwandaAddressForm({
       {/* District (auto-filtered by province) */}
       <div>
         <Label htmlFor="addr-district" className="flex items-center gap-1.5">
-          <MapPin className="h-3.5 w-3.5" /> District *
+          <MapPin className="h-3.5 w-3.5" /> {t('checkout.district')} *
         </Label>
         <Select
           value={district}
@@ -177,7 +179,7 @@ export function RwandaAddressForm({
           disabled={!province}
         >
           <SelectTrigger id="addr-district" className="mt-1">
-            <SelectValue placeholder={province ? "Select district" : "Select province first"} />
+            <SelectValue placeholder={province ? t('checkout.district_select') : t('checkout.select_province_first')} />
           </SelectTrigger>
           <SelectContent>
             {availableDistricts.map((d) => (
@@ -191,10 +193,10 @@ export function RwandaAddressForm({
 
       {/* Sector (auto-filtered by district) */}
       <div>
-        <Label htmlFor="addr-sector">Sector</Label>
+        <Label htmlFor="addr-sector">{t('checkout.sector')}</Label>
         <Select value={sector} onValueChange={setSector} disabled={!district}>
           <SelectTrigger id="addr-sector" className="mt-1">
-            <SelectValue placeholder={district ? "Select sector" : "Select district first"} />
+            <SelectValue placeholder={district ? t('checkout.select_sector') : t('checkout.select_district_first')} />
           </SelectTrigger>
           <SelectContent>
             {sectors.map((s) => (
@@ -208,12 +210,12 @@ export function RwandaAddressForm({
 
       {/* Cell */}
       <div>
-        <Label htmlFor="addr-cell">Cell (optional)</Label>
+        <Label htmlFor="addr-cell">{t('checkout.cell_optional')}</Label>
         <Input
           id="addr-cell"
           value={cell}
           onChange={(e) => setCell(e.target.value)}
-          placeholder="e.g., Akabuye"
+          placeholder={t('checkout.cell_example')}
           className="mt-1"
         />
       </div>
@@ -221,13 +223,13 @@ export function RwandaAddressForm({
       {/* Landmark / Street */}
       <div>
         <Label htmlFor="addr-landmark" className="flex items-center gap-1.5">
-          <Landmark className="h-3.5 w-3.5" /> Landmark / Street *
+          <Landmark className="h-3.5 w-3.5" /> {t('checkout.landmark')} *
         </Label>
         <Input
           id="addr-landmark"
           value={landmark}
           onChange={(e) => setLandmark(e.target.value)}
-          placeholder="Near KCT Building"
+          placeholder={t('checkout.landmark_kct_example')}
           className="mt-1"
         />
       </div>
@@ -235,13 +237,13 @@ export function RwandaAddressForm({
       {/* Additional Notes */}
       <div>
         <Label htmlFor="addr-notes" className="flex items-center gap-1.5">
-          <MessageSquare className="h-3.5 w-3.5" /> Additional Notes
+          <MessageSquare className="h-3.5 w-3.5" /> {t('checkout.additional_notes')}
         </Label>
         <Textarea
           id="addr-notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Call when you arrive"
+          placeholder={t('checkout.call_on_arrival')}
           rows={2}
           className="mt-1"
         />
@@ -256,7 +258,7 @@ export function RwandaAddressForm({
             onCheckedChange={(v) => setSaveAddress(v === true)}
           />
           <Label htmlFor="save-addr" className="text-sm font-normal cursor-pointer">
-            💾 Save this address for future orders
+            💾 {t('checkout.save_address_future')}
           </Label>
         </div>
       )}
@@ -264,7 +266,7 @@ export function RwandaAddressForm({
       {/* Save button (optional) */}
       {onSave && (
         <Button onClick={handleSubmit} className="w-full" size="lg">
-          <Save className="mr-2 h-4 w-4" /> Save Address
+          <Save className="mr-2 h-4 w-4" /> {t('checkout.save_address_button')}
         </Button>
       )}
     </div>

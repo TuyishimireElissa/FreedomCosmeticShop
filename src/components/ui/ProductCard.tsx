@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Heart, ShoppingCart, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { formatRWF } from '@/lib/utils'
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface Product {
   id: string
@@ -24,6 +25,7 @@ interface Product {
 }
 
 export default function ProductCard({ product }: { product: Product }) {
+  const t = useT()
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [addingToCart, setAddingToCart] = useState(false)
 
@@ -43,12 +45,12 @@ export default function ProductCard({ product }: { product: Product }) {
         }),
       })
       if (res.ok) {
-        toast.success(`Added to cart! ${formatRWF(product.price)}`)
+        toast.success(`${t('product.added')} ${formatRWF(product.price)}`)
       } else {
-        toast.error('Please login to add to cart')
+        toast.error(t('product.login_to_add'))
       }
     } catch {
-      toast.error('Something went wrong')
+      toast.error(t('common.error'))
     } finally {
       setAddingToCart(false)
     }
@@ -59,7 +61,7 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-[0_4px_18px_rgba(26,26,26,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-rose-100 hover:shadow-[0_14px_32px_rgba(183,110,121,0.14)]">
       <div className="relative aspect-square overflow-hidden bg-[#f8f9fa]">
-        <Link href={`/products/${product.slug}`} className="block h-full" aria-label={`View ${product.name}`}>
+        <Link href={`/products/${product.slug}`} className="block h-full" aria-label={t('product.view_product', { product: product.name })}>
           <Image
             src={product.images[0] || 'https://via.placeholder.com/400x400?text=Product'}
             alt={product.name}
@@ -71,16 +73,16 @@ export default function ProductCard({ product }: { product: Product }) {
 
         <div className="absolute left-2 top-2 flex max-w-[70%] flex-col items-start gap-1 sm:left-3 sm:top-3">
           {discount > 0 && <span className="badge bg-red-500 text-white shadow-sm">-{discount}%</span>}
-          {product.isNewArrival && <span className="badge bg-emerald-600 text-white shadow-sm">New</span>}
-          {product.isBestSeller && <span className="badge bg-[#B76E79] text-white shadow-sm">🔥 Best Seller</span>}
-          {product.stockQuantity > 0 && product.stockQuantity <= 5 && <span className="badge bg-amber-500 text-white shadow-sm">Only {product.stockQuantity} left</span>}
+          {product.isNewArrival && <span className="badge bg-emerald-600 text-white shadow-sm">{t('common.new')}</span>}
+          {product.isBestSeller && <span className="badge bg-[#B76E79] text-white shadow-sm">🔥 {t('categories.best_sellers')}</span>}
+          {product.stockQuantity > 0 && product.stockQuantity <= 5 && <span className="badge bg-amber-500 text-white shadow-sm">{t('common.low_stock', { count: product.stockQuantity })}</span>}
         </div>
 
-        <span className="absolute right-2 top-2 hidden items-center rounded-full bg-white/95 px-2 py-1 text-[10px] font-bold text-emerald-700 shadow-sm backdrop-blur sm:inline-flex">✓ Genuine</span>
+        <span className="absolute right-2 top-2 hidden items-center rounded-full bg-white/95 px-2 py-1 text-[10px] font-bold text-emerald-700 shadow-sm backdrop-blur sm:inline-flex">✓ {t('common.authentic')}</span>
 
         {outOfStock && (
           <div className="pointer-events-none absolute inset-0 grid place-items-center bg-white/25">
-            <span className="rounded-full bg-[#1a1a1a]/90 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">Out of stock</span>
+            <span className="rounded-full bg-[#1a1a1a]/90 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">{t('common.sold_out')}</span>
           </div>
         )}
 
@@ -88,7 +90,7 @@ export default function ProductCard({ product }: { product: Product }) {
           type="button"
           onClick={() => setIsWishlisted((wishlisted) => !wishlisted)}
           className="absolute bottom-2 right-2 grid h-9 w-9 place-items-center rounded-full bg-white text-gray-500 shadow-md transition-all hover:scale-105 hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79] sm:bottom-3 sm:right-3 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"
-          aria-label={isWishlisted ? `Remove ${product.name} from wishlist` : `Add ${product.name} to wishlist`}
+          aria-label={isWishlisted ? `${t('product.remove_from_wishlist')}: ${product.name}` : `${t('product.add_to_wishlist')}: ${product.name}`}
           aria-pressed={isWishlisted}
         >
           <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
@@ -101,7 +103,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-[#1a1a1a] transition-colors hover:text-[#B76E79] sm:text-[15px]">{product.name}</h3>
         </Link>
 
-        <div className="mt-2 flex items-center gap-1.5" aria-label={`${product.avgRating} out of 5 stars, ${product.reviewCount} reviews`}>
+        <div className="mt-2 flex items-center gap-1.5" aria-label={t('product.rating_label', { rating: product.avgRating, count: product.reviewCount })}>
           <div className="flex" aria-hidden="true">
             {[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-3 w-3 ${star <= Math.round(product.avgRating) ? 'fill-[#FFD700] text-[#FFD700]' : 'fill-gray-200 text-gray-200'}`} />)}
           </div>
@@ -121,7 +123,7 @@ export default function ProductCard({ product }: { product: Product }) {
           className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-3 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-[#a55d68] hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-gray-300 sm:text-sm"
         >
           <ShoppingCart className="h-4 w-4" />
-          {addingToCart ? 'Adding...' : outOfStock ? 'Out of Stock' : 'Add to Cart'}
+          {addingToCart ? t('product.adding') : outOfStock ? t('common.sold_out') : t('product.add_to_cart')}
         </button>
       </div>
     </article>

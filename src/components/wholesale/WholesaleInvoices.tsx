@@ -13,6 +13,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { formatRWF } from "@/lib/format"
+import { BUSINESS } from "@/lib/business-config"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
@@ -22,6 +23,7 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface InvoiceListItem {
   id: string
@@ -62,6 +64,7 @@ interface InvoiceDetail {
 }
 
 export function WholesaleInvoices({ onBack }: { onBack: () => void }) {
+  const t = useT()
   const [invoices, setInvoices] = useState<InvoiceListItem[]>([])
   const [selected, setSelected] = useState<InvoiceDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -107,9 +110,9 @@ export function WholesaleInvoices({ onBack }: { onBack: () => void }) {
         </button>
         <div>
           <h1 className="flex items-center gap-2 text-xl font-bold">
-            <FileText className="h-5 w-5 text-primary" /> Wholesale Invoices
+            <FileText className="h-5 w-5 text-primary" /> {t('wholesale.invoices')}
           </h1>
-          <p className="text-xs text-muted-foreground">{invoices.length} invoice{invoices.length !== 1 ? "s" : ""}</p>
+          <p className="text-xs text-muted-foreground">{t('wholesale.invoice_count', { count: invoices.length })}</p>
         </div>
       </div>
 
@@ -120,8 +123,8 @@ export function WholesaleInvoices({ onBack }: { onBack: () => void }) {
       ) : invoices.length === 0 ? (
         <div className="grid place-items-center py-16 text-center">
           <FileText className="h-10 w-10 text-muted-foreground/40" />
-          <h3 className="mt-3 font-semibold">No invoices yet</h3>
-          <p className="mt-1 text-sm text-muted-foreground">Invoices are generated when you place a wholesale order.</p>
+          <h3 className="mt-3 font-semibold">{t('wholesale.no_invoices')}</h3>
+          <p className="mt-1 text-sm text-muted-foreground">{t('wholesale.invoices_generated')}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -136,14 +139,14 @@ export function WholesaleInvoices({ onBack }: { onBack: () => void }) {
                 <p className="text-xs text-muted-foreground">
                   {new Date(inv.issuedAt).toLocaleDateString("en-RW", { day: "numeric", month: "short", year: "numeric" })}
                   {inv.dueDate && !inv.isPaid && (
-                    <span className="ml-2 text-amber-600">· Due: {new Date(inv.dueDate).toLocaleDateString("en-RW", { day: "numeric", month: "short" })}</span>
+                    <span className="ml-2 text-amber-600">· {t('wholesale.due')}: {new Date(inv.dueDate).toLocaleDateString("en-RW", { day: "numeric", month: "short" })}</span>
                   )}
                 </p>
               </div>
               <div className="text-right">
                 <p className="font-bold">{formatRWF(inv.totalAmount)}</p>
                 <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${inv.isPaid ? "text-emerald-600" : "text-amber-600"}`}>
-                  {inv.isPaid ? <><CheckCircle2 className="h-3 w-3" /> PAID</> : <><Clock className="h-3 w-3" /> DUE</>}
+                  {inv.isPaid ? <><CheckCircle2 className="h-3 w-3" /> {t('wholesale.paid')}</> : <><Clock className="h-3 w-3" /> {t('wholesale.due')}</>}
                 </span>
               </div>
             </button>
@@ -159,14 +162,15 @@ export function WholesaleInvoices({ onBack }: { onBack: () => void }) {
 // ============================================================================
 
 function InvoiceDetail({ invoice, onBack }: { invoice: InvoiceDetail; onBack: () => void }) {
+  const t = useT()
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6 print:px-0 print:py-0">
       <div className="mb-4 flex items-center justify-between print:hidden">
         <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> Back to invoices
+          <ArrowLeft className="h-4 w-4" /> {t('wholesale.back_invoices')}
         </button>
         <Button variant="outline" size="sm" onClick={() => window.print()}>
-          <Printer className="mr-1.5 h-3.5 w-3.5" /> Print / PDF
+          <Printer className="mr-1.5 h-3.5 w-3.5" /> {t('wholesale.print_pdf')}
         </Button>
       </div>
 
@@ -174,8 +178,8 @@ function InvoiceDetail({ invoice, onBack }: { invoice: InvoiceDetail; onBack: ()
         {/* Header */}
         <div className="flex items-start justify-between border-b pb-4">
           <div>
-            <h1 className="text-2xl font-bold text-primary">FreedomCosmeticShop</h1>
-            <p className="text-xs text-muted-foreground">Wholesale Invoice</p>
+            <h1 className="text-2xl font-bold text-primary">{BUSINESS.tradingName}</h1>
+            <p className="text-xs text-muted-foreground">{t('wholesale.invoice')}</p>
           </div>
           <div className="text-right">
             <p className="font-mono text-sm font-bold">{invoice.invoiceNumber}</p>
@@ -188,14 +192,14 @@ function InvoiceDetail({ invoice, onBack }: { invoice: InvoiceDetail; onBack: ()
         {/* From / To */}
         <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">From</p>
-            <p className="mt-1 font-medium">FreedomCosmeticShop Ltd</p>
-            <p className="text-xs text-muted-foreground">Kigali, Rwanda</p>
-            <p className="text-xs text-muted-foreground">TIN: 123456789</p>
-            <p className="text-xs text-muted-foreground">Tel: +250 780 000 000</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{t('wholesale.from')}</p>
+            <p className="mt-1 font-medium">{BUSINESS.legalName.includes('TODO') ? BUSINESS.tradingName : BUSINESS.legalName}</p>
+            <p className="text-xs text-muted-foreground">{BUSINESS.address.full}</p>
+            {!BUSINESS.tinNumber.includes('TODO') && <p className="text-xs text-muted-foreground">TIN: {BUSINESS.tinNumber}</p>}
+            <p className="text-xs text-muted-foreground">Tel: {BUSINESS.phoneDisplay}</p>
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">To</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{t('wholesale.to')}</p>
             <p className="mt-1 font-medium">{invoice.businessName}</p>
             <p className="text-xs text-muted-foreground">{invoice.businessAddress}</p>
             {invoice.tinNumber && <p className="text-xs text-muted-foreground">TIN: {invoice.tinNumber}</p>}
@@ -207,10 +211,10 @@ function InvoiceDetail({ invoice, onBack }: { invoice: InvoiceDetail; onBack: ()
           <table className="w-full text-sm">
             <thead className="border-b text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="py-2 pr-3 text-left font-medium">Item</th>
-                <th className="py-2 pr-3 text-center font-medium">Qty</th>
-                <th className="py-2 pr-3 text-right font-medium">Unit Price</th>
-                <th className="py-2 text-right font-medium">Total</th>
+                <th className="py-2 pr-3 text-left font-medium">{t('wholesale.item')}</th>
+                <th className="py-2 pr-3 text-center font-medium">{t('cart.quantity')}</th>
+                <th className="py-2 pr-3 text-right font-medium">{t('product.unit_price')}</th>
+                <th className="py-2 text-right font-medium">{t('cart.total')}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -229,23 +233,23 @@ function InvoiceDetail({ invoice, onBack }: { invoice: InvoiceDetail; onBack: ()
         {/* Totals */}
         <div className="mt-4 ml-auto w-64 space-y-1 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Subtotal</span>
+            <span className="text-muted-foreground">{t('cart.subtotal')}</span>
             <span className="font-medium">{formatRWF(invoice.subtotal)}</span>
           </div>
           {invoice.discount > 0 && (
             <div className="flex justify-between text-emerald-600">
-              <span>Wholesale Discount</span>
+              <span>{t('wholesale.discount')}</span>
               <span>−{formatRWF(invoice.discount)}</span>
             </div>
           )}
           {invoice.tax > 0 && (
             <div className="flex justify-between">
-              <span className="text-muted-foreground">VAT (18%)</span>
+              <span className="text-muted-foreground">VAT ({BUSINESS.invoice.vatRate}%)</span>
               <span className="font-medium">{formatRWF(invoice.tax)}</span>
             </div>
           )}
           <div className="flex justify-between border-t pt-2 text-base font-bold">
-            <span>TOTAL</span>
+            <span>{t('cart.total').toUpperCase()}</span>
             <span>{formatRWF(invoice.totalAmount)}</span>
           </div>
         </div>
@@ -253,30 +257,30 @@ function InvoiceDetail({ invoice, onBack }: { invoice: InvoiceDetail; onBack: ()
         {/* Payment terms */}
         <div className="mt-6 rounded-lg bg-secondary/20 p-4 text-xs">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Payment Terms</span>
-            <span className="font-medium">{invoice.paymentTerms || "Due on receipt"}</span>
+            <span className="text-muted-foreground">{t('wholesale.payment_terms')}</span>
+            <span className="font-medium">{invoice.paymentTerms || t('wholesale.due_on_receipt')}</span>
           </div>
           {invoice.dueDate && (
             <div className="mt-1 flex justify-between">
-              <span className="text-muted-foreground">Due Date</span>
+              <span className="text-muted-foreground">{t('wholesale.due_date')}</span>
               <span className="font-medium">{new Date(invoice.dueDate).toLocaleDateString("en-RW", { day: "numeric", month: "long", year: "numeric" })}</span>
             </div>
           )}
           <div className="mt-1 flex justify-between">
-            <span className="text-muted-foreground">Status</span>
+            <span className="text-muted-foreground">{t('orders.status_label')}</span>
             <span className={`font-medium ${invoice.isPaid ? "text-emerald-600" : "text-amber-600"}`}>
-              {invoice.isPaid ? "✅ PAID" : "⏳ DUE"}
+              {invoice.isPaid ? `✅ ${t('wholesale.paid')}` : `⏳ ${t('wholesale.due')}`}
             </span>
           </div>
           <div className="mt-2 border-t pt-2 text-[10px] text-muted-foreground">
-            Pay to MTN MoMo: 078 XXX XXXX · Reference: {invoice.invoiceNumber}
+            {t('wholesale.pay_momo_reference', { phone: BUSINESS.invoice.momoPaymentNumber, reference: invoice.invoiceNumber })}
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-6 border-t pt-4 text-center text-xs text-muted-foreground">
-          <p>Thank you for your business! 🇷🇼</p>
-          <p className="mt-1">Questions? +250 780 000 000 · wholesale@freedomcosmeticshop.rw</p>
+          <p>{t('wholesale.thank_business')} 🇷🇼</p>
+          <p className="mt-1">{t('wholesale.questions')} {BUSINESS.phoneDisplay} · {BUSINESS.emailInvoices}</p>
         </div>
       </div>
     </div>

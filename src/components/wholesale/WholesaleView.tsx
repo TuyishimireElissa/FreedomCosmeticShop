@@ -50,19 +50,20 @@ import {
 } from "lucide-react"
 import { WholesaleDashboard } from "./WholesaleDashboard"
 import { WholesaleInvoices } from "./WholesaleInvoices"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 type InternalView = "landing" | "apply" | "status" | "success" | "dashboard" | "invoices"
 
 const BUSINESS_TYPES = [
-  { value: "BEAUTY_SALON", label: "💇 Beauty Salon" },
-  { value: "HAIR_SALON", label: "✂️ Hair Salon" },
-  { value: "SPA", label: "🧖 Spa & Wellness" },
-  { value: "SHOP", label: "🏪 Shop / Kiosk" },
-  { value: "MARKET_VENDOR", label: "🛒 Market Vendor" },
-  { value: "BEAUTY_SCHOOL", label: "🎓 Beauty School" },
-  { value: "HOTEL", label: "🏨 Hotel / Lodge" },
-  { value: "RESELLER", label: "📦 Reseller" },
-  { value: "OTHER", label: "📋 Other" },
+  { value: "BEAUTY_SALON", label: "wholesale.business_beauty_salon" },
+  { value: "HAIR_SALON", label: "wholesale.business_hair_salon" },
+  { value: "SPA", label: "wholesale.business_spa" },
+  { value: "SHOP", label: "wholesale.business_shop" },
+  { value: "MARKET_VENDOR", label: "wholesale.business_market_vendor" },
+  { value: "BEAUTY_SCHOOL", label: "wholesale.business_beauty_school" },
+  { value: "HOTEL", label: "wholesale.business_hotel" },
+  { value: "RESELLER", label: "wholesale.business_reseller" },
+  { value: "OTHER", label: "wholesale.business_other" },
 ]
 
 const REVENUE_RANGES = [
@@ -83,6 +84,7 @@ const HEARD_FROM_OPTIONS = [
 // ============================================================================
 
 export function WholesaleView() {
+  const t = useT()
   const { user, goHome, goCatalog } = useStore()
   const [view, setView] = useState<InternalView>("landing")
 
@@ -109,7 +111,7 @@ export function WholesaleView() {
             onClick={goHome}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" /> Back to store
+            <ArrowLeft className="h-4 w-4" /> {t('wholesale.back_store')}
           </button>
         </div>
       </div>
@@ -129,6 +131,7 @@ export function WholesaleView() {
 // ============================================================================
 
 function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: () => void; onCheckStatus: () => void; onDashboard: () => void }) {
+  const t = useT()
   const { user } = useStore()
 
   const isApproved = user?.wholesaleStatus === "APPROVED"
@@ -140,27 +143,27 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
         <div className="mx-auto max-w-4xl text-center">
           <p className="text-5xl">🏪</p>
           <h1 className="mt-4 text-3xl font-bold sm:text-5xl">
-            FreedomCosmeticShop Wholesale Program
+            {t('wholesale.program_title')}
           </h1>
           <p className="mt-3 text-lg text-primary-foreground/90">
-            Rwanda's Premier Beauty Wholesale Supplier
+            {t('wholesale.premier_supplier')}
           </p>
           <p className="mt-2 text-sm text-primary-foreground/80">
-            Up to 30% off retail prices · For salons, shops & resellers across all 30 districts
+            {t('wholesale.hero_subtitle')}
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             {isApproved ? (
               <Button size="lg" variant="secondary" onClick={onDashboard}>
-                🏪 Go to Wholesale Dashboard →
+                🏪 {t('wholesale.go_dashboard')} →
               </Button>
             ) : (
               <Button size="lg" variant="secondary" onClick={onApply}>
-                Apply Now — It's Free →
+                {t('wholesale.apply_free')} →
               </Button>
             )}
             {user && !isApproved && (
               <Button size="lg" variant="outline" onClick={onCheckStatus} className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
-                Check Application Status
+                {t('wholesale.check_status')}
               </Button>
             )}
           </div>
@@ -170,15 +173,15 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
       {/* Benefits */}
       <section className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-center text-2xl font-bold">Why Join Wholesale?</h2>
+          <h2 className="text-center text-2xl font-bold">{t('wholesale.why_join')}</h2>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { icon: TrendingDown, title: "Up to 30% Discount", desc: "Save on every product when you buy in bulk. The more you buy, the more you save." },
-              { icon: Truck, title: "Priority Bulk Delivery", desc: "Fast delivery across all 30 districts of Rwanda. Priority handling for wholesale orders." },
-              { icon: FileText, title: "Professional Invoices", desc: "TIN-compliant invoices with your business details. Perfect for accounting and tax purposes." },
-              { icon: CreditCard, title: "Credit Payment Available", desc: "Buy now, pay later with 30-day credit terms. Credit limit based on your business size." },
-              { icon: Package, title: "Bulk Order Support", desc: "Dedicated account manager for large orders. Special requests accommodated." },
-              { icon: Trophy, title: "Loyalty Rewards", desc: "Earn points on every wholesale order. Redeem for discounts and free products." },
+              { icon: TrendingDown, title: t('wholesale.discount_title'), desc: t('wholesale.discount_desc') },
+              { icon: Truck, title: t('wholesale.priority_title'), desc: t('wholesale.priority_desc') },
+              { icon: FileText, title: t('wholesale.invoices_title'), desc: t('wholesale.invoices_desc') },
+              { icon: CreditCard, title: t('wholesale.credit_title'), desc: t('wholesale.credit_desc') },
+              { icon: Package, title: t('wholesale.bulk_title'), desc: t('wholesale.bulk_desc') },
+              { icon: Trophy, title: t('wholesale.loyalty_title'), desc: t('wholesale.loyalty_desc') },
             ].map((b) => (
               <div key={b.title} className="rounded-2xl border bg-card p-5">
                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10">
@@ -195,15 +198,15 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
       {/* Who Can Apply */}
       <section className="bg-secondary/30 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-center text-2xl font-bold">Who Can Apply?</h2>
+          <h2 className="text-center text-2xl font-bold">{t('wholesale.who_apply')}</h2>
           <p className="mt-1 text-center text-sm text-muted-foreground">
-            Wholesale is available for registered businesses across Rwanda
+            {t('wholesale.registered_rwanda')}
           </p>
           <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {BUSINESS_TYPES.map((bt) => (
               <div key={bt.value} className="rounded-xl border bg-card p-4 text-center">
-                <p className="text-2xl">{bt.label.split(" ")[0]}</p>
-                <p className="mt-1 text-xs font-medium">{bt.label.split(" ").slice(1).join(" ")}</p>
+                <p className="text-2xl">{t(bt.label).split(" ")[0]}</p>
+                <p className="mt-1 text-xs font-medium">{t(bt.label).split(" ").slice(1).join(" ")}</p>
               </div>
             ))}
           </div>
@@ -213,26 +216,26 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
       {/* Price Example Table */}
       <section className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
-          <h2 className="text-center text-2xl font-bold">Example: Wholesale Pricing</h2>
+          <h2 className="text-center text-2xl font-bold">{t('wholesale.pricing_example')}</h2>
           <p className="mt-1 text-center text-sm text-muted-foreground">
-            Sample product — actual discounts vary per product
+            {t('wholesale.pricing_sample_hint')}
           </p>
           <div className="mt-6 overflow-hidden rounded-2xl border">
             <table className="w-full text-sm">
               <thead className="bg-secondary/30">
                 <tr className="text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-3 text-left font-medium">Quantity</th>
-                  <th className="px-4 py-3 text-right font-medium">Unit Price</th>
-                  <th className="px-4 py-3 text-right font-medium">Total Savings</th>
+                  <th className="px-4 py-3 text-left font-medium">{t('product.quantity_label')}</th>
+                  <th className="px-4 py-3 text-right font-medium">{t('product.unit_price')}</th>
+                  <th className="px-4 py-3 text-right font-medium">{t('wholesale.total_savings')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {[
-                  { qty: "1 - 5 units", price: 8500, savings: "—" },
-                  { qty: "6 - 11 units", price: 7500, savings: "Up to 10,000 RWF" },
-                  { qty: "12 - 23 units", price: 7000, savings: "Up to 34,000 RWF" },
-                  { qty: "24 - 47 units", price: 6500, savings: "Up to 96,000 RWF" },
-                  { qty: "48+ units", price: 6000, savings: "Over 240,000 RWF" },
+                  { qty: t('wholesale.qty_1_5'), price: 8500, savings: "—" },
+                  { qty: t('wholesale.qty_6_11'), price: 7500, savings: t('wholesale.save_10000') },
+                  { qty: t('wholesale.qty_12_23'), price: 7000, savings: t('wholesale.save_34000') },
+                  { qty: t('wholesale.qty_24_47'), price: 6500, savings: t('wholesale.save_96000') },
+                  { qty: t('wholesale.qty_48_plus'), price: 6000, savings: t('wholesale.over_240000') },
                 ].map((row) => (
                   <tr key={row.qty} className="hover:bg-secondary/20">
                     <td className="px-4 py-3 font-medium">{row.qty}</td>
@@ -244,7 +247,7 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
             </table>
           </div>
           <p className="mt-3 text-center text-xs text-muted-foreground">
-            Minimum wholesale order: 50,000 RWF · Prices in Rwandan Francs
+            {t('wholesale.minimum_pricing_note')}
           </p>
         </div>
       </section>
@@ -252,13 +255,13 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
       {/* How It Works */}
       <section className="bg-secondary/30 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-center text-2xl font-bold">How It Works</h2>
+          <h2 className="text-center text-2xl font-bold">{t('wholesale.how_works')}</h2>
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-4">
             {[
-              { step: 1, title: "Apply Online", desc: "Fill out the application form in 5 minutes" },
-              { step: 2, title: "We Review", desc: "We review your application within 24-48 hours" },
-              { step: 3, title: "Get Approved", desc: "Access wholesale prices + credit terms" },
-              { step: 4, title: "Order & Save!", desc: "Place bulk orders and save up to 30%" },
+              { step: 1, title: t('wholesale.apply_online'), desc: t('wholesale.apply_online_desc') },
+              { step: 2, title: t('wholesale.we_review'), desc: t('wholesale.we_review_desc') },
+              { step: 3, title: t('wholesale.get_approved'), desc: t('wholesale.get_approved_desc') },
+              { step: 4, title: t('wholesale.order_save'), desc: t('wholesale.order_save_desc') },
             ].map((s) => (
               <div key={s.step} className="text-center">
                 <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
@@ -275,14 +278,14 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
       {/* FAQ */}
       <section className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl">
-          <h2 className="text-center text-2xl font-bold">Frequently Asked Questions</h2>
+          <h2 className="text-center text-2xl font-bold">{t('faq.title')}</h2>
           <div className="mt-6 space-y-3">
             {[
-              { q: "What is the minimum wholesale order?", a: "The minimum wholesale order is 50,000 RWF. Orders below this amount will be processed as retail orders." },
-              { q: "How long does approval take?", a: "We review applications within 24-48 business hours. You'll receive an SMS notification when your application is reviewed." },
-              { q: "What documents do I need?", a: "Business registration and TIN certificate are helpful but not required. You can apply with just your business details and National ID." },
-              { q: "Is credit payment available?", a: "Yes! Approved wholesale customers can pay on credit with 30-day terms. Credit limit is set based on your business size and history." },
-              { q: "Can I order from provinces?", a: "Absolutely! We deliver to all 30 districts of Rwanda. Delivery fees vary by province — Kigali is 1,000 RWF, provinces range from 3,000-4,000 RWF." },
+              { q: t('wholesale.faq_min_q'), a: t('wholesale.faq_min_a') },
+              { q: t('wholesale.faq_approval_q'), a: t('wholesale.faq_approval_a') },
+              { q: t('wholesale.faq_docs_q'), a: t('wholesale.faq_docs_a') },
+              { q: t('wholesale.faq_credit_q'), a: t('wholesale.faq_credit_a') },
+              { q: t('wholesale.faq_provinces_q'), a: t('wholesale.faq_provinces_a') },
             ].map((faq) => (
               <details key={faq.q} className="rounded-xl border bg-card p-4">
                 <summary className="cursor-pointer text-sm font-medium">{faq.q}</summary>
@@ -295,12 +298,12 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
 
       {/* CTA */}
       <section className="bg-primary px-4 py-12 text-center text-primary-foreground sm:px-6 lg:px-8">
-        <h2 className="text-2xl font-bold">Ready to save up to 30%?</h2>
+        <h2 className="text-2xl font-bold">{t('wholesale.ready_save')}</h2>
         <p className="mt-2 text-sm text-primary-foreground/90">
-          Join 100+ Rwandan businesses already saving with FreedomCosmeticShop Wholesale
+          {t('wholesale.join_businesses')}
         </p>
         <Button size="lg" variant="secondary" className="mt-6" onClick={onApply}>
-          Apply for Wholesale Account →
+          {t('home.apply_wholesale_account')} →
         </Button>
       </section>
     </div>
@@ -312,6 +315,7 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
 // ============================================================================
 
 function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void; onBack: () => void }) {
+  const t = useT()
   const { user, goLogin } = useStore()
   const { toast } = useToast()
   const [step, setStep] = useState(1)
@@ -343,36 +347,36 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
   if (!user) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold">Login Required</h1>
+        <h1 className="text-2xl font-bold">{t('wholesale.login_required')}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Please log in or register to apply for a wholesale account.
+          {t('wholesale.login_apply_hint')}
         </p>
         <Button className="mt-6" onClick={goLogin}>
-          Go to Login
+          {t('auth.go_login')}
         </Button>
       </div>
     )
   }
 
   const validateStep1 = () => {
-    if (!businessName.trim()) return "Business name is required"
-    if (!businessPhone.trim()) return "Business phone is required"
-    if (!businessDistrict) return "Business district is required"
-    if (!businessAddress.trim()) return "Business address is required"
+    if (!businessName.trim()) return t('wholesale.business_name_required')
+    if (!businessPhone.trim()) return t('wholesale.business_phone_required')
+    if (!businessDistrict) return t('wholesale.business_district_required')
+    if (!businessAddress.trim()) return t('wholesale.business_address_required')
     return null
   }
 
   const validateStep2 = () => {
-    if (!ownerName.trim()) return "Owner name is required"
-    if (!ownerPhone.trim()) return "Owner phone is required"
-    if (!nationalId.trim()) return "National ID is required"
+    if (!ownerName.trim()) return t('wholesale.owner_name_required')
+    if (!ownerPhone.trim()) return t('wholesale.owner_phone_required')
+    if (!nationalId.trim()) return t('wholesale.national_id_required')
     return null
   }
 
   const handleNext = () => {
     const error = step === 1 ? validateStep1() : step === 2 ? validateStep2() : null
     if (error) {
-      toast({ title: "Please fix errors", description: error, variant: "destructive" })
+      toast({ title: t('wholesale.fix_errors'), description: error, variant: "destructive" })
       return
     }
     setStep(step + 1)
@@ -380,7 +384,7 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
 
   const handleSubmit = async () => {
     if (!agreeTerms || !confirmAccurate) {
-      toast({ title: "Please accept the terms", description: "You must agree to the wholesale terms and confirm your information is accurate.", variant: "destructive" })
+      toast({ title: t('wholesale.accept_terms'), description: t('wholesale.accept_terms_hint'), variant: "destructive" })
       return
     }
 
@@ -405,13 +409,13 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
         }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Submission failed")
+      if (!res.ok) throw new Error(data.error || t('wholesale.submission_failed'))
 
       onSuccess()
     } catch (e) {
       toast({
-        title: "Submission failed",
-        description: e instanceof Error ? e.message : "Unknown error",
+        title: t('wholesale.submission_failed'),
+        description: e instanceof Error ? e.message : t('common.error'),
         variant: "destructive",
       })
     } finally {
@@ -440,35 +444,35 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
       </div>
 
       <p className="mb-6 text-center text-sm text-muted-foreground">
-        Step {step} of 3: {step === 1 ? "Business Details" : step === 2 ? "Owner Details" : "Documents & Submit"}
+        {t('wholesale.step_of', { step })}: {step === 1 ? t('wholesale.business_details') : step === 2 ? t('wholesale.owner_details') : t('wholesale.documents_submit')}
       </p>
 
       {/* Step 1: Business Information */}
       {step === 1 && (
         <div className="space-y-4 rounded-2xl border bg-card p-6">
           <div>
-            <Label htmlFor="biz-name">Business Name *</Label>
+            <Label htmlFor="biz-name">{t('wholesale.business_name')}</Label>
             <Input id="biz-name" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="Amina Beauty Salon" className="mt-1" />
           </div>
           <div>
-            <Label htmlFor="biz-type">Business Type *</Label>
+            <Label htmlFor="biz-type">{t('wholesale.business_type')}</Label>
             <Select value={businessType} onValueChange={setBusinessType}>
               <SelectTrigger id="biz-type" className="mt-1"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {BUSINESS_TYPES.map((bt) => (
-                  <SelectItem key={bt.value} value={bt.value}>{bt.label}</SelectItem>
+                  <SelectItem key={bt.value} value={bt.value}>{t(bt.label)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label htmlFor="biz-phone">Business Phone *</Label>
+            <Label htmlFor="biz-phone">{t('wholesale.business_phone')}</Label>
             <Input id="biz-phone" value={businessPhone} onChange={(e) => setBusinessPhone(e.target.value)} placeholder="+250 780 000 001" className="mt-1" />
           </div>
           <div>
-            <Label htmlFor="biz-district">Business District *</Label>
+            <Label htmlFor="biz-district">{t('wholesale.business_district')}</Label>
             <Select value={businessDistrict} onValueChange={setBusinessDistrict}>
-              <SelectTrigger id="biz-district" className="mt-1"><SelectValue placeholder="Select district" /></SelectTrigger>
+              <SelectTrigger id="biz-district" className="mt-1"><SelectValue placeholder={t('checkout.district_select')} /></SelectTrigger>
               <SelectContent>
                 {allDistricts.map((d) => (
                   <SelectItem key={d} value={d}>{d}</SelectItem>
@@ -477,28 +481,28 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
             </Select>
           </div>
           <div>
-            <Label htmlFor="biz-address">Business Address *</Label>
+            <Label htmlFor="biz-address">{t('wholesale.business_address')}</Label>
             <Input id="biz-address" value={businessAddress} onChange={(e) => setBusinessAddress(e.target.value)} placeholder="KG 123 St, near KCT Building" className="mt-1" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="years">Years in Business</Label>
+              <Label htmlFor="years">{t('wholesale.years_business')}</Label>
               <Select value={yearsInBusiness} onValueChange={setYearsInBusiness}>
                 <SelectTrigger id="years" className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {[1, 2, 3, 5, 10, 20].map((y) => (
-                    <SelectItem key={y} value={String(y)}>{y} year{y > 1 ? "s" : ""}</SelectItem>
+                    <SelectItem key={y} value={String(y)}>{t('wholesale.years_count', { count: y })}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="tin">TIN Number (optional)</Label>
+              <Label htmlFor="tin">{t('wholesale.tin_optional')}</Label>
               <Input id="tin" value={tinNumber} onChange={(e) => setTinNumber(e.target.value)} placeholder="123456789" className="mt-1" />
             </div>
           </div>
           <div className="flex justify-end pt-2">
-            <Button onClick={handleNext}>Next Step →</Button>
+            <Button onClick={handleNext}>{t('wholesale.next_step')} →</Button>
           </div>
         </div>
       )}
@@ -507,46 +511,46 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
       {step === 2 && (
         <div className="space-y-4 rounded-2xl border bg-card p-6">
           <div>
-            <Label htmlFor="owner-name">Owner Full Name *</Label>
+            <Label htmlFor="owner-name">{t('wholesale.owner_full_name')}</Label>
             <Input id="owner-name" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} placeholder="Amina Uwase" className="mt-1" />
           </div>
           <div>
-            <Label htmlFor="owner-phone">Owner Phone *</Label>
+            <Label htmlFor="owner-phone">{t('wholesale.owner_phone')}</Label>
             <Input id="owner-phone" value={ownerPhone} onChange={(e) => setOwnerPhone(e.target.value)} placeholder="+250 780 000 001" className="mt-1" />
           </div>
           <div>
-            <Label htmlFor="owner-email">Owner Email (optional)</Label>
+            <Label htmlFor="owner-email">{t('wholesale.owner_email_optional')}</Label>
             <Input id="owner-email" type="email" value={ownerEmail} onChange={(e) => setOwnerEmail(e.target.value)} placeholder="amina@gmail.com" className="mt-1" />
           </div>
           <div>
-            <Label htmlFor="national-id">National ID Number *</Label>
+            <Label htmlFor="national-id">{t('wholesale.national_id')}</Label>
             <Input id="national-id" value={nationalId} onChange={(e) => setNationalId(e.target.value)} placeholder="1 1990 8 0000001 0 00" className="mt-1" />
           </div>
           <div>
-            <Label htmlFor="revenue">Estimated Monthly Order</Label>
+            <Label htmlFor="revenue">{t('wholesale.monthly_order')}</Label>
             <Select value={monthlyRevenue} onValueChange={setMonthlyRevenue}>
               <SelectTrigger id="revenue" className="mt-1"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {REVENUE_RANGES.map((r) => (
-                  <SelectItem key={r} value={r}>{r}</SelectItem>
+                {REVENUE_RANGES.map((r, index) => (
+                  <SelectItem key={r} value={r}>{t(`wholesale.revenue_${index}`)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label htmlFor="heard">How did you hear about us?</Label>
+            <Label htmlFor="heard">{t('wholesale.heard_about')}</Label>
             <Select value={heardFrom} onValueChange={setHeardFrom}>
               <SelectTrigger id="heard" className="mt-1"><SelectValue /></SelectTrigger>
               <SelectContent>
-                {HEARD_FROM_OPTIONS.map((h) => (
-                  <SelectItem key={h} value={h}>{h}</SelectItem>
+                {HEARD_FROM_OPTIONS.map((h, index) => (
+                  <SelectItem key={h} value={h}>{t(`wholesale.heard_${index}`)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div className="flex justify-between pt-2">
-            <Button variant="outline" onClick={() => setStep(1)}>← Back</Button>
-            <Button onClick={handleNext}>Next Step →</Button>
+            <Button variant="outline" onClick={() => setStep(1)}>← {t('common.back')}</Button>
+            <Button onClick={handleNext}>{t('wholesale.next_step')} →</Button>
           </div>
         </div>
       )}
@@ -555,19 +559,18 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
       {step === 3 && (
         <div className="space-y-4 rounded-2xl border bg-card p-6">
           <div className="rounded-lg border border-dashed p-4 text-center">
-            <p className="text-sm font-medium">📎 Document Upload (optional)</p>
+            <p className="text-sm font-medium">📎 {t('wholesale.document_upload')}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Business registration, TIN certificate, or other documents can help speed up approval.
-              For now, you can submit without documents — we'll contact you if needed.
+              {t('wholesale.documents_hint')}
             </p>
           </div>
           <div>
-            <Label htmlFor="notes">Additional Notes (optional)</Label>
+            <Label htmlFor="notes">{t('wholesale.additional_notes')}</Label>
             <Textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="We supply 5 salons in Kimironko and need regular bulk deliveries..."
+              placeholder={t('wholesale.notes_placeholder')}
               rows={3}
               className="mt-1 resize-none"
               maxLength={1000}
@@ -576,20 +579,20 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
           <div className="space-y-2">
             <label className="flex items-start gap-2 text-sm">
               <input type="checkbox" checked={agreeTerms} onChange={(e) => setAgreeTerms(e.target.checked)} className="mt-1 h-4 w-4 rounded" />
-              <span>I agree to the wholesale terms and conditions, including minimum order requirements and payment terms.</span>
+              <span>{t('wholesale.agree_terms')}</span>
             </label>
             <label className="flex items-start gap-2 text-sm">
               <input type="checkbox" checked={confirmAccurate} onChange={(e) => setConfirmAccurate(e.target.checked)} className="mt-1 h-4 w-4 rounded" />
-              <span>I confirm that all information provided is accurate and complete.</span>
+              <span>{t('wholesale.confirm_accurate')}</span>
             </label>
           </div>
           <div className="flex justify-between pt-2">
-            <Button variant="outline" onClick={() => setStep(2)}>← Back</Button>
+            <Button variant="outline" onClick={() => setStep(2)}>← {t('common.back')}</Button>
             <Button onClick={handleSubmit} disabled={submitting}>
               {submitting ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting...</>
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t('wholesale.submitting')}</>
               ) : (
-                <>Submit Application</>
+                <>{t('wholesale.submit_application')}</>
               )}
             </Button>
           </div>
@@ -597,7 +600,7 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
       )}
 
       <button onClick={onBack} className="mt-6 w-full text-center text-xs text-muted-foreground hover:text-foreground">
-        ← Back to Wholesale Info
+        ← {t('wholesale.back_info')}
       </button>
     </div>
   )
@@ -608,6 +611,7 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
 // ============================================================================
 
 function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
+  const t = useT()
   const { user, goHome, goCatalog, goLogin } = useStore()
   const [application, setApplication] = useState<{
     hasApplication: boolean
@@ -655,9 +659,9 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
   if (!user) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold">Login Required</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Please log in to check your application status.</p>
-        <Button className="mt-6" onClick={goLogin}>Go to Login</Button>
+        <h1 className="text-2xl font-bold">{t('wholesale.login_required')}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t('wholesale.login_status_hint')}</p>
+        <Button className="mt-6" onClick={goLogin}>{t('auth.go_login')}</Button>
       </div>
     )
   }
@@ -666,11 +670,11 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <Store className="mx-auto h-12 w-12 text-muted-foreground/40" />
-        <h1 className="mt-4 text-xl font-bold">No Application Found</h1>
-        <p className="mt-2 text-sm text-muted-foreground">You haven't applied for a wholesale account yet.</p>
-        <Button className="mt-6" onClick={onApply}>Apply for Wholesale →</Button>
+        <h1 className="mt-4 text-xl font-bold">{t('wholesale.no_application')}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{t('wholesale.not_applied')}</p>
+        <Button className="mt-6" onClick={onApply}>{t('home.apply_wholesale')} →</Button>
         <button onClick={goHome} className="mt-4 block w-full text-xs text-muted-foreground hover:text-foreground">
-          ← Back to store
+          ← {t('wholesale.back_store')}
         </button>
       </div>
     )
@@ -686,9 +690,9 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-amber-100">
             <Clock className="h-8 w-8 text-amber-600" />
           </div>
-          <h1 className="mt-4 text-xl font-bold text-amber-900">Application Under Review</h1>
+          <h1 className="mt-4 text-xl font-bold text-amber-900">{t('wholesale.under_review')}</h1>
           <p className="mt-1 font-mono text-sm text-muted-foreground">
-            Application ID: {application.application?.id?.slice(-8).toUpperCase()}
+            {t('wholesale.application_id')}: {application.application?.id?.slice(-8).toUpperCase()}
           </p>
 
           {/* Timeline */}
@@ -697,39 +701,39 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
               <div className="mx-auto grid h-8 w-8 place-items-center rounded-full bg-emerald-500 text-white">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
-              <p className="mt-1 text-[10px] font-medium">Submitted</p>
+              <p className="mt-1 text-[10px] font-medium">{t('wholesale.submitted')}</p>
             </div>
             <div className="flex-1 border-t-2 border-amber-300"></div>
             <div className="text-center">
               <div className="mx-auto grid h-8 w-8 place-items-center rounded-full bg-amber-400 text-white">
                 <Clock className="h-4 w-4 animate-pulse" />
               </div>
-              <p className="mt-1 text-[10px] font-medium">In Review</p>
+              <p className="mt-1 text-[10px] font-medium">{t('wholesale.in_review')}</p>
             </div>
             <div className="flex-1 border-t-2 border-secondary"></div>
             <div className="text-center">
               <div className="mx-auto grid h-8 w-8 place-items-center rounded-full bg-secondary text-muted-foreground">
                 <Sparkles className="h-4 w-4" />
               </div>
-              <p className="mt-1 text-[10px] font-medium">Decision</p>
+              <p className="mt-1 text-[10px] font-medium">{t('wholesale.decision')}</p>
             </div>
           </div>
 
           <p className="mt-6 text-sm text-muted-foreground">
-            Submitted: {new Date(application.application?.appliedAt || "").toLocaleDateString("en-RW", { day: "numeric", month: "long", year: "numeric" })}
+            {t('wholesale.submitted_label')}: {new Date(application.application?.appliedAt || "").toLocaleDateString("en-RW", { day: "numeric", month: "long", year: "numeric" })}
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Expected: Within 48 hours
+            {t('wholesale.expected_48')}
           </p>
           <p className="mt-4 text-xs text-muted-foreground">
-            We will SMS you at <span className="font-medium text-foreground">{user.phone}</span> when your application is reviewed.
+            {t('wholesale.sms_review_prefix')} <span className="font-medium text-foreground">{user.phone}</span> {t('wholesale.sms_review_suffix')}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Questions? WhatsApp: <a href="https://wa.me/250780000000" className="text-primary hover:underline">+250 780 000 000</a>
+            {t('wholesale.questions_whatsapp')}: <a href="https://wa.me/250780000000" className="text-primary hover:underline">+250 780 000 000</a>
           </p>
         </div>
         <button onClick={goHome} className="mt-6 w-full text-center text-xs text-muted-foreground hover:text-foreground">
-          ← Continue Shopping as Retail
+          ← {t('wholesale.continue_retail')}
         </button>
       </div>
     )
@@ -743,32 +747,32 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500">
             <CheckCircle2 className="h-8 w-8 text-white" />
           </div>
-          <h1 className="mt-4 text-xl font-bold text-emerald-900">Wholesale Account Approved! 🎉</h1>
+          <h1 className="mt-4 text-xl font-bold text-emerald-900">{t('wholesale.approved_title')}</h1>
           <p className="mt-1 text-sm text-emerald-700">
-            Welcome to FreedomCosmeticShop Wholesale Program!
+            {t('wholesale.approved_welcome')}
           </p>
 
           <div className="mt-6 space-y-2 text-left">
             <div className="flex items-center gap-2 rounded-lg bg-white p-2 text-sm">
               <TrendingDown className="h-4 w-4 text-emerald-600" />
-              <span>Up to 30% discount on all products</span>
+              <span>{t('wholesale.approved_discount')}</span>
             </div>
             <div className="flex items-center gap-2 rounded-lg bg-white p-2 text-sm">
               <CreditCard className="h-4 w-4 text-emerald-600" />
-              <span>Credit payment available (30-day terms)</span>
+              <span>{t('wholesale.approved_credit')}</span>
             </div>
             <div className="flex items-center gap-2 rounded-lg bg-white p-2 text-sm">
               <FileText className="h-4 w-4 text-emerald-600" />
-              <span>Professional invoices with TIN</span>
+              <span>{t('wholesale.approved_invoices')}</span>
             </div>
             <div className="flex items-center gap-2 rounded-lg bg-white p-2 text-sm">
               <Truck className="h-4 w-4 text-emerald-600" />
-              <span>Priority bulk delivery across Rwanda</span>
+              <span>{t('wholesale.approved_delivery')}</span>
             </div>
           </div>
 
           <Button className="mt-6 w-full" size="lg" onClick={() => goCatalog()}>
-            Start Shopping Wholesale →
+            {t('wholesale.start_wholesale')} →
           </Button>
         </div>
       </div>
@@ -783,25 +787,25 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-red-100">
             <XCircle className="h-8 w-8 text-red-600" />
           </div>
-          <h1 className="mt-4 text-xl font-bold text-red-900">Application Not Approved</h1>
+          <h1 className="mt-4 text-xl font-bold text-red-900">{t('wholesale.not_approved')}</h1>
           <p className="mt-2 text-sm text-red-700">
-            Unfortunately, your wholesale application was not approved at this time.
+            {t('wholesale.not_approved_hint')}
           </p>
           {application.application?.rejectionReason && (
             <div className="mt-4 rounded-lg border border-red-200 bg-white p-3 text-left">
-              <p className="text-xs font-semibold text-red-800">Reason:</p>
+              <p className="text-xs font-semibold text-red-800">{t('wholesale.reason')}:</p>
               <p className="mt-1 text-sm text-red-700">{application.application.rejectionReason}</p>
             </div>
           )}
           <p className="mt-4 text-sm text-muted-foreground">
-            You can still shop as a retail customer. For questions, call <a href="tel:+250780000000" className="text-primary hover:underline">+250 780 000 000</a>.
+            {t('wholesale.retail_call_prefix')} <a href="tel:+250780000000" className="text-primary hover:underline">+250 780 000 000</a>.
           </p>
           <div className="mt-6 space-y-2">
             <Button variant="outline" className="w-full" onClick={onApply}>
-              Reapply (after 30 days)
+              {t('wholesale.reapply_30')}
             </Button>
             <Button className="w-full" onClick={() => goCatalog()}>
-              Continue Shopping
+              {t('cart.continue_shopping')}
             </Button>
           </div>
         </div>
@@ -812,8 +816,8 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
   // Unknown status
   return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
-      <p className="text-sm text-muted-foreground">Status: {status}</p>
-      <Button className="mt-6" onClick={goHome}>Back to store</Button>
+      <p className="text-sm text-muted-foreground">{t('orders.status_label')}: {status}</p>
+      <Button className="mt-6" onClick={goHome}>{t('wholesale.back_store')}</Button>
     </div>
   )
 }
@@ -823,6 +827,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
 // ============================================================================
 
 function WholesaleSuccessPage({ onCheckStatus, onContinue }: { onCheckStatus: () => void; onContinue: () => void }) {
+  const t = useT()
   const { user } = useStore()
   return (
     <div className="mx-auto max-w-md px-4 py-12">
@@ -830,13 +835,13 @@ function WholesaleSuccessPage({ onCheckStatus, onContinue }: { onCheckStatus: ()
         <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500">
           <CheckCircle2 className="h-8 w-8 text-white" />
         </div>
-        <h1 className="mt-4 text-2xl font-bold text-emerald-900">Application Submitted! 🎉</h1>
+        <h1 className="mt-4 text-2xl font-bold text-emerald-900">{t('wholesale.application_submitted')}</h1>
         <p className="mt-2 text-sm text-emerald-700">
-          We will review your application within 24-48 business hours.
+          {t('wholesale.review_24_48')}
         </p>
 
         <div className="mt-6 rounded-lg bg-white p-4 text-left">
-          <p className="text-xs font-semibold text-muted-foreground">We will contact you on:</p>
+          <p className="text-xs font-semibold text-muted-foreground">{t('wholesale.contact_on')}:</p>
           <p className="mt-1 flex items-center gap-1.5 text-sm">
             <Phone className="h-3.5 w-3.5 text-primary" /> {user?.phone}
           </p>
@@ -848,15 +853,15 @@ function WholesaleSuccessPage({ onCheckStatus, onContinue }: { onCheckStatus: ()
         </div>
 
         <p className="mt-4 text-xs text-muted-foreground">
-          You will receive an SMS confirmation shortly. We'll also SMS you when your application is reviewed.
+          {t('wholesale.sms_confirmation')}
         </p>
 
         <div className="mt-6 space-y-2">
           <Button className="w-full" onClick={onCheckStatus}>
-            Check Application Status
+            {t('wholesale.check_status')}
           </Button>
           <Button variant="outline" className="w-full" onClick={onContinue}>
-            Continue Shopping as Retail
+            {t('wholesale.continue_retail')}
           </Button>
         </div>
       </div>

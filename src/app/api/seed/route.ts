@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 
 import { NextResponse } from 'next/server'
 import { requireRole } from '@/lib/auth'
+import { shouldBlockProductionSeedRoute } from '@/lib/route-security'
 
 /**
  * Production seeding is deliberately disabled. Database seeding must run from
@@ -10,8 +11,15 @@ import { requireRole } from '@/lib/auth'
  */
 export async function POST() {
   try {
-    if (process.env.NODE_ENV === 'production' || process.env.ALLOW_SEED !== 'true') {
-      return NextResponse.json({ success: false, error: 'Not found' }, { status: 404 })
+    // Defense 2: fail closed in the route even if middleware is bypassed.
+    if (
+      shouldBlockProductionSeedRoute('/api/seed', process.env.NODE_ENV) ||
+      process.env.ALLOW_SEED !== 'true'
+    ) {
+      return NextResponse.json(
+        { success: false, error: 'Not found' },
+        { status: 404, headers: { 'Cache-Control': 'private, no-store, max-age=0' } },
+      )
     }
     await requireRole('ADMIN')
     return NextResponse.json(
@@ -28,3 +36,11 @@ export async function POST() {
     )
   }
 }
+
+// Every method fails closed. In production middleware rejects these requests
+// before this module runs; these exports provide route-level defense-in-depth.
+export const GET = POST
+export const PUT = POST
+export const PATCH = POST
+export const DELETE = POST
+export const OPTIONS = POST

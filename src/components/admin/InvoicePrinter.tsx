@@ -15,6 +15,7 @@
 
 import { Button } from "@/components/ui/button"
 import { formatRWF, PAYMENT_METHODS, PaymentMethodKey } from "@/lib/format"
+import { BUSINESS } from "@/lib/business-config"
 import { Printer } from "lucide-react"
 import type { Order } from "@/lib/types"
 
@@ -177,8 +178,8 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
   <div class="header">
     <div>
       <div class="logo">
-        FreedomCosmeticShop
-        <small>Beauty that unites us</small>
+        ${BUSINESS.legalName.includes('TODO') ? BUSINESS.tradingName : BUSINESS.legalName}
+        <small>${BUSINESS.tagline}</small>
       </div>
     </div>
     <div class="invoice-meta">
@@ -256,9 +257,10 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
   </div>
 
   <div class="footer">
-    <p>Thank you for shopping with FreedomCosmeticShop! 🌸</p>
-    <p>KN 4 Ave, Kigali Heights, Kigali, Rwanda · +250 788 123 456 · hello@freedomcosmeticshop.rw</p>
-    <p>For support, call us or send a WhatsApp message.</p>
+    <p>Thank you for shopping with ${BUSINESS.tradingName}! 🌸</p>
+    <p>${BUSINESS.address.full} · ${BUSINESS.phoneDisplay} · ${BUSINESS.emailInvoices}</p>
+    ${BUSINESS.tinNumber.includes('TODO') ? '' : `<p>TIN: ${BUSINESS.tinNumber}</p>`}
+    <p>For support, call ${BUSINESS.phoneDisplay} or send a WhatsApp message to ${BUSINESS.whatsapp}.</p>
   </div>
 
   <div class="no-print" style="text-align: center; margin-top: 24px;">

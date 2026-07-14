@@ -40,6 +40,8 @@ export interface AuthUser {
   wholesaleStatus?: string | null
   wholesaleDiscount?: number
   businessName?: string | null
+  mfaEnabled?: boolean
+  mustChangePassword?: boolean
 }
 
 export interface CartItem {

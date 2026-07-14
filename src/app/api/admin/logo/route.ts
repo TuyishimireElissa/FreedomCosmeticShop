@@ -4,7 +4,9 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import cloudinary from '@/lib/cloudinary'
 import { requireRole } from '@/lib/auth'
+import { DESTRUCTIVE_OPERATIONS, requireDestructiveOperation } from '@/lib/permissions'
 import { emitRealtimeEvent } from '@/lib/event-bus'
+import { logActivity } from '@/server/services/activity'
 
 const allowed = new Set(['image/jpeg','image/png','image/webp'])
 const maxSize = 5 * 1024 * 1024
@@ -34,16 +36,18 @@ export async function POST(request: Request) {
     if (oldPublicId && oldPublicId !== uploaded.public_id) await cloudinary.uploader.destroy(oldPublicId).catch(()=>{})
     emitRealtimeEvent('logo:updated',{logoUrl:updated.logoUrl,storeName:updated.storeName},{source:admin.name})
     const data={logoUrl:updated.logoUrl,logoPublicId:updated.logoPublicId}
+    await logActivity({ userId: admin.id, userName: admin.name, userRole: admin.role, action: 'LOGO_UPDATED', entityType: 'SETTINGS', entityId: updated.id, description: 'Store logo uploaded to Cloudinary', req: request })
     return NextResponse.json({success:true,data,...data},{status:201})
   } catch (error) { const status=error instanceof Error&&'statusCode'in error?Number((error as {statusCode:number}).statusCode):500;console.error('Logo upload error:',error);return NextResponse.json({success:false,error:status===500?'Logo upload failed':(error as Error).message},{status}) }
 }
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
   try {
-    const admin=await requireRole('ADMIN','MANAGER');const settings=await prisma.storeSettings.findFirst();if(!settings)return NextResponse.json({success:false,error:'Store settings not found'},{status:404})
+    const admin=await requireDestructiveOperation(DESTRUCTIVE_OPERATIONS.STORE_BRANDING_DELETE);const settings=await prisma.storeSettings.findFirst();if(!settings)return NextResponse.json({success:false,error:'Store settings not found'},{status:404})
     if(settings.logoPublicId)await cloudinary.uploader.destroy(settings.logoPublicId).catch(()=>{})
     const updated=await prisma.storeSettings.update({where:{id:settings.id},data:{logoUrl:null,logoPublicId:null,logoUpdatedAt:null}})
     emitRealtimeEvent('logo:updated',{logoUrl:null,storeName:updated.storeName},{source:admin.name})
+    await logActivity({ userId: admin.id, userName: admin.name, userRole: admin.role, action: 'LOGO_REMOVED', entityType: 'SETTINGS', entityId: updated.id, description: 'Store logo removed', req: request, severity: 'warn' })
     return NextResponse.json({success:true,data:{logoUrl:null},logoUrl:null})
   } catch(error){const status=error instanceof Error&&'statusCode'in error?Number((error as {statusCode:number}).statusCode):500;console.error('Logo delete error:',error);return NextResponse.json({success:false,error:status===500?'Logo removal failed':(error as Error).message},{status})}
 }

@@ -14,6 +14,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface Review {
   name: string
@@ -73,6 +74,7 @@ const DEFAULT_REVIEWS: Review[] = [
 ]
 
 export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselProps) {
+  const t = useT()
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
 
@@ -102,14 +104,14 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-2">
             <span className="rounded-full bg-background px-2.5 py-0.5 text-xs font-medium text-primary">
-              Testimonials
+              {t('home.testimonials')}
             </span>
           </div>
           <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            Loved by Rwandans
+            {t('home.loved_by_rwandans')}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Real reviews from our customers across the country.
+            {t('home.reviews_countrywide')}
           </p>
           <div className="mt-3 flex items-center justify-center gap-2">
             <div className="flex">
@@ -119,7 +121,7 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
             </div>
             <span className="text-sm font-medium">4.8/5</span>
             <span className="text-sm text-muted-foreground">
-              from 1,200+ reviews
+              {t('home.from_reviews', { count: '1,200+' })}
             </span>
           </div>
         </div>
@@ -182,7 +184,7 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
               variant="outline"
               size="icon"
               onClick={prev}
-              aria-label="Previous reviews"
+              aria-label={t('home.previous_reviews')}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -194,7 +196,7 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
                   className={`h-2 rounded-full transition-all ${
                     i === current ? "w-6 bg-primary" : "w-2 bg-muted-foreground/30"
                   }`}
-                  aria-label={`Go to review group ${i + 1}`}
+                  aria-label={t('home.review_group', { number: i + 1 })}
                 />
               ))}
             </div>
@@ -202,7 +204,7 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
               variant="outline"
               size="icon"
               onClick={next}
-              aria-label="Next reviews"
+              aria-label={t('home.next_reviews')}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

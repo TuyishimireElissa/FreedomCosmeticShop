@@ -22,6 +22,7 @@ import { SignJWT, jwtVerify } from "jose"
 import bcrypt from "bcryptjs"
 import { cookies } from "next/headers"
 import { NextRequest, NextResponse } from "next/server"
+import { resolveAuthSecret } from "@/lib/auth-secret"
 
 const ACCESS_TOKEN_NAME = "ub_access"
 const REFRESH_TOKEN_NAME = "ub_refresh"
@@ -32,10 +33,12 @@ const ACCESS_TOKEN_TTL_SECONDS = 15 * 60
 const REFRESH_TOKEN_TTL = "30d" // 30 days
 const REFRESH_TOKEN_TTL_SECONDS = 30 * 24 * 60 * 60
 
-// JWT secret — in production, this MUST be set via env
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || "dev-only-secret-change-in-production-32chars"
-)
+// Production fails closed if neither configured secret is strong enough.
+const JWT_SECRET = new TextEncoder().encode(resolveAuthSecret(
+  process.env.NEXTAUTH_SECRET,
+  process.env.JWT_SECRET,
+  process.env.NODE_ENV,
+))
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -61,6 +64,8 @@ export interface AuthUser {
   wholesaleStatus?: string | null
   wholesaleDiscount?: number
   businessName?: string | null
+  mfaEnabled?: boolean
+  mustChangePassword?: boolean
 }
 
 // ─── Password hashing ────────────────────────────────────────────────────────
@@ -243,6 +248,8 @@ export async function requireAuth(): Promise<AuthUser | null> {
       wholesaleStatus: true,
       wholesaleDiscount: true,
       businessName: true,
+      mfaEnabled: true,
+      mustChangePassword: true,
     },
   })
 

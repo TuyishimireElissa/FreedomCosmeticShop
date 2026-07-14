@@ -3,11 +3,12 @@ import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminHeader from '@/components/admin/AdminHeader'
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard'
 import { AdminShellProvider } from '@/components/admin/AdminShellContext'
+import { BUSINESS } from '@/lib/business-config'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Admin | FreedomCosmeticShop',
-    template: '%s | FCS Admin',
+    default: `Admin | ${BUSINESS.name}`,
+    template: `%s | ${BUSINESS.invoice.prefix} Admin`,
   },
 }
 

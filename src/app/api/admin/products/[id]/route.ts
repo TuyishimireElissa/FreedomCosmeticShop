@@ -10,7 +10,13 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
-import { requirePermission, PERMISSIONS, rateLimit } from "@/lib/permissions"
+import {
+  DESTRUCTIVE_OPERATIONS,
+  requireDestructiveOperation,
+  requirePermission,
+  PERMISSIONS,
+  rateLimit,
+} from "@/lib/permissions"
 import { broadcastProductEvent } from "@/lib/realtime"
 import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
@@ -241,7 +247,7 @@ export async function DELETE(
 ) {
   try {
     // Section 11: Strict permission check (PRODUCTS_CRUD) + rate limiting (10/min)
-    const adminUser = await requirePermission(PERMISSIONS.PRODUCTS_CRUD)
+    const adminUser = await requireDestructiveOperation(DESTRUCTIVE_OPERATIONS.PRODUCT_DELETE)
     const rl = rateLimit(`admin:${adminUser.id}:product-delete`, { maxActions: 10, windowMs: 60000 })
     if (!rl.allowed) {
       return NextResponse.json(

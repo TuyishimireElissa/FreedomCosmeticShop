@@ -51,27 +51,29 @@ import {
   ChevronRight,
   Star,
 } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 type SortKey = "newest" | "price-asc" | "price-desc" | "rating" | "best-selling"
 type ViewMode = "grid" | "list"
 
 const SKIN_TYPES = [
-  { value: "ALL", label: "All skin types" },
-  { value: "OILY", label: "Oily" },
-  { value: "DRY", label: "Dry" },
-  { value: "COMBINATION", label: "Combination" },
-  { value: "SENSITIVE", label: "Sensitive" },
-  { value: "NORMAL", label: "Normal" },
+  { value: "ALL", label: "skin_types.ALL" },
+  { value: "OILY", label: "skin_types.OILY" },
+  { value: "DRY", label: "skin_types.DRY" },
+  { value: "COMBINATION", label: "skin_types.COMBINATION" },
+  { value: "SENSITIVE", label: "skin_types.SENSITIVE" },
+  { value: "NORMAL", label: "skin_types.NORMAL" },
 ]
 
 const PRICE_PRESETS = [
-  { label: "Under RWF 5,000", min: 0, max: 5000 },
-  { label: "RWF 5,000 - 10,000", min: 5000, max: 10000 },
-  { label: "RWF 10,000 - 15,000", min: 10000, max: 15000 },
-  { label: "Over RWF 15,000", min: 15000, max: 100000 },
+  { label: "search.price_under_5000", min: 0, max: 5000 },
+  { label: "search.price_5000_10000", min: 5000, max: 10000 },
+  { label: "search.price_10000_15000", min: 10000, max: 15000 },
+  { label: "search.price_over_15000", min: 15000, max: 100000 },
 ]
 
 export function CatalogView() {
+  const t = useT()
   const {
     catalogCategory,
     catalogSearch,
@@ -242,20 +244,20 @@ export function CatalogView() {
   if (catalogCategory) {
     const cat = categories.find((c) => c.slug === catalogCategory)
     activeFilters.push({
-      label: `Category: ${cat?.name || catalogCategory}`,
+      label: t('search.filter_category', { category: cat?.name || catalogCategory }),
       onRemove: () => goCatalog(null),
     })
   }
   if (catalogSearch) {
     activeFilters.push({
-      label: `Search: "${catalogSearch}"`,
+      label: t('search.filter_search', { query: catalogSearch }),
       onRemove: () => clearCatalogSearch(),
     })
   }
   if (selectedBrand) {
     const br = brands.find((b) => b.slug === selectedBrand)
     activeFilters.push({
-      label: `Brand: ${br?.name || selectedBrand}`,
+      label: t('search.filter_brand', { brand: br?.name || selectedBrand }),
       onRemove: () => setSelectedBrand(""),
     })
   }
@@ -267,27 +269,27 @@ export function CatalogView() {
   }
   if (skinType) {
     activeFilters.push({
-      label: `Skin: ${skinType}`,
+      label: t('search.filter_skin', { skin: t(`skin_types.${skinType}`) }),
       onRemove: () => setSkinType(""),
     })
   }
   if (minRating > 0) {
     activeFilters.push({
-      label: `${minRating}+ stars`,
+      label: t('search.stars_up', { rating: minRating }),
       onRemove: () => setMinRating(0),
     })
   }
   if (inStockOnly) {
     activeFilters.push({
-      label: "In stock only",
+      label: t('search.in_stock_only'),
       onRemove: () => setInStockOnly(false),
     })
   }
 
   const hasActiveFilters = activeFilters.length > 0
   const currentCategoryName = catalogCategory
-    ? categories.find((c) => c.slug === catalogCategory)?.name || "Catalog"
-    : "All products"
+    ? categories.find((c) => c.slug === catalogCategory)?.name || t('search.catalog')
+    : t('categories.all')
 
   // ─── Filter panel (reused in sidebar + mobile sheet) ──────────────
   const FilterPanel = (
@@ -295,7 +297,7 @@ export function CatalogView() {
       {/* Categories */}
       <div>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground/70">
-          Category
+          {t('search.category')}
         </h3>
         <div className="flex flex-col gap-1">
           <button
@@ -309,7 +311,7 @@ export function CatalogView() {
                 : "hover:bg-secondary"
             }`}
           >
-            All categories
+            {t('search.all_categories')}
           </button>
           {categories.map((c) => (
             <button
@@ -337,7 +339,7 @@ export function CatalogView() {
       {brands.length > 0 && (
         <div>
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground/70">
-            Brand
+            {t('search.brand')}
           </h3>
           <div className="flex flex-col gap-1">
             <button
@@ -346,7 +348,7 @@ export function CatalogView() {
                 !selectedBrand ? "bg-primary text-primary-foreground" : "hover:bg-secondary"
               }`}
             >
-              All brands
+              {t('search.all_brands')}
             </button>
             {brands.map((b) => (
               <button
@@ -368,7 +370,7 @@ export function CatalogView() {
       {/* Price range */}
       <div>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground/70">
-          Price range (RWF)
+          {t('search.price_range_label')}
         </h3>
         <div className="mb-3 flex items-center gap-2">
           <Checkbox
@@ -377,7 +379,7 @@ export function CatalogView() {
             onCheckedChange={(v) => setPriceEnabled(v === true)}
           />
           <Label htmlFor="price-enable" className="text-sm font-normal">
-            Filter by price
+            {t('search.filter_by_price')}
           </Label>
         </div>
         {priceEnabled && (
@@ -406,7 +408,7 @@ export function CatalogView() {
                   }}
                   className="rounded-lg px-2 py-1 text-left text-xs text-foreground/70 hover:bg-secondary"
                 >
-                  {p.label}
+                  {t(p.label)}
                 </button>
               ))}
             </div>
@@ -417,7 +419,7 @@ export function CatalogView() {
       {/* Skin type */}
       <div>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground/70">
-          Skin type
+          {t('search.skin_type')}
         </h3>
         <div className="flex flex-col gap-1">
           <button
@@ -426,7 +428,7 @@ export function CatalogView() {
               !skinType ? "bg-primary text-primary-foreground" : "hover:bg-secondary"
             }`}
           >
-            All skin types
+            {t('skin_types.ALL')}
           </button>
           {SKIN_TYPES.filter((s) => s.value !== "ALL").map((s) => (
             <button
@@ -438,7 +440,7 @@ export function CatalogView() {
                   : "hover:bg-secondary"
               }`}
             >
-              {s.label}
+              {t(s.label)}
             </button>
           ))}
         </div>
@@ -447,7 +449,7 @@ export function CatalogView() {
       {/* Rating */}
       <div>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-foreground/70">
-          Minimum rating
+          {t('search.minimum_rating')}
         </h3>
         <div className="flex flex-col gap-1">
           {[0, 3, 4, 4.5].map((r) => (
@@ -459,7 +461,7 @@ export function CatalogView() {
               }`}
             >
               {r === 0 ? (
-                "All ratings"
+                t('search.all_ratings')
               ) : (
                 <>
                   <span className="flex">
@@ -474,7 +476,7 @@ export function CatalogView() {
                       />
                     ))}
                   </span>
-                  <span>{r}+ stars</span>
+                  <span>{t('search.stars_up', { rating: r })}</span>
                 </>
               )}
             </button>
@@ -490,14 +492,14 @@ export function CatalogView() {
           onCheckedChange={(v) => setInStockOnly(v === true)}
         />
         <Label htmlFor="in-stock" className="text-sm font-normal">
-          In stock only
+          {t('search.in_stock_only')}
         </Label>
       </div>
 
       {/* Clear all */}
       {hasActiveFilters && (
         <Button variant="outline" className="w-full" onClick={clearAllFilters}>
-          <X className="mr-1.5 h-4 w-4" /> Clear all filters
+          <X className="mr-1.5 h-4 w-4" /> {t('search.clear_all_filters')}
         </Button>
       )}
     </div>
@@ -512,11 +514,11 @@ export function CatalogView() {
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {loading
-            ? "Loading products..."
-            : `${pagination.total} product${pagination.total !== 1 ? "s" : ""} found`}
+            ? t('search.loading_products')
+            : t('search.products_found', { count: pagination.total })}
           {catalogSearch && (
             <>
-              {" "}for <span className="font-medium">&ldquo;{catalogSearch}&rdquo;</span>
+              {" "}{t('search.for_query')} <span className="font-medium">&ldquo;{catalogSearch}&rdquo;</span>
             </>
           )}
         </p>
@@ -535,14 +537,14 @@ export function CatalogView() {
               <button
                 onClick={f.onRemove}
                 className="rounded-full p-0.5 hover:bg-background"
-                aria-label={`Remove filter: ${f.label}`}
+                aria-label={t('search.remove_filter', { filter: f.label })}
               >
                 <X className="h-3 w-3" />
               </button>
             </Badge>
           ))}
           <Button variant="ghost" size="sm" onClick={clearAllFilters} className="h-7 text-xs">
-            Clear all
+            {t('common.clear')}
           </Button>
         </div>
       )}
@@ -553,7 +555,7 @@ export function CatalogView() {
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search products..."
+            placeholder={t('search.placeholder')}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="h-10 pl-9 pr-9"
@@ -566,7 +568,7 @@ export function CatalogView() {
                 clearCatalogSearch()
               }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              aria-label="Clear search"
+              aria-label={t('search.clear_search')}
             >
               <X className="h-4 w-4" />
             </button>
@@ -576,14 +578,14 @@ export function CatalogView() {
         {/* Sort */}
         <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
           <SelectTrigger className="h-10 w-[160px] sm:w-[180px]">
-            <SelectValue placeholder="Sort by" />
+            <SelectValue placeholder={t('search.sort_by')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="newest">Newest</SelectItem>
-            <SelectItem value="price-asc">Price: Low to High</SelectItem>
-            <SelectItem value="price-desc">Price: High to Low</SelectItem>
-            <SelectItem value="rating">Top rated</SelectItem>
-            <SelectItem value="best-selling">Best selling</SelectItem>
+            <SelectItem value="newest">{t('search.sort_newest')}</SelectItem>
+            <SelectItem value="price-asc">{t('search.sort_price_low')}</SelectItem>
+            <SelectItem value="price-desc">{t('search.sort_price_high')}</SelectItem>
+            <SelectItem value="rating">{t('search.sort_top_rated')}</SelectItem>
+            <SelectItem value="best-selling">{t('search.sort_best_selling')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -594,7 +596,7 @@ export function CatalogView() {
             size="icon"
             className="h-10 w-10 rounded-r-none"
             onClick={() => setViewMode("grid")}
-            aria-label="Grid view"
+            aria-label={t('search.grid_view')}
           >
             <LayoutGrid className="h-4 w-4" />
           </Button>
@@ -603,7 +605,7 @@ export function CatalogView() {
             size="icon"
             className="h-10 w-10 rounded-l-none"
             onClick={() => setViewMode("list")}
-            aria-label="List view"
+            aria-label={t('search.list_view')}
           >
             <List className="h-4 w-4" />
           </Button>
@@ -614,7 +616,7 @@ export function CatalogView() {
           <SheetTrigger asChild>
             <Button variant="outline" className="lg:hidden">
               <SlidersHorizontal className="mr-1.5 h-4 w-4" />
-              Filters
+              {t('search.filters')}
               {hasActiveFilters && (
                 <span className="ml-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
                   {activeFilters.length}
@@ -624,7 +626,7 @@ export function CatalogView() {
           </SheetTrigger>
           <SheetContent side="left" className="w-80 overflow-y-auto">
             <SheetHeader>
-              <SheetTitle>Filters</SheetTitle>
+              <SheetTitle>{t('search.filters')}</SheetTitle>
             </SheetHeader>
             <div className="mt-4">{FilterPanel}</div>
           </SheetContent>
@@ -660,13 +662,12 @@ export function CatalogView() {
           ) : products.length === 0 ? (
             <div className="grid place-items-center rounded-2xl border border-dashed py-20 text-center">
               <PackageOpen className="h-12 w-12 text-muted-foreground/50" />
-              <h3 className="mt-4 text-lg font-semibold">No products found</h3>
+              <h3 className="mt-4 text-lg font-semibold">{t('empty.products')}</h3>
               <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                Try adjusting your filters or search terms. Check the category
-                or remove some filters.
+                {t('search.adjust_filters_hint')}
               </p>
               <Button variant="outline" className="mt-4" onClick={clearAllFilters}>
-                Clear all filters
+                {t('search.clear_all_filters')}
               </Button>
             </div>
           ) : viewMode === "grid" ? (
@@ -691,7 +692,7 @@ export function CatalogView() {
                 size="icon"
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                aria-label="Previous page"
+                aria-label={t('common.previous')}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -729,7 +730,7 @@ export function CatalogView() {
                 size="icon"
                 onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
                 disabled={page === pagination.totalPages}
-                aria-label="Next page"
+                aria-label={t('common.next')}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -745,6 +746,7 @@ export function CatalogView() {
  * ProductListCard — horizontal card for list view.
  */
 function ProductListCard({ product }: { product: Product }) {
+  const t = useT()
   const { goProduct, addToCart } = useStore()
   const images = product.images || []
   const primaryImage = images[0] || "/placeholder.svg"
@@ -819,7 +821,7 @@ function ProductListCard({ product }: { product: Product }) {
               })
             }}
           >
-            {outOfStock ? "Sold out" : "Add to cart"}
+            {outOfStock ? t('common.sold_out') : t('product.add_to_cart')}
           </Button>
         </div>
       </div>

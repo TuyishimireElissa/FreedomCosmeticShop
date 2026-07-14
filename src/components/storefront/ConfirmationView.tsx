@@ -33,19 +33,21 @@ import {
   ArrowRight,
   Share2,
 } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface ConfirmationViewProps {
   orderId: string
 }
 
 const STATUS_STEPS = [
-  { key: "PENDING", label: "Order placed", icon: CheckCircle2 },
-  { key: "CONFIRMED", label: "Confirmed", icon: Package },
-  { key: "SHIPPED", label: "Shipped", icon: Truck },
-  { key: "DELIVERED", label: "Delivered", icon: HomeIcon },
+  { key: "PENDING", label: "orders.step_placed", icon: CheckCircle2 },
+  { key: "CONFIRMED", label: "orders.status_confirmed", icon: Package },
+  { key: "SHIPPED", label: "orders.status_shipped", icon: Truck },
+  { key: "DELIVERED", label: "orders.status_delivered", icon: HomeIcon },
 ]
 
 export function ConfirmationView({ orderId }: ConfirmationViewProps) {
+  const t = useT()
   const { goCatalog, goHome, goTrackOrder } = useStore()
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
@@ -76,7 +78,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
     const items = order.items
       .map((i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`)
       .join("\n")
-    const message = `🛍️ Order ${order.orderNumber} from FreedomCosmeticShop\n\n${items}\n\nTotal: ${formatRWF(order.total)}\nPayment: ${PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod}\nStatus: ${order.status}\n\nTrack at freedomcosmeticshop.rw 🌸`
+    const message = t('checkout.order_share_message', { order: order.orderNumber, items, total: formatRWF(order.total), payment: PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod, status: order.status })
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, "_blank")
   }
 
@@ -94,12 +96,12 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
   if (!order) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold">Order not found</h1>
+        <h1 className="text-2xl font-bold">{t('checkout.order_not_found')}</h1>
         <p className="mt-2 text-muted-foreground">
-          We couldn&apos;t find this order. It may have been removed.
+          {t('checkout.order_not_found_hint')}
         </p>
         <Button className="mt-6" onClick={goHome}>
-          Back to home
+          {t('checkout.back_home')}
         </Button>
       </div>
     )
@@ -119,15 +121,15 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
           <CheckCircle2 className="h-12 w-12" />
         </div>
         <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
-          {isCancelled ? "Order cancelled" : "Thank you for your order!"}
+          {isCancelled ? t('checkout.order_cancelled') : t('checkout.thank_you_order')}
         </h1>
         <p className="mt-2 text-muted-foreground">
-          We&apos;ve received your order and will contact you on{" "}
-          <span className="font-medium text-foreground">{order.customerPhone}</span> to confirm.
+          {t('checkout.received_contact_prefix')} {" "}
+          <span className="font-medium text-foreground">{order.customerPhone}</span> {t('checkout.to_confirm')}
         </p>
         <div className="mt-3 inline-flex items-center gap-2 rounded-full bg-secondary px-4 py-1.5">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">
-            Order number
+            {t('checkout.order_number')}
           </span>
           <span className="font-mono text-sm font-semibold">{order.orderNumber}</span>
         </div>
@@ -137,7 +139,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
       {!isCancelled && (
         <div className="mt-8 rounded-2xl border bg-card p-5">
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Order status
+            {t('checkout.order_status')}
           </h2>
           <ol className="grid grid-cols-4 gap-2 sm:gap-4">
             {STATUS_STEPS.map((step, i) => {
@@ -159,7 +161,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
                       done ? "text-foreground" : "text-muted-foreground"
                     }`}
                   >
-                    {step.label}
+                    {t(step.label)}
                   </span>
                 </li>
               )
@@ -167,7 +169,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
           </ol>
           <div className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-secondary/40 p-3 text-sm">
             <Clock className="h-4 w-4 text-primary" />
-            <span className="text-muted-foreground">Estimated delivery:</span>
+            <span className="text-muted-foreground">{t('checkout.estimated_delivery_label')}</span>
             <span className="font-medium">{estimatedDelivery}</span>
           </div>
         </div>
@@ -177,7 +179,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border bg-card p-5">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Customer
+            {t('checkout.customer')}
           </h2>
           <p className="mt-2 font-medium">{order.customerName}</p>
           <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -189,7 +191,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         </div>
         <div className="rounded-2xl border bg-card p-5">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Delivery address
+            {t('checkout.step_address')}
           </h2>
           <p className="mt-2 flex items-start gap-1.5 text-sm">
             <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
@@ -211,7 +213,7 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
       {/* ─── Order items ─────────────────────────────────────────────── */}
       <div className="mt-6 rounded-2xl border bg-card p-5">
         <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-          Items
+          {t('checkout.items_label')}
         </h2>
         <ul className="mt-3 space-y-3">
           {order.items.map((item) => (
@@ -237,28 +239,28 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         {/* Totals */}
         <div className="mt-4 space-y-2 border-t pt-4 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Subtotal</span>
+            <span className="text-muted-foreground">{t('cart.subtotal')}</span>
             <span>{formatRWF(order.subtotal)}</span>
           </div>
           {order.discountAmount > 0 && (
             <div className="flex justify-between text-emerald-600">
-              <span>Discount</span>
+              <span>{t('cart.discount')}</span>
               <span>−{formatRWF(order.discountAmount)}</span>
             </div>
           )}
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Delivery fee</span>
+            <span className="text-muted-foreground">{t('checkout.delivery_fee')}</span>
             <span>{formatRWF(order.deliveryFee)}</span>
           </div>
           <div className="flex items-baseline justify-between border-t pt-2">
-            <span className="font-semibold">Total</span>
+            <span className="font-semibold">{t('cart.total')}</span>
             <span className="text-xl font-bold">{formatRWF(order.total)}</span>
           </div>
         </div>
 
         {/* Payment status */}
         <div className="mt-4 flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-3 text-sm">
-          <span className="text-muted-foreground">Payment</span>
+          <span className="text-muted-foreground">{t('checkout.step_payment')}</span>
           <span className="font-medium">
             {paymentLabel} ·{" "}
             <span
@@ -281,10 +283,9 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
         <div className="flex items-start gap-3">
           <MessageCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
           <div>
-            <p className="font-medium">What happens next?</p>
+            <p className="font-medium">{t('checkout.what_next')}</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              We&apos;ll send SMS updates to {order.customerPhone} as your order is confirmed,
-              shipped, and delivered. If you have questions, call us at{" "}
+              {t('checkout.sms_updates_next', { phone: order.customerPhone })} {t('checkout.questions_call')} {" "}
               <span className="font-medium text-foreground">+250 788 123 456</span>.
             </p>
           </div>
@@ -295,14 +296,14 @@ export function ConfirmationView({ orderId }: ConfirmationViewProps) {
       <div className="mt-6 space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <Button onClick={() => goTrackOrder(order.orderNumber)} size="lg">
-            <Package className="mr-2 h-5 w-5" /> Track order
+            <Package className="mr-2 h-5 w-5" /> {t('checkout.track_order')}
           </Button>
           <Button variant="outline" size="lg" onClick={handleShareOrder}>
-            <Share2 className="mr-2 h-5 w-5" /> Share on WhatsApp
+            <Share2 className="mr-2 h-5 w-5" /> {t('checkout.share_order')}
           </Button>
         </div>
         <Button variant="ghost" size="sm" className="w-full" onClick={() => goCatalog(null)}>
-          Continue shopping <ArrowRight className="ml-1.5 h-4 w-4" />
+          {t('checkout.continue_shopping')} <ArrowRight className="ml-1.5 h-4 w-4" />
         </Button>
       </div>
     </div>

@@ -1,10 +1,10 @@
-import Link from 'next/link'
-import { Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
+import type { Metadata } from 'next'
+import ContactPageClient from '@/components/contact/ContactPageClient'
+
+export const metadata: Metadata = {
+  title: 'Contact Us',
+}
 
 export default function ContactPage() {
-  return <main className="min-h-screen bg-[#f8f9fa] px-4 py-12 sm:px-6 lg:px-8"><div className="mx-auto max-w-5xl"><header className="text-center"><p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#B76E79]">Customer care</p><h1 className="mt-3 text-4xl font-black text-[#1a1a1a]">Contact FreedomCosmeticShop</h1><p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-gray-500">Questions about products, payments, delivery, returns, or wholesale? Our Rwanda support team is ready to help.</p></header><div className="mt-10 grid gap-4 md:grid-cols-3">{[
-    { icon: MessageCircle, title: 'WhatsApp', value: '+250 780 000 000', href: 'https://wa.me/250780000000?text=Hello%20FreedomCosmeticShop' },
-    { icon: Phone, title: 'Call us', value: '+250 780 000 000', href: 'tel:+250780000000' },
-    { icon: Mail, title: 'Email', value: 'hello@freedomcosmeticshop.rw', href: 'mailto:hello@freedomcosmeticshop.rw' },
-  ].map(({icon:Icon,title,value,href})=><a key={title} href={href} target={href.startsWith('http')?'_blank':undefined} rel="noreferrer" className="rounded-3xl border border-gray-100 bg-white p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"><span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-rose-50 text-[#B76E79]"><Icon className="h-5 w-5" /></span><h2 className="mt-4 font-black">{title}</h2><p className="mt-1 break-all text-sm text-gray-500">{value}</p></a>)}</div><section className="mt-6 rounded-3xl bg-[#1a1a1a] p-7 text-white sm:p-9"><div className="flex items-start gap-3"><MapPin className="mt-1 h-5 w-5 shrink-0 text-[#FFD700]" /><div><h2 className="text-xl font-black">Kigali, Rwanda 🇷🇼</h2><p className="mt-2 text-sm leading-6 text-gray-400">Online orders and nationwide delivery. Confirm any physical pickup arrangement with support before travelling.</p><p className="mt-4 text-xs text-gray-500">Support hours: Monday–Saturday, 8:00–18:00 Africa/Kigali.</p></div></div></section><div className="mt-7 text-center"><Link href="/faq" className="font-bold text-[#B76E79]">Read frequently asked questions →</Link></div></div></main>
+  return <ContactPageClient />
 }

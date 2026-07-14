@@ -28,8 +28,10 @@ import {
   Store,
   Clock,
 } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 export function AccountView() {
+  const t = useT()
   const { user, logout, goHome, goCatalog, fetchUser } = useStore()
   const { toast } = useToast()
 
@@ -45,31 +47,31 @@ export function AccountView() {
       const isEarned = event.includes(":earned") || event.includes(":adjusted")
       const points = Math.abs(d.points)
       toast({
-        title: isEarned ? `💎 ${points} points added!` : `${points} points adjusted`,
-        description: `New balance: ${d.balance} points${d.reason ? ` · ${d.reason}` : ""}`,
+        title: isEarned ? t('auth.points_added', { points }) : t('auth.points_adjusted', { points }),
+        description: `${t('auth.new_points_balance', { points: d.balance })}${d.reason ? ` · ${d.reason}` : ""}`,
       })
     } else if (event.startsWith(`user:${user?.id}:order:`)) {
       // Order status changed — show a toast
       const d = data as { orderNumber: string; status: string }
       const statusMessages: Record<string, string> = {
-        confirmed: "✅ Order confirmed!",
-        shipped: "🚚 Order shipped!",
-        delivered: "🎉 Order delivered!",
-        cancelled: "❌ Order cancelled",
+        confirmed: `✅ ${t('checkout.order_confirmed')}`,
+        shipped: `🚚 ${t('orders.status_shipped')}`,
+        delivered: `🎉 ${t('orders.status_delivered')}`,
+        cancelled: `❌ ${t('orders.status_cancelled')}`,
       }
       const action = event.split(":").pop() || ""
       const msg = statusMessages[action]
       if (msg) {
         toast({
-          title: `Order ${d.orderNumber}`,
+          title: t('orders.order_number', { number: d.orderNumber }),
           description: msg,
         })
       }
     } else if (event === `user:${user?.id}:account:blocked`) {
       // ─── Section 9: Customer blocked — log out immediately ───────
       toast({
-        title: "Account suspended",
-        description: "Your account has been suspended. Please contact support.",
+        title: t('auth.account_suspended'),
+        description: t('auth.account_suspended_hint'),
         variant: "destructive",
       })
       // Call the logout API to clear cookies, then clear client state
@@ -79,8 +81,8 @@ export function AccountView() {
     } else if (event === `user:${user?.id}:account:unblocked`) {
       // ─── Section 9: Customer unblocked — show reactivation toast ─
       toast({
-        title: "Account reactivated",
-        description: "Your account has been reactivated. Welcome back!",
+        title: t('auth.account_reactivated'),
+        description: t('auth.account_reactivated_hint'),
       })
     }
   })
@@ -92,20 +94,20 @@ export function AccountView() {
       // Ignore — we clear client state anyway
     }
     logout()
-    toast({ title: "Logged out", description: "See you soon! 🌸" })
+    toast({ title: t('auth.logged_out'), description: t('auth.see_you_soon') })
     goHome()
   }
 
   if (!user) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold">Not logged in</h1>
-        <p className="mt-2 text-muted-foreground">Please log in to view your account.</p>
+        <h1 className="text-2xl font-bold">{t('auth.not_logged_in')}</h1>
+        <p className="mt-2 text-muted-foreground">{t('auth.login_view_account')}</p>
         <Button
           className="mt-6"
           onClick={() => useStore.getState().setView("login")}
         >
-          Go to login
+          {t('auth.go_login')}
         </Button>
       </div>
     )
@@ -119,10 +121,10 @@ export function AccountView() {
     .toUpperCase()
 
   const menuItems = [
-    { icon: ShoppingBag, label: "My Orders", desc: "Track and view your orders", soon: true },
-    { icon: MapPin, label: "Saved Addresses", desc: "Manage delivery addresses", soon: true },
-    { icon: Heart, label: "Wishlist", desc: "Your saved products", soon: true },
-    { icon: Gift, label: "Loyalty Points", desc: `${user.loyaltyPoints || 0} points available`, soon: true },
+    { icon: ShoppingBag, label: t('orders.title'), desc: t('auth.track_view_orders'), soon: true },
+    { icon: MapPin, label: t('checkout.saved_addresses'), desc: t('auth.manage_addresses'), soon: true },
+    { icon: Heart, label: t('nav.wishlist'), desc: t('auth.saved_products'), soon: true },
+    { icon: Gift, label: t('loyalty.title'), desc: t('auth.points_available', { points: user.loyaltyPoints || 0 }), soon: true },
   ]
 
   // Section 9: Wholesale user state
@@ -156,12 +158,12 @@ export function AccountView() {
             {/* Section 9: Wholesale badge */}
             {isWholesaleApproved && (
               <span className="inline-block rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-medium text-violet-700">
-                🏪 Wholesale
+                🏪 {t('nav.wholesale')}
               </span>
             )}
             {isWholesalePending && (
               <span className="inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-                ⏳ Wholesale Pending
+                ⏳ {t('auth.wholesale_pending')}
               </span>
             )}
           </div>
@@ -178,8 +180,8 @@ export function AccountView() {
             <Store className="h-5 w-5" />
           </span>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-violet-900">🏪 Wholesale Dashboard</p>
-            <p className="text-xs text-violet-700">View credit, invoices, reorder & savings</p>
+            <p className="text-sm font-semibold text-violet-900">🏪 {t('auth.wholesale_dashboard')}</p>
+            <p className="text-xs text-violet-700">{t('auth.wholesale_dashboard_hint')}</p>
           </div>
           <ChevronRight className="h-4 w-4 text-violet-600" />
         </button>
@@ -195,8 +197,8 @@ export function AccountView() {
             <Clock className="h-5 w-5" />
           </span>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-amber-900">⏳ Wholesale Application</p>
-            <p className="text-xs text-amber-700">Check your application status</p>
+            <p className="text-sm font-semibold text-amber-900">⏳ {t('auth.wholesale_application')}</p>
+            <p className="text-xs text-amber-700">{t('auth.check_application')}</p>
           </div>
           <ChevronRight className="h-4 w-4 text-amber-600" />
         </button>
@@ -212,8 +214,8 @@ export function AccountView() {
             <Store className="h-5 w-5" />
           </span>
           <div className="flex-1">
-            <p className="text-sm font-semibold">🏪 Upgrade to Wholesale</p>
-            <p className="text-xs text-muted-foreground">Save up to 30% on bulk orders</p>
+            <p className="text-sm font-semibold">🏪 {t('auth.upgrade_wholesale')}</p>
+            <p className="text-xs text-muted-foreground">{t('auth.wholesale_save')}</p>
           </div>
           <ChevronRight className="h-4 w-4 text-primary" />
         </button>
@@ -223,15 +225,15 @@ export function AccountView() {
       <div className="mt-4 grid grid-cols-3 gap-3">
         <div className="rounded-xl border bg-card p-4 text-center">
           <p className="text-2xl font-bold text-primary">0</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">Orders</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t('orders.title')}</p>
         </div>
         <div className="rounded-xl border bg-card p-4 text-center">
           <p className="text-2xl font-bold text-primary">0</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">Wishlist</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t('nav.wishlist')}</p>
         </div>
         <div className="rounded-xl border bg-card p-4 text-center">
           <p className="text-2xl font-bold text-primary">0</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">Points</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">{t('auth.points')}</p>
         </div>
       </div>
 
@@ -255,7 +257,7 @@ export function AccountView() {
             </div>
             {item.soon ? (
               <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                Soon
+                {t('auth.soon')}
               </span>
             ) : (
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
@@ -267,16 +269,16 @@ export function AccountView() {
       {/* Actions */}
       <div className="mt-4 flex gap-3">
         <Button variant="outline" className="flex-1" onClick={() => goCatalog(null)}>
-          <ShoppingBag className="mr-2 h-4 w-4" /> Continue shopping
+          <ShoppingBag className="mr-2 h-4 w-4" /> {t('cart.continue_shopping')}
         </Button>
         <Button variant="destructive" className="flex-1" onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" /> Log out
+          <LogOut className="mr-2 h-4 w-4" /> {t('nav.logout')}
         </Button>
       </div>
 
       <p className="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
         <Sparkles className="h-3 w-3 text-primary" />
-        FreedomCosmeticShop — beauty that unites us
+        {t('auth.beauty_unites')}
       </p>
     </div>
   )

@@ -12,6 +12,7 @@ export type AdminTab =
   | 'reports'
   | 'settings'
   | 'staff'
+  | 'security'
   | 'sms'
   | 'payments'
   | 'marketing'

@@ -1,6 +1,7 @@
 'use client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
+import { LanguageProvider } from '@/lib/i18n/LanguageContext'
 
 export default function Providers({
   children,
@@ -18,7 +19,9 @@ export default function Providers({
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <LanguageProvider>
+        {children}
+      </LanguageProvider>
     </QueryClientProvider>
   )
 }

@@ -15,6 +15,7 @@ import {
   Package,
   Settings,
   Shield,
+  ShieldAlert,
   ShoppingCart,
   Store,
   Truck,
@@ -29,6 +30,7 @@ interface MenuItem {
   label: string
   tab: AdminTab
   icon: LucideIcon
+  roles?: string[]
 }
 
 const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
@@ -60,7 +62,8 @@ const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
     group: 'System',
     items: [
       { label: 'Settings', tab: 'settings', icon: Settings },
-      { label: 'Staff & Security', tab: 'staff', icon: Shield },
+      { label: 'Staff Accounts', tab: 'staff', icon: Shield },
+      { label: 'Security Dashboard', tab: 'security', icon: ShieldAlert, roles: ['ADMIN', 'SUPER_ADMIN'] },
     ],
   },
 ]
@@ -125,6 +128,7 @@ export default function AdminSidebar() {
               <p className={`px-3 pb-1.5 pt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-gray-600 ${collapsed ? 'md:hidden' : ''}`}>{group.group}</p>
               <div className="space-y-1">
                 {group.items.map((item) => {
+                  if (item.roles && (!user || !item.roles.includes(user.role))) return null
                   const Icon = item.icon
                   const active = activeTab === item.tab
                   return (

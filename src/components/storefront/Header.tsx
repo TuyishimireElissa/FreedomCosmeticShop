@@ -30,8 +30,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 import { useSettings } from "@/hooks/use-settings"
+import { useT } from "@/lib/i18n/LanguageContext"
 
 export function Header() {
+  const t = useT()
   const { goHome, goCatalog, goCart, goAdmin, goLogin, goAccount, cartCount, user, authLoading, logout } = useStore()
   const { toast } = useToast()
   const { settings } = useSettings()
@@ -57,9 +59,9 @@ export function Header() {
   }, [])
 
   const navLinks = [
-    { label: "Skincare", slug: "skincare" },
-    { label: "Makeup", slug: "makeup" },
-    { label: "Haircare", slug: "haircare" },
+    { label: "Skincare", translationKey: 'categories.skincare', slug: "skincare" },
+    { label: "Makeup", translationKey: 'categories.makeup', slug: "makeup" },
+    { label: "Haircare", translationKey: 'categories.haircare', slug: "haircare" },
   ]
 
   return (
@@ -72,7 +74,7 @@ export function Header() {
         {/* Mobile menu */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+            <Button variant="ghost" size="icon" className="md:hidden" aria-label={t('nav.open_menu')}>
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
@@ -91,7 +93,7 @@ export function Header() {
                 }}
                 className="hover:bg-secondary rounded-lg px-3 py-2.5 text-left text-sm font-medium"
               >
-                Home
+                {t('nav.home')}
               </button>
               {navLinks.map((l) => (
                 <button
@@ -102,7 +104,7 @@ export function Header() {
                   }}
                   className="hover:bg-secondary rounded-lg px-3 py-2.5 text-left text-sm font-medium"
                 >
-                  {l.label}
+                  {t(l.translationKey)}
                 </button>
               ))}
               <div className="bg-border my-2 h-px" />
@@ -116,7 +118,7 @@ export function Header() {
                     className="hover:bg-secondary flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium"
                   >
                     <UserIcon className="h-4 w-4" />
-                    My Account
+{t('nav.account')}
                   </button>
                   <button
                     onClick={() => {
@@ -126,7 +128,7 @@ export function Header() {
                     className="text-muted-foreground hover:bg-secondary flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium"
                   >
                     <Shield className="h-4 w-4" />
-                    Admin
+                    {t('nav.admin')}
                   </button>
                 </>
               ) : (
@@ -138,7 +140,7 @@ export function Header() {
                   className="hover:bg-secondary flex items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-medium"
                 >
                   <UserIcon className="h-4 w-4" />
-                  Login / Register
+                  {t('nav.login')} / {t('nav.register')}
                 </button>
               )}
             </nav>
@@ -149,7 +151,7 @@ export function Header() {
         <button
           onClick={goHome}
           className="flex shrink-0 items-center gap-2"
-          aria-label="Go to homepage"
+          aria-label={t('nav.home')}
         >
           {settings?.logoUrl ? (
             <img src={settings.logoUrl} alt="FreedomCosmeticShop" className="max-h-10 max-w-[160px] object-contain" />
@@ -173,7 +175,7 @@ export function Header() {
               onClick={() => goCatalog(l.slug)}
               className="text-foreground/80 hover:bg-secondary hover:text-foreground rounded-lg px-3 py-2 text-sm font-medium transition-colors"
             >
-              {l.label}
+              {t(l.translationKey)}
             </button>
           ))}
         </nav>
@@ -188,7 +190,7 @@ export function Header() {
           {/* Admin link (desktop) */}
           <Button variant="ghost" size="sm" className="hidden lg:inline-flex" onClick={goAdmin}>
             <Shield className="mr-1.5 h-4 w-4" />
-            Admin
+            {t('nav.admin')}
           </Button>
 
           {/* Language switcher (desktop) */}
@@ -201,12 +203,12 @@ export function Header() {
             className="hidden sm:flex"
             onClick={() => {
               toast({
-                title: "Wishlist",
-                description: "Sign in to save your favorite products.",
+                title: t('nav.wishlist'),
+                description: t('nav.sign_in_wishlist'),
               })
               if (!user) goLogin()
             }}
-            aria-label="Wishlist"
+            aria-label={t('nav.wishlist')}
           >
             <Heart className="h-5 w-5" />
           </Button>
@@ -233,14 +235,14 @@ export function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={goAccount}>
-                  <UserIcon className="mr-2 h-4 w-4" /> My Account
+                  <UserIcon className="mr-2 h-4 w-4" /> {t('nav.account')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => goCatalog(null)}>
-                  <Package className="mr-2 h-4 w-4" /> Continue Shopping
+                  <Package className="mr-2 h-4 w-4" /> {t('cart.continue_shopping')}
                 </DropdownMenuItem>
                 {user.role === "ADMIN" && (
                   <DropdownMenuItem onClick={goAdmin}>
-                    <Shield className="mr-2 h-4 w-4" /> Admin Dashboard
+                    <Shield className="mr-2 h-4 w-4" /> {t('footer.admin_dashboard')}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
@@ -249,7 +251,7 @@ export function Header() {
                   onClick={async () => {
                     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
                     logout()
-                    toast({ title: "Logged out" })
+                    toast({ title: t('nav.signed_out') })
                     goHome()
                   }}
                 >
@@ -260,7 +262,7 @@ export function Header() {
           ) : (
             <Button variant="ghost" size="sm" onClick={goLogin}>
               <UserIcon className="mr-1.5 h-4 w-4" />
-              Login
+              {t('nav.login')}
             </Button>
           )}
 
@@ -270,7 +272,7 @@ export function Header() {
             size="icon"
             className="relative"
             onClick={goCart}
-            aria-label={`Cart with ${count} items`}
+            aria-label={`${t('nav.cart')}: ${count}`}
           >
             <ShoppingBag className="h-5 w-5" />
             {count > 0 && (
@@ -287,7 +289,7 @@ export function Header() {
 
       {/* Mobile search row (only on small screens) */}
       <div className="border-t px-4 py-2 lg:hidden">
-        <SearchWithSuggestions placeholder="Search skincare, makeup, haircare..." />
+        <SearchWithSuggestions placeholder={t('nav.search_placeholder')} />
       </div>
     </header>
   )
@@ -300,6 +302,7 @@ export function Header() {
  * To fully implement, integrate next-intl with locale routing.
  */
 function LanguageSwitcher() {
+  const t = useT()
   const { toast } = useToast()
   const [current, setCurrent] = useState<"EN" | "FR" | "RW">("EN")
 
@@ -314,13 +317,13 @@ function LanguageSwitcher() {
     const next = languages[(idx + 1) % languages.length]
     setCurrent(next.code)
     toast({
-      title: `Language: ${next.label}`,
+      title: t('nav.language_selected', { language: next.label }),
       description:
         next.code === "EN"
-          ? "Language set to English."
+          ? t('nav.english_selected')
           : next.code === "FR"
-          ? "Langue définie sur Français. (Coming soon)"
-          : "Ururimi rwahiswemo Kinyarwanda. (Coming soon)",
+          ? t('nav.french_coming')
+          : t('nav.kinyarwanda_selected'),
     })
   }
 
@@ -330,7 +333,7 @@ function LanguageSwitcher() {
       size="sm"
       className="hidden gap-1.5 lg:flex"
       onClick={handleCycle}
-      aria-label={`Language: ${current}. Click to change.`}
+      aria-label={t('nav.language_change', { language: current })}
     >
       <Globe className="h-4 w-4" />
       <span className="font-medium">{current}</span>

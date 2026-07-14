@@ -1,10 +1,11 @@
 import type { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
+import { BUSINESS } from '@/lib/business-config'
 
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://freedom-cosmetic-shop.vercel.app'
+  const baseUrl = BUSINESS.url
   const now = new Date()
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: now, changeFrequency: 'daily', priority: 1 },

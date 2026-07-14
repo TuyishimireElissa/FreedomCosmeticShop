@@ -21,6 +21,7 @@
  */
 
 import { features } from "@/lib/env"
+import { BUSINESS } from "@/lib/business-config"
 import { sendSms } from "@/server/services/sms"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -210,7 +211,7 @@ export async function createOtp(opts: CreateOtpOptions): Promise<CreateOtpResult
   otpStore.set(key, entry)
 
   // Send via SMS (or simulate)
-  const smsBody = `FreedomCosmeticShop: Your verification code is ${code}. It expires in 5 minutes. Do not share it with anyone.`
+  const smsBody = `${BUSINESS.tradingName}: Your verification code is ${code}. It expires in 5 minutes. Do not share it with anyone.`
   const smsResult = await sendSms(opts.phone, smsBody)
 
   if (!smsResult.success) {

@@ -16,6 +16,10 @@ export default function AdminAuthGuard({ children }: { children: React.ReactNode
     fetchUser()
   }, [fetchUser])
 
+  useEffect(() => {
+    if (!authLoading && user?.mustChangePassword) router.replace('/change-password')
+  }, [authLoading, router, user?.mustChangePassword])
+
   const returnToStore = () => {
     goHome()
     router.push('/')
@@ -35,6 +39,10 @@ export default function AdminAuthGuard({ children }: { children: React.ReactNode
 
   if (!user) {
     return <AdminLoginScreen onBack={returnToStore} />
+  }
+
+  if (user.mustChangePassword) {
+    return <div className="grid min-h-dvh place-items-center bg-[#f8f9fa] text-sm font-semibold text-gray-600">Redirecting to secure password change…</div>
   }
 
   if (!ADMIN_ROLES.has(user.role)) {

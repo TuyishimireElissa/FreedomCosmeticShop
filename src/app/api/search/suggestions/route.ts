@@ -15,6 +15,7 @@ export const dynamic = 'force-dynamic'
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { expandSearchQuery, parsePriceFromQuery, removePriceExpression } from "@/lib/search-vocabulary"
 
 export async function GET(req: Request) {
   try {
@@ -25,16 +26,24 @@ export async function GET(req: Request) {
       return NextResponse.json({ products: [], categories: [], brands: [] })
     }
 
+    const priceSearch = parsePriceFromQuery(q)
+    const expandedTerms = expandSearchQuery(removePriceExpression(q, priceSearch))
+    if (expandedTerms.length === 0) {
+      return NextResponse.json({ products: [], categories: [], brands: [] })
+    }
+
     const [products, categories, brands] = await Promise.all([
       db.product.findMany({
         where: {
           isActive: true,
           isDeleted: false,
-          OR: [
-            { name: { contains: q } },
-            { brand: { name: { contains: q } } },
-            { shortDescription: { contains: q } },
-          ],
+          OR: expandedTerms.flatMap((term) => [
+            { name: { contains: term, mode: "insensitive" as const } },
+            { brand: { name: { contains: term, mode: "insensitive" as const } } },
+            { category: { name: { contains: term, mode: "insensitive" as const } } },
+            { shortDescription: { contains: term, mode: "insensitive" as const } },
+            { ingredients: { contains: term, mode: "insensitive" as const } },
+          ]),
         },
         take: 8,
         orderBy: { rating: "desc" },
@@ -51,7 +60,10 @@ export async function GET(req: Request) {
         where: {
           isActive: true,
           isDeleted: false,
-          OR: [{ name: { contains: q } }, { slug: { contains: q } }],
+          OR: expandedTerms.flatMap((term) => [
+            { name: { contains: term, mode: "insensitive" as const } },
+            { slug: { contains: term, mode: "insensitive" as const } },
+          ]),
         },
         take: 3,
         select: { id: true, name: true, slug: true },
@@ -60,7 +72,10 @@ export async function GET(req: Request) {
         where: {
           isActive: true,
           isDeleted: false,
-          OR: [{ name: { contains: q } }, { slug: { contains: q } }],
+          OR: expandedTerms.flatMap((term) => [
+            { name: { contains: term, mode: "insensitive" as const } },
+            { slug: { contains: term, mode: "insensitive" as const } },
+          ]),
         },
         take: 3,
         select: { id: true, name: true, slug: true },

@@ -4,7 +4,7 @@
  * All templates support variable interpolation using {{variable}} syntax.
  * Templates are kept under 160 characters (single SMS segment) where possible.
  *
- * Brand: "FreedomCosmeticShop" (used in all messages for consistency)
+ * Brand: BUSINESS.tradingName (central owner-managed business identity)
  *
  * Supported variables per template:
  *   - ORDER_PLACED: {orderNumber, customerName?}
@@ -17,6 +17,9 @@
  *   - WELCOME: {customerName}
  *   - PROMOTIONAL: {message, code?}
  */
+
+import { BUSINESS } from "@/lib/business-config"
+import { resolveTranslation } from "@/lib/i18n"
 
 export type SmsLanguage = "en" | "rw"
 export type SmsTemplateKey =
@@ -47,90 +50,90 @@ export interface SmsTemplate {
 export const SMS_TEMPLATES: Record<SmsTemplateKey, SmsTemplate> = {
   ORDER_PLACED: {
     key: "ORDER_PLACED",
-    label: "Order Placed",
-    description: "Sent when a customer places an order",
-    en: "Thank you! Your order {{orderNumber}} has been received. We'll process it shortly. FreedomCosmeticShop 📦",
-    rw: "Murakoze! Itumwa ryawe {{orderNumber}} ryakirwa. Tuzoherekeza vuba. FreedomCosmeticShop 📦",
+    label: resolveTranslation('en', 'sms.order_placed_label'),
+    description: resolveTranslation('en', 'sms.order_placed_description'),
+    en: resolveTranslation('en', 'sms.order_placed', { business: BUSINESS.tradingName }),
+    rw: resolveTranslation('rw', 'sms.order_placed', { business: BUSINESS.tradingName }),
     variables: ["orderNumber"],
     critical: true,
   },
 
   PAYMENT_CONFIRMED: {
     key: "PAYMENT_CONFIRMED",
-    label: "Payment Confirmed",
-    description: "Sent when payment is confirmed (MTN MoMo, Airtel, Card)",
-    en: "Payment of {{amount}} RWF confirmed! Order {{orderNumber}} is being prepared. FreedomCosmeticShop ✅",
-    rw: "Kwishyura kwawe kwa {{amount}} RWF byagenze neza! Itumwa ryawe {{orderNumber}} riri mu nzira. FreedomCosmeticShop ✅",
+    label: resolveTranslation('en', 'sms.payment_confirmed_label'),
+    description: resolveTranslation('en', 'sms.payment_confirmed_description'),
+    en: resolveTranslation('en', 'sms.payment_confirmed', { business: BUSINESS.tradingName }),
+    rw: resolveTranslation('rw', 'sms.payment_confirmed', { business: BUSINESS.tradingName }),
     variables: ["orderNumber", "amount"],
     critical: true,
   },
 
   ORDER_SHIPPED: {
     key: "ORDER_SHIPPED",
-    label: "Order Shipped",
-    description: "Sent when order is out for delivery",
-    en: "Your order {{orderNumber}} is on the way! Rider: {{riderName}} - {{riderPhone}}. ETA: {{etaDays}} days. FreedomCosmeticShop 🏍️",
-    rw: "Ibicuruzwa byawe {{orderNumber}} byagiye! Muraza: {{riderName}} - {{riderPhone}}. Uzabibone mu minsi {{etaDays}}. FreedomCosmeticShop 🏍️",
+    label: resolveTranslation('en', 'sms.order_shipped_label'),
+    description: resolveTranslation('en', 'sms.order_shipped_description'),
+    en: resolveTranslation('en', 'sms.order_shipped', { business: BUSINESS.tradingName }),
+    rw: resolveTranslation('rw', 'sms.order_shipped', { business: BUSINESS.tradingName }),
     variables: ["orderNumber", "riderName", "riderPhone", "etaDays"],
     critical: true,
   },
 
   ORDER_DELIVERED: {
     key: "ORDER_DELIVERED",
-    label: "Order Delivered",
-    description: "Sent when order is delivered, includes review link",
-    en: "Your order {{orderNumber}} has been delivered! Thank you for choosing FreedomCosmeticShop. Review: {{reviewLink}} 🌟",
-    rw: "Itumwa ryawe {{orderNumber}} ryarafitiwe! Murakoze guhitamo FreedomCosmeticShop. Tanga igitekerezo: {{reviewLink}} 🌟",
+    label: resolveTranslation('en', 'sms.order_delivered_label'),
+    description: resolveTranslation('en', 'sms.order_delivered_description'),
+    en: resolveTranslation('en', 'sms.order_delivered', { business: BUSINESS.tradingName }),
+    rw: resolveTranslation('rw', 'sms.order_delivered', { business: BUSINESS.tradingName }),
     variables: ["orderNumber", "reviewLink"],
     critical: false,
   },
 
   LOW_STOCK: {
     key: "LOW_STOCK",
-    label: "Low Stock Alert",
-    description: "Sent to admin when a product is running low",
-    en: "ALERT: {{productName}} has only {{stockCount}} items left! Restock soon. FreedomCosmeticShop Admin",
-    rw: "IMENYESHA: {{productName}} isigaye {{stockCount}} gusa! Ongera wugure. FreedomCosmeticShop Admin",
+    label: resolveTranslation('en', 'sms.low_stock_label'),
+    description: resolveTranslation('en', 'sms.low_stock_description'),
+    en: resolveTranslation('en', 'sms.low_stock', { business: BUSINESS.tradingName }),
+    rw: resolveTranslation('rw', 'sms.low_stock', { business: BUSINESS.tradingName }),
     variables: ["productName", "stockCount"],
     critical: true,
   },
 
   OTP: {
     key: "OTP",
-    label: "OTP Verification",
-    description: "Sent for phone verification, login, and password reset",
-    en: "FreedomCosmeticShop: Your verification code is {{code}}. Valid for 5 minutes. Do not share it with anyone.",
-    rw: "FreedomCosmeticShop: Kod yawe yo kwemeza ni {{code}}. Irahoraho iminota 5. Ntuyisangire n'umwe.",
+    label: resolveTranslation('en', 'sms.otp_label'),
+    description: resolveTranslation('en', 'sms.otp_description'),
+    en: resolveTranslation('en', 'sms.otp', { business: BUSINESS.tradingName }),
+    rw: resolveTranslation('rw', 'sms.otp', { business: BUSINESS.tradingName }),
     variables: ["code"],
     critical: true,
   },
 
   ABANDONED_CART: {
     key: "ABANDONED_CART",
-    label: "Abandoned Cart",
-    description: "Sent 2 hours after cart abandonment",
-    en: "You left {{itemCount}} item(s) in your cart! Complete your order now: {{cartLink}} FreedomCosmeticShop 🛒",
-    rw: "Mutasize ibintu {{itemCount}} mu gitebo cyanyu! Gura none: {{cartLink}} FreedomCosmeticShop 🛒",
+    label: resolveTranslation('en', 'sms.abandoned_cart_label'),
+    description: resolveTranslation('en', 'sms.abandoned_cart_description'),
+    en: resolveTranslation('en', 'sms.abandoned_cart', { business: BUSINESS.tradingName }),
+    rw: resolveTranslation('rw', 'sms.abandoned_cart', { business: BUSINESS.tradingName }),
     variables: ["itemCount", "cartLink"],
     critical: false,
   },
 
   WELCOME: {
     key: "WELCOME",
-    label: "Welcome",
-    description: "Sent when a new customer registers",
-    en: "Welcome to FreedomCosmeticShop, {{customerName}}! Enjoy 10% off your first order with code WELCOME10. 🌸",
-    rw: "Murakaza neza kuri FreedomCosmeticShop, {{customerName}}! Hema 10% ku gitebo cyawe na kode WELCOME10. 🌸",
+    label: resolveTranslation('en', 'sms.welcome_label'),
+    description: resolveTranslation('en', 'sms.welcome_description'),
+    en: resolveTranslation('en', 'sms.welcome', { business: BUSINESS.tradingName }),
+    rw: resolveTranslation('rw', 'sms.welcome', { business: BUSINESS.tradingName }),
     variables: ["customerName"],
     critical: false,
   },
 
   PROMOTIONAL: {
     key: "PROMOTIONAL",
-    label: "Promotional",
-    description: "Custom promotional message (opt-out applies)",
-    en: "{{message}}{{code ? ' Use code: ' + code : ''}} FreedomCosmeticShop 🌸",
-    rw: "{{message}}{{code ? ' Koresha kode: ' + code : ''}} FreedomCosmeticShop 🌸",
+    label: resolveTranslation('en', 'sms.promotional_label'),
+    description: resolveTranslation('en', 'sms.promotional_description'),
+    en: resolveTranslation('en', 'sms.promotional', { business: BUSINESS.tradingName }),
+    rw: resolveTranslation('rw', 'sms.promotional', { business: BUSINESS.tradingName }),
     variables: ["message", "code"],
     critical: false,
   },

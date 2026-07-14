@@ -16,6 +16,7 @@
 import { useDeliveryFee } from "@/hooks/useDelivery"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Truck, Clock, CheckCircle2, Sparkles } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface DeliveryFeeCardProps {
   district: string | null
@@ -24,6 +25,7 @@ interface DeliveryFeeCardProps {
 }
 
 export function DeliveryFeeCard({ district, orderTotal, className = "" }: DeliveryFeeCardProps) {
+  const t = useT()
   const { calculation, loading } = useDeliveryFee(district, orderTotal)
 
   // No district selected
@@ -33,8 +35,8 @@ export function DeliveryFeeCard({ district, orderTotal, className = "" }: Delive
         <div className="flex items-center gap-2">
           <Truck className="h-5 w-5 text-muted-foreground" />
           <div>
-            <p className="text-sm font-medium text-muted-foreground">Delivery</p>
-            <p className="text-xs text-muted-foreground">Select your district to see delivery fee</p>
+            <p className="text-sm font-medium text-muted-foreground">{t('cart.delivery')}</p>
+            <p className="text-xs text-muted-foreground">{t('checkout.select_district_for_fee')}</p>
           </div>
         </div>
       </div>
@@ -67,16 +69,16 @@ export function DeliveryFeeCard({ district, orderTotal, className = "" }: Delive
           </span>
           <div>
             <p className="text-sm font-semibold">
-              Delivery to {district}
+              {t('checkout.delivery_to', { place: district })}
             </p>
             {isSameDay && !isFree && (
               <p className="flex items-center gap-1 text-xs font-medium text-primary">
-                <CheckCircle2 className="h-3 w-3" /> Same Day Delivery
+                <CheckCircle2 className="h-3 w-3" /> {t('delivery.kigali_same_day')}
               </p>
             )}
             {isFree && (
               <p className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                <Sparkles className="h-3 w-3" /> FREE Delivery!
+                <Sparkles className="h-3 w-3" /> {t('delivery.free_delivery')}
               </p>
             )}
           </div>
@@ -95,7 +97,7 @@ export function DeliveryFeeCard({ district, orderTotal, className = "" }: Delive
               <span className="text-sm text-muted-foreground line-through">
                 {calculation.zone === "KIGALI_SAME_DAY" ? "1,000 RWF" : "3,000 RWF"}
               </span>
-              <span className="text-lg font-bold text-emerald-600">FREE</span>
+              <span className="text-lg font-bold text-emerald-600">{t('common.free')}</span>
             </div>
           ) : (
             <span className="text-lg font-bold">{calculation.feeFormatted}</span>
@@ -107,7 +109,7 @@ export function DeliveryFeeCard({ district, orderTotal, className = "" }: Delive
       {!isFree && calculation.amountNeededForFree > 0 && (
         <div className="mt-3 rounded-lg bg-primary/5 p-2 text-center">
           <p className="text-xs text-primary">
-            🎉 Spend {calculation.amountNeededForFree.toLocaleString()} RWF more for FREE delivery!
+            {t('delivery.spend_more', { amount: calculation.amountNeededForFree.toLocaleString() })}
           </p>
         </div>
       )}
@@ -115,7 +117,7 @@ export function DeliveryFeeCard({ district, orderTotal, className = "" }: Delive
       {/* Same-day cutoff note */}
       {isSameDay && !isFree && (
         <p className="mt-2 text-xs text-muted-foreground">
-          ⏰ Order before 2PM for same-day delivery
+          ⏰ {t('delivery.cutoff')}
         </p>
       )}
     </div>

@@ -1,11 +1,16 @@
+'use client'
+
 import InformationPage from '@/components/layout/InformationPage'
+import { BUSINESS } from '@/lib/business-config'
+import { useT } from '@/lib/i18n/LanguageContext'
 
 export default function ReturnsPage() {
-  return <InformationPage eyebrow="Customer care" title="Returns & Refunds" intro="We want every order to arrive correctly and safely. Contact us promptly if there is a problem with your purchase." sections={[
-    { title: 'Return window', paragraphs: ['Contact us within 7 days of delivery. Products must be unopened, unused, undamaged, and in their original sealed packaging unless they arrived defective or incorrect.'] },
-    { title: 'Items we cannot accept', bullets: ['Opened cosmetics, skincare, fragrances, or personal-care products for hygiene reasons.', 'Items damaged after delivery or used contrary to instructions.', 'Clearance or final-sale items unless defective.', 'Products without proof of purchase.'] },
-    { title: 'Damaged or incorrect items', paragraphs: ['Send your order number, photos, and a description through WhatsApp or email within 48 hours. After verification, we will arrange replacement, store credit, or refund as appropriate.'] },
-    { title: 'Refund timing', paragraphs: ['Approved refunds are returned through the original payment method where possible. Provider processing times may apply. Delivery fees are refundable only when the error is ours or the entire order is rejected for a verified defect.'] },
-    { title: 'How to request a return', bullets: ['Contact support before sending anything back.', 'Provide the order number and reason.', 'Wait for return instructions and authorization.', 'Package approved returns securely.'] },
+  const t = useT()
+  return <InformationPage eyebrow={t('pages.customer_care')} title={t('pages.returns_title')} intro={t('pages.returns_intro')} sections={[
+    { title: t('pages.return_window'), paragraphs: [t('pages.return_window_text', { days: BUSINESS.policies.returnDays })] },
+    { title: t('pages.return_excluded'), bullets: [t('pages.return_excluded_opened'), t('pages.return_excluded_damaged'), t('pages.return_excluded_clearance'), t('pages.return_excluded_proof')] },
+    { title: t('pages.damaged_incorrect'), paragraphs: [t('pages.damaged_incorrect_text')] },
+    { title: t('pages.refund_timing'), paragraphs: [t('pages.refund_timing_text')] },
+    { title: t('pages.return_request'), bullets: [t('pages.return_contact_first'), t('pages.return_provide_order'), t('pages.return_wait_instructions'), t('pages.return_package_securely')] },
   ]} />
 }

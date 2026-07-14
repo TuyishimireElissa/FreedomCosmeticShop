@@ -15,6 +15,7 @@ import { useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface Brand {
   id: string
@@ -31,6 +32,7 @@ interface BrandCarouselProps {
 }
 
 export function BrandCarousel({ brands }: BrandCarouselProps) {
+  const t = useT()
   const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -51,10 +53,10 @@ export function BrandCarousel({ brands }: BrandCarouselProps) {
       <div className="mb-6 flex items-end justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Top brands
+            {t('home.top_brands')}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Authentic products from brands you love.
+            {t('home.brand_subtitle')}
           </p>
         </div>
 
@@ -64,7 +66,7 @@ export function BrandCarousel({ brands }: BrandCarouselProps) {
             variant="outline"
             size="icon"
             onClick={() => scroll("left")}
-            aria-label="Scroll brands left"
+            aria-label={t('home.scroll_brands_left')}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -72,7 +74,7 @@ export function BrandCarousel({ brands }: BrandCarouselProps) {
             variant="outline"
             size="icon"
             onClick={() => scroll("right")}
-            aria-label="Scroll brands right"
+            aria-label={t('home.scroll_brands_right')}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -97,7 +99,7 @@ export function BrandCarousel({ brands }: BrandCarouselProps) {
               {brand.logo ? (
                 <img
                   src={brand.logo}
-                  alt={`${brand.name} logo`}
+                  alt={t('home.brand_logo', { brand: brand.name })}
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />
@@ -117,7 +119,7 @@ export function BrandCarousel({ brands }: BrandCarouselProps) {
             )}
             {brand._count && (
               <p className="mt-2 rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium">
-                {brand._count.products} products
+                {t('home.products_count', { count: brand._count.products })}
               </p>
             )}
           </button>

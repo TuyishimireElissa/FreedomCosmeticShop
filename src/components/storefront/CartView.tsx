@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
 import {
   Minus,
   Plus,
@@ -50,6 +51,7 @@ const PROVINCES = [
 ]
 
 export function CartView() {
+  const t = useT()
   const {
     items,
     savedItems,
@@ -104,7 +106,7 @@ export function CartView() {
     setUndoTimer(timer)
 
     toast({
-      title: "Removed from cart",
+      title: t('cart.removed_from_cart'),
       description: item.name,
       action: (
         <button
@@ -121,7 +123,7 @@ export function CartView() {
             if (undoTimer) clearTimeout(undoTimer)
           }}
         >
-          Undo
+          {t('cart.undo')}
         </button>
       ),
     })
@@ -140,7 +142,7 @@ export function CartView() {
       const data = await res.json()
       if (!res.ok || !data.valid) {
         toast({
-          title: "Invalid coupon",
+          title: t('cart.invalid_coupon'),
           description: data.error,
           variant: "destructive",
         })
@@ -154,11 +156,11 @@ export function CartView() {
         freeShipping: data.freeShipping,
       })
       toast({
-        title: "Coupon applied!",
+        title: t('cart.coupon_applied_title'),
         description: data.message,
       })
     } catch {
-      toast({ title: "Failed to validate coupon", variant: "destructive" })
+      toast({ title: t('cart.coupon_validation_failed'), variant: "destructive" })
     } finally {
       setCouponLoading(false)
     }
@@ -166,9 +168,10 @@ export function CartView() {
 
   // ─── WhatsApp share cart ─────────────────────────────────────────
   const handleShareCart = () => {
-    const message = `🛍️ My FreedomCosmeticShop Cart:\n\n${items
-      .map((i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`)
-      .join("\n")}\n\nSubtotal: ${formatRWF(subtotal)}\n\nShop at FreedomCosmeticShop! 🌸`
+    const message = t('cart.share_message', {
+      items: items.map((i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`).join("\n"),
+      subtotal: formatRWF(subtotal),
+    })
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(url, "_blank")
   }
@@ -181,13 +184,13 @@ export function CartView() {
           <ShoppingBag className="h-12 w-12 text-primary/60" />
         </div>
         <h1 className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">
-          Your cart is empty
+          {t('cart.empty')}
         </h1>
         <p className="mt-2 text-muted-foreground">
-          Looks like you haven&apos;t added any products yet. Let&apos;s fix that!
+          {t('cart.empty_friendly_hint')}
         </p>
         <Button size="lg" className="mt-6" onClick={() => goCatalog(null)}>
-          <ShoppingCart className="mr-2 h-5 w-5" /> Start shopping
+          <ShoppingCart className="mr-2 h-5 w-5" /> {t('cart.start_shopping')}
         </Button>
       </div>
     )
@@ -198,14 +201,14 @@ export function CartView() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Your cart</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('cart.your_cart')}</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {items.length} item{items.length !== 1 ? "s" : ""} in your cart
-            {savedItems.length > 0 && ` · ${savedItems.length} saved for later`}
+            {t('cart.items_in_cart', { count: items.length })}
+            {savedItems.length > 0 && ` · ${t('cart.saved_count', { count: savedItems.length })}`}
           </p>
         </div>
         <Button variant="ghost" size="sm" onClick={() => goCatalog(null)}>
-          <ArrowLeft className="mr-1.5 h-4 w-4" /> Continue shopping
+          <ArrowLeft className="mr-1.5 h-4 w-4" /> {t('cart.continue_shopping')}
         </Button>
       </div>
 
@@ -232,7 +235,7 @@ export function CartView() {
                       />
                     ) : (
                       <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">
-                        No image
+                        {t('product.no_image')}
                       </div>
                     )}
                   </button>
@@ -250,16 +253,16 @@ export function CartView() {
                         <button
                           onClick={() => saveForLater(item.productId)}
                           className="shrink-0 rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-primary"
-                          aria-label={`Save ${item.name} for later`}
-                          title="Save for later"
+                          aria-label={t('cart.save_product_later', { product: item.name })}
+                          title={t('cart.save_for_later')}
                         >
                           <Heart className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleRemove(item)}
                           className="shrink-0 rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                          aria-label={`Remove ${item.name}`}
-                          title="Remove"
+                          aria-label={t('cart.remove_product', { product: item.name })}
+                          title={t('cart.remove')}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -267,7 +270,7 @@ export function CartView() {
                     </div>
 
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      {formatRWF(item.price)} each
+                      {t('cart.price_each', { price: formatRWF(item.price) })}
                     </p>
 
                     <div className="mt-auto flex items-end justify-between pt-2">
@@ -279,7 +282,7 @@ export function CartView() {
                           className="h-8 w-8 rounded-r-none"
                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                           disabled={item.quantity <= 1}
-                          aria-label="Decrease quantity"
+                          aria-label={t('product.decrease_quantity')}
                         >
                           <Minus className="h-3.5 w-3.5" />
                         </Button>
@@ -292,7 +295,7 @@ export function CartView() {
                           className="h-8 w-8 rounded-l-none"
                           onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                           disabled={item.quantity >= item.stock}
-                          aria-label="Increase quantity"
+                          aria-label={t('product.increase_quantity')}
                         >
                           <Plus className="h-3.5 w-3.5" />
                         </Button>
@@ -309,7 +312,7 @@ export function CartView() {
             <div className="rounded-2xl border border-dashed py-12 text-center">
               <ShoppingBag className="mx-auto h-10 w-10 text-muted-foreground/50" />
               <p className="mt-2 text-sm text-muted-foreground">
-                Cart is empty — add products or move saved items back.
+                {t('cart.empty_or_restore')}
               </p>
             </div>
           )}
@@ -318,20 +321,20 @@ export function CartView() {
           {items.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
               <Button variant="outline" size="sm" onClick={handleShareCart}>
-                <MessageCircle className="mr-1.5 h-4 w-4" /> Share cart on WhatsApp
+                <MessageCircle className="mr-1.5 h-4 w-4" /> {t('cart.share_whatsapp')}
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 className="text-muted-foreground"
                 onClick={() => {
-                  if (window.confirm("Remove all items from your cart?")) {
+                  if (window.confirm(t('cart.clear_confirm'))) {
                     clearCart()
-                    toast({ title: "Cart cleared" })
+                    toast({ title: t('cart.cleared') })
                   }
                 }}
               >
-                <Trash2 className="mr-1.5 h-4 w-4" /> Clear cart
+                <Trash2 className="mr-1.5 h-4 w-4" /> {t('cart.clear_cart')}
               </Button>
             </div>
           )}
@@ -340,7 +343,7 @@ export function CartView() {
           {savedItems.length > 0 && (
             <div className="mt-8">
               <h2 className="mb-3 text-lg font-semibold">
-                Saved for later ({savedItems.length})
+                {t('cart.saved_for_later_count', { count: savedItems.length })}
               </h2>
               <ul className="space-y-2">
                 {savedItems.map((item) => (
@@ -368,14 +371,14 @@ export function CartView() {
                       size="sm"
                       onClick={() => moveToCart(item.productId)}
                     >
-                      Move to cart
+                      {t('cart.move_to_cart')}
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 text-muted-foreground hover:text-destructive"
                       onClick={() => removeFromSaved(item.productId)}
-                      aria-label="Remove from saved"
+                      aria-label={t('cart.remove_from_saved')}
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -392,13 +395,13 @@ export function CartView() {
             {/* Coupon */}
             <div className="rounded-2xl border bg-card p-4 shadow-sm">
               <h2 className="flex items-center gap-1.5 text-sm font-semibold">
-                <Tag className="h-4 w-4 text-primary" /> Coupon code
+                <Tag className="h-4 w-4 text-primary" /> {t('cart.coupon')}
               </h2>
               {appliedCoupon ? (
                 <div className="mt-3 flex items-center justify-between rounded-lg bg-emerald-50 px-3 py-2">
                   <div>
                     <p className="text-sm font-medium text-emerald-700">
-                      {appliedCoupon.code} applied
+                      {t('cart.code_applied', { code: appliedCoupon.code })}
                     </p>
                     {appliedCoupon.discountAmount > 0 && (
                       <p className="text-xs text-emerald-600">
@@ -406,14 +409,14 @@ export function CartView() {
                       </p>
                     )}
                     {appliedCoupon.freeShipping && (
-                      <p className="text-xs text-emerald-600">Free shipping!</p>
+                      <p className="text-xs text-emerald-600">{t('cart.free_shipping')}</p>
                     )}
                   </div>
                   <button
                     onClick={() => {
                       clearCoupon()
                       setCouponCode("")
-                      toast({ title: "Coupon removed" })
+                      toast({ title: t('cart.coupon_removed') })
                     }}
                     className="rounded-md p-1 text-emerald-700 hover:bg-emerald-100"
                   >
@@ -423,7 +426,7 @@ export function CartView() {
               ) : (
                 <div className="mt-3 flex gap-2">
                   <Input
-                    placeholder="e.g. WELCOME10"
+                    placeholder={t('cart.coupon_example', { code: 'WELCOME10' })}
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                     className="h-9"
@@ -440,13 +443,13 @@ export function CartView() {
                     {couponLoading ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      "Apply"
+                      t('cart.apply_coupon')
                     )}
                   </Button>
                 </div>
               )}
               <p className="mt-2 text-xs text-muted-foreground">
-                Try: WELCOME10 (10% off) or WEEKEND15 (15% off)
+                {t('cart.coupon_suggestions')}
               </p>
             </div>
 
@@ -454,15 +457,15 @@ export function CartView() {
             {user && (
               <div className="rounded-2xl border bg-card p-4 shadow-sm">
                 <h2 className="flex items-center gap-1.5 text-sm font-semibold">
-                  <Gift className="h-4 w-4 text-primary" /> Loyalty points
+                  <Gift className="h-4 w-4 text-primary" /> {t('cart.loyalty_points')}
                 </h2>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  You have {0} points (1 pt = RWF 1)
+                  {t('cart.points_balance', { points: 0 })}
                 </p>
                 <div className="mt-3 flex items-center gap-2">
                   <Input
                     type="number"
-                    placeholder="Points to redeem"
+                    placeholder={t('cart.points_redeem_placeholder')}
                     value={redeemPoints || ""}
                     onChange={(e) => setRedeemPoints(Number(e.target.value) || 0)}
                     className="h-9"
@@ -474,12 +477,12 @@ export function CartView() {
                     onClick={() => setRedeemPoints(0)}
                     disabled={redeemPoints === 0}
                   >
-                    Clear
+                    {t('common.clear')}
                   </Button>
                 </div>
                 {redeemPoints > 0 && (
                   <p className="mt-1 text-xs text-emerald-600">
-                    −{formatRWF(loyaltyDiscount)} applied
+                    −{t('cart.amount_applied', { amount: formatRWF(loyaltyDiscount) })}
                   </p>
                 )}
               </div>
@@ -487,12 +490,12 @@ export function CartView() {
 
             {/* Order summary */}
             <div className="rounded-2xl border bg-card p-4 shadow-sm">
-              <h2 className="text-sm font-semibold">Order summary</h2>
+              <h2 className="text-sm font-semibold">{t('checkout.order_summary')}</h2>
 
               {/* Province selector for delivery estimate */}
               <div className="mt-3">
                 <Label className="mb-1 block text-xs text-muted-foreground">
-                  Delivery province (estimate)
+                  {t('cart.delivery_province_estimate')}
                 </Label>
                 <select
                   value={province}
@@ -510,32 +513,32 @@ export function CartView() {
               {/* Totals */}
               <div className="mt-3 space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
+                  <span className="text-muted-foreground">{t('cart.subtotal')}</span>
                   <span className="font-medium">{formatRWF(subtotal)}</span>
                 </div>
                 {couponDiscount > 0 && (
                   <div className="flex justify-between text-emerald-600">
-                    <span>Coupon discount</span>
+                    <span>{t('cart.coupon_discount')}</span>
                     <span className="font-medium">−{formatRWF(couponDiscount)}</span>
                   </div>
                 )}
                 {loyaltyDiscount > 0 && (
                   <div className="flex justify-between text-emerald-600">
-                    <span>Loyalty points</span>
+                    <span>{t('cart.loyalty_points')}</span>
                     <span className="font-medium">−{formatRWF(loyaltyDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Delivery fee</span>
+                  <span className="text-muted-foreground">{t('checkout.delivery_fee')}</span>
                   {finalDeliveryFee === 0 && appliedCoupon?.freeShipping ? (
-                    <span className="font-medium text-emerald-600">FREE</span>
+                    <span className="font-medium text-emerald-600">{t('common.free')}</span>
                   ) : (
                     <span className="font-medium">{formatRWF(finalDeliveryFee)}</span>
                   )}
                 </div>
                 <div className="border-t pt-2">
                   <div className="flex items-baseline justify-between">
-                    <span className="font-semibold">Total</span>
+                    <span className="font-semibold">{t('cart.total')}</span>
                     <span className="text-xl font-bold">{formatRWF(total)}</span>
                   </div>
                 </div>
@@ -547,7 +550,7 @@ export function CartView() {
                 onClick={goCheckout}
                 disabled={items.length === 0}
               >
-                Proceed to checkout <ArrowRight className="ml-2 h-4 w-4" />
+                {t('cart.checkout')} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
@@ -555,7 +558,7 @@ export function CartView() {
                 className="mt-2 w-full"
                 onClick={() => goCatalog(null)}
               >
-                Continue shopping
+                {t('cart.continue_shopping')}
               </Button>
             </div>
           </div>

@@ -1,12 +1,17 @@
+'use client'
+
 import InformationPage from '@/components/layout/InformationPage'
+import { BUSINESS } from '@/lib/business-config'
+import { useT } from '@/lib/i18n/LanguageContext'
 
 export default function TermsPage() {
-  return <InformationPage eyebrow="Legal" title="Terms & Conditions" intro="These terms govern purchases and use of FreedomCosmeticShop. By ordering, you agree to provide accurate information and comply with these conditions." sections={[
-    { title: 'Orders and pricing', bullets: ['All prices are displayed in Rwandan francs (RWF).', 'An order is confirmed after payment approval, or acceptance for eligible cash-on-delivery orders.', 'We may cancel an order affected by a pricing error, unavailable stock, suspected fraud, or an invalid delivery address.'] },
-    { title: 'Payments', paragraphs: ['We accept the payment methods shown at checkout. Mobile Money and card confirmations are handled by approved payment providers. Never share your PIN with FreedomCosmeticShop staff.'] },
-    { title: 'Delivery', paragraphs: ['Delivery times are estimates and may change because of weather, road conditions, public holidays, or an incomplete address. Risk transfers to the customer after confirmed delivery.'] },
-    { title: 'Products', paragraphs: ['Colours and packaging may vary slightly from on-screen images. Always read product ingredients, directions, and warnings. Cosmetics are not medical treatment; seek professional advice for medical concerns.'] },
-    { title: 'Acceptable use', bullets: ['Do not attempt unauthorized access, fraud, scraping, or interference with the service.', 'Do not submit false reviews or misuse promotions.', 'Accounts involved in abuse may be suspended.'] },
-    { title: 'Liability and governing law', paragraphs: ['Nothing in these terms limits rights that cannot legally be excluded. These terms are governed by the laws of Rwanda, and disputes should first be raised with our support team for good-faith resolution.'] },
+  const t = useT()
+  return <InformationPage eyebrow={t('pages.legal')} title={t('pages.terms_title')} intro={t('pages.terms_intro', { business: BUSINESS.tradingName })} sections={[
+    { title: t('pages.orders_pricing'), bullets: [t('pages.prices_rwf'), t('pages.order_confirmation_terms'), t('pages.order_cancellation_terms')] },
+    { title: t('pages.payments'), paragraphs: [t('pages.payments_text', { business: BUSINESS.tradingName })] },
+    { title: t('pages.delivery'), paragraphs: [t('pages.delivery_terms_text')] },
+    { title: t('pages.products'), paragraphs: [t('pages.products_terms_text')] },
+    { title: t('pages.acceptable_use'), bullets: [t('pages.use_no_unauthorized'), t('pages.use_no_false_reviews'), t('pages.use_suspension')] },
+    { title: t('pages.liability_law'), paragraphs: [t('pages.liability_law_text')] },
   ]} />
 }

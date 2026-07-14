@@ -20,6 +20,7 @@
 import { useState, useEffect } from "react"
 import { useStore } from "@/store/useStore"
 import { useToast } from "@/hooks/use-toast"
+import MFALoginChallenge from "@/components/auth/MFALoginChallenge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -56,6 +57,7 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
   const [error, setError] = useState<string | null>(null)
   const [attempts, setAttempts] = useState(0)
   const [lockedUntil, setLockedUntil] = useState<number | null>(null)
+  const [mfaChallenge, setMfaChallenge] = useState<string | null>(null)
 
   // Check lockout on mount
   useEffect(() => {
@@ -107,12 +109,20 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
       if (!res.ok) {
         throw new Error(data.error || "Invalid credentials")
       }
+      if (data.mfaRequired && data.challengeToken) {
+        setMfaChallenge(data.challengeToken)
+        return
+      }
       // Fetch the full user to check role
       await fetchUser()
       const user = useStore.getState().user
 
       if (!user) {
         throw new Error("Login failed — no user returned")
+      }
+      if (user.mustChangePassword) {
+        window.location.assign('/change-password')
+        return
       }
 
       if (user.role !== "ADMIN" && user.role !== "STAFF" && user.role !== "MANAGER") {
@@ -179,6 +189,35 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
           <Button variant="outline" className="mt-6" onClick={onBack}>
             Back to store
           </Button>
+        </div>
+      </div>
+    )
+  }
+
+  if (mfaChallenge) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/20 px-4 py-8">
+        <div className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-lg sm:p-8">
+          <MFALoginChallenge
+            challengeToken={mfaChallenge}
+            onCancel={() => { setMfaChallenge(null); setPassword(''); setError(null) }}
+            onSuccess={async () => {
+              await fetchUser()
+              const authenticated = useStore.getState().user
+              if (authenticated?.mustChangePassword) {
+                window.location.assign('/change-password')
+                return
+              }
+              if (!authenticated || !['ADMIN', 'STAFF', 'MANAGER', 'SUPER_ADMIN'].includes(authenticated.role)) {
+                await logout()
+                setMfaChallenge(null)
+                setError('Admin access required')
+                return
+              }
+              setMfaChallenge(null)
+              toast({ title: 'Welcome, Admin! 🔐', description: `Logged in as ${authenticated.name}` })
+            }}
+          />
         </div>
       </div>
     )

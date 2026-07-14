@@ -17,6 +17,7 @@
 import { db } from "@/lib/db"
 import { enqueueSms } from "@/server/services/sms-queue"
 import { features } from "@/lib/env"
+import { BUSINESS } from "@/lib/business-config"
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -392,13 +393,13 @@ export async function sendWholesaleSms(
   if (!features.sms) return
 
   const messages: Record<string, string> = {
-    application_received: `FreedomCosmeticShop: Wholesale application #${variables.id} received! We review in 24-48 hours. Questions? +250780000000`,
-    application_approved: `Congratulations ${variables.name}! Your wholesale account at FreedomCosmeticShop is APPROVED! 🎉 Shop now and save up to 30% on all orders!`,
-    application_rejected: `FreedomCosmeticShop: Your wholesale application was not approved. Reason: ${variables.reason}. Questions: +250780000000`,
-    order_confirmed: `Wholesale Order #${variables.orderNumber} confirmed! Amount: ${variables.amount} RWF. Invoice: ${variables.invoice}. Due: ${variables.dueDate}. FreedomCosmeticShop 📦`,
-    payment_due: `Reminder: Invoice ${variables.invoice} of ${variables.amount} RWF due on ${variables.dueDate}. Pay MTN MoMo: ${variables.momoNumber}. Ref: ${variables.invoice}. FreedomCosmeticShop 💳`,
-    payment_overdue: `URGENT: Invoice ${variables.invoice} of ${variables.amount} RWF is OVERDUE. Pay now to avoid suspension. Call: +250780000000. FreedomCosmeticShop ⚠️`,
-    payment_received: `Payment of ${variables.amount} RWF received for ${variables.invoice}. Balance: ${variables.remaining} RWF. Thank you! FreedomCosmeticShop ✅`,
+    application_received: `${BUSINESS.tradingName}: Wholesale application #${variables.id} received! We review in 24-48 hours. Questions? ${BUSINESS.phone}`,
+    application_approved: `Congratulations ${variables.name}! Your wholesale account at ${BUSINESS.tradingName} is APPROVED! 🎉 Shop now and save up to 30% on all orders!`,
+    application_rejected: `${BUSINESS.tradingName}: Your wholesale application was not approved. Reason: ${variables.reason}. Questions: ${BUSINESS.phone}`,
+    order_confirmed: `Wholesale Order #${variables.orderNumber} confirmed! Amount: ${variables.amount} RWF. Invoice: ${variables.invoice}. Due: ${variables.dueDate}. ${BUSINESS.tradingName} 📦`,
+    payment_due: `Reminder: Invoice ${variables.invoice} of ${variables.amount} RWF due on ${variables.dueDate}. Pay MTN MoMo: ${variables.momoNumber}. Ref: ${variables.invoice}. ${BUSINESS.tradingName} 💳`,
+    payment_overdue: `URGENT: Invoice ${variables.invoice} of ${variables.amount} RWF is OVERDUE. Pay now to avoid suspension. Call: ${BUSINESS.phone}. ${BUSINESS.tradingName} ⚠️`,
+    payment_received: `Payment of ${variables.amount} RWF received for ${variables.invoice}. Balance: ${variables.remaining} RWF. Thank you! ${BUSINESS.tradingName} ✅`,
   }
 
   const message = messages[template]

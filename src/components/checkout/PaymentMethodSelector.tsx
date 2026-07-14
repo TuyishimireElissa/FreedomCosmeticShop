@@ -49,6 +49,7 @@ import {
   AlertCircle,
   ArrowRight,
 } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 type Method = "MTN_MOMO" | "AIRTEL_MONEY" | "CARD" | "COD"
 
@@ -68,6 +69,7 @@ export function PaymentMethodSelector({
   onPaymentFailure,
   codAvailable = true,
 }: PaymentMethodSelectorProps) {
+  const t = useT()
   const [method, setMethod] = useState<Method>("MTN_MOMO")
   const [momoPhone, setMomoPhone] = useState("")
   const [airtelPhone, setAirtelPhone] = useState("")
@@ -90,7 +92,7 @@ export function PaymentMethodSelector({
 
     if (method === "MTN_MOMO") {
       if (!validateMTNPhone(momoPhone)) {
-        setPhoneError("Enter a valid MTN number (078 or 079)")
+        setPhoneError(t('checkout.momo_wrong_number'))
         return
       }
       const success = await initiate({
@@ -100,11 +102,11 @@ export function PaymentMethodSelector({
         network: "MTN",
       })
       if (!success && status === "failed") {
-        onPaymentFailure?.(error || "Payment failed")
+        onPaymentFailure?.(error || t('checkout.payment_failed_title'))
       }
     } else if (method === "AIRTEL_MONEY") {
       if (!validateAirtelPhone(airtelPhone)) {
-        setPhoneError("Enter a valid Airtel number (072 or 073)")
+        setPhoneError(t('checkout.airtel_wrong_number'))
         return
       }
       const success = await initiate({
@@ -114,7 +116,7 @@ export function PaymentMethodSelector({
         network: "AIRTEL",
       })
       if (!success && status === "failed") {
-        onPaymentFailure?.(error || "Payment failed")
+        onPaymentFailure?.(error || t('checkout.payment_failed_title'))
       }
     }
   }
@@ -130,17 +132,16 @@ export function PaymentMethodSelector({
         <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-primary/10">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-        <h3 className="text-lg font-bold">Waiting for payment approval</h3>
+        <h3 className="text-lg font-bold">{t('checkout.waiting_approval')}</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          Check your phone and approve the {method === "MTN_MOMO" ? "MTN MoMo" : "Airtel Money"} prompt
-          to complete your payment of <strong>{formatRWF(amount)}</strong>.
+          {t('checkout.approve_network_payment', { network: method === "MTN_MOMO" ? "MTN MoMo" : "Airtel Money", amount: formatRWF(amount) })}
         </p>
 
         {/* Countdown timer */}
         <div className="mx-auto mt-4 max-w-xs">
           <div className="mb-1 flex justify-between text-xs text-muted-foreground">
-            <span>Elapsed: {Math.floor(elapsedSeconds / 60)}:{String(elapsedSeconds % 60).padStart(2, "0")}</span>
-            <span>Remaining: {Math.floor(remainingSeconds / 60)}:{String(remainingSeconds % 60).padStart(2, "0")}</span>
+            <span>{t('checkout.elapsed_time', { time: `${Math.floor(elapsedSeconds / 60)}:${String(elapsedSeconds % 60).padStart(2, "0")}` })}</span>
+            <span>{t('checkout.remaining_time', { time: `${Math.floor(remainingSeconds / 60)}:${String(remainingSeconds % 60).padStart(2, "0")}` })}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-secondary">
             <div
@@ -151,7 +152,7 @@ export function PaymentMethodSelector({
         </div>
 
         <Button variant="outline" className="mt-4" onClick={cancel}>
-          <XCircle className="mr-2 h-4 w-4" /> Cancel Payment
+          <XCircle className="mr-2 h-4 w-4" /> {t('checkout.momo_cancel')}
         </Button>
       </div>
     )
@@ -164,18 +165,18 @@ export function PaymentMethodSelector({
         <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-emerald-100">
           <CheckCircle2 className="h-8 w-8 text-emerald-600" />
         </div>
-        <h3 className="text-lg font-bold text-emerald-900">Payment Successful!</h3>
+        <h3 className="text-lg font-bold text-emerald-900">{t('checkout.payment_successful')}</h3>
         <p className="mt-2 text-sm text-emerald-700">
-          {formatRWF(amount)} received
+          {t('checkout.amount_received', { amount: formatRWF(amount) })}
         </p>
         <p className="mt-1 text-xs text-emerald-600">
-          Order confirmed · SMS sent to your phone
+          {t('checkout.order_confirmed_sms')}
         </p>
         <Button
           className="mt-4 bg-emerald-600 hover:bg-emerald-700"
           onClick={() => onPaymentSuccess?.(transactionRef || "")}
         >
-          View My Order <ArrowRight className="ml-2 h-4 w-4" />
+          {t('checkout.view_my_order')} <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
     )
@@ -188,12 +189,12 @@ export function PaymentMethodSelector({
         <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full bg-red-100">
           <XCircle className="h-8 w-8 text-red-600" />
         </div>
-        <h3 className="text-lg font-bold text-red-900">Payment Failed</h3>
+        <h3 className="text-lg font-bold text-red-900">{t('checkout.payment_failed_title')}</h3>
         <p className="mt-2 text-sm text-red-700">
-          {error || "Payment could not be completed. Please try again."}
+          {error || t('checkout.payment_could_not_complete')}
         </p>
         <Button variant="outline" className="mt-4" onClick={handleRetry}>
-          Try Again
+          {t('common.retry')}
         </Button>
       </div>
     )
@@ -203,8 +204,8 @@ export function PaymentMethodSelector({
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold">Select Payment Method</h3>
-        <p className="text-sm text-muted-foreground">Choose how you want to pay</p>
+        <h3 className="text-lg font-semibold">{t('checkout.select_payment_method')}</h3>
+        <p className="text-sm text-muted-foreground">{t('checkout.choose_how_pay')}</p>
       </div>
 
       <RadioGroup
@@ -226,17 +227,17 @@ export function PaymentMethodSelector({
           <span className="grid h-10 w-10 place-items-center rounded-lg bg-yellow-400 text-2xl">📱</span>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-medium">MTN Mobile Money</span>
-              <Badge className="bg-primary/10 text-xs text-primary">Most Popular</Badge>
+              <span className="font-medium">{t('checkout.mtn_momo')}</span>
+              <Badge className="bg-primary/10 text-xs text-primary">{t('checkout.mtn_popular')}</Badge>
             </div>
-            <p className="text-sm text-muted-foreground">Pay instantly with MTN — get a prompt on your phone</p>
+            <p className="text-sm text-muted-foreground">{t('checkout.mtn_instant_prompt')}</p>
           </div>
         </label>
 
         {/* MTN phone input */}
         {method === "MTN_MOMO" && (
           <div className="ml-8 rounded-lg border bg-card p-3">
-            <Label htmlFor="momo-phone" className="text-xs">MTN MoMo Number</Label>
+            <Label htmlFor="momo-phone" className="text-xs">{t('checkout.mtn_number')}</Label>
             <Input
               id="momo-phone"
               type="tel"
@@ -246,9 +247,9 @@ export function PaymentMethodSelector({
               className={`mt-1 ${phoneError ? "border-destructive" : ""}`}
             />
             {phoneError && <p className="mt-1 text-xs text-destructive">{phoneError}</p>}
-            <p className="mt-1 text-xs text-muted-foreground">⚠️ Use the number registered for MTN Mobile Money</p>
+            <p className="mt-1 text-xs text-muted-foreground">⚠️ {t('checkout.use_registered_mtn')}</p>
             <Button className="mt-3 w-full" onClick={handlePay}>
-              Pay {formatRWF(amount)} with MoMo
+              {t('checkout.pay_momo_amount', { amount: formatRWF(amount) })}
             </Button>
           </div>
         )}
@@ -263,15 +264,15 @@ export function PaymentMethodSelector({
           <RadioGroupItem value="AIRTEL_MONEY" id="pay-airtel" className="mt-1" />
           <span className="grid h-10 w-10 place-items-center rounded-lg bg-red-500 text-2xl">📲</span>
           <div className="flex-1">
-            <span className="font-medium">Airtel Money</span>
-            <p className="text-sm text-muted-foreground">Pay with Airtel — same flow as MTN</p>
+            <span className="font-medium">{t('checkout.airtel_money')}</span>
+            <p className="text-sm text-muted-foreground">{t('checkout.airtel_same_flow')}</p>
           </div>
         </label>
 
         {/* Airtel phone input */}
         {method === "AIRTEL_MONEY" && (
           <div className="ml-8 rounded-lg border bg-card p-3">
-            <Label htmlFor="airtel-phone" className="text-xs">Airtel Money Number</Label>
+            <Label htmlFor="airtel-phone" className="text-xs">{t('checkout.airtel_number')}</Label>
             <Input
               id="airtel-phone"
               type="tel"
@@ -282,7 +283,7 @@ export function PaymentMethodSelector({
             />
             {phoneError && <p className="mt-1 text-xs text-destructive">{phoneError}</p>}
             <Button className="mt-3 w-full" onClick={handlePay}>
-              Pay {formatRWF(amount)} with Airtel
+              {t('checkout.pay_airtel_amount', { amount: formatRWF(amount) })}
             </Button>
           </div>
         )}
@@ -297,8 +298,8 @@ export function PaymentMethodSelector({
           <RadioGroupItem value="CARD" id="pay-card" className="mt-1" />
           <span className="grid h-10 w-10 place-items-center rounded-lg bg-gray-800 text-2xl">💳</span>
           <div className="flex-1">
-            <span className="font-medium">Visa / Mastercard</span>
-            <p className="text-sm text-muted-foreground">Secure card payment via Flutterwave</p>
+            <span className="font-medium">{t('checkout.card_payment')}</span>
+            <p className="text-sm text-muted-foreground">{t('checkout.flutterwave_secure')}</p>
           </div>
         </label>
 
@@ -314,9 +315,9 @@ export function PaymentMethodSelector({
           <RadioGroupItem value="COD" id="pay-cod" className="mt-1" disabled={!codAvailable} />
           <span className="grid h-10 w-10 place-items-center rounded-lg bg-emerald-500 text-2xl">💵</span>
           <div className="flex-1">
-            <span className="font-medium">Cash on Delivery</span>
+            <span className="font-medium">{t('checkout.cod')}</span>
             <p className="text-sm text-muted-foreground">
-              {codAvailable ? "Pay with cash when your order arrives" : "Kigali only"}
+              {codAvailable ? t('checkout.pay_cash_arrival') : t('checkout.cod_kigali_only')}
             </p>
           </div>
         </label>

@@ -33,6 +33,7 @@ import { SpecialOffers } from "@/components/home/SpecialOffers"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Truck, Smartphone, ShieldCheck, Sparkles } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface Banner {
   id: string
@@ -67,6 +68,7 @@ interface BlogPost {
 }
 
 export function HomeView() {
+  const t = useT()
   const { goCatalog } = useStore()
 
   const [banners, setBanners] = useState<Banner[]>([])
@@ -209,23 +211,23 @@ export function HomeView() {
           {[
             {
               icon: Truck,
-              title: "Fast delivery",
-              desc: "1-3 days in Kigali, 3-5 days in provinces",
+              title: t('footer.fast_delivery'),
+              desc: t('home.delivery_days'),
             },
             {
               icon: Smartphone,
-              title: "MTN MoMo & COD",
-              desc: "Pay your way — mobile money or cash",
+              title: t('home.momo_cod'),
+              desc: t('home.pay_your_way'),
             },
             {
               icon: ShieldCheck,
-              title: "Authentic products",
-              desc: "100% genuine, sourced from authorized distributors",
+              title: t('home.authentic_products'),
+              desc: t('home.authorized_genuine'),
             },
             {
               icon: Sparkles,
-              title: "Made for Rwanda",
-              desc: "Shades & formulas for melanin-rich skin",
+              title: t('home.made_for_rwanda'),
+              desc: t('home.melanin_formulas'),
             },
           ].map((item, i) => (
             <div key={i} className="flex items-start gap-3">
@@ -260,9 +262,9 @@ export function HomeView() {
 
       {/* 4. Best Sellers */}
       <ProductSection
-        title="Best sellers"
-        subtitle="Customer favorites, handpicked for you."
-        badge="★ Top rated"
+        title={t('categories.best_sellers')}
+        subtitle={t('home.best_sellers_subtitle')}
+        badge={t('home.top_rated')}
         products={bestSellers}
         loading={loading}
         onViewAll={() => goCatalog(null)}
@@ -271,15 +273,15 @@ export function HomeView() {
       {/* 5. Special Offers */}
       <SpecialOffers
         code="WEEKEND15"
-        description="15% off on weekends. Pay with MTN MoMo or cash on delivery. Min order RWF 10,000."
-        discount="15% OFF"
+        description={t('home.weekend_offer')}
+        discount={t('home.weekend_discount')}
       />
 
       {/* 6. New Arrivals */}
       <ProductSection
-        title="New arrivals"
-        subtitle="The latest additions to our shelves."
-        badge="✨ New"
+        title={t('categories.new_arrivals')}
+        subtitle={t('home.new_arrivals_subtitle')}
+        badge={`✨ ${t('common.new')}`}
         products={newArrivals}
         loading={loading}
         onViewAll={() => goCatalog(null)}
@@ -303,6 +305,7 @@ export function HomeView() {
 // ─── Section 4: Wholesale CTA Banner ─────────────────────────────────────────
 
 function WholesaleCtaBanner() {
+  const t = useT()
   const { user, setView } = useStore()
   const isWholesale = user?.userType === "WHOLESALE" || user?.userType === "BOTH"
 
@@ -314,20 +317,20 @@ function WholesaleCtaBanner() {
       <div className="mx-auto max-w-4xl text-center">
         <p className="text-3xl">🏪</p>
         <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
-          Are you a salon or shop owner?
+          {t('home.salon_shop_owner')}
         </h2>
         <p className="mt-2 text-sm text-primary-foreground/90">
-          Join FreedomCosmeticShop Wholesale Program and save up to 30% on all products
+          {t('home.join_wholesale_program')}
         </p>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
           {[
-            { icon: "💰", label: "Up to 30% off" },
-            { icon: "🚚", label: "Priority delivery" },
-            { icon: "📄", label: "Pro invoices" },
-            { icon: "💳", label: "Credit available" },
-            { icon: "📦", label: "Bulk support" },
-            { icon: "🏆", label: "Loyalty rewards" },
+            { icon: "💰", label: t('home.up_to_off') },
+            { icon: "🚚", label: t('home.priority_delivery') },
+            { icon: "📄", label: t('home.pro_invoices') },
+            { icon: "💳", label: t('home.credit_available') },
+            { icon: "📦", label: t('home.bulk_support') },
+            { icon: "🏆", label: t('home.loyalty_rewards') },
           ].map((b) => (
             <div key={b.label} className="rounded-xl bg-primary-foreground/10 p-3 text-center">
               <p className="text-2xl">{b.icon}</p>
@@ -337,7 +340,7 @@ function WholesaleCtaBanner() {
         </div>
 
         <p className="mt-4 text-xs text-primary-foreground/80">
-          Minimum order: 50,000 RWF · For salons, shops, spas & resellers across Rwanda
+          {t('home.wholesale_minimum_audience')}
         </p>
 
         <Button
@@ -346,7 +349,7 @@ function WholesaleCtaBanner() {
           className="mt-6"
           onClick={() => setView("wholesale" as never)}
         >
-          Apply for Wholesale Account →
+          {t('home.apply_wholesale_account')} →
         </Button>
       </div>
     </section>

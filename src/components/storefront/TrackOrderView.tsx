@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
 import { useOrderUpdates, useDeliveryUpdates } from "@/hooks/use-realtime"
 import {
   Package,
@@ -75,6 +76,7 @@ interface TimelineStep {
 export function TrackOrderView() {
   const { goHome } = useStore()
   const { toast } = useToast()
+  const t = useT()
   const [orderNumber, setOrderNumber] = useState("")
   const [order, setOrder] = useState<TrackedOrder | null>(null)
   const [timeline, setTimeline] = useState<TimelineStep[]>([])
@@ -94,13 +96,13 @@ export function TrackOrderView() {
       const res = await fetch(`/api/orders/${encodeURIComponent(orderNumber.trim())}/track`)
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "Order not found")
+        throw new Error(data.error || t('checkout.order_not_found'))
       }
       const data = await res.json()
       setOrder(data.order)
       setTimeline(data.timeline || [])
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to track order")
+      setError(err instanceof Error ? err.message : t('orders.track_failed'))
       setOrder(null)
       setTimeline([])
     } finally {
@@ -125,16 +127,16 @@ export function TrackOrderView() {
 
       // Show a toast notification for the status change
       const statusMessages: Record<string, string> = {
-        confirmed: "✅ Order confirmed! We're preparing your order.",
-        processing: "📦 Order is being processed.",
-        shipped: "🚚 Order shipped! It's on the way.",
-        delivered: "🎉 Order delivered! Thank you for shopping with us.",
-        cancelled: "❌ Order has been cancelled.",
+        confirmed: `✅ ${t('orders.realtime_confirmed')}`,
+        processing: `📦 ${t('orders.realtime_processing')}`,
+        shipped: `🚚 ${t('orders.realtime_shipped')}`,
+        delivered: `🎉 ${t('orders.realtime_delivered')}`,
+        cancelled: `❌ ${t('orders.realtime_cancelled')}`,
       }
       const action = event.replace("order:", "")
       const message = statusMessages[action]
       if (message) {
-        toast({ title: "Order Update", description: message })
+        toast({ title: t('orders.order_update'), description: message })
       }
 
       // If shipped or delivered, refetch the full order to get rider info + timeline
@@ -174,10 +176,10 @@ export function TrackOrderView() {
         })
         .catch(() => {})
       toast({
-        title: "🏍️ Rider assigned!",
+        title: `🏍️ ${t('orders.rider_assigned')}`,
         description: d.riderName
-          ? `${d.riderName} — ${d.riderPhone || "Phone pending"}`
-          : "Your order is on the way!",
+          ? `${d.riderName} — ${d.riderPhone || t('orders.phone_pending')}`
+          : t('orders.on_the_way'),
       })
     } else if (event === "delivery:updated") {
       // General delivery update — refetch to get latest status
@@ -199,7 +201,7 @@ export function TrackOrderView() {
     const items = order.items
       .map((i) => `• ${i.name} × ${i.quantity}`)
       .join("\n")
-    const msg = `📦 Order ${order.orderNumber} status: ${order.status}\n\n${items}\n\nTotal: ${formatRWF(order.total)}\nTrack at freedomcosmeticshop.rw 🌸`
+    const msg = t('orders.share_tracking_message', { order: order.orderNumber, status: order.status, items, total: formatRWF(order.total) })
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank")
   }
 
@@ -209,14 +211,14 @@ export function TrackOrderView() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            <Package className="h-7 w-7 text-primary" /> Track your order
+            <Package className="h-7 w-7 text-primary" /> {t('orders.track')}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Enter your order number to see the latest status.
+            {t('orders.enter_number_status')}
           </p>
         </div>
         <Button variant="ghost" size="sm" onClick={goHome}>
-          <ArrowLeft className="mr-1.5 h-4 w-4" /> Home
+          <ArrowLeft className="mr-1.5 h-4 w-4" /> {t('nav.home')}
         </Button>
       </div>
 
@@ -235,11 +237,11 @@ export function TrackOrderView() {
             />
           </div>
           <Button type="submit" size="lg" disabled={loading || !orderNumber.trim()}>
-            {loading ? "Tracking..." : "Track"}
+            {loading ? t('common.loading') : t('orders.track')}
           </Button>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Your order number was sent via SMS when you placed your order.
+          {t('orders.number_sent_sms')}
         </p>
       </form>
 
@@ -255,10 +257,10 @@ export function TrackOrderView() {
       {error && !loading && (
         <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-6 text-center">
           <AlertCircle className="mx-auto h-10 w-10 text-destructive/50" />
-          <h3 className="mt-3 font-semibold text-destructive">Order not found</h3>
+          <h3 className="mt-3 font-semibold text-destructive">{t('checkout.order_not_found')}</h3>
           <p className="mt-1 text-sm text-muted-foreground">{error}</p>
           <p className="mt-2 text-xs text-muted-foreground">
-            Double-check your order number — it looks like UB-YYYY-NNNNN.
+            {t('orders.number_format_hint')}
           </p>
         </div>
       )}
@@ -278,11 +280,11 @@ export function TrackOrderView() {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Order</p>
+                <p className="text-sm text-muted-foreground">{t('orders.order_label')}</p>
                 <p className="font-mono text-lg font-bold">{order.orderNumber}</p>
               </div>
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">Status</p>
+                <p className="text-sm text-muted-foreground">{t('orders.status_label')}</p>
                 <p
                   className={`text-lg font-bold ${
                     order.status === "DELIVERED"
@@ -292,13 +294,13 @@ export function TrackOrderView() {
                       : "text-primary"
                   }`}
                 >
-                  {order.status}
+                  {t(`orders.status_${order.status.toLowerCase()}`)}
                 </p>
               </div>
             </div>
             <div className="mt-3 flex items-center gap-2 text-sm">
               <Clock className="h-4 w-4 text-primary" />
-              <span className="text-muted-foreground">Placed on</span>
+              <span className="text-muted-foreground">{t('orders.placed_label')}</span>
               <span className="font-medium">
                 {new Date(order.createdAt).toLocaleString("en-RW", {
                   day: "numeric",
@@ -312,13 +314,13 @@ export function TrackOrderView() {
             {order.status !== "CANCELLED" && order.status !== "DELIVERED" && (
               <div className="mt-2 flex items-center gap-2 text-sm">
                 <Truck className="h-4 w-4 text-primary" />
-                <span className="text-muted-foreground">Estimated delivery:</span>
+                <span className="text-muted-foreground">{t('checkout.delivery_time')}:</span>
                 <span className="font-medium">{deliveryTimeFor(order.province)}</span>
               </div>
             )}
             {order.trackingCode && (
               <div className="mt-2 text-sm">
-                <span className="text-muted-foreground">Tracking code: </span>
+                <span className="text-muted-foreground">{t('orders.tracking_code')}: </span>
                 <span className="font-mono font-medium">{order.trackingCode}</span>
               </div>
             )}
@@ -328,7 +330,7 @@ export function TrackOrderView() {
           {order.status !== "CANCELLED" && timeline.length > 0 && (
             <div className="rounded-2xl border bg-card p-5">
               <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                Order timeline
+                {t('orders.timeline')}
               </h2>
               <ol className="space-y-4">
                 {timeline.map((step, i) => {
@@ -368,7 +370,7 @@ export function TrackOrderView() {
                       </div>
                       {i === timeline.length - 1 && step.completed && (
                         <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                          Current
+                          {t('orders.current')}
                         </span>
                       )}
                     </li>
@@ -381,7 +383,7 @@ export function TrackOrderView() {
           {/* Items + totals */}
           <div className="rounded-2xl border bg-card p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Items ({order.items.length})
+              {t('checkout.items_count', { count: order.items.length })}
             </h2>
             <ul className="mt-3 space-y-3">
               {order.items.map((item) => (
@@ -403,26 +405,26 @@ export function TrackOrderView() {
             </ul>
             <div className="mt-4 space-y-2 border-t pt-4 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Subtotal</span>
+                <span className="text-muted-foreground">{t('cart.subtotal')}</span>
                 <span>{formatRWF(order.subtotal)}</span>
               </div>
               {order.discountAmount > 0 && (
                 <div className="flex justify-between text-emerald-600">
-                  <span>Discount</span>
+                  <span>{t('cart.discount')}</span>
                   <span>−{formatRWF(order.discountAmount)}</span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Delivery</span>
+                <span className="text-muted-foreground">{t('cart.delivery')}</span>
                 <span>{formatRWF(order.deliveryFee)}</span>
               </div>
               <div className="flex items-baseline justify-between border-t pt-2">
-                <span className="font-semibold">Total</span>
+                <span className="font-semibold">{t('cart.total')}</span>
                 <span className="text-xl font-bold">{formatRWF(order.total)}</span>
               </div>
             </div>
             <div className="mt-3 flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-2 text-sm">
-              <span className="text-muted-foreground">Payment</span>
+              <span className="text-muted-foreground">{t('checkout.step_payment')}</span>
               <span className="font-medium">
                 {PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod}{" "}
                 · <span className={order.paymentStatus === "PAID" ? "text-emerald-600" : "text-amber-600"}>{order.paymentStatus}</span>
@@ -433,7 +435,7 @@ export function TrackOrderView() {
           {/* Delivery info */}
           <div className="rounded-2xl border bg-card p-5">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Delivery to
+              {t('checkout.step_address')}
             </h2>
             <p className="mt-2 font-medium">{order.customerName}</p>
             <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -454,7 +456,7 @@ export function TrackOrderView() {
 
           {/* Share */}
           <Button variant="outline" className="w-full" onClick={handleShare}>
-            <Share2 className="mr-2 h-4 w-4" /> Share order on WhatsApp
+            <Share2 className="mr-2 h-4 w-4" /> {t('checkout.share_order')}
           </Button>
         </div>
       )}
@@ -463,9 +465,9 @@ export function TrackOrderView() {
       {!searched && !order && !loading && (
         <div className="rounded-2xl border border-dashed py-16 text-center">
           <Package className="mx-auto h-12 w-12 text-muted-foreground/50" />
-          <h3 className="mt-3 font-semibold">Enter your order number above</h3>
+          <h3 className="mt-3 font-semibold">{t('orders.track')}</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            You&apos;ll see the full status timeline, items, and delivery info.
+            {t('orders.tracking_empty_hint')}
           </p>
         </div>
       )}

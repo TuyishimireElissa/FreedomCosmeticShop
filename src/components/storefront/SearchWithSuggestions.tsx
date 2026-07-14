@@ -17,7 +17,9 @@ import { useEffect, useRef, useState } from "react"
 import { useStore } from "@/store/useStore"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Search, X, Clock, TrendingUp, ArrowRight } from "lucide-react"
+import { Search, X, Clock, TrendingUp, ArrowRight, Tag } from "lucide-react"
+import { useT } from '@/lib/i18n/LanguageContext'
+import { getSearchSuggestions, POPULAR_LOCAL_SEARCHES, POPULAR_PRICE_SEARCHES } from "@/lib/search-vocabulary"
 
 interface Suggestion {
   products: {
@@ -34,7 +36,7 @@ interface Suggestion {
 
 const RECENT_SEARCHES_KEY = "freedom-recent-searches"
 const MAX_RECENT = 5
-const TRENDING_SEARCHES = ["Vitamin C", "Sunscreen", "Foundation", "Hair oil", "Lipstick"]
+const TRENDING_SEARCHES = [...POPULAR_LOCAL_SEARCHES, "Vitamin C", "Sunscreen", "Foundation", "Hair oil", "Lipstick"]
 
 interface SearchWithSuggestionsProps {
   className?: string
@@ -44,9 +46,11 @@ interface SearchWithSuggestionsProps {
 
 export function SearchWithSuggestions({
   className = "",
-  placeholder = "Search products...",
+  placeholder,
 }: SearchWithSuggestionsProps) {
   const { goCatalog, setCatalogSearch, goProduct } = useStore()
+  const t = useT()
+  const searchPlaceholder = placeholder || t('search.placeholder')
 
   const [query, setQuery] = useState("")
   const [suggestions, setSuggestions] = useState<Suggestion | null>(null)
@@ -169,6 +173,7 @@ export function SearchWithSuggestions({
   const showRecent = isOpen && query.length < 2 && recentSearches.length > 0
   const showTrending = isOpen && query.length < 2
   const showResults = isOpen && query.length >= 2
+  const localSuggestions = showResults ? getSearchSuggestions(query, 5) : []
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -176,7 +181,7 @@ export function SearchWithSuggestions({
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
-          placeholder={placeholder}
+          placeholder={searchPlaceholder}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value)
@@ -186,7 +191,7 @@ export function SearchWithSuggestions({
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           className="h-9 rounded-full pl-9 pr-9"
-          aria-label="Search products"
+          aria-label={t('nav.search_placeholder')}
           aria-expanded={isOpen}
           aria-autocomplete="list"
         />
@@ -199,7 +204,7 @@ export function SearchWithSuggestions({
               setIsOpen(false)
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            aria-label="Clear search"
+            aria-label={t('common.clear')}
           >
             <X className="h-4 w-4" />
           </button>
@@ -220,7 +225,7 @@ export function SearchWithSuggestions({
           {showRecent && !loading && (
             <div className="border-b p-3">
               <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <Clock className="h-3 w-3" /> Recent searches
+                <Clock className="h-3 w-3" /> {t('search.recent')}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {recentSearches.map((s) => (
@@ -242,7 +247,7 @@ export function SearchWithSuggestions({
                   }}
                   className="rounded-full px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
                 >
-                  Clear
+                  {t('search.clear_recent')}
                 </button>
               </div>
             </div>
@@ -252,7 +257,7 @@ export function SearchWithSuggestions({
           {showTrending && !loading && (
             <div className="p-3">
               <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <TrendingUp className="h-3 w-3" /> Trending
+                <TrendingUp className="h-3 w-3" /> {t('search.popular')}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {TRENDING_SEARCHES.map((s) => (
@@ -268,19 +273,37 @@ export function SearchWithSuggestions({
                   </button>
                 ))}
               </div>
+              <p className="mb-2 mt-4 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <Tag className="h-3 w-3" /> {t('search.price_searches')}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {POPULAR_PRICE_SEARCHES.map((price) => (
+                  <button key={price.maxPrice} type="button" onClick={() => { setQuery(price.query); handleSubmit(price.query) }} className="rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-[#B76E79] hover:bg-rose-100">
+                    {price.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
           {/* Results */}
           {showResults && !loading && (
             <>
+              {localSuggestions.length > 0 && (
+                <div className="border-b p-3">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t('search.local_terms')}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {localSuggestions.map((term) => <button key={term} type="button" onClick={() => { setQuery(term); handleSubmit(term) }} className="rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-[#B76E79] hover:bg-rose-100">{term}</button>)}
+                  </div>
+                </div>
+              )}
               {hasResults ? (
                 <div className="p-2">
                   {/* Products */}
                   {suggestions!.products.length > 0 && (
                     <div className="mb-2">
                       <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        Products
+                        {t('nav.products')}
                       </p>
                       {suggestions!.products.map((p) => (
                         <button
@@ -315,7 +338,7 @@ export function SearchWithSuggestions({
                   {suggestions!.categories.length > 0 && (
                     <div className="mb-2">
                       <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        Categories
+                        {t('nav.categories')}
                       </p>
                       {suggestions!.categories.map((c) => (
                         <button
@@ -337,7 +360,7 @@ export function SearchWithSuggestions({
                   {suggestions!.brands.length > 0 && (
                     <div>
                       <p className="px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                        Brands
+                        {t('nav.brands')}
                       </p>
                       {suggestions!.brands.map((b) => (
                         <button
@@ -360,17 +383,17 @@ export function SearchWithSuggestions({
                     onClick={() => handleSubmit()}
                     className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-lg bg-primary p-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                   >
-                    View all results for &ldquo;{query}&rdquo;
+                    {t('search.view_all_results', { query })}
                     <ArrowRight className="h-4 w-4" />
                   </button>
                 </div>
               ) : (
                 <div className="p-6 text-center">
                   <p className="text-sm text-muted-foreground">
-                    No results for &ldquo;{query}&rdquo;
+                    {t('search.no_results', { query })}
                   </p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Try a different search term or browse categories.
+                    {t('search.no_results_hint')}
                   </p>
                 </div>
               )}

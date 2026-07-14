@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { Sparkles, Truck, X } from 'lucide-react'
+import { useT } from '@/lib/i18n/LanguageContext'
 
 const STORAGE_KEY = 'freedom-announcement-dismissed'
 
 export default function AnnouncementBar() {
+  const t = useT()
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
@@ -25,14 +27,14 @@ export default function AnnouncementBar() {
         <span className="inline-flex items-center gap-1.5">
           <Truck className="h-3.5 w-3.5 shrink-0 text-[#FFD700]" aria-hidden="true" />
           <span>
-            <strong>FREE delivery</strong> above 50,000 RWF
+            <strong>{t('announcement.free_delivery', { amount: '50,000' })}</strong>
           </span>
         </span>
         <span className="hidden text-white/30 sm:inline" aria-hidden="true">|</span>
         <span className="inline-flex items-center gap-1.5">
           <Sparkles className="h-3.5 w-3.5 shrink-0 text-[#FFD700]" aria-hidden="true" />
           <span>
-            Code <strong className="text-[#FFD700]">BEAUTY20</strong> gives 20% off
+            {t('announcement.promotion', { code: 'BEAUTY20', percent: 20 })}
           </span>
         </span>
       </div>
@@ -40,7 +42,7 @@ export default function AnnouncementBar() {
         type="button"
         onClick={dismiss}
         className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFD700] sm:right-4"
-        aria-label="Dismiss announcement"
+        aria-label={t('announcement.dismiss')}
       >
         <X className="h-4 w-4" />
       </button>

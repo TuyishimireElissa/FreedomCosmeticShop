@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import ProductDetailClient from '@/components/products/ProductDetailClient'
+import { BUSINESS } from '@/lib/business-config'
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://freedom-cosmetic-shop.vercel.app'
+const baseUrl = BUSINESS.url
 
 async function getProduct(slug: string) {
   return prisma.product.findFirst({
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     alternates: { canonical: `/products/${product.slug}` },
     openGraph: {
       type: 'website',
-      title: `${product.name} | FreedomCosmeticShop`,
+      title: `${product.name} | ${BUSINESS.name}`,
       description,
       url: `${baseUrl}/products/${product.slug}`,
       images: images[0] ? [{ url: images[0], alt: product.name }] : undefined,

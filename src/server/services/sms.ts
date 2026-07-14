@@ -24,6 +24,7 @@
 import { env, features } from "@/lib/env"
 import { normalizeRwandaPhone } from "@/lib/phone"
 import { isCriticalTemplate, type SmsTemplateKey } from "./sms-templates"
+import { resolveTranslation } from "@/lib/i18n"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -82,15 +83,15 @@ export function shouldSendSms(
 ): { shouldSend: boolean; reason: string } {
   // Critical templates (OTP, order updates) always send
   if (templateKey && isCriticalTemplate(templateKey)) {
-    return { shouldSend: true, reason: "Transactional (critical)" }
+    return { shouldSend: true, reason: resolveTranslation('en', 'sms.reason_transactional') }
   }
 
   // Check opt-out for non-critical (promotional, abandoned cart, etc.)
   if (hasOptedOut(phone)) {
-    return { shouldSend: false, reason: "Recipient opted out" }
+    return { shouldSend: false, reason: resolveTranslation('en', 'sms.reason_opted_out') }
   }
 
-  return { shouldSend: true, reason: "OK" }
+  return { shouldSend: true, reason: resolveTranslation('en', 'sms.reason_ok') }
 }
 
 // ─── Phone normalization ─────────────────────────────────────────────────────
@@ -110,7 +111,7 @@ async function sendViaAfricasTalking(
   message: string
 ): Promise<SmsProviderResult> {
   if (!env.AT_API_KEY || !env.AT_USERNAME) {
-    throw new Error("Africa's Talking not configured")
+    throw new Error(resolveTranslation('en', 'sms.at_not_configured'))
   }
 
   const normalized = normalizeRwandaPhoneSafe(to).replace("+", "") // 250XXXXXXXXX
@@ -132,20 +133,20 @@ async function sendViaAfricasTalking(
 
   if (!res.ok) {
     const err = await res.text()
-    throw new Error(`Africa's Talking error: ${err}`)
+    throw new Error(resolveTranslation('en', 'sms.at_error', { error: err }))
   }
 
   const data = await res.json()
   const recipient = data.SMSMessageData?.Recipients?.[0]
 
   if (!recipient || recipient.status !== "Success") {
-    throw new Error(recipient?.status || "Africa's Talking delivery failed")
+    throw new Error(recipient?.status || resolveTranslation('en', 'sms.at_delivery_failed'))
   }
 
   return {
     success: true,
     messageId: recipient.messageId,
-    message: "Sent via Africa's Talking",
+    message: resolveTranslation('en', 'sms.sent_via_at'),
     provider: "AFRICAS_TALKING",
   }
 }
@@ -157,7 +158,7 @@ async function sendViaPindo(
   message: string
 ): Promise<SmsProviderResult> {
   if (!env.PINDO_API_KEY) {
-    throw new Error("Pindo not configured")
+    throw new Error(resolveTranslation('en', 'sms.pindo_not_configured'))
   }
 
   const normalized = normalizeRwandaPhoneSafe(to).replace("+", "")
@@ -177,7 +178,7 @@ async function sendViaPindo(
 
   if (!res.ok) {
     const err = await res.text()
-    throw new Error(`Pindo error: ${err}`)
+    throw new Error(resolveTranslation('en', 'sms.pindo_error', { error: err }))
   }
 
   const data = await res.json()
@@ -185,7 +186,7 @@ async function sendViaPindo(
   return {
     success: true,
     messageId: data.id || data.message_id,
-    message: "Sent via Pindo",
+    message: resolveTranslation('en', 'sms.sent_via_pindo'),
     provider: "PINDO",
   }
 }
@@ -212,7 +213,7 @@ export async function sendSmsViaProvider(
     return {
       success: true,
       messageId: `mock-${Date.now()}`,
-      message: "SMS simulated (ENABLE_SMS_NOTIFICATIONS=false)",
+      message: resolveTranslation('en', 'sms.simulated'),
       provider: "SIMULATED",
     }
   }
@@ -230,7 +231,7 @@ export async function sendSmsViaProvider(
       console.error("[SMS] Pindo also failed:", pindoError instanceof Error ? pindoError.message : pindoError)
       return {
         success: false,
-        message: `Both providers failed. AT: ${atError instanceof Error ? atError.message : "unknown"} | Pindo: ${pindoError instanceof Error ? pindoError.message : "unknown"}`,
+        message: resolveTranslation('en', 'sms.providers_failed', { atError: atError instanceof Error ? atError.message : resolveTranslation('en', 'sms.unknown'), pindoError: pindoError instanceof Error ? pindoError.message : resolveTranslation('en', 'sms.unknown') }),
         provider: "AFRICAS_TALKING",
       }
     }
@@ -260,7 +261,7 @@ export async function sendSms(
   if (!shouldSend) {
     return {
       success: false,
-      message: `SMS not sent: ${reason}`,
+      message: resolveTranslation('en', 'sms.not_sent', { reason }),
     }
   }
 

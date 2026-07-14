@@ -86,6 +86,8 @@ function toAuthUser(user: {
   wholesaleStatus?: string | null
   wholesaleDiscount?: number
   businessName?: string | null
+  mfaEnabled?: boolean
+  mustChangePassword?: boolean
 }): AuthUser {
   return {
     id: user.id,
@@ -98,6 +100,8 @@ function toAuthUser(user: {
     wholesaleStatus: user.wholesaleStatus,
     wholesaleDiscount: user.wholesaleDiscount,
     businessName: user.businessName,
+    mfaEnabled: user.mfaEnabled,
+    mustChangePassword: user.mustChangePassword,
   }
 }
 
@@ -118,6 +122,13 @@ async function issueTokens(user: { id: string; role: string; phone: string }): P
     tokenVersion: 0, // MVP: no token versioning
   })
   return { accessToken, refreshToken }
+}
+
+export async function completeMfaLogin(userId: string): Promise<AuthResult> {
+  const user = await db.user.findFirst({ where: { id: userId, isDeleted: false } })
+  if (!user) throw new Error('User not found')
+  const tokens = await issueTokens(user)
+  return { user: toAuthUser(user), ...tokens }
 }
 
 // ─── Registration ────────────────────────────────────────────────────────────
@@ -420,7 +431,12 @@ export async function resetPassword(input: ResetPasswordInput): Promise<AuthResu
   const passwordHash = await hashPassword(input.newPassword)
   const updated = await db.user.update({
     where: { id: user.id },
-    data: { passwordHash },
+    data: {
+      passwordHash,
+      passwordChangedAt: new Date(),
+      failedLoginCount: 0,
+      lockedUntil: null,
+    },
   })
 
   const tokens = await issueTokens(updated)

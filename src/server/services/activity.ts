@@ -25,6 +25,7 @@
  */
 
 import { db } from "@/lib/db"
+import { ActivityLogger } from "@/lib/activity-logger"
 
 export interface LogActivityInput {
   userId?: string | null
@@ -81,6 +82,24 @@ export async function logActivity(input: LogActivityInput): Promise<void> {
         userAgent,
       },
     })
+
+    if (input.userId) {
+      await ActivityLogger.log({
+        userId: input.userId,
+        userName: input.userName,
+        userRole: input.userRole,
+        action: input.action,
+        resource: input.entityType || "SYSTEM",
+        resourceId: input.entityId,
+        details: {
+          description: input.description || "",
+          severity: input.severity || "info",
+        },
+        status: input.action.includes("FAILED") ? "FAILED" : "SUCCESS",
+        ipAddress,
+        userAgent,
+      })
+    }
   } catch (error) {
     // Best-effort: never throw. Log to stderr for visibility.
     console.error("[activity] Failed to write audit log:", error)

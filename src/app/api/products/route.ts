@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from 'next/server'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
+import { expandSearchQuery, parsePriceFromQuery, removePriceExpression } from '@/lib/search-vocabulary'
 
 function parseJsonArray(value: string | null): unknown[] | null {
   if (!value) return null
@@ -70,6 +71,9 @@ export async function GET(request: Request) {
     const maxPrice = params.get('maxPrice')
     const minRating = params.get('minRating')
     const sort = params.get('sort') || 'newest'
+    const priceSearch = parsePriceFromQuery(search)
+    const searchableText = removePriceExpression(search, priceSearch)
+    const expandedTerms = expandSearchQuery(searchableText)
     const where: Prisma.ProductWhereInput = { isActive: true, isDeleted: false }
     if (category && category !== 'all') where.category = { slug: category }
     if (brand) where.brand = { slug: brand }
@@ -77,12 +81,27 @@ export async function GET(request: Request) {
     if (params.get('inStock') === 'true') where.stock = { gt: 0 }
     if (skinType) where.skinType = { contains: skinType }
     if (minRating && Number.isFinite(Number(minRating))) where.rating = { gte: Number(minRating) }
-    if (minPrice || maxPrice) {
+
+    const explicitMinPrice = minPrice && Number.isFinite(Number(minPrice)) ? Number(minPrice) : undefined
+    const explicitMaxPrice = maxPrice && Number.isFinite(Number(maxPrice)) ? Number(maxPrice) : undefined
+    const effectiveMinPrice = explicitMinPrice ?? priceSearch?.minPrice
+    const effectiveMaxPrice = explicitMaxPrice ?? priceSearch?.maxPrice
+    if (effectiveMinPrice !== undefined || effectiveMaxPrice !== undefined) {
       where.price = {}
-      if (minPrice && Number.isFinite(Number(minPrice))) where.price.gte = Number(minPrice)
-      if (maxPrice && Number.isFinite(Number(maxPrice))) where.price.lte = Number(maxPrice)
+      if (effectiveMinPrice !== undefined) where.price.gte = effectiveMinPrice
+      if (effectiveMaxPrice !== undefined) where.price.lte = effectiveMaxPrice
     }
-    if (search) where.OR = [{ name: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }, { brand: { name: { contains: search, mode: 'insensitive' } } }]
+
+    if (expandedTerms.length > 0) {
+      where.OR = expandedTerms.flatMap((term) => [
+        { name: { contains: term, mode: 'insensitive' as const } },
+        { shortDescription: { contains: term, mode: 'insensitive' as const } },
+        { description: { contains: term, mode: 'insensitive' as const } },
+        { ingredients: { contains: term, mode: 'insensitive' as const } },
+        { brand: { name: { contains: term, mode: 'insensitive' as const } } },
+        { category: { name: { contains: term, mode: 'insensitive' as const } } },
+      ])
+    }
 
     const orderBy: Prisma.ProductOrderByWithRelationInput = sort === 'price-asc' ? { price: 'asc' } : sort === 'price-desc' ? { price: 'desc' } : sort === 'rating' ? { rating: 'desc' } : sort === 'best-selling' ? { featured: 'desc' } : { createdAt: 'desc' }
     const [rows, total] = await Promise.all([

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { BUSINESS } from '@/lib/business-config'
 
 export interface InformationSection {
   title: string
@@ -35,7 +36,7 @@ export default function InformationPage({
             </section>
           ))}
           <div className="border-t border-gray-100 pt-6 text-sm text-gray-500">
-            Questions? Email <a className="font-bold text-[#B76E79]" href="mailto:hello@freedomcosmeticshop.rw">hello@freedomcosmeticshop.rw</a> or contact us on WhatsApp.
+            Questions? Email <a className="font-bold text-[#B76E79]" href={BUSINESS.email.includes('TODO') ? undefined : `mailto:${BUSINESS.email}`}>{BUSINESS.email}</a> or contact {BUSINESS.tradingName} on WhatsApp.
           </div>
           <Link href="/" className="inline-flex rounded-full bg-[#B76E79] px-5 py-2.5 text-sm font-black text-white">Back to store</Link>
         </div>

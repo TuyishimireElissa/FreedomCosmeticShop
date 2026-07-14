@@ -24,8 +24,10 @@ import {
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
 import { useCartUpdates } from "@/hooks/use-realtime"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 export function CartDrawer() {
+  const t = useT()
   const { toast } = useToast()
   const {
     isCartOpen,
@@ -53,8 +55,8 @@ export function CartDrawer() {
       // Remove from cart and notify
       removeFromCart(p.id)
       toast({
-        title: event === "product:deleted" ? "Product removed" : "Out of stock",
-        description: `"${p.name}" was removed from your cart (no longer available).`,
+        title: event === "product:deleted" ? t('product.product_removed') : t('product.out_of_stock_update'),
+        description: t('cart.realtime_removed', { product: p.name }),
         variant: "destructive",
       })
     } else if (event === "product:priceChange" && p.price !== undefined) {
@@ -66,8 +68,8 @@ export function CartDrawer() {
         ),
       })
       toast({
-        title: "Price updated",
-        description: `"${p.name}" is now ${formatRWF(p.price)}`,
+        title: t('product.price_updated'),
+        description: t('cart.price_now', { product: p.name, price: formatRWF(p.price) }),
       })
     }
   })
@@ -78,12 +80,12 @@ export function CartDrawer() {
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <ShoppingBag className="text-primary h-5 w-5" />
-            Your cart
+            {t('cart.your_cart')}
           </SheetTitle>
           <SheetDescription>
             {items.length === 0
-              ? "Your cart is currently empty."
-              : `${items.length} item${items.length !== 1 ? "s" : ""} · ${formatRWF(subtotal)}`}
+              ? t('cart.currently_empty')
+              : t('cart.drawer_summary', { count: items.length, subtotal: formatRWF(subtotal) })}
           </SheetDescription>
         </SheetHeader>
 
@@ -92,7 +94,7 @@ export function CartDrawer() {
             <div className="bg-secondary grid h-20 w-20 place-items-center rounded-full">
               <ShoppingBag className="text-primary/40 h-10 w-10" />
             </div>
-            <p className="text-muted-foreground text-sm">Add some products to get started.</p>
+            <p className="text-muted-foreground text-sm">{t('cart.empty_hint')}</p>
             <Button
               variant="outline"
               onClick={() => {
@@ -100,7 +102,7 @@ export function CartDrawer() {
                 useStore.getState().goCatalog(null)
               }}
             >
-              Browse products
+              {t('cart.browse_products')}
             </Button>
           </div>
         ) : (
@@ -147,7 +149,7 @@ export function CartDrawer() {
                           className="h-7 w-7 rounded-r-none"
                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                           disabled={item.quantity <= 1}
-                          aria-label="Decrease quantity"
+                          aria-label={t('product.decrease_quantity')}
                         >
                           <Minus className="h-3 w-3" />
                         </Button>
@@ -158,7 +160,7 @@ export function CartDrawer() {
                           className="h-7 w-7 rounded-l-none"
                           onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                           disabled={item.quantity >= item.stock}
-                          aria-label="Increase quantity"
+                          aria-label={t('product.increase_quantity')}
                         >
                           <Plus className="h-3 w-3" />
                         </Button>
@@ -171,7 +173,7 @@ export function CartDrawer() {
                   <button
                     onClick={() => removeFromCart(item.productId)}
                     className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive self-start rounded-md p-1"
-                    aria-label={`Remove ${item.name}`}
+                    aria-label={t('cart.remove_product', { product: item.name })}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -182,11 +184,11 @@ export function CartDrawer() {
             {/* Footer */}
             <div className="bg-card border-t p-4">
               <div className="mb-3 flex items-baseline justify-between">
-                <span className="text-muted-foreground text-sm">Subtotal</span>
+                <span className="text-muted-foreground text-sm">{t('cart.subtotal')}</span>
                 <span className="text-lg font-bold">{formatRWF(subtotal)}</span>
               </div>
               <p className="text-muted-foreground mb-3 text-xs">
-                Delivery fee calculated at checkout.
+                {t('cart.delivery_fee_checkout')}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <Button
@@ -196,7 +198,7 @@ export function CartDrawer() {
                     goCart()
                   }}
                 >
-                  View cart
+                  {t('cart.view_cart')}
                 </Button>
                 <Button
                   onClick={() => {
@@ -204,7 +206,7 @@ export function CartDrawer() {
                     goCheckout()
                   }}
                 >
-                  Checkout
+                  {t('checkout.title')}
                   <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Button>
               </div>

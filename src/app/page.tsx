@@ -20,6 +20,7 @@ import {
   usePromotionUpdates,
   useRealtimeEvents,
 } from "@/hooks/use-realtime"
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface Brand {
   id: string
@@ -86,6 +87,7 @@ function useApiResource<T>(url: string): ApiResource<T> {
 }
 
 function Homepage() {
+  const t = useT()
   const router = useRouter()
   const banners = useApiResource<{ banners: HomeBanner[] }>("/api/banners?placement=HOME_HERO")
   const categories = useApiResource<{ categories: Category[] }>("/api/categories")
@@ -109,13 +111,13 @@ function Homepage() {
     <div className="flex flex-col overflow-hidden bg-white">
       <HeroBanner banners={banners.data?.banners || []} loading={banners.loading} error={banners.error} onRetry={banners.retry} />
 
-      <section className="border-b border-gray-100 bg-white" aria-label="Store guarantees">
+      <section className="border-b border-gray-100 bg-white" aria-label={t('home.store_guarantees')}>
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-3 gap-y-5 px-4 py-6 sm:px-6 md:grid-cols-4 lg:px-8">
           {[
-            { icon: Truck, title: "Fast Rwanda delivery", text: "Kigali and all 30 districts" },
-            { icon: Smartphone, title: "MTN MoMo & Airtel", text: "Simple local payments" },
-            { icon: ShieldCheck, title: "100% authentic", text: "Genuine beauty products" },
-            { icon: Sparkles, title: "Beauty expertise", text: "Made for your routine" },
+            { icon: Truck, title: t('home.fast_rwanda_delivery'), text: t('home.kigali_all_districts') },
+            { icon: Smartphone, title: t('home.momo_airtel'), text: t('home.simple_local_payments') },
+            { icon: ShieldCheck, title: t('home.authentic_percent'), text: t('home.genuine_beauty_products') },
+            { icon: Sparkles, title: t('home.beauty_expertise'), text: t('home.made_for_routine') },
           ].map(({ icon: Icon, title, text }) => (
             <div key={title} className="flex items-start gap-2.5 sm:gap-3">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#B76E79]/10 text-[#B76E79] sm:h-10 sm:w-10"><Icon className="h-4 w-4 sm:h-5 sm:w-5" /></span>
@@ -127,21 +129,21 @@ function Homepage() {
 
       <CategoryGrid categories={categories.data?.categories || []} loading={categories.loading} error={categories.error} onRetry={categories.retry} />
 
-      <ProductSection title="Featured beauty essentials" subtitle="A curated selection of skincare, makeup and haircare available across Rwanda." badge="Freedom favourites" products={bestSellers.data?.products || []} loading={bestSellers.loading} error={bestSellers.error} onRetry={bestSellers.retry} onViewAll={() => router.push("/products")} />
+      <ProductSection title={t('home.featured_essentials')} subtitle={t('home.featured_subtitle')} badge={t('home.freedom_favourites')} products={bestSellers.data?.products || []} loading={bestSellers.loading} error={bestSellers.error} onRetry={bestSellers.retry} onViewAll={() => router.push("/products")} />
 
       <FlashSale products={flashSale.data?.products || []} loading={flashSale.loading} error={flashSale.error} onRetry={flashSale.retry} />
 
-      <ProductSection title="Just arrived" subtitle="Fresh formulas, trending shades and new beauty discoveries now available in Rwanda." badge="New this week" products={newArrivals.data?.products || []} loading={newArrivals.loading} error={newArrivals.error} onRetry={newArrivals.retry} onViewAll={() => router.push("/products")} tone="soft" />
+      <ProductSection title={t('home.just_arrived')} subtitle={t('home.just_arrived_subtitle')} badge={t('home.new_this_week')} products={newArrivals.data?.products || []} loading={newArrivals.loading} error={newArrivals.error} onRetry={newArrivals.retry} onViewAll={() => router.push("/products")} tone="soft" />
 
       <section className="bg-white">
         {brands.loading ? (
           <SectionSkeleton titleWidth="w-40" cardCount={5} />
         ) : brands.error ? (
-          <SectionFailure title="Our brand partners could not be loaded." onRetry={brands.retry} />
+          <SectionFailure title={t('home.brands_load_failed')} onRetry={brands.retry} />
         ) : brands.data?.brands.length ? (
           <BrandCarousel brands={brands.data.brands} />
         ) : (
-          <SectionEmpty message="New beauty brands are joining our collection soon." />
+          <SectionEmpty message={t('home.brands_coming')} />
         )}
       </section>
 
@@ -152,11 +154,11 @@ function Homepage() {
         {blog.loading ? (
           <SectionSkeleton titleWidth="w-56" cardCount={3} />
         ) : blog.error ? (
-          <SectionFailure title="Beauty stories could not be loaded." onRetry={blog.retry} />
+          <SectionFailure title={t('home.stories_load_failed')} onRetry={blog.retry} />
         ) : blog.data?.posts.length ? (
           <BeautyTips posts={blog.data.posts} />
         ) : (
-          <SectionEmpty message="Fresh beauty guides are being prepared." />
+          <SectionEmpty message={t('home.guides_preparing')} />
         )}
       </section>
     </div>
@@ -175,11 +177,12 @@ function SectionSkeleton({ titleWidth, cardCount }: { titleWidth: string; cardCo
 }
 
 function SectionFailure({ title, onRetry }: { title: string; onRetry: () => void }) {
+  const t = useT()
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="rounded-3xl border border-dashed border-rose-200 bg-rose-50/40 px-5 py-10 text-center">
         <p className="text-sm font-semibold text-gray-800">{title}</p>
-        <button type="button" onClick={onRetry} className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white"><RefreshCw className="h-3.5 w-3.5" />Try again</button>
+        <button type="button" onClick={onRetry} className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white"><RefreshCw className="h-3.5 w-3.5" />{t('common.retry')}</button>
       </div>
     </div>
   )

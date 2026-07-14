@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     if (await verifyPassword(parsed.data.newPassword, account.passwordHash)) {
       return NextResponse.json({ success: false, error: 'New password must be different' }, { status: 400 })
     }
-    await prisma.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(parsed.data.newPassword) } })
+    await prisma.user.update({ where: { id: user.id }, data: { passwordHash: await hashPassword(parsed.data.newPassword), mustChangePassword: false, passwordChangedAt: new Date(), failedLoginCount: 0, lockedUntil: null } })
     return NextResponse.json({ success: true, data: { changed: true } })
   } catch (error) {
     console.error('Password change error:', error)
