@@ -449,7 +449,7 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
     return <AdminLoginScreen onBack={goHome} />
   }
 
-  if (user.role !== "ADMIN" && user.role !== "STAFF" && user.role !== "MANAGER") {
+  if (user.role !== "SUPER_ADMIN" && user.role !== "ADMIN" && user.role !== "STAFF" && user.role !== "MANAGER") {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4">
         <div className="w-full max-w-md rounded-2xl border bg-card p-8 text-center shadow-lg">
