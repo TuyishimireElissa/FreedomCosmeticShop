@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
+  LOCAL_SEARCH_VOCABULARY,
   expandSearchQuery,
+  getAlternativeSuggestions,
   getSearchSuggestions,
+  jaroWinkler,
   parsePriceFromQuery,
   removePriceExpression,
 } from '@/lib/search-vocabulary'
@@ -52,5 +55,41 @@ describe('Rwanda local search vocabulary', () => {
 
   it('returns no expansions for blank input', () => {
     expect(expandSearchQuery('   ')).toEqual([])
+  })
+
+  it('preserves the existing vocabulary while expanding to 189 entries', () => {
+    expect(Object.keys(LOCAL_SEARCH_VOCABULARY)).toHaveLength(189)
+    expect(LOCAL_SEARCH_VOCABULARY.uruhu).toContain('skincare')
+    expect(LOCAL_SEARCH_VOCABULARY.mosturizer).toContain('moisturizer')
+    expect(LOCAL_SEARCH_VOCABULARY['umusatsi ugwa']).toContain('alopecia')
+  })
+
+  it('expands new concern, ingredient, shade, and occasion vocabulary', () => {
+    expect(expandSearchQuery('ibiheri')).toContain('breakouts')
+    expect(expandSearchQuery('niacinamide')).toContain('vitamin b3')
+    expect(expandSearchQuery('irangi ry’ubutaka')).toContain('mocha')
+    expect(expandSearchQuery('umuganura')).toContain('bridal beauty')
+  })
+
+  it('uses Jaro-Winkler typo tolerance at the high threshold', () => {
+    expect(jaroWinkler('maybeline', 'maybelline')).toBeGreaterThanOrEqual(0.85)
+    expect(expandSearchQuery('maybeline')).toContain('maybelline')
+    expect(expandSearchQuery('zzzz')).toEqual(['zzzz'])
+  })
+
+  it.each([
+    ['5k', { maxPrice: 5000 }],
+    ['around 10000 RWF', { minPrice: 8000, maxPrice: 12000 }],
+    ['hafi ya 10000 RWF', { minPrice: 8000, maxPrice: 12000 }],
+    ['amafaranga make', { maxPrice: 10000 }],
+    ['amafaranga menshi', { minPrice: 30000 }],
+  ])('parses expanded price phrase: %s', (query, expected) => {
+    expect(parsePriceFromQuery(query)).toMatchObject(expected)
+  })
+
+  it('returns language-aware alternatives without duplicates', () => {
+    expect(getAlternativeSuggestions('amavuta y’umusatsi', 'rw')).toContain("Ubuvura bw'umusatsi")
+    expect(getAlternativeSuggestions('hair treatment', 'en')).toContain('hair products')
+    expect(getAlternativeSuggestions('unknown term', 'en')).toEqual(['Skincare', 'Haircare', 'Body lotion'])
   })
 })

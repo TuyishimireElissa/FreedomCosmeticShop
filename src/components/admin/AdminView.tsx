@@ -57,6 +57,7 @@ import { useStore } from "@/store/useStore"
 import { useAdminNotifications } from "@/hooks/useAdminNotifications"
 import { AdminLoginScreen } from "./AdminLoginScreen"
 import { AdminOverview } from "./AdminOverview"
+import ZeroResultSearches from "./ZeroResultSearches"
 import { AdminProductManager } from "./AdminProductManager"
 import { AdminCustomers } from "./AdminCustomers"
 import { AdminDeliveries } from "./AdminDeliveries"
@@ -769,6 +770,7 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
         {/* Overview */}
         <TabsContent value="overview">
           <AdminOverview />
+          {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && <div className="mt-6"><ZeroResultSearches /></div>}
         </TabsContent>
 
         {/* Orders */}

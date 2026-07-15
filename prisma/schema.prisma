@@ -35,6 +35,7 @@
 //  30. Supplier       — supplier identity for admin inventory
 //  31. ProductImage   — structured Cloudinary product images
 //  32. ProductBatch   — real stock batches and expiry dates
+//  33. SearchLog      — real search-result analytics and product-gap tracking
 //
 // PostgreSQL production schema — uses Supabase.
 // =============================================================================
@@ -1267,6 +1268,26 @@ model StoreSettings {
   language String @default("en")
 
   updatedAt DateTime @updatedAt
+}
+
+// =============================================================================
+// SEARCH ANALYTICS — real customer searches and zero-result product gaps
+// =============================================================================
+
+model SearchLog {
+  id          String   @id @default(cuid())
+  query       String
+  hasResults  Boolean  @default(true)
+  resultCount Int      @default(0)
+  userId      String?
+  sessionId   String?
+  filters     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([query])
+  @@index([hasResults])
+  @@index([createdAt])
+  @@index([sessionId])
 }
 
 // =============================================================================

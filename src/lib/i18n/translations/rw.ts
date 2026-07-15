@@ -250,6 +250,9 @@ export const rw = {
     recently_viewed: 'Ibyo uheruka kureba', // verified-rw
     remove_filter: 'Kuraho inshungura: {filter}', // verified-rw
     sort_best_selling: 'Ibigurishwa cyane', // verified-rw
+    sort_relevance: 'Ibihuye cyane n’ibishakishwa', // verified-rw
+    sort_rating: 'Ibyahawe amanota meza', // verified-rw
+    sort_popular: 'Ibigurishwa cyane', // verified-rw
     sort_by: 'Tondeka ukurikije', // verified-rw
     sort_newest: 'Ibishya mbere', // verified-rw
     sort_price_high: 'Igiciro: kinini kugera ku gito', // verified-rw
@@ -261,6 +264,13 @@ export const rw = {
     price_5000_10000: 'Hagati ya 5,000 na 10,000 RWF', // verified-rw
     price_10000_15000: 'Hagati ya 10,000 na 15,000 RWF', // verified-rw
     price_over_15000: 'Hejuru ya 15,000 RWF', // verified-rw
+    zero_results_title: 'Ibyashakishijwe ntibiboneke', // verified-rw
+    zero_results_badge: 'Ibicuruzwa bibura · iminsi 30 ishize', // verified-rw
+    zero_results_description: 'Amagambo nyayo abakiriya bashakishije ntibabone ibicuruzwa. Banza uyagenzure mbere yo kwemeza ibicuruzwa bashobora kuba bakeneye.', // verified-rw
+    zero_results_empty: 'Nta byashakishijwe ntibiboneke byanditswe mu minsi 30 ishize.', // verified-rw
+    zero_results_count: 'Byashakishijwe inshuro {count}', // verified-rw
+    zero_results_terms: 'Amagambo {count} yashakishijwe', // verified-rw
+    zero_results_load_failed: 'Amakuru y’ibyashakishijwe ntibiboneke ntiyashoboye gufunguka.', // verified-rw
   },
   cart: {
     title: 'Igitebo cyanjye', empty: 'Igitebo cyawe kirimo ubusa', empty_hint: 'Shyiramo ibicuruzwa kugira ngo utangire!', browse_products: 'Reba ibicuruzwa', items: 'Ibicuruzwa {count}', subtotal: 'Igiteranyo mbere y’ibindi', delivery: 'Kukugezaho', delivery_free: 'UBUNTU', delivery_calculated: 'Kibarwa mu gihe cyo kwishyura', discount: 'Igabanyirizwa', total: 'Igiteranyo cyose', coupon: 'Kode y’igabanyirizwa', coupon_placeholder: 'Andika kode y’igabanyirizwa', apply_coupon: 'Koresha', remove_coupon: 'Kuraho', coupon_applied: 'Kode yakoreshejwe! Uzigama {amount} RWF', coupon_invalid: 'Kode y’igabanyirizwa ntiyemewe', coupon_expired: 'Iyi kode yararengeje igihe', continue_shopping: 'Komeza guhaha', checkout: 'Komeza wishyure', save_for_later: 'Bika uzagure nyuma', remove: 'Kuraho', update: 'Hindura', quantity: 'Umubare', free_delivery_hint: 'Ongeraho ibicuruzwa bya {amount} RWF ubone kubigezwaho ku buntu!', free_delivery_achieved: '🎉 Urabigezwaho ku buntu!', loyalty_redeem: 'Koresha amanota {points} ugabanyirizwe {value} RWF', wholesale_minimum: 'Amafaranga make yo kurangura ni {amount} RWF. Ongeraho {remaining} RWF.', savings: 'Uzigama {amount} RWF yose hamwe!', // 🔍 REVIEW
