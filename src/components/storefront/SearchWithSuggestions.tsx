@@ -9,7 +9,6 @@ import { useLanguage } from '@/lib/i18n/LanguageContext'
 import {
   getAlternativeSuggestions,
   getSearchSuggestions,
-  POPULAR_LOCAL_SEARCHES,
   POPULAR_PRICE_SEARCHES,
   trackZeroResultSearch,
 } from '@/lib/search-vocabulary'
@@ -44,6 +43,7 @@ interface SearchWithSuggestionsProps {
 
 const RECENT_SEARCHES_KEY = 'fcs_recent_searches'
 const SEARCH_SESSION_KEY = 'fcs_search_session'
+const POPULAR_SEARCH_CACHE_KEY = 'fcs_popular_searches'
 const CACHE_PREFIX = 'fcs_suggestions_'
 const CACHE_TTL_MS = 5 * 60 * 1000
 const MAX_RECENT = 8
@@ -78,6 +78,7 @@ export function SearchWithSuggestions({
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const [recentSearches, setRecentSearches] = useState<string[]>([])
+  const [popularSearches, setPopularSearches] = useState<string[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const abortRef = useRef<AbortController | null>(null)
@@ -90,6 +91,32 @@ export function SearchWithSuggestions({
     } catch {
       setRecentSearches([])
     }
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
+    const loadPopular = async () => {
+      try {
+        const cachedValue = sessionStorage.getItem(POPULAR_SEARCH_CACHE_KEY)
+        if (cachedValue) {
+          const cached = JSON.parse(cachedValue) as { timestamp: number; data: string[] }
+          if (Date.now() - cached.timestamp < CACHE_TTL_MS) {
+            setPopularSearches(cached.data)
+            return
+          }
+        }
+        const response = await fetch('/api/search/popular', { signal: controller.signal })
+        if (!response.ok) return
+        const result = await response.json()
+        const searches = (result.data || []).map((entry: { query?: unknown }) => entry.query).filter((value: unknown): value is string => typeof value === 'string').slice(0, 6)
+        setPopularSearches(searches)
+        sessionStorage.setItem(POPULAR_SEARCH_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data: searches }))
+      } catch (error) {
+        if (!(error instanceof DOMException && error.name === 'AbortError')) setPopularSearches([])
+      }
+    }
+    void loadPopular()
+    return () => controller.abort()
   }, [])
 
   useEffect(() => {
@@ -277,7 +304,7 @@ export function SearchWithSuggestions({
         <div id="search-suggestions-listbox" role="listbox" className="absolute left-0 right-0 top-full z-50 mt-2 max-h-[min(70vh,520px)] overflow-y-auto rounded-2xl border border-gray-100 bg-white shadow-xl">
           {showEmptyMenu && <div className="space-y-4 p-3">
             {recentSearches.length > 0 && <section><div className="mb-2 flex items-center justify-between"><p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500"><Clock className="h-3 w-3" />{t('search.recent')}</p><button type="button" onClick={clearRecentSearches} className="min-h-8 px-2 text-xs text-gray-500">{t('search.clear_recent')}</button></div><div className="flex flex-wrap gap-2">{recentSearches.slice(0, 5).map((term) => <button key={term} type="button" onClick={() => { setQuery(term); navigateToSearch(term) }} className="min-h-9 rounded-full bg-gray-100 px-3 text-xs font-medium text-gray-700">{term}</button>)}</div></section>}
-            <section><p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500"><TrendingUp className="h-3 w-3" />{t('search.popular')}</p><div className="flex flex-wrap gap-2">{POPULAR_LOCAL_SEARCHES.map((term) => <button key={term} type="button" onClick={() => { setQuery(term); navigateToSearch(term) }} className="min-h-9 rounded-full bg-rose-50 px-3 text-xs font-medium text-[#B76E79]">{term}</button>)}</div></section>
+            {popularSearches.length > 0 && <section><p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500"><TrendingUp className="h-3 w-3" />{t('search.popular')}</p><div className="flex flex-wrap gap-2">{popularSearches.map((term) => <button key={term} type="button" onClick={() => { setQuery(term); navigateToSearch(term) }} className="min-h-9 rounded-full bg-rose-50 px-3 text-xs font-medium text-[#B76E79]">{term}</button>)}</div></section>}
             <section><p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-500"><Tag className="h-3 w-3" />{t('search.price_searches')}</p><div className="flex flex-wrap gap-2">{POPULAR_PRICE_SEARCHES.map((price) => <button key={price.maxPrice} type="button" onClick={() => { setQuery(price.query); navigateToSearch(price.query) }} className="min-h-9 rounded-full bg-gray-100 px-3 text-xs font-medium text-gray-700">{t('search.price_under', { price: price.maxPrice.toLocaleString('en-RW') })}</button>)}</div></section>
           </div>}
 

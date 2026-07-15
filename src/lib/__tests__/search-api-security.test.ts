@@ -6,6 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8'
 const productsRoute = read('src/app/api/products/route.ts')
 const suggestionsRoute = read('src/app/api/search/suggestions/route.ts')
 const trackingRoute = read('src/app/api/search/track-zero-result/route.ts')
+const popularRoute = read('src/app/api/search/popular/route.ts')
 const analyticsService = read('src/server/services/search-analytics.ts')
 const schema = read('prisma/schema.prisma')
 
@@ -36,5 +37,12 @@ describe('search API data and analytics security', () => {
     expect(suggestionsRoute).toContain("getCloudinaryUrl(structured.publicId, 'THUMBNAIL')")
     expect(suggestionsRoute).not.toContain('costPrice')
     expect(suggestionsRoute).not.toContain('supplierId')
+  })
+
+  it('derives popular searches from real successful logs and filters contact details', () => {
+    expect(popularRoute).toContain('prisma.searchLog.groupBy')
+    expect(popularRoute).toContain('hasResults: true')
+    expect(popularRoute).toContain('.slice(0, 6)')
+    expect(popularRoute).toContain('EMAIL_OR_PHONE')
   })
 })

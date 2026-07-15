@@ -11,10 +11,13 @@ describe('smart search performance and navigation', () => {
     expect(source).toContain("signal: controller.signal")
   })
 
-  it('caches suggestions and recent searches in sessionStorage', () => {
+  it('caches suggestions, real popular searches, and recent searches in sessionStorage', () => {
     expect(source).toContain("CACHE_PREFIX = 'fcs_suggestions_'")
     expect(source).toContain('sessionStorage.setItem(cacheKey')
     expect(source).toContain("RECENT_SEARCHES_KEY = 'fcs_recent_searches'")
+    expect(source).toContain("fetch('/api/search/popular'")
+    expect(source).toContain('POPULAR_SEARCH_CACHE_KEY')
+    expect(source).not.toContain('POPULAR_LOCAL_SEARCHES.map')
     expect(source).not.toContain('localStorage.')
   })
 
