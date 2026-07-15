@@ -53,12 +53,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from "@/lib/i18n/LanguageContext"
 import { useStore } from "@/store/useStore"
 import { useAdminNotifications } from "@/hooks/useAdminNotifications"
 import { AdminLoginScreen } from "./AdminLoginScreen"
 import { AdminOverview } from "./AdminOverview"
 import ZeroResultSearches from "./ZeroResultSearches"
 import { AdminProductManager } from "./AdminProductManager"
+import BundleManager from "./BundleManager"
 import { AdminCustomers } from "./AdminCustomers"
 import { AdminDeliveries } from "./AdminDeliveries"
 import { AdminAnalytics } from "./AdminAnalytics"
@@ -141,6 +143,7 @@ const STATUS_COLORS: Record<string, string> = {
 export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
   const { goHome, user } = useStore()
   const { toast } = useToast()
+  const t = useT()
   const adminShell = useOptionalAdminShell()
   const [localActiveTab, setLocalActiveTab] = useState("overview")
   const activeTab = embedded && adminShell ? adminShell.activeTab : localActiveTab
@@ -175,7 +178,7 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
       if (e.altKey && !e.ctrlKey && !e.metaKey && /^[1-9]$/.test(e.key)) {
         e.preventDefault()
         const tabOrder = [
-          "overview", "orders", "products", "customers", "deliveries",
+          "overview", "orders", "products", "bundles", "customers", "deliveries",
           "analytics", "reports", "settings", "staff", "security", "sms", "payments", "marketing",
         ]
         const idx = Number(e.key) - 1
@@ -713,6 +716,10 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
             <Package className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Products</span>
           </TabsTrigger>
+          <TabsTrigger value="bundles" className="gap-1">
+            <Package className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{t('nav.bundles')}</span>
+          </TabsTrigger>
           <TabsTrigger value="customers" className="gap-1">
             <Users className="h-3.5 w-3.5" />
             <span className="hidden sm:inline">Customers</span>
@@ -992,6 +999,10 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
         {/* Products */}
         <TabsContent value="products">
           <AdminProductManager />
+        </TabsContent>
+
+        <TabsContent value="bundles">
+          <BundleManager />
         </TabsContent>
 
         {/* Customers */}

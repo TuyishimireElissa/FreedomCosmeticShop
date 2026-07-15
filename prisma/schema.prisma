@@ -37,6 +37,9 @@
 //  32. ProductBatch   — real stock batches and expiry dates
 //  33. SearchLog      — real search-result analytics and product-gap tracking
 //  34. OtpVerification — durable hashed OTP state for serverless authentication
+//  35. Bundle         — real product routines and sets
+//  36. BundleProduct  — products, quantities, and order within a bundle
+//  37. QuizResult     — recommendation answers and real result references
 //
 // PostgreSQL production schema — uses Supabase.
 // =============================================================================
@@ -126,6 +129,7 @@ model User {
   wholesaleApplication WholesaleApplication?
   wholesaleCredit      WholesaleCredit?
   wholesaleInvoices    WholesaleInvoice[]
+  quizResults           QuizResult[]
 
   @@index([phone])
   @@index([email])
@@ -349,6 +353,7 @@ model Product {
   pricing       ProductPricing?
   productImages ProductImage[]
   batches       ProductBatch[]
+  bundles       BundleProduct[]
 
   @@index([slug])
   @@index([categoryId])
@@ -386,6 +391,15 @@ enum ImageType {
   SHADE
   LIFESTYLE
   VIDEO_THUMB
+}
+
+enum BundleType {
+  ROUTINE
+  CONCERN
+  HAIR
+  MAKEUP
+  GIFT
+  STARTER
 }
 
 model Supplier {
@@ -440,6 +454,93 @@ model ProductBatch {
   @@index([productId])
   @@index([expiryDate])
   @@index([isActive])
+}
+
+// =============================================================================
+// PRODUCT BUNDLES AND QUIZ RECOMMENDATION ANALYTICS
+// =============================================================================
+
+model Bundle {
+  id                  String          @id @default(cuid())
+  name                String
+  nameRw              String?
+  slug                String          @unique
+  description         String?         @db.Text
+  descriptionRw       String?         @db.Text
+  bundleType          BundleType      @default(ROUTINE)
+
+  // RWF prices use integer storage, consistent with Product and OrderItem.
+  // Public APIs must recalculate normalTotal and savings from current products.
+  bundlePrice         Int
+  normalTotal         Int             @default(0)
+
+  coverImage          String?
+  coverImageUrl       String?
+  isActive            Boolean         @default(true)
+  isFeatured          Boolean         @default(false)
+  // Cached admin value only; public APIs must recalculate from product stock.
+  isInStock           Boolean         @default(true)
+
+  targetConcern       String?
+  targetSkinType      String?
+  targetHairType      String?
+  targetCategory      String?
+  usageInstructions   String?         @db.Text
+  usageInstructionsRw String?         @db.Text
+
+  products            BundleProduct[]
+  orderItems          OrderItem[]
+  totalSales          Int             @default(0)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  deletedAt           DateTime?
+
+  @@index([slug])
+  @@index([bundleType])
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([deletedAt])
+}
+
+model BundleProduct {
+  id          String   @id @default(cuid())
+  bundleId    String
+  bundle      Bundle   @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  stepOrder   Int      @default(0)
+  stepLabel   String?
+  stepLabelRw String?
+  quantity    Int      @default(1)
+  isOptional  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@unique([bundleId, productId])
+  @@index([bundleId])
+  @@index([productId])
+}
+
+model QuizResult {
+  id                       String   @id @default(cuid())
+  sessionId                String?
+  userId                   String?
+  user                     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  category                 String
+  mainConcern              String
+  skinType                 String?
+  hairType                 String?
+  preferredResult          String
+  budget                   String
+  sensitivity              String
+  recommendedProductIds    String[] @default([])
+  recommendedBundleIds     String[] @default([])
+  language                 String   @default("rw")
+  createdAt                DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([category])
+  @@index([createdAt])
 }
 
 // =============================================================================
@@ -568,6 +669,10 @@ model OrderItem {
   productId String?
   product   Product? @relation(fields: [productId], references: [id])
 
+  // Optional bundle snapshot link. Individual product rows remain intact.
+  bundleId String?
+  bundle   Bundle? @relation(fields: [bundleId], references: [id], onDelete: SetNull)
+
   // Snapshot fields (preserved even if product is deleted)
   name     String
   price    Int // RWF at time of purchase
@@ -580,6 +685,7 @@ model OrderItem {
 
   @@index([orderId])
   @@index([productId])
+  @@index([bundleId])
 }
 
 // =============================================================================

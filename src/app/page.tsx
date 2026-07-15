@@ -29,6 +29,10 @@ const ReviewsSection = dynamic(
   () => import('@/components/home/ReviewsSection').then((module) => module.ReviewsSection),
   { loading: () => null },
 )
+const QuizBanner = dynamic(
+  () => import('@/components/home/QuizBanner'),
+  { loading: () => null },
+)
 const WhatsAppCTA = dynamic(
   () => import('@/components/home/WhatsAppCTA'),
   { loading: () => null },
@@ -110,10 +114,13 @@ function Homepage() {
       {/* 8. Hidden unless at least three real approved reviews exist — lazy */}
       <ReviewsSection />
 
-      {/* 9. Hidden until a real WhatsApp number is configured — lazy */}
+      {/* 9. Optional recommendation entry point — no product claims */}
+      <QuizBanner />
+
+      {/* 10. Hidden until a real WhatsApp number is configured — lazy */}
       <WhatsAppCTA />
 
-      {/* 10. Footer is connected through SiteChrome */}
+      {/* 11. Footer is connected through SiteChrome */}
     </div>
   )
 }

@@ -90,6 +90,17 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
     if (claimed.count !== 1) return false
 
     for (const item of order.items) {
+      if (item.bundleId) {
+        const bundle = await tx.bundle.findUnique({ where: { id: item.bundleId }, include: { products: true } })
+        if (!bundle) throw new Error(`Bundle unavailable while confirming order ${order.orderNumber}`)
+        for (const component of bundle.products) {
+          const quantity = component.quantity * item.quantity
+          const stock = await tx.product.updateMany({ where: { id: component.productId, stock: { gte: quantity } }, data: { stock: { decrement: quantity } } })
+          if (stock.count !== 1) throw new Error(`Insufficient bundle stock while confirming order ${order.orderNumber}`)
+        }
+        await tx.bundle.update({ where: { id: bundle.id }, data: { totalSales: { increment: item.quantity } } })
+        continue
+      }
       if (!item.productId) continue
       const stock = await tx.product.updateMany({
         where: { id: item.productId, stock: { gte: item.quantity } },

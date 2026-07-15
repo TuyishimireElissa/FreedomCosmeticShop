@@ -10,7 +10,7 @@ export const rw = {
     loading: 'Birimo gutegurwa...', error: 'Habaye ikibazo', retry: 'Ongera ugerageze', save: 'Bika', cancel: 'Hagarika', confirm: 'Emeza', delete: 'Siba', edit: 'Hindura', view: 'Reba', close: 'Funga', back: 'Subira inyuma', next: 'Komeza', previous: 'Ibibanza', search: 'Shakisha', filter: 'Shungura', sort: 'Tondeka', clear: 'Siba byose', apply: 'Koresha', submit: 'Ohereza', yes: 'Yego', no: 'Oya', or: 'cyangwa', and: 'na', currency: 'RWF', free: 'UBUNTU', required: 'Birasabwa', optional: 'Si ngombwa', new: 'Gishya', hot: 'Gikunzwe', sale: 'Cyagabanyijwe', sold_out: 'Byashize', in_stock: 'Birahari', low_stock: 'Hasigaye {count} gusa!', authentic: '100% Umwimerere', // 🔍 REVIEW
   },
   nav: {
-    home: 'Ahabanza', products: 'Ibicuruzwa', categories: 'Ibyiciro', brands: 'Ibirango', wholesale: 'Kurangura', wholesale_offer: 'Kurangura ibicuruzwa by’ubwiza — zigama kugera kuri 30%', blog: 'Inkuru', about: 'Abo turi bo', contact: 'Twandikire', account: 'Konti yanjye', orders: 'Ibyo natumije', wishlist: 'Ibyo nifuza', cart: 'Igitebo', login: 'Injira', register: 'Iyandikishe', logout: 'Sohoka', admin: 'Ubuyobozi', help: 'Ubufasha', language: 'Ururimi', signed_out: 'Wasohotse neza', sign_in_wishlist: 'Injira kugira ngo ubike ibyo ukunda', payment_methods: 'Uburyo bwo kwishyura twemera', account_menu: 'Ibikubiye muri konti', product_categories: 'Ibyiciro by’ibicuruzwa', mobile_navigation: 'Ibikubiye kuri telefoni', language_selected: 'Ururimi: {language}', english_selected: 'Hahiswemo Icyongereza.', french_coming: 'Igifaransa kizongerwamo vuba.', kinyarwanda_selected: 'Hahiswemo Ikinyarwanda.', language_change: 'Ururimi: {language}. Kanda uhindure.', open_search: 'Fungura ahashakirwa', close_search: 'Funga ahashakirwa', open_menu: 'Fungura urutonde', close_menu: 'Funga urutonde', search_placeholder: 'Shakisha ibita ku ruhu, ibikoresho byo kwisiga, ibita ku musatsi...', // 🔍 REVIEW // verified-rw
+    home: 'Ahabanza', products: 'Ibicuruzwa', categories: 'Ibyiciro', brands: 'Ibirango', bundles: 'Gahunda n’amatsinda', quiz: 'Shakisha gahunda yanjye', wholesale: 'Kurangura', wholesale_offer: 'Kurangura ibicuruzwa by’ubwiza — zigama kugera kuri 30%', blog: 'Inkuru', about: 'Abo turi bo', contact: 'Twandikire', account: 'Konti yanjye', orders: 'Ibyo natumije', wishlist: 'Ibyo nifuza', cart: 'Igitebo', login: 'Injira', register: 'Iyandikishe', logout: 'Sohoka', admin: 'Ubuyobozi', help: 'Ubufasha', language: 'Ururimi', signed_out: 'Wasohotse neza', sign_in_wishlist: 'Injira kugira ngo ubike ibyo ukunda', payment_methods: 'Uburyo bwo kwishyura twemera', account_menu: 'Ibikubiye muri konti', product_categories: 'Ibyiciro by’ibicuruzwa', mobile_navigation: 'Ibikubiye kuri telefoni', language_selected: 'Ururimi: {language}', english_selected: 'Hahiswemo Icyongereza.', french_coming: 'Igifaransa kizongerwamo vuba.', kinyarwanda_selected: 'Hahiswemo Ikinyarwanda.', language_change: 'Ururimi: {language}. Kanda uhindure.', open_search: 'Fungura ahashakirwa', close_search: 'Funga ahashakirwa', open_menu: 'Fungura urutonde', close_menu: 'Funga urutonde', search_placeholder: 'Shakisha ibita ku ruhu, ibikoresho byo kwisiga, ibita ku musatsi...', // 🔍 REVIEW // verified-rw
   },
   announcement: {
     free_delivery: 'Kubigezwaho ni ubuntu ku bicuruzwa birengeje {amount} RWF', // verified-rw
@@ -176,6 +176,10 @@ export const rw = {
     whatsapp_title: 'Ukeneye ubufasha?', // verified-rw
     whatsapp_subtitle: 'Ohereza ubutumwa kuri WhatsApp kugira ngo abagufasha bagufashe.', // verified-rw
     whatsapp_hours: 'Amasaha y’ubufasha: {hours}', // verified-rw
+    quiz_title: 'Shakisha gahunda mu bicuruzwa biriho ubu', // verified-rw
+    quiz_subtitle: 'Subiza ibibazo bitandatu urebe ibicuruzwa bihuye n’icyiciro, ikibazo, amafaranga n’ibyo ukunda.', // verified-rw
+    quiz_cta: 'Tangira ibibazo', // verified-rw
+    quiz_time: 'Ibibazo bitandatu · kugura si ngombwa', // verified-rw
   },
   categories: {
     all: 'Ibicuruzwa byose', skincare: 'Kwita ku ruhu', makeup: 'Ibikoresho byo kwisiga', haircare: 'Kwita ku musatsi', fragrance: 'Imibavu', body_care: 'Kwita ku mubiri', mens: "Ibikoresho by'abagabo", natural: 'Ibikomoka ku bidukikije', gifts: 'Impano', new_arrivals: 'Ibicuruzwa bishya', best_sellers: 'Ibicuruzwa bikunzwe cyane', on_sale: 'Ibyagabanyijwe', // 🔍 REVIEW
@@ -1047,6 +1051,47 @@ export const rw = {
   },
   loyalty: {
     title: 'Amanota y’indahemuka', balance: 'Amanota yawe: {points}', value: 'Afite agaciro ka {value} RWF', earn: 'Bona amanota {points} kuri buri 1,000 RWF uguze', redeem: 'Koresha amanota', history: 'Amateka y’amanota', earned: 'Yabonetse', used: 'Yakoreshejwe', expires: 'Azarangira ku wa {date}', level_bronze: 'Umunyamuryango wa Bronze', level_silver: 'Umunyamuryango wa Silver', level_gold: 'Umunyamuryango wa Gold', level_vip: 'Umunyamuryango VIP', // 🔍 REVIEW
+  },
+  bundles: {
+    type_routine: 'Gahunda', type_concern: 'Ukurikije ikibazo', type_hair: 'Itsinda ry’umusatsi', type_makeup: 'Itsinda ryo kwisiga', type_gift: 'Impano', type_starter: 'Itsinda ry’abatangira', // verified-rw
+    normal_total: 'Igiteranyo gisanzwe', you_save: 'Uzigama', additional_cost: 'Kiruta igiteranyo cyo kugura ukwabyo', bundle_price: 'Igiciro cy’itsinda', // verified-rw
+    out_of_stock: 'Hari kimwe cyangwa byinshi mu bicuruzwa birimo bitaboneka.', view_bundle: 'Reba itsinda', all_bundles: 'Amatsinda yose', not_found: 'Itsinda ntiryabonetse.', // verified-rw
+    products_included: 'Ibicuruzwa birimo ({count})', optional: 'Si ngombwa', in_stock: 'Birahari', usage_title: 'Uko iyi gahunda ikoreshwa', pricing_breakdown: 'Ibisobanuro by’igiciro', // verified-rw
+    add_to_cart: 'Shyira itsinda mu gitebo — {price}', added_to_cart: 'Itsinda ryashyizwe mu gitebo', // verified-rw
+    title: 'Gahunda n’amatsinda y’ibicuruzwa', subtitle: 'Ibicuruzwa nyabyo byashyizwe muri gahunda zifatika kandi ibiciro bigaragazwa neza.', // verified-rw
+    quiz_title: 'Ntumenya gahunda ikubereye?', quiz_subtitle: 'Subiza ibibazo bitandatu urebe ibyo wagirwaho inama mu bicuruzwa biriho ubu.', quiz_cta: 'Subiza ibibazo', // verified-rw
+    filter_label: 'Shungura amatsinda ukurikije ubwoko', filter_all: 'Amatsinda yose', load_failed: 'Amatsinda ntiyashoboye gufunguka.', // verified-rw
+    empty: 'Nta matsinda araboneka', empty_hint: 'Amatsinda nyayo azagaragara nyuma y’uko umuyobozi ashyizemo ibicuruzwa n’ibiciro.', // verified-rw
+    admin_title: 'Amatsinda na gahunda', admin_count: 'Amatsinda {count}', admin_create: 'Kora itsinda', admin_edit: 'Hindura itsinda', admin_empty: 'Nta matsinda arakorwa.', admin_load_failed: 'Amatsinda ntiyashoboye gufunguka.', // verified-rw
+    admin_name: 'Izina', admin_name_rw: 'Izina mu Kinyarwanda', admin_slug: 'Izina rikoreshwa mu murongo', admin_type: 'Ubwoko bw’itsinda', admin_target_category: 'Icyiciro kigenewe', admin_target_concern: 'Ikibazo kigenewe', admin_target_skin: 'Ubwoko bw’uruhu bugenewe', admin_target_hair: 'Ubwoko bw’umusatsi bugenewe', admin_description: 'Ibisobanuro', admin_description_rw: 'Ibisobanuro mu Kinyarwanda', admin_cover: 'Ishusho y’itsinda', admin_products: 'Ibicuruzwa birimo', admin_step_en: 'Izina ry’intambwe', admin_step_rw: 'Izina ry’intambwe mu Kinyarwanda', admin_usage_rw: 'Uko rikoreshwa mu Kinyarwanda', admin_active: 'Rirakora', admin_featured: 'Ryatoranyijwe', admin_sales: 'Ubuguzi {count} bwishyuwe cyangwa bwemejwe', // verified-rw
+    admin_required: 'Shyiramo izina, igiciro cyemewe n’igicuruzwa nibura kimwe.', admin_upload_failed: 'Gushyiraho ishusho ntibyakunze.', admin_save_failed: 'Itsinda ntiryashoboye kubikwa.', admin_created: 'Itsinda ryakozwe', admin_updated: 'Itsinda ryahinduwe', admin_delete_confirm: 'Urashaka gusiba {bundle}?', admin_deleted: 'Itsinda ryasibwe', admin_delete_failed: 'Itsinda ntiryashoboye gusibwa.', // verified-rw
+  },
+  quiz: {
+    title: 'Ibibazo byagufasha guhitamo gahunda y’ubwiza', // verified-rw
+    step: 'Intambwe {step} muri {total}', // verified-rw
+    question_category: 'Ni iki ushaka kwitaho?', // verified-rw
+    subtitle_category: 'Turashakisha mu bicuruzwa biri mu bubiko ibishobora kukubera.', // verified-rw
+    category_skin: 'Uruhu rwanjye', category_hair: 'Umusatsi wanjye', category_makeup: 'Ibikoresho byo kwisiga', // verified-rw
+    question_concern_skin: 'Ikibazo cy’ingenzi cy’uruhu rwawe ni ikihe?', // verified-rw
+    question_concern_hair: 'Ikibazo cy’ingenzi cy’umusatsi wawe ni ikihe?', // verified-rw
+    question_concern_makeup: 'Ni ibihe bikoresho byo kwisiga ushaka?', // verified-rw
+    concern_skin_acne: 'Ibiheri n’utundi tuntu ku ruhu', concern_skin_dark_spots: 'Utubara twijimye', concern_skin_dryness: 'Uruhu rwumye', concern_skin_oiliness: 'Uruhu rugira amavuta', concern_skin_aging: 'Imirongo mito no gusaza kw’uruhu', concern_skin_uneven_tone: 'Ibara ry’uruhu ritaringaniye', concern_skin_pores: 'Utwenge tw’uruhu tugaragara', concern_skin_glow: 'Uruhu rurabagirana', concern_skin_sensitivity: 'Uruhu rworoshye', // verified-rw
+    concern_hair_hair_loss: 'Umusatsi ugwa', concern_hair_dryness: 'Umusatsi wumye cyangwa ucika', concern_hair_dandruff: 'Umwanda wo mu mutwe cyangwa kwishimagura', concern_hair_growth: 'Gukura kw’umusatsi', concern_hair_breakage: 'Umusatsi ucika', concern_hair_frizz: 'Umusatsi usatagurika', concern_hair_relaxer: 'Kuworoshya cyangwa kuwugorora', concern_hair_natural: 'Kwita ku musatsi karemano', concern_hair_color: 'Kwita ku musatsi wasizwe irangi', // verified-rw
+    concern_makeup_coverage: 'Guhisha neza utubara', concern_makeup_natural_look: 'Kugaragara nk’uwisize bisanzwe', concern_makeup_long_lasting: 'Ibisiga bimara igihe', concern_makeup_eyes: 'Ibikoresho by’amaso', concern_makeup_lips: 'Ibikoresho by’iminwa', concern_makeup_glow: 'Kugaragara urabagirana', concern_makeup_everyday: 'Ibikoreshwa buri munsi', // verified-rw
+    question_skin_type: 'Uruhu rwawe ni ubwoko ki?', question_hair_type: 'Umusatsi wawe ni ubwoko ki?', // verified-rw
+    question_result: 'Ni iki wifuza kugeraho cyane?', // verified-rw
+    result_skin_clear_skin: 'Uruhu rusa n’urufite isuku', result_skin_bright_skin: 'Uruhu rusa n’ururabagirana', result_skin_moisturized: 'Uruhu rutose kandi rworoshye', result_skin_even_tone: 'Ibara risa n’iringaniye', result_skin_youthful: 'Uruhu rusa n’urukomeye kandi rushya', result_skin_smooth: 'Uruhu rusa n’urworoshye', // verified-rw
+    result_hair_long_strong: 'Umusatsi usa n’umuremure kandi ukomeye', result_hair_moisturized_soft: 'Umusatsi utose kandi woroshye', result_hair_smooth_shiny: 'Umusatsi woroshye kandi ubengerana', result_hair_defined_curls: 'Imisatsi igunda igaragara neza', result_hair_clean_scalp: 'Umutwe ufite isuku', // verified-rw
+    result_makeup_everyday_look: 'Kwisiga bisanzwe buri munsi', result_makeup_full_glam: 'Kwisiga byuzuye', result_makeup_office_look: 'Kwisiga bikwiriye akazi', result_makeup_glowing_skin: 'Kugaragara urabagirana', // verified-rw
+    question_budget: 'Ushaka gukoresha amafaranga angahe?', subtitle_budget: 'Ibiciro bishingira ku biri ku rutonde ubu mu mafaranga y’u Rwanda.', // verified-rw
+    budget_under5k: 'Munsi ya 5,000 RWF', budget_5k_15k: '5,000–15,000 RWF', budget_15k_50k: '15,000–50,000 RWF', budget_50k_plus: 'Hejuru ya 50,000 RWF', // verified-rw
+    question_sensitivity: 'Hari ibicuruzwa umubiri wawe utihanganira?', subtitle_sensitivity: 'Ibyifuzo ntibisimbura inama ya muganga cyangwa iyerekeye allergie.', // verified-rw
+    sensitivity_none: 'Nta byo nzi umubiri utihanganira', sensitivity_some: 'Hari bimwe utihanganira', sensitivity_high: 'Umubiri woroshye cyane', // verified-rw
+    loading: 'Turimo gushaka ibicuruzwa bihuye...', loading_subtitle: 'Turagenzura ibicuruzwa, ibiciro n’ububiko biriho ubu.', // verified-rw
+    results_title: 'Ibyo twakugiriye inama', results_subtitle: 'Bishingiye ku bisubizo byawe n’ibicuruzwa biriho ubu.', // verified-rw
+    recommended_bundles: 'Gahunda zihuye n’ibisubizo', recommended_products: 'Ibicuruzwa bihuye n’ibisubizo', restart: 'Subira utangire', view_all: 'Reba ibicuruzwa byose', // verified-rw
+    no_results: 'Nta bihuye neza byabonetse', no_results_hint: 'Gerageza ibindi bisubizo cyangwa urebe ibicuruzwa byose.', retry: 'Ongera ugerageze ibibazo', // verified-rw
+    sensitivity_notice: 'Kuba nta bitera allergie byanditswe ntibyemeza ko igicuruzwa kitayitera. Soma ibyanditse ku gipfunyika kandi usabe inama y’inzobere igihe bikenewe.', // verified-rw
   },
   skin_types: { OILY: 'Uruhu rugira amavuta menshi', DRY: 'Uruhu rwumye', COMBINATION: 'Uruhu ruvanze', NORMAL: 'Uruhu rusanzwe', SENSITIVE: 'Uruhu rworoshye', ALL: 'Ubwoko bwose bw’uruhu' }, // 🔍 REVIEW
   hair_types: { NATURAL: 'Umusatsi karemano', RELAXED: 'Umusatsi woroshyijwe', WAVY: 'Umusatsi ufite imiraba', CURLY: 'Umusatsi uzengurutse', COILY: 'Umusatsi wisobekeranye cyane', ALL_HAIR: 'Ubwoko bwose bw’umusatsi' }, // verified-rw

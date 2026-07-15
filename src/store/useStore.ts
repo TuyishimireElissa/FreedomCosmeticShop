@@ -52,6 +52,8 @@ export interface CartItem {
   image: string
   quantity: number
   stock: number
+  bundleId?: string
+  isBundle?: boolean
 }
 
 interface StoreState {

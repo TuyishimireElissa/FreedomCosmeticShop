@@ -25,6 +25,7 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import { type AdminTab, useAdminShell } from '@/components/admin/AdminShellContext'
 import { useStore } from '@/store/useStore'
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface MenuItem {
   label: string
@@ -43,6 +44,7 @@ const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
     items: [
       { label: 'Orders', tab: 'orders', icon: ShoppingCart },
       { label: 'Products', tab: 'products', icon: Package },
+      { label: 'Bundles', tab: 'bundles', icon: Package },
       { label: 'Customers', tab: 'customers', icon: Users },
       { label: 'Deliveries', tab: 'deliveries', icon: Truck },
       { label: 'Payments', tab: 'payments', icon: CreditCard },
@@ -69,6 +71,7 @@ const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
 ]
 
 export default function AdminSidebar() {
+  const t = useT()
   const [collapsed, setCollapsed] = useState(false)
   const router = useRouter()
   const { activeTab, setActiveTab, mobileOpen, setMobileOpen } = useAdminShell()
@@ -141,12 +144,12 @@ export default function AdminSidebar() {
                           ? 'bg-[#B76E79] font-semibold text-white shadow-lg shadow-[#B76E79]/15'
                           : 'text-gray-400 hover:bg-white/[0.07] hover:text-white'
                       } ${collapsed ? 'md:justify-center md:px-2' : ''}`}
-                      title={collapsed ? item.label : undefined}
+                      title={collapsed ? (item.tab === 'bundles' ? t('nav.bundles') : item.label) : undefined}
                       aria-current={active ? 'page' : undefined}
                     >
                       {active && <span className="absolute -left-2 h-6 w-1 rounded-r-full bg-[#FFD700]" aria-hidden="true" />}
                       <Icon className="h-[18px] w-[18px] shrink-0" />
-                      <span className={collapsed ? 'md:hidden' : ''}>{item.label}</span>
+                      <span className={collapsed ? 'md:hidden' : ''}>{item.tab === 'bundles' ? t('nav.bundles') : item.label}</span>
                     </button>
                   )
                 })}
