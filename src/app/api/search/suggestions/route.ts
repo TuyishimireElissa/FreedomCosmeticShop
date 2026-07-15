@@ -60,6 +60,9 @@ export async function GET(req: Request) {
         where: {
           isActive: true,
           isDeleted: false,
+          products: {
+            some: { isActive: true, isDeleted: false, stock: { gt: 0 } },
+          },
           OR: expandedTerms.flatMap((term) => [
             { name: { contains: term, mode: "insensitive" as const } },
             { slug: { contains: term, mode: "insensitive" as const } },

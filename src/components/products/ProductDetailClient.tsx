@@ -7,11 +7,12 @@ import type { Product } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
 import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
-import ProductImages from '@/components/products/ProductImages'
+import ProductImageGallery from '@/components/products/ProductImageGallery'
 import ProductTabs from '@/components/products/ProductTabs'
 import DeliveryEstimator from '@/components/products/DeliveryEstimator'
 import ProductGrid from '@/components/products/ProductGrid'
 import { useT } from '@/lib/i18n/LanguageContext'
+import { getProductPrimaryImage } from '@/lib/cloudinary-images'
 
 interface ProductResponse { product: Product; related: Product[] }
 
@@ -45,10 +46,11 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const outOfStock = product.stock < 1
   const lowStock = product.stock > 0 && product.stock <= product.lowStockThreshold
   const discount = product.compareAt && product.compareAt > product.price ? Math.round((1 - product.price / product.compareAt) * 100) : 0
+  const primaryImage = getProductPrimaryImage(product)
 
   const add = () => {
     if (outOfStock) return
-    addToCart({ productId: product.id, slug: product.slug, name: product.name, price: product.price, image: product.images?.[0] || '', stock: product.stock }, quantity)
+    addToCart({ productId: product.id, slug: product.slug, name: product.name, price: product.price, image: primaryImage?.url || '', stock: product.stock }, quantity)
     toast({ title: t('product.added'), description: `${quantity} × ${product.name}${shade ? ` · ${shade}` : ''}` })
   }
 
@@ -58,7 +60,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         <nav className="mb-5 flex items-center gap-2 text-xs text-gray-500"><button type="button" onClick={() => router.push('/products')} className="flex items-center gap-1 font-semibold hover:text-[#B76E79]"><ChevronLeft className="h-3.5 w-3.5" />{t('nav.products')}</button><span>/</span><span>{product.category?.name || t('product.beauty')}</span><span>/</span><span className="min-w-0 truncate font-semibold text-gray-800">{product.name}</span></nav>
 
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-          <ProductImages images={product.images || []} productName={product.name} discount={discount} outOfStock={outOfStock} />
+          <ProductImageGallery productImages={product.productImages || []} legacyImages={product.images || []} productName={product.name} videoUrl={product.videoUrl} discount={discount} outOfStock={outOfStock} isAuthentic={product.isAuthentic === true} />
 
           <div className="min-w-0">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B76E79]">{product.brand?.name || t('product.beauty')}</p>
@@ -66,7 +68,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             <button type="button" onClick={() => document.getElementById('product-details')?.scrollIntoView({ behavior: 'smooth' })} className="mt-3 flex items-center gap-2">{product.reviewsCount > 0 ? <><span className="flex">{[1,2,3,4,5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= Math.round(product.rating) ? 'fill-[#FFD700] text-[#FFD700]' : 'fill-gray-200 text-gray-200'}`} />)}</span><span className="text-sm font-bold">{product.rating.toFixed(1)}</span><span className="text-xs text-gray-400">{t('product.reviews_count', { count: product.reviewsCount })}</span></> : <span className="text-sm font-semibold text-gray-500">{t('product.no_reviews')}</span>}</button>
 
             <div className="mt-5 flex flex-wrap items-baseline gap-3"><span className="text-3xl font-black text-[#B76E79]">{formatRWF(product.price)}</span>{product.compareAt && product.compareAt > product.price && <span className="text-base text-gray-400 line-through">{formatRWF(product.compareAt)}</span>}{discount > 0 && <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-600">{t('product.save_percent', { percent: discount })}</span>}</div>
-            <div className="mt-3 flex flex-wrap gap-2">{outOfStock ? <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-600">{t('common.sold_out')}</span> : lowStock ? <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">{t('common.low_stock', { count: product.stock })}</span> : <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700"><Check className="h-3.5 w-3.5" />{t('common.in_stock')}</span>}<span className="flex items-center gap-1 rounded-full border border-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"><ShieldCheck className="h-3.5 w-3.5" />{t('common.authentic')}</span></div>
+            <div className="mt-3 flex flex-wrap gap-2">{outOfStock ? <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-600">{t('common.sold_out')}</span> : lowStock ? <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">{t('common.low_stock', { count: product.stock })}</span> : <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700"><Check className="h-3.5 w-3.5" />{t('common.in_stock')}</span>}{product.isAuthentic === true && <span className="flex items-center gap-1 rounded-full border border-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"><ShieldCheck className="h-3.5 w-3.5" />{t('common.authentic')}</span>}</div>
             {product.shortDescription && <p className="mt-5 text-sm leading-7 text-gray-600">{product.shortDescription}</p>}
 
             {product.shades && product.shades.length > 0 && <div className="mt-6"><p className="text-xs font-black uppercase tracking-wider text-gray-500">{t('product.select_shade')} <span className="ml-1 normal-case text-[#B76E79]">{shade}</span></p><div className="mt-2 flex flex-wrap gap-2">{product.shades.map((value) => <button key={value} type="button" onClick={() => setShade(value)} className={`rounded-xl border-2 px-3 py-2 text-sm font-bold ${shade === value ? 'border-[#B76E79] bg-rose-50 text-[#B76E79]' : 'border-gray-200 text-gray-600'}`}>{value}</button>)}</div></div>}

@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth'
+import { PUBLIC_PRODUCT_SELECT, getRealUnitSales, serializePublicProduct } from '@/lib/public-product'
 
 const schema = z.object({ productId: z.string().min(1) })
 const fail = (error: string, status: number) => NextResponse.json({ success: false, error }, { status })
@@ -11,8 +12,16 @@ const fail = (error: string, status: number) => NextResponse.json({ success: fal
 export async function GET() {
   try {
     const user = await requireAuth(); if (!user) return fail('Unauthorized', 401)
-    const rows = await prisma.wishlist.findMany({ where: { userId: user.id }, include: { product: { include: { brand: true, category: true } } }, orderBy: { createdAt: 'desc' } })
-    const wishlist = rows.map((item) => ({ ...item, product: { ...item.product, images: safeParse(item.product.images), skinType: safeParse(item.product.skinType), shades: safeParse(item.product.shades), ingredients: safeParse(item.product.ingredients) } }))
+    const rows = await prisma.wishlist.findMany({
+      where: { userId: user.id },
+      include: { product: { select: PUBLIC_PRODUCT_SELECT } },
+      orderBy: { createdAt: 'desc' },
+    })
+    const sales = await getRealUnitSales(rows.map((item) => item.productId))
+    const wishlist = rows.map((item) => ({
+      ...item,
+      product: serializePublicProduct(item.product, sales.get(item.productId) || 0),
+    }))
     return NextResponse.json({ success: true, data: { wishlist }, wishlist })
   } catch (error) { console.error('Wishlist GET error:', error); return fail('Failed to fetch wishlist', 500) }
 }
@@ -33,4 +42,3 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: true, data: { productId: parsed.data.productId } })
   } catch (error) { console.error('Wishlist DELETE error:', error); return fail('Failed to remove wishlist item', 500) }
 }
-function safeParse(value: string | null) { if (!value) return null; try { return JSON.parse(value) } catch { return [] } }

@@ -189,6 +189,43 @@ export const rw = {
     no_image_available: 'Nta shusho y’igicuruzwa iboneka', // verified-rw
     previous_image: 'Ishusho ibanza', // verified-rw
     show_image: 'Erekana ishusho {number}', // verified-rw
+
+    image_type_product: 'Igicuruzwa', // verified-rw
+    image_type_packaging: 'Igipfunyika', // verified-rw
+    image_type_back_label: 'Aho ibigize byanditse', // verified-rw
+    image_type_seal: 'Ikimenyetso cy’umwimerere', // verified-rw
+    image_type_texture: 'Uko giteye', // verified-rw
+    image_type_size_scale: 'Ikigereranyo cy’ingano', // verified-rw
+    image_type_shade: 'Ibara', // verified-rw
+    image_type_lifestyle: 'Uko gikoreshwa', // verified-rw
+    image_type_video: 'Videwo', // verified-rw
+    play_video: 'Fungura videwo y’igicuruzwa', // verified-rw
+    video: 'Videwo', // verified-rw
+    photos_count: 'Amafoto {count}', // verified-rw
+
+    product_information: 'Amakuru y’igicuruzwa', // verified-rw
+    expected_results: 'Ibyitezwe ku gicuruzwa', // verified-rw
+    authenticity: 'Umwimerere w’igicuruzwa', // verified-rw
+    country_of_origin: 'Igihugu cyakorewemo', // verified-rw
+    imported_by: 'Cyatumijwe na', // verified-rw
+    hair_type: 'Ubwoko bw’umusatsi', // verified-rw
+    fragrance_notes: 'Impumuro zirimo', // verified-rw
+    fragrance_top: 'Impumuro ibanza', // verified-rw
+    fragrance_middle: 'Impumuro yo hagati', // verified-rw
+    fragrance_base: 'Impumuro isoza', // verified-rw
+    warnings: 'Imiburo', // verified-rw
+    allergens: 'Ibishobora gutera allergie', // verified-rw
+    period_after_opening: 'Nyuma yo gufungura', // verified-rw
+    use_within: 'Koresha mu mezi {months} nyuma yo gufungura.', // verified-rw
+    ingredients_inci_note: 'Buri gihe genzura urutonde rw’ibigize ruri ku gipfunyika, kuko uwagikoze ashobora guhindura ibigize.', // verified-rw
+    results_timeframe: 'Igihe gisanzwe cyatanzwe', // verified-rw
+    results_disclaimer: 'Icyitonderwa ku byitezwe', // verified-rw
+    results_disclaimer_text: 'Ibyo igicuruzwa kimarira umuntu biratandukana bitewe n’umuntu, gahunda n’uko gikoreshwa. Aya makuru si inama y’ubuvuzi kandi ntabwo yizeza igisubizo runaka.', // verified-rw
+    authenticity_verified: 'Umwimerere w’iki gicuruzwa waremejwe', // verified-rw
+    authenticity_not_verified: 'Nta cyemezo cy’umwimerere cyanditswe', // verified-rw
+    authenticity_not_verified_detail: 'Ntabwo twerekana ko igicuruzwa cyemejwe nk’umwimerere kugeza amakuru yo kubyemeza yanditswe kuri iki gicuruzwa.', // verified-rw
+    reviews_unavailable: 'Ibitekerezo ntibiboneka by’akanya.', // verified-rw
+    delivery_exact_fee: 'Hitamo akarere kawe urebe ikiguzi cyo kukugezaho n’igihe giteganyijwe. Ikiguzi cya nyuma cyemezwa mu gihe cyo kwishyura.', // verified-rw
   },
   search: {
     placeholder: 'Shakisha ibita ku ruhu, ibikoresho byo kwisiga, ibita ku musatsi...', results: 'Ibisubizo {count} kuri "{query}"', no_results: 'Nta bicuruzwa byabonetse kuri "{query}"', no_results_hint: 'Gerageza andi magambo cyangwa urebe mu byiciro', suggestions: 'Ibyifuzo', popular: 'Ibikunze gushakishwa', local_terms: 'Amagambo akoreshwa mu Rwanda', price_searches: 'Shakisha ukurikije igiciro', recent: 'Ibyashakishijwe vuba', clear_recent: 'Siba ibyashakishijwe vuba', price_under: 'Munsi ya {price} RWF', price_range: 'Hagati ya {min} na {max} RWF', searching: 'Birimo gushakishwa...', search_in: 'Shakisha muri {category}', filters_active: 'Inshungura {count} zirakoreshwa', filters: 'Inshungura', reset: 'Subiza ku ntangiriro', category: 'Icyiciro', brand: 'Ikirango', all_brands: 'Ibirango byose', price_range_label: 'Urwego rw’ibiciro (RWF)', minimum: 'Igiciro gito', maximum: 'Igiciro kinini', skin_type: 'Ubwoko bw’uruhu', customer_rating: 'Amanota y’abakiriya', and_up: '{rating} no hejuru', in_stock_only: 'Ibirahari gusa', products_load_failed_hint: 'Reba umurongo wa interineti wongere ugerageze.', no_filter_results: 'Nta bicuruzwa bihuye n’inshungura', broaden_search: 'Gerageza gukuraho inshungura cyangwa ukoreshe amagambo rusange.', wishlist_failed: 'Guhindura ibyo wifuza ntibyakunze', removed_wishlist: 'Cyakuwe mu byo wifuza', saved_wishlist: 'Cyabitswe mu byo wifuza', // 🔍 REVIEW // verified-rw
@@ -1002,6 +1039,7 @@ export const rw = {
     title: 'Amanota y’indahemuka', balance: 'Amanota yawe: {points}', value: 'Afite agaciro ka {value} RWF', earn: 'Bona amanota {points} kuri buri 1,000 RWF uguze', redeem: 'Koresha amanota', history: 'Amateka y’amanota', earned: 'Yabonetse', used: 'Yakoreshejwe', expires: 'Azarangira ku wa {date}', level_bronze: 'Umunyamuryango wa Bronze', level_silver: 'Umunyamuryango wa Silver', level_gold: 'Umunyamuryango wa Gold', level_vip: 'Umunyamuryango VIP', // 🔍 REVIEW
   },
   skin_types: { OILY: 'Uruhu rugira amavuta menshi', DRY: 'Uruhu rwumye', COMBINATION: 'Uruhu ruvanze', NORMAL: 'Uruhu rusanzwe', SENSITIVE: 'Uruhu rworoshye', ALL: 'Ubwoko bwose bw’uruhu' }, // 🔍 REVIEW
+  hair_types: { NATURAL: 'Umusatsi karemano', RELAXED: 'Umusatsi woroshyijwe', WAVY: 'Umusatsi ufite imiraba', CURLY: 'Umusatsi uzengurutse', COILY: 'Umusatsi wisobekeranye cyane', ALL_HAIR: 'Ubwoko bwose bw’umusatsi' }, // verified-rw
 } satisfies TranslationShape<EnglishTranslations>
 
 // 🔍 REVIEW: Owner must obtain a fluent Kinyarwanda speaker’s approval before

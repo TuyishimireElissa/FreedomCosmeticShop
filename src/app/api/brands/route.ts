@@ -1,39 +1,25 @@
-/**
- * GET /api/brands - with fallback for Vercel deployment
- */
-import { NextResponse } from "next/server"
-import { db } from "@/lib/db"
-import { fallbackBrands, fallbackProducts } from "@/lib/fallbackData"
+/** GET /api/brands — real active brands with at least one active product. */
+import { NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 
 export async function GET() {
   try {
-    try {
-      const brands = await db.brand.findMany({
-        where: { isActive: true, isDeleted: false },
-        orderBy: { name: "asc" },
-        include: {
-          _count: { select: { products: { where: { isActive: true, isDeleted: false } } } },
-        },
-      })
-      const brandsWithProducts = brands.filter((b) => b._count.products > 0)
-      if (brandsWithProducts.length === 0) {
-        const mapped = fallbackBrands.map(b => ({
-          ...b,
-          _count: { products: fallbackProducts.filter(p => p.brandId === b.id).length }
-        }))
-        return NextResponse.json({ brands: mapped, _source: "fallback-empty" })
-      }
-      return NextResponse.json({ brands: brandsWithProducts, _source: "database" })
-    } catch (dbError) {
-      console.warn("Brands DB failed, fallback:", dbError)
-      const mapped = fallbackBrands.map(b => ({
-        ...b,
-        _count: { products: fallbackProducts.filter(p => p.brandId === b.id).length }
-      }))
-      return NextResponse.json({ brands: mapped, _source: "fallback-error" })
-    }
+    const brands = await db.brand.findMany({
+      where: { isActive: true, isDeleted: false },
+      orderBy: { name: 'asc' },
+      include: {
+        _count: { select: { products: { where: { isActive: true, isDeleted: false } } } },
+      },
+    })
+    return NextResponse.json({
+      brands: brands.filter((brand) => brand._count.products > 0),
+      _source: 'database',
+    })
   } catch (error) {
-    console.error("Failed to fetch brands:", error)
-    return NextResponse.json({ brands: fallbackBrands, _source: "fallback-exception" })
+    console.error('Brands database query failed:', error)
+    return NextResponse.json(
+      { brands: [], _source: 'unavailable', error: 'Brands are temporarily unavailable' },
+      { status: 503 },
+    )
   }
 }

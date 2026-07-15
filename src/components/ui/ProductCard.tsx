@@ -20,6 +20,8 @@ interface Product {
   isBestSeller?: boolean
   isNewArrival?: boolean
   isFeatured?: boolean
+  isAuthentic?: boolean
+  lowStockThreshold?: number
   stockQuantity: number
   brand?: { name: string }
 }
@@ -75,10 +77,10 @@ export default function ProductCard({ product }: { product: Product }) {
           {discount > 0 && <span className="badge bg-red-500 text-white shadow-sm">-{discount}%</span>}
           {product.isNewArrival && <span className="badge bg-emerald-600 text-white shadow-sm">{t('common.new')}</span>}
           {product.isBestSeller && <span className="badge bg-[#B76E79] text-white shadow-sm">🔥 {t('categories.best_sellers')}</span>}
-          {product.stockQuantity > 0 && product.stockQuantity <= 5 && <span className="badge bg-amber-500 text-white shadow-sm">{t('common.low_stock', { count: product.stockQuantity })}</span>}
+          {product.stockQuantity > 0 && product.stockQuantity <= (product.lowStockThreshold ?? 5) && <span className="badge bg-amber-500 text-white shadow-sm">{t('common.low_stock', { count: product.stockQuantity })}</span>}
         </div>
 
-        <span className="absolute right-2 top-2 hidden items-center rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-emerald-700 shadow-sm backdrop-blur sm:inline-flex">✓ {t('common.authentic')}</span>
+        {product.isAuthentic === true && <span className="absolute right-2 top-2 hidden items-center rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-emerald-700 shadow-sm backdrop-blur sm:inline-flex">✓ {t('common.authentic')}</span>}
 
         {outOfStock && (
           <div className="pointer-events-none absolute inset-0 grid place-items-center bg-white/25">
@@ -103,11 +105,11 @@ export default function ProductCard({ product }: { product: Product }) {
           <h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-[#1a1a1a] transition-colors hover:text-[#B76E79] sm:text-[15px]">{product.name}</h3>
         </Link>
 
-        <div className="mt-2 flex items-center gap-1.5" aria-label={t('product.rating_label', { rating: product.avgRating, count: product.reviewCount })}>
-          <div className="flex" aria-hidden="true">
+        <div className="mt-2 flex min-h-4 items-center gap-1.5" aria-label={product.reviewCount > 0 ? t('product.rating_label', { rating: product.avgRating, count: product.reviewCount }) : t('product.no_reviews')}>
+          {product.reviewCount > 0 ? <><div className="flex" aria-hidden="true">
             {[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-3 w-3 ${star <= Math.round(product.avgRating) ? 'fill-[#FFD700] text-[#FFD700]' : 'fill-gray-200 text-gray-200'}`} />)}
           </div>
-          <span className="text-xs text-gray-400">({product.reviewCount})</span>
+          <span className="text-xs text-gray-400">({product.reviewCount})</span></> : <span className="text-xs text-gray-400">{t('product.no_reviews')}</span>}
         </div>
 
         <div className="mt-2.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">

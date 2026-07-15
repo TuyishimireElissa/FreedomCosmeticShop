@@ -23,7 +23,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Star, Plus, Check, ShieldCheck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useT } from "@/lib/i18n/LanguageContext"
+import { useLanguage } from "@/lib/i18n/LanguageContext"
+import { getCloudinaryUrl, getImageSizes, getProductPrimaryImage } from "@/lib/cloudinary-images"
 
 interface ProductCardProps {
   product: Product
@@ -31,25 +32,27 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, compact = false }: ProductCardProps) {
-  const { addToCart, user } = useStore()
+  const addToCart = useStore((state) => state.addToCart)
   const router = useRouter()
   const { toast } = useToast()
-  const t = useT()
+  const { t, language } = useLanguage()
   const [added, setAdded] = useState(false)
 
-  // Section 4: Check if user is approved wholesale
-  const isWholesaleUser =
-    user &&
-    (user.userType === "WHOLESALE" || user.userType === "BOTH") &&
-    user.wholesaleStatus === "APPROVED"
-
-  const images = product.images || []
-  const primaryImage = images[0] || "/placeholder.svg"
+  const primaryImage = getProductPrimaryImage(product)
+  const imageSource = primaryImage?.publicId
+    ? getCloudinaryUrl(primaryImage.publicId, compact ? 'CARD_MOBILE' : 'CARD_DESKTOP')
+    : primaryImage?.url || '/placeholder.svg'
+  const imageAlt = language === 'rw' && primaryImage?.altTextRw
+    ? primaryImage.altTextRw
+    : primaryImage?.altText || product.name
   const hasDiscount = product.compareAt !== null && product.compareAt > product.price
   const discountPercent = hasDiscount
     ? Math.round(((product.compareAt! - product.price) / product.compareAt!) * 100)
     : 0
-  const outOfStock = product.stock === 0
+  const outOfStock = product.isOutOfStock ?? product.stock === 0
+  const lowStock = product.isLowStock ?? (product.stock > 0 && product.stock <= product.lowStockThreshold)
+  const isNewArrival = product.isNewArrival === true
+  const isBestSeller = product.isBestSeller === true
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -59,7 +62,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       slug: product.slug,
       name: product.name,
       price: product.price,
-      image: primaryImage,
+      image: primaryImage?.url || imageSource,
       stock: product.stock,
     })
     setAdded(true)
@@ -75,9 +78,11 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       ? t('common.sold_out')
       : hasDiscount
         ? `-${discountPercent}%`
-        : product.featured
+        : isBestSeller
           ? `🔥 ${t('categories.best_sellers')}`
-          : null
+          : isNewArrival
+            ? t('common.new')
+            : null
 
     return (
       <Link
@@ -88,11 +93,11 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         <article className="h-full w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-transform duration-150 active:scale-[0.98]">
           <div className="relative aspect-square overflow-hidden bg-gray-50">
             <Image
-              src={primaryImage}
-              alt={product.name}
+              src={imageSource}
+              alt={imageAlt}
               fill
               className={`object-cover ${outOfStock ? 'opacity-60' : ''}`}
-              sizes="(max-width: 640px) 50vw, 180px"
+              sizes={getImageSizes('card_compact')}
               loading="lazy"
             />
             {compactBadge && (
@@ -126,13 +131,13 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       <div className="bg-secondary/30 relative aspect-square overflow-hidden">
         {primaryImage ? (
           <Image
-            src={primaryImage}
-            alt={product.name}
+            src={imageSource}
+            alt={imageAlt}
             fill
             className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
               outOfStock ? "opacity-60" : ""
             }`}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            sizes={getImageSizes('card')}
             loading="lazy"
           />
         ) : (
@@ -146,20 +151,23 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           {hasDiscount && (
             <Badge className="bg-primary text-primary-foreground shadow">-{discountPercent}%</Badge>
           )}
-          {product.featured && <Badge className="bg-orange-500 text-white shadow">🔥 {t('categories.best_sellers')}</Badge>}
+          {isBestSeller && <Badge className="bg-orange-500 text-white shadow">🔥 {t('categories.best_sellers')}</Badge>}
+          {isNewArrival && <Badge className="bg-emerald-600 text-white shadow">{t('common.new')}</Badge>}
+          {lowStock && <Badge className="bg-amber-500 text-white shadow">{t('common.low_stock', { count: product.stock })}</Badge>}
         </div>
 
-        {/* Top-right: Authentic badge + Wishlist heart */}
-        <div className="absolute top-2 right-2 flex flex-col gap-1.5 items-end">
-          <Badge
-            variant="outline"
-            className="border-emerald-500/30 bg-background/90 text-emerald-700 shadow backdrop-blur"
-            title={t('product.authentic_guarantee')}
-          >
-            <ShieldCheck className="mr-1 h-3 w-3" />
-            {t('common.authentic')}
-          </Badge>
-        </div>
+        {product.isAuthentic === true && (
+          <div className="absolute top-2 right-2 flex flex-col items-end gap-1.5">
+            <Badge
+              variant="outline"
+              className="border-emerald-500/30 bg-background/90 text-emerald-700 shadow backdrop-blur"
+              title={t('product.authenticity_verified')}
+            >
+              <ShieldCheck className="mr-1 h-3 w-3" />
+              {t('common.authentic')}
+            </Badge>
+          </div>
+        )}
 
         {/* Out-of-stock overlay */}
         {outOfStock && (
@@ -201,42 +209,27 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         {/* NEW: Skin type badge */}
         {product.skinType && product.skinType.length > 0 && (
           <span className="mt-1 inline-block w-fit rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-            {product.skinType[0].charAt(0) + product.skinType[0].slice(1).toLowerCase()} skin
+            {t(`skin_types.${product.skinType[0]}`)}
           </span>
         )}
 
         {/* NEW: Low stock indicator */}
-        {product.stock > 0 && product.stock <= 5 && (
+        {lowStock && (
           <p className="mt-1 text-xs font-semibold text-amber-600">
             ⚡ {t('common.low_stock', { count: product.stock })}
           </p>
         )}
 
-        {/* Price — Section 4: Show wholesale price for wholesale users */}
-        {isWholesaleUser ? (
-          <div className="mt-2">
-            <p className="text-xs text-muted-foreground line-through">
-              {t('product.retail_price', { price: formatRWF(product.price) })}
-            </p>
-            <p className="text-base font-bold text-violet-700 sm:text-lg">
-              {formatRWF(product.price)}
-            </p>
-            <p className="text-xs font-medium text-violet-600">
-              💛 {t('product.wholesale_price', { count: product.minWholesaleQty || 6 })}
-            </p>
-          </div>
-        ) : (
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-foreground text-base font-semibold sm:text-lg">
-              {formatRWF(product.price)}
+        <div className="mt-2 flex items-baseline gap-2">
+          <span className="text-foreground text-base font-semibold sm:text-lg">
+            {formatRWF(product.price)}
+          </span>
+          {hasDiscount && (
+            <span className="text-muted-foreground text-xs line-through">
+              {formatRWF(product.compareAt!)}
             </span>
-            {hasDiscount && (
-              <span className="text-muted-foreground text-xs line-through">
-                {formatRWF(product.compareAt!)}
-              </span>
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Spacer pushes button to bottom */}
         <div className="flex-1" />

@@ -2,7 +2,7 @@
 // FreedomCosmeticShop — Complete Prisma Schema (PostgreSQL / Production)
 // =============================================================================
 //
-// 29 models for a production-ready Rwanda cosmetics e-commerce platform:
+// 32 models for a production-ready Rwanda cosmetics e-commerce platform:
 //   1.  User           — with +250 phone, role enum, soft delete, wholesale
 //   2.  StaffProfile   — extends User for admin/staff
 //   3.  Category       — hierarchical (parent/child self-relation)
@@ -31,7 +31,10 @@
 //  26.  WholesaleCredit — credit account for wholesale customers
 //  27.  CreditHistory  — credit transaction ledger
 //  28.  WholesaleInvoice — professional invoices for wholesale orders
-//  29.  StoreSettings  — store name, logo, colors, social links
+//  29. StoreSettings  — store name, logo, colors, social links
+//  30. Supplier       — supplier identity for admin inventory
+//  31. ProductImage   — structured Cloudinary product images
+//  32. ProductBatch   — real stock batches and expiry dates
 //
 // PostgreSQL production schema — uses Supabase.
 // =============================================================================
@@ -230,7 +233,7 @@ model Brand {
 // 5. PRODUCT (with cosmetics-specific fields)
 // =============================================================================
 // Prices in RWF (Rwandan Franc) as Int to avoid float precision issues.
-// images, skinType, shades, ingredients stored as JSON strings (SQLite).
+// Legacy images, skinType, shades, and ingredients remain JSON strings for backward compatibility.
 
 model Product {
   id               String  @id @default(cuid())
@@ -248,7 +251,22 @@ model Product {
   stock             Int     @default(0)
   lowStockThreshold Int     @default(5)
   sku               String? @unique
+  // Real SKU supplied by the distributor. Kept separate from the legacy SKU.
+  realSku           String? @unique
   barcode           String?
+
+  // Supplier and batch metadata are admin-only and must never be selected by public APIs.
+  supplierId        String?
+  supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  manufacturedDate  DateTime?
+  expiryDate        DateTime?
+  periodAfterOpening Int?
+  batchNumber       String?
+
+  // Physical product measurements.
+  volume            String?
+  volumeMl          Decimal?
+  weightGrams       Decimal?
 
   // Media — JSON array of image URLs: '["url1", "url2"]'
   images   String  @default("[]")
@@ -263,13 +281,36 @@ model Product {
   shades            String? // JSON array
   // ingredients: JSON array of ingredient names
   // Example: '["Vitamin C", "Hyaluronic Acid", "Glycerin"]'
-  ingredients       String? // JSON array
+  ingredients       String? // Legacy JSON array; retained for backward compatibility
+  ingredientsRw     String? @db.Text
   // size: e.g., "50ml", "100g", "30 capsules"
   size              String?
-  // usageInstructions: how to use the product
+  // usageInstructions: legacy usage field retained for backward compatibility
   usageInstructions String?
+  howToUse          String? @db.Text
+  howToUseRw        String? @db.Text
   // warnings: cautions and warnings
   warnings          String?
+  warningsRw        String? @db.Text
+  allergens         String[] @default([])
+
+  // Additional cosmetic attributes.
+  hairType          HairType?
+  shade             String?
+  shadeHex          String?
+  undertone         String?
+  fragranceNotes    Json?
+
+  // Honest expected results. These fields must not contain medical claims.
+  expectedResults   String? @db.Text
+  expectedResultsRw String? @db.Text
+  resultsTimeframe  String?
+
+  // Authenticity and origin information.
+  isAuthentic       Boolean @default(false)
+  authenticityInfo String?
+  countryOfOrigin   String?
+  importedBy        String?
   // ─── End cosmetics-specific fields ───────────────────────────────
 
   // Ratings (denormalized for quick display)
@@ -304,16 +345,99 @@ model Product {
   wishlistItems Wishlist[]
   cartItems     CartItem[]
   pricing       ProductPricing?
+  productImages ProductImage[]
+  batches       ProductBatch[]
 
   @@index([slug])
   @@index([categoryId])
   @@index([brandId])
+  @@index([supplierId])
+  @@index([expiryDate])
   @@index([featured])
   @@index([isActive])
   @@index([isDeleted])
   @@index([price])
   @@index([createdAt])
   @@index([wholesaleActive])
+}
+
+// =============================================================================
+// PRODUCT INVENTORY SUPPORT — supplier, structured images, and stock batches
+// =============================================================================
+
+enum HairType {
+  NATURAL
+  RELAXED
+  WAVY
+  CURLY
+  COILY
+  ALL_HAIR
+}
+
+enum ImageType {
+  PRODUCT
+  PACKAGING
+  BACK_LABEL
+  SEAL
+  TEXTURE
+  SIZE_SCALE
+  SHADE
+  LIFESTYLE
+  VIDEO_THUMB
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  country   String?
+  isActive  Boolean  @default(true)
+  products  Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([isActive])
+}
+
+model ProductImage {
+  id        String    @id @default(cuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  publicId  String
+  url       String
+  altText   String
+  altTextRw String?
+  imageType ImageType @default(PRODUCT)
+  sortOrder Int       @default(0)
+  isPrimary Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  @@index([productId])
+  @@index([isPrimary])
+  @@index([imageType])
+}
+
+model ProductBatch {
+  id               String   @id @default(cuid())
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  batchNumber      String
+  quantity         Int
+  manufacturedDate DateTime?
+  expiryDate       DateTime?
+  receivedDate     DateTime @default(now())
+  supplierInvoice  String?
+  notes            String?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  @@unique([productId, batchNumber])
+  @@index([productId])
+  @@index([expiryDate])
+  @@index([isActive])
 }
 
 // =============================================================================

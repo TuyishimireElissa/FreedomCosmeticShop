@@ -23,6 +23,8 @@
     "next-env.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
+    "scripts/import-real-products.ts",
+    "scripts/seed.ts",
     "app/**/*.ts",
     "app/**/*.tsx",
     "components/**/*.ts",

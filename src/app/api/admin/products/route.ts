@@ -25,7 +25,16 @@ const CreateProductSchema = z.object({
   price: z.number().int().min(0),
   compareAt: z.number().int().min(0).optional().nullable(),
   stock: z.number().int().min(0).default(0),
-  sku: z.string().optional().nullable(),
+  lowStockThreshold: z.number().int().min(0).default(5),
+  sku: z.string().max(100).optional().nullable(),
+  realSku: z.string().max(100).optional().nullable(),
+  costPrice: z.number().int().min(0).optional().nullable(),
+  supplierId: z.string().optional().nullable(),
+  manufacturedDate: z.string().datetime().optional().nullable(),
+  expiryDate: z.string().datetime().optional().nullable(),
+  periodAfterOpening: z.number().int().min(1).max(120).optional().nullable(),
+  batchNumber: z.string().max(100).optional().nullable(),
+  volume: z.string().max(100).optional().nullable(),
   brandId: z.string().optional().nullable(),
   categoryId: z.string().min(1),
   images: z.array(z.string().url()).min(1),
@@ -38,6 +47,16 @@ const CreateProductSchema = z.object({
   featured: z.boolean().default(false),
   isActive: z.boolean().default(true),
 })
+
+function addProfitInfo<T extends { price: number; costPrice: number | null }>(product: T) {
+  if (product.costPrice === null || product.price <= 0) return product
+  const profitAmount = product.price - product.costPrice
+  return {
+    ...product,
+    profitAmount,
+    profitMargin: Math.round((profitAmount / product.price) * 1000) / 10,
+  }
+}
 
 function slugify(s: string) {
   return s
@@ -61,16 +80,25 @@ export async function GET(req: Request) {
     const where: Prisma.ProductWhereInput = { isDeleted: false }
     if (search) {
       where.OR = [
-        { name: { contains: search } },
-        { sku: { contains: search } },
-        { brand: { name: { contains: search } } },
+        { name: { contains: search, mode: "insensitive" } },
+        { sku: { contains: search, mode: "insensitive" } },
+        { realSku: { contains: search, mode: "insensitive" } },
+        { batchNumber: { contains: search, mode: "insensitive" } },
+        { supplier: { name: { contains: search, mode: "insensitive" } } },
+        { brand: { name: { contains: search, mode: "insensitive" } } },
       ]
     }
 
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
-        include: { category: true, brand: true },
+        include: {
+          category: true,
+          brand: true,
+          supplier: true,
+          productImages: { orderBy: { sortOrder: "asc" } },
+          batches: { orderBy: { createdAt: "desc" }, take: 5 },
+        },
         orderBy: { createdAt: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,
@@ -78,7 +106,7 @@ export async function GET(req: Request) {
       prisma.product.count({ where }),
     ])
 
-    const serialized = products.map((p) => ({
+    const serialized = products.map((p) => addProfitInfo({
       ...p,
       images: JSON.parse(p.images) as string[],
       skinType: p.skinType ? JSON.parse(p.skinType) : null,
@@ -139,7 +167,16 @@ export async function POST(req: Request) {
         price: data.price,
         compareAt: data.compareAt ?? null,
         stock: data.stock,
+        lowStockThreshold: data.lowStockThreshold,
         sku: data.sku || null,
+        realSku: data.realSku || null,
+        costPrice: data.costPrice ?? null,
+        supplierId: data.supplierId || null,
+        manufacturedDate: data.manufacturedDate ? new Date(data.manufacturedDate) : null,
+        expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+        periodAfterOpening: data.periodAfterOpening ?? null,
+        batchNumber: data.batchNumber || null,
+        volume: data.volume || null,
         brandId: data.brandId || null,
         categoryId: data.categoryId,
         images: JSON.stringify(data.images),
@@ -151,7 +188,7 @@ export async function POST(req: Request) {
         warnings: data.warnings || null,
         featured: data.featured,
         isActive: data.isActive,
-        isNew: true,
+        isNew: false,
         rating: 0,
         reviewsCount: 0,
       },

@@ -83,7 +83,6 @@ import {
   LayoutDashboard,
   Bell,
   RefreshCw,
-  Trash2,
   CheckCircle2,
   XCircle,
   Search,
@@ -390,22 +389,6 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
     }
   }
 
-  // ─── Reseed ──────────────────────────────────────────────────────
-  const handleReseed = async () => {
-    if (!window.confirm("Reset catalog to demo data? Orders will be preserved.")) return
-    try {
-      const res = await fetch("/api/seed", { method: "POST" })
-      if (!res.ok) throw new Error("Seed failed")
-      toast({ title: "Database re-seeded" })
-    } catch (e) {
-      toast({
-        title: "Seed failed",
-        description: e instanceof Error ? e.message : "Unknown error",
-        variant: "destructive",
-      })
-    }
-  }
-
   const orderStats = {
     total: orders.length,
     pending: orders.filter((o) => o.status === "PENDING").length,
@@ -645,11 +628,6 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
 
             {/* Real-time notifications */}
             <RealTimeNotifications />
-
-            {/* Reset button */}
-            <Button variant="outline" size="sm" onClick={handleReseed} className="hidden sm:inline-flex">
-              <Trash2 className="mr-1.5 h-4 w-4" /> Reset
-            </Button>
 
             {/* Admin profile dropdown — NEW */}
             <DropdownMenu>

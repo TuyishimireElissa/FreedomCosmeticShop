@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth'
+import { PUBLIC_PRODUCT_SELECT, getRealUnitSales, serializePublicProduct } from '@/lib/public-product'
 
 const itemSchema = z.object({ productId: z.string().min(1), quantity: z.number().int().min(1).max(99) })
 function fail(error: string, status: number) { return NextResponse.json({ success: false, error }, { status }) }
@@ -12,8 +13,20 @@ async function recalculate(cartId: string) { const items = await prisma.cartItem
 export async function GET() {
   try {
     const user = await requireAuth(); if (!user) return fail('Unauthorized', 401)
-    const cart = await prisma.cart.findUnique({ where: { userId: user.id }, include: { items: { include: { product: { include: { brand: true, category: true } } } } } })
-    const data = cart ? { ...cart, items: cart.items.map((item) => ({ ...item, product: { ...item.product, images: safeParse(item.product.images) } })) } : { items: [], totalItems: 0, subtotal: 0 }
+    const cart = await prisma.cart.findUnique({
+      where: { userId: user.id },
+      include: { items: { include: { product: { select: PUBLIC_PRODUCT_SELECT } } } },
+    })
+    const sales = await getRealUnitSales(cart?.items.map((item) => item.productId) || [])
+    const data = cart
+      ? {
+          ...cart,
+          items: cart.items.map((item) => ({
+            ...item,
+            product: serializePublicProduct(item.product, sales.get(item.productId) || 0),
+          })),
+        }
+      : { items: [], totalItems: 0, subtotal: 0 }
     return NextResponse.json({ success: true, data: { cart: data }, cart: data })
   } catch (error) { console.error('Cart GET error:', error); return fail('Failed to fetch cart', 500) }
 }
@@ -54,4 +67,3 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ success: true, data: { cart: updated }, cart: updated })
   } catch (error) { console.error('Cart DELETE error:', error); return fail('Failed to remove cart item', 500) }
 }
-function safeParse(value: string) { try { return JSON.parse(value) } catch { return [] } }

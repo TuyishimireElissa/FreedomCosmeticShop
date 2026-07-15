@@ -63,9 +63,24 @@ import {
   Tag,
 } from "lucide-react"
 import { WholesalePricingPanel } from "./WholesalePricingPanel"
+import AdminProductImageManager from "./AdminProductImageManager"
 
 interface AdminProductManagerProps {
   onStatsUpdate?: () => void
+}
+
+interface SupplierOption { id: string; name: string }
+interface ProductBatchSummary { id: string; batchNumber: string; quantity: number; expiryDate: string | null; receivedDate: string }
+interface AdminProduct extends Product {
+  supplierId?: string | null
+  supplier?: SupplierOption | null
+  realSku?: string | null
+  manufacturedDate?: string | null
+  expiryDate?: string | null
+  batchNumber?: string | null
+  profitAmount?: number
+  profitMargin?: number
+  batches?: ProductBatchSummary[]
 }
 
 interface ProductFormState {
@@ -75,8 +90,17 @@ interface ProductFormState {
   description: string
   price: string
   compareAt: string
+  costPrice: string
   stock: string
+  lowStockThreshold: string
   sku: string
+  realSku: string
+  supplierId: string
+  batchNumber: string
+  manufacturedDate: string
+  expiryDate: string
+  periodAfterOpening: string
+  volume: string
   categoryId: string
   brandId: string
   images: string[]
@@ -93,14 +117,27 @@ interface ProductFormState {
   isActive: boolean
 }
 
+function getAdminPrimaryImage(product: AdminProduct) {
+  return product.productImages?.find((image) => image.isPrimary)?.url || product.productImages?.[0]?.url || product.images?.[0] || ''
+}
+
 const EMPTY_FORM: ProductFormState = {
   name: "",
   shortDescription: "",
   description: "",
   price: "",
   compareAt: "",
+  costPrice: "",
   stock: "0",
+  lowStockThreshold: "5",
   sku: "",
+  realSku: "",
+  supplierId: "none",
+  batchNumber: "",
+  manufacturedDate: "",
+  expiryDate: "",
+  periodAfterOpening: "",
+  volume: "",
   categoryId: "",
   brandId: "",
   images: [],
@@ -120,9 +157,10 @@ const EMPTY_FORM: ProductFormState = {
 export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps) {
   const { toast } = useToast()
 
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<AdminProduct[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
+  const [suppliers, setSuppliers] = useState<SupplierOption[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
 
@@ -135,21 +173,30 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   const [form, setForm] = useState<ProductFormState>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
 
-  const [deleteTarget, setDeleteTarget] = useState<Product | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<AdminProduct | null>(null)
   const [deleting, setDeleting] = useState(false)
 
   // Section 3: Wholesale pricing modal
-  const [pricingTarget, setPricingTarget] = useState<Product | null>(null)
+  const [pricingTarget, setPricingTarget] = useState<AdminProduct | null>(null)
+  const [imageTarget, setImageTarget] = useState<AdminProduct | null>(null)
+  const [batchTarget, setBatchTarget] = useState<AdminProduct | null>(null)
+  const [batchForm, setBatchForm] = useState({ batchNumber: "", quantity: "", manufacturedDate: "", expiryDate: "", supplierInvoice: "", notes: "" })
+  const [receivingBatch, setReceivingBatch] = useState(false)
+  const [showSupplierForm, setShowSupplierForm] = useState(false)
+  const [supplierForm, setSupplierForm] = useState({ name: "", email: "", phone: "", country: "" })
+  const [savingSupplier, setSavingSupplier] = useState(false)
 
   // Load categories + brands once
   useEffect(() => {
     Promise.all([
       fetch("/api/categories").then((r) => r.json()),
       fetch("/api/brands").then((r) => r.json()),
+      fetch("/api/admin/suppliers").then((r) => r.ok ? r.json() : { suppliers: [] }),
     ])
-      .then(([cats, brs]) => {
+      .then(([cats, brs, supplierData]) => {
         setCategories(cats.categories || [])
         setBrands(brs.brands || [])
+        setSuppliers(supplierData.suppliers || [])
       })
       .catch((e) => console.error(e))
   }, [])
@@ -190,7 +237,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     setShowForm(true)
   }
 
-  const openEdit = (product: Product) => {
+  const openEdit = (product: AdminProduct) => {
     setForm({
       id: product.id,
       name: product.name,
@@ -198,8 +245,17 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       description: product.description,
       price: String(product.price),
       compareAt: product.compareAt ? String(product.compareAt) : "",
+      costPrice: product.costPrice !== null ? String(product.costPrice) : "",
       stock: String(product.stock),
+      lowStockThreshold: String(product.lowStockThreshold),
       sku: product.sku || "",
+      realSku: product.realSku || "",
+      supplierId: product.supplierId || "none",
+      batchNumber: product.batchNumber || "",
+      manufacturedDate: product.manufacturedDate?.slice(0, 10) || "",
+      expiryDate: product.expiryDate?.slice(0, 10) || "",
+      periodAfterOpening: product.periodAfterOpening ? String(product.periodAfterOpening) : "",
+      volume: product.volume || "",
       categoryId: product.categoryId,
       brandId: product.brandId || "",
       images: product.images || [],
@@ -227,6 +283,10 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       })
       return
     }
+    if (form.manufacturedDate && form.expiryDate && form.expiryDate <= form.manufacturedDate) {
+      toast({ title: "Invalid inventory dates", description: "Expiry date must be after the manufacturing date.", variant: "destructive" })
+      return
+    }
     if (form.images.length === 0) {
       toast({
         title: "Image required",
@@ -244,8 +304,17 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
         description: form.description,
         price: Number(form.price),
         compareAt: form.compareAt ? Number(form.compareAt) : null,
+        costPrice: form.costPrice ? Number(form.costPrice) : null,
         stock: Number(form.stock) || 0,
+        lowStockThreshold: Number(form.lowStockThreshold) || 0,
         sku: form.sku || null,
+        realSku: form.realSku || null,
+        supplierId: form.supplierId === "none" ? null : form.supplierId,
+        batchNumber: form.batchNumber || null,
+        manufacturedDate: form.manufacturedDate ? new Date(`${form.manufacturedDate}T00:00:00.000Z`).toISOString() : null,
+        expiryDate: form.expiryDate ? new Date(`${form.expiryDate}T00:00:00.000Z`).toISOString() : null,
+        periodAfterOpening: form.periodAfterOpening ? Number(form.periodAfterOpening) : null,
+        volume: form.volume || null,
         categoryId: form.categoryId,
         brandId: form.brandId || null,
         images: form.images,
@@ -316,8 +385,61 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     }
   }
 
+  const createSupplier = async () => {
+    if (supplierForm.name.trim().length < 2) return
+    setSavingSupplier(true)
+    try {
+      const response = await fetch("/api/admin/suppliers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...supplierForm, email: supplierForm.email || null, phone: supplierForm.phone || null, country: supplierForm.country || null }) })
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(result.error || "Supplier creation failed")
+      const supplier = result.supplier as SupplierOption
+      setSuppliers((current) => [...current, supplier].sort((a, b) => a.name.localeCompare(b.name)))
+      setForm((current) => ({ ...current, supplierId: supplier.id }))
+      setSupplierForm({ name: "", email: "", phone: "", country: "" })
+      setShowSupplierForm(false)
+      toast({ title: "Supplier created", description: supplier.name })
+    } catch (error) {
+      toast({ title: "Supplier creation failed", description: error instanceof Error ? error.message : "Unknown error", variant: "destructive" })
+    } finally {
+      setSavingSupplier(false)
+    }
+  }
+
+  const receiveBatch = async () => {
+    if (!batchTarget || !batchForm.batchNumber || Number(batchForm.quantity) < 1) {
+      toast({ title: "Batch number and quantity are required", variant: "destructive" })
+      return
+    }
+    setReceivingBatch(true)
+    try {
+      const response = await fetch(`/api/admin/products/${batchTarget.id}/batches`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          batchNumber: batchForm.batchNumber,
+          quantity: Number(batchForm.quantity),
+          manufacturedDate: batchForm.manufacturedDate ? new Date(`${batchForm.manufacturedDate}T00:00:00.000Z`).toISOString() : null,
+          expiryDate: batchForm.expiryDate ? new Date(`${batchForm.expiryDate}T00:00:00.000Z`).toISOString() : null,
+          supplierInvoice: batchForm.supplierInvoice || null,
+          notes: batchForm.notes || null,
+        }),
+      })
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(result.error || "Batch receipt failed")
+      toast({ title: "Inventory received", description: `${batchForm.quantity} units added to ${batchTarget.name}` })
+      setBatchTarget(null)
+      setBatchForm({ batchNumber: "", quantity: "", manufacturedDate: "", expiryDate: "", supplierInvoice: "", notes: "" })
+      await loadProducts()
+      onStatsUpdate?.()
+    } catch (error) {
+      toast({ title: "Inventory update failed", description: error instanceof Error ? error.message : "Unknown error", variant: "destructive" })
+    } finally {
+      setReceivingBatch(false)
+    }
+  }
+
   // Quick stock toggle
-  const toggleActive = async (product: Product) => {
+  const toggleActive = async (product: AdminProduct) => {
     try {
       const res = await fetch(`/api/admin/products/${product.id}`, {
         method: "PUT",
@@ -340,15 +462,24 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   }
 
   // NEW: Duplicate a product (opens create form pre-filled with product data)
-  const handleDuplicate = (product: Product) => {
+  const handleDuplicate = (product: AdminProduct) => {
     setForm({
       name: `${product.name} (Copy)`,
       shortDescription: product.shortDescription || "",
       description: product.description,
       price: String(product.price),
       compareAt: product.compareAt ? String(product.compareAt) : "",
+      costPrice: product.costPrice !== null ? String(product.costPrice) : "",
       stock: String(product.stock),
-      sku: product.sku || "",
+      lowStockThreshold: String(product.lowStockThreshold),
+      sku: "",
+      realSku: "",
+      supplierId: product.supplierId || "none",
+      batchNumber: "",
+      manufacturedDate: "",
+      expiryDate: "",
+      periodAfterOpening: product.periodAfterOpening ? String(product.periodAfterOpening) : "",
+      volume: product.volume || "",
       categoryId: product.categoryId,
       brandId: product.brandId || "",
       images: product.images || [],
@@ -397,8 +528,8 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   const filteredProducts = products.filter((p) => {
     if (categoryFilter !== "all" && p.categoryId !== categoryFilter) return false
     if (brandFilter !== "all" && p.brandId !== brandFilter) return false
-    if (stockFilter === "in" && p.stock <= 5) return false
-    if (stockFilter === "low" && (p.stock === 0 || p.stock > 5)) return false
+    if (stockFilter === "in" && p.stock <= p.lowStockThreshold) return false
+    if (stockFilter === "low" && (p.stock === 0 || p.stock > p.lowStockThreshold)) return false
     if (stockFilter === "out" && p.stock !== 0) return false
     return true
   })
@@ -508,9 +639,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2">
                         <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary/30">
-                          {p.images[0] && (
+                          {getAdminPrimaryImage(p) && (
                             <img
-                              src={p.images[0]}
+                              src={getAdminPrimaryImage(p)}
                               alt={p.name}
                               className="h-full w-full object-cover"
                             />
@@ -521,6 +652,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                           <p className="text-xs text-muted-foreground">
                             {p.brand?.name || "No brand"}
                             {p.featured && " · ★ Featured"}
+                          </p>
+                          <p className="line-clamp-1 text-xs text-muted-foreground">
+                            {p.realSku || p.sku || "No SKU"}{p.supplier?.name ? ` · ${p.supplier.name}` : ""}
                           </p>
                         </div>
                       </div>
@@ -533,19 +667,24 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                           RWF {p.compareAt.toLocaleString()}
                         </p>
                       )}
+                      {p.costPrice !== null && <p className="text-xs text-muted-foreground">Cost: RWF {p.costPrice.toLocaleString()}</p>}
+                      {p.profitMargin !== undefined && <p className={`text-xs font-medium ${p.profitMargin < 0 ? "text-destructive" : "text-emerald-600"}`}>{p.profitMargin}% margin</p>}
                     </td>
                     <td className="px-3 py-3 text-right">
                       <span
                         className={
                           p.stock === 0
                             ? "text-destructive"
-                            : p.stock <= 5
+                            : p.stock <= p.lowStockThreshold
                             ? "text-amber-600"
                             : ""
                         }
                       >
                         {p.stock}
                       </span>
+                      <p className="text-xs text-muted-foreground">Alert at {p.lowStockThreshold}</p>
+                      {p.batchNumber && <p className="text-xs text-muted-foreground">Batch {p.batchNumber}</p>}
+                      {p.expiryDate && <p className={`text-xs ${new Date(p.expiryDate).getTime() <= Date.now() ? "font-semibold text-destructive" : "text-muted-foreground"}`}>Expiry {new Date(p.expiryDate).toLocaleDateString("en-RW")}</p>}
                     </td>
                     <td className="px-3 py-3">
                       <button onClick={() => toggleActive(p)}>
@@ -567,6 +706,26 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                           aria-label={`Edit ${p.name}`}
                         >
                           <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-[#B76E79] hover:bg-rose-50"
+                          onClick={() => setImageTarget(p)}
+                          aria-label={`Manage images for ${p.name}`}
+                          title="Manage product images"
+                        >
+                          <ImagePlus className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-emerald-700 hover:bg-emerald-50"
+                          onClick={() => { setBatchTarget(p); setBatchForm({ batchNumber: p.batchNumber || "", quantity: "", manufacturedDate: "", expiryDate: "", supplierInvoice: "", notes: "" }) }}
+                          aria-label={`Receive inventory for ${p.name}`}
+                          title="Receive inventory batch"
+                        >
+                          <Package className="h-4 w-4" />
                         </Button>
                         {/* Section 3: Wholesale pricing button */}
                         <Button
@@ -691,6 +850,23 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
               </div>
             </div>
 
+            <div className="rounded-xl border border-amber-200 bg-amber-50/40 p-4">
+              <h3 className="font-semibold text-amber-950">Private inventory and margin</h3>
+              <p className="mt-1 text-xs text-amber-800">Cost, supplier, batch, manufacturing, and expiry details are visible only to administrators.</p>
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div><Label htmlFor="p-cost">Cost price (RWF)</Label><Input id="p-cost" type="number" min="0" value={form.costPrice} onChange={(e) => setForm({ ...form, costPrice: e.target.value })} /></div>
+                <div><Label htmlFor="p-threshold">Low-stock threshold</Label><Input id="p-threshold" type="number" min="0" value={form.lowStockThreshold} onChange={(e) => setForm({ ...form, lowStockThreshold: e.target.value })} /></div>
+                <div><Label htmlFor="p-real-sku">Distributor SKU</Label><Input id="p-real-sku" value={form.realSku} onChange={(e) => setForm({ ...form, realSku: e.target.value })} /></div>
+                <div><div className="flex items-center justify-between"><Label>Supplier</Label><button type="button" onClick={() => setShowSupplierForm(true)} className="text-xs font-medium text-primary">New supplier</button></div><Select value={form.supplierId} onValueChange={(value) => setForm({ ...form, supplierId: value })}><SelectTrigger><SelectValue placeholder="No supplier" /></SelectTrigger><SelectContent><SelectItem value="none">No supplier</SelectItem>{suppliers.map((supplier) => <SelectItem key={supplier.id} value={supplier.id}>{supplier.name}</SelectItem>)}</SelectContent></Select></div>
+                <div><Label htmlFor="p-batch">Current batch number</Label><Input id="p-batch" value={form.batchNumber} onChange={(e) => setForm({ ...form, batchNumber: e.target.value })} /></div>
+                <div><Label htmlFor="p-volume">Volume / weight label</Label><Input id="p-volume" value={form.volume} onChange={(e) => setForm({ ...form, volume: e.target.value })} placeholder="50 ml" /></div>
+                <div><Label htmlFor="p-manufactured">Manufactured date</Label><Input id="p-manufactured" type="date" value={form.manufacturedDate} onChange={(e) => setForm({ ...form, manufacturedDate: e.target.value })} /></div>
+                <div><Label htmlFor="p-expiry">Expiry date</Label><Input id="p-expiry" type="date" value={form.expiryDate} onChange={(e) => setForm({ ...form, expiryDate: e.target.value })} /></div>
+                <div><Label htmlFor="p-pao">Use after opening (months)</Label><Input id="p-pao" type="number" min="1" max="120" value={form.periodAfterOpening} onChange={(e) => setForm({ ...form, periodAfterOpening: e.target.value })} /></div>
+              </div>
+              {form.costPrice && form.price && <p className={`mt-3 text-sm font-semibold ${Number(form.price) - Number(form.costPrice) < 0 ? "text-destructive" : "text-emerald-700"}`}>Estimated margin: {Number(form.price) > 0 ? (((Number(form.price) - Number(form.costPrice)) / Number(form.price)) * 100).toFixed(1) : "0.0"}% · RWF {(Number(form.price) - Number(form.costPrice)).toLocaleString()}</p>}
+            </div>
+
             {/* Category + Brand + SKU */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               <div>
@@ -798,7 +974,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 </div>
               )}
               <p className="mt-1 text-xs text-muted-foreground">
-                Paste image URLs. In production, integrate Cloudinary upload.
+Legacy URL images. Save the product, then use “Manage product images” for structured Cloudinary uploads, image types, bilingual alt text, and primary-image selection.
               </p>
             </div>
 
@@ -1058,6 +1234,48 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {imageTarget && (
+        <Dialog open={!!imageTarget} onOpenChange={(open) => !open && setImageTarget(null)}>
+          <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
+            <DialogHeader><DialogTitle>Product images — {imageTarget.name}</DialogTitle></DialogHeader>
+            <AdminProductImageManager productId={imageTarget.id} productName={imageTarget.name} onChanged={() => void loadProducts()} />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      <Dialog open={showSupplierForm} onOpenChange={setShowSupplierForm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>Add supplier</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label htmlFor="supplier-name">Supplier name *</Label><Input id="supplier-name" value={supplierForm.name} onChange={(e) => setSupplierForm({ ...supplierForm, name: e.target.value })} /></div>
+            <div><Label htmlFor="supplier-email">Email</Label><Input id="supplier-email" type="email" value={supplierForm.email} onChange={(e) => setSupplierForm({ ...supplierForm, email: e.target.value })} /></div>
+            <div><Label htmlFor="supplier-phone">Phone</Label><Input id="supplier-phone" value={supplierForm.phone} onChange={(e) => setSupplierForm({ ...supplierForm, phone: e.target.value })} /></div>
+            <div><Label htmlFor="supplier-country">Country</Label><Input id="supplier-country" value={supplierForm.country} onChange={(e) => setSupplierForm({ ...supplierForm, country: e.target.value })} /></div>
+          </div>
+          <DialogFooter><Button variant="outline" onClick={() => setShowSupplierForm(false)}>Cancel</Button><Button onClick={createSupplier} disabled={savingSupplier || supplierForm.name.trim().length < 2}>{savingSupplier && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Create supplier</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {batchTarget && (
+        <Dialog open={!!batchTarget} onOpenChange={(open) => !open && setBatchTarget(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader><DialogTitle>Receive inventory — {batchTarget.name}</DialogTitle></DialogHeader>
+            <div className="space-y-4">
+              <p className="rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900">Receiving a batch creates a permanent batch record and increases the current stock by the quantity entered. Do not enter stock already counted.</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div><Label htmlFor="batch-number">Batch number *</Label><Input id="batch-number" value={batchForm.batchNumber} onChange={(e) => setBatchForm({ ...batchForm, batchNumber: e.target.value })} /></div>
+                <div><Label htmlFor="batch-quantity">Quantity received *</Label><Input id="batch-quantity" type="number" min="1" value={batchForm.quantity} onChange={(e) => setBatchForm({ ...batchForm, quantity: e.target.value })} /></div>
+                <div><Label htmlFor="batch-manufactured">Manufactured date</Label><Input id="batch-manufactured" type="date" value={batchForm.manufacturedDate} onChange={(e) => setBatchForm({ ...batchForm, manufacturedDate: e.target.value })} /></div>
+                <div><Label htmlFor="batch-expiry">Expiry date</Label><Input id="batch-expiry" type="date" value={batchForm.expiryDate} onChange={(e) => setBatchForm({ ...batchForm, expiryDate: e.target.value })} /></div>
+              </div>
+              <div><Label htmlFor="batch-invoice">Supplier invoice/reference</Label><Input id="batch-invoice" value={batchForm.supplierInvoice} onChange={(e) => setBatchForm({ ...batchForm, supplierInvoice: e.target.value })} /></div>
+              <div><Label htmlFor="batch-notes">Internal notes</Label><Textarea id="batch-notes" value={batchForm.notes} onChange={(e) => setBatchForm({ ...batchForm, notes: e.target.value })} rows={2} /></div>
+            </div>
+            <DialogFooter><Button variant="outline" onClick={() => setBatchTarget(null)} disabled={receivingBatch}>Cancel</Button><Button onClick={receiveBatch} disabled={receivingBatch}>{receivingBatch && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Receive batch</Button></DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Section 3: Wholesale Pricing Modal */}
       {pricingTarget && (

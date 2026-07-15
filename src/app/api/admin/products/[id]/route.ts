@@ -29,7 +29,15 @@ const UpdateProductSchema = z.object({
   compareAt: z.number().int().min(0).optional().nullable(),
   stock: z.number().int().min(0).optional(),
   lowStockThreshold: z.number().int().min(0).optional(),
-  sku: z.string().optional().nullable(),
+  sku: z.string().max(100).optional().nullable(),
+  realSku: z.string().max(100).optional().nullable(),
+  costPrice: z.number().int().min(0).optional().nullable(),
+  supplierId: z.string().optional().nullable(),
+  manufacturedDate: z.string().datetime().optional().nullable(),
+  expiryDate: z.string().datetime().optional().nullable(),
+  periodAfterOpening: z.number().int().min(1).max(120).optional().nullable(),
+  batchNumber: z.string().max(100).optional().nullable(),
+  volume: z.string().max(100).optional().nullable(),
   brandId: z.string().optional().nullable(),
   categoryId: z.string().optional(),
   images: z.array(z.string().url()).optional(),
@@ -69,7 +77,13 @@ export async function GET(
 
     const product = await db.product.findFirst({
       where: { id, isDeleted: false },
-      include: { category: true, brand: true },
+      include: {
+        category: true,
+        brand: true,
+        supplier: true,
+        productImages: { orderBy: { sortOrder: "asc" } },
+        batches: { orderBy: { createdAt: "desc" }, take: 20 },
+      },
     })
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
@@ -122,6 +136,8 @@ export async function PUT(
 
     // Serialize array fields
     const data: Record<string, unknown> = { ...parsed.data }
+    if (data.manufacturedDate !== undefined) data.manufacturedDate = data.manufacturedDate ? new Date(data.manufacturedDate as string) : null
+    if (data.expiryDate !== undefined) data.expiryDate = data.expiryDate ? new Date(data.expiryDate as string) : null
     if (data.images) data.images = JSON.stringify(data.images)
     if (data.skinType !== undefined) {
       data.skinType = data.skinType ? JSON.stringify(data.skinType) : null
@@ -148,7 +164,13 @@ export async function PUT(
     const updated = await db.product.update({
       where: { id },
       data,
-      include: { category: true, brand: true },
+      include: {
+        category: true,
+        brand: true,
+        supplier: true,
+        productImages: { orderBy: { sortOrder: "asc" } },
+        batches: { orderBy: { createdAt: "desc" }, take: 20 },
+      },
     })
 
     // ─── Section 2: Real-time broadcast with smart event detection ───

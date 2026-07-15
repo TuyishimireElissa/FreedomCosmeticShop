@@ -16,6 +16,10 @@ async function getProduct(slug: string) {
       price: true,
       stock: true,
       images: true,
+      productImages: {
+        select: { url: true, isPrimary: true, sortOrder: true },
+        orderBy: { sortOrder: 'asc' },
+      },
       brand: { select: { name: true } },
       reviews: {
         where: { isApproved: true, isDeleted: false },
@@ -28,7 +32,7 @@ async function getProduct(slug: string) {
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const product = await getProduct(params.slug).catch(() => null)
   if (!product) return { title: 'Product not found' }
-  const images = parseImages(product.images)
+  const images = getMetadataImages(product)
   const description = product.shortDescription || product.description.slice(0, 160)
   return {
     title: product.name,
@@ -55,7 +59,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
     '@type': 'Product',
     name: product.name,
     description: product.shortDescription || product.description,
-    image: parseImages(product.images),
+    image: getMetadataImages(product),
     brand: product.brand ? { '@type': 'Brand', name: product.brand.name } : undefined,
     offers: {
       '@type': 'Offer',
@@ -75,4 +79,13 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
 function parseImages(value: string): string[] {
   try { const images = JSON.parse(value); return Array.isArray(images) ? images : [] } catch { return [] }
+}
+
+function getMetadataImages(product: { images: string; productImages: Array<{ url: string; isPrimary: boolean; sortOrder: number }> }) {
+  if (product.productImages.length > 0) {
+    return [...product.productImages]
+      .sort((left, right) => Number(right.isPrimary) - Number(left.isPrimary) || left.sortOrder - right.sortOrder)
+      .map((image) => image.url)
+  }
+  return parseImages(product.images)
 }

@@ -9,7 +9,8 @@ import type { Product } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
 import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
-import { useT } from '@/lib/i18n/LanguageContext'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { getCloudinaryUrl, getImageSizes, getProductPrimaryImage } from '@/lib/cloudinary-images'
 
 interface ProductGridProps {
   products: Product[]
@@ -19,7 +20,7 @@ interface ProductGridProps {
 }
 
 export default function ProductGrid({ products, loading = false, error, onRetry }: ProductGridProps) {
-  const t = useT()
+  const { t, language } = useLanguage()
   const addToCart = useStore((state) => state.addToCart)
   const user = useStore((state) => state.user)
   const router = useRouter()
@@ -65,16 +66,21 @@ export default function ProductGrid({ products, loading = false, error, onRetry 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
       {products.map((product) => {
-        const image = product.images?.[0]
+        const primaryImage = getProductPrimaryImage(product)
+        const image = primaryImage?.publicId
+          ? getCloudinaryUrl(primaryImage.publicId, 'CARD_DESKTOP')
+          : primaryImage?.url || ''
+        const imageAlt = language === 'rw' && primaryImage?.altTextRw ? primaryImage.altTextRw : primaryImage?.altText || product.name
         const discount = product.compareAt && product.compareAt > product.price ? Math.round((1 - product.price / product.compareAt) * 100) : 0
-        const outOfStock = product.stock < 1
+        const outOfStock = product.isOutOfStock ?? product.stock < 1
+        const lowStock = product.isLowStock ?? (product.stock > 0 && product.stock <= product.lowStockThreshold)
         return (
           <article key={product.id} className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-[0_5px_20px_rgba(26,26,26,0.05)] transition-all hover:-translate-y-1 hover:border-rose-100 hover:shadow-[0_16px_34px_rgba(183,110,121,0.14)]">
             <div className="relative aspect-square overflow-hidden bg-[#f8f9fa]">
               <Link href={`/products/${product.slug}`} className="block h-full">
-                {image ? <Image src={image} alt={product.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" className={`object-cover transition-transform duration-300 group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`} loading="lazy" /> : <div className="grid h-full place-items-center text-xs text-gray-400">{t('product.no_image')}</div>}
+                {image ? <Image src={image} alt={imageAlt} fill sizes={getImageSizes('card')} className={`object-cover transition-transform duration-300 group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`} loading="lazy" /> : <div className="grid h-full place-items-center text-xs text-gray-400">{t('product.no_image')}</div>}
               </Link>
-              <div className="absolute left-2 top-2 flex flex-col gap-1">{discount > 0 && <span className="rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">-{discount}%</span>}{product.isNew && <span className="rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white">{t('common.new')}</span>}{outOfStock && <span className="rounded-full bg-[#1a1a1a] px-2 py-1 text-[10px] font-bold text-white">{t('common.sold_out')}</span>}</div>
+              <div className="absolute left-2 top-2 flex flex-col items-start gap-1">{discount > 0 && <span className="rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">-{discount}%</span>}{product.isNewArrival === true && <span className="rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white">{t('common.new')}</span>}{product.isBestSeller === true && <span className="rounded-full bg-[#B76E79] px-2 py-1 text-[10px] font-bold text-white">🔥 {t('categories.best_sellers')}</span>}{lowStock && <span className="rounded-full bg-amber-500 px-2 py-1 text-[10px] font-bold text-white">{t('common.low_stock', { count: product.stock })}</span>}{outOfStock && <span className="rounded-full bg-[#1a1a1a] px-2 py-1 text-[10px] font-bold text-white">{t('common.sold_out')}</span>}</div>
               <button type="button" onClick={() => toggleWishlist(product.id)} className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-500 shadow-sm hover:text-red-500" aria-label={`${t('product.add_to_wishlist')}: ${product.name}`} aria-pressed={wishlisted.has(product.id)}><Heart className={`h-4 w-4 ${wishlisted.has(product.id) ? 'fill-red-500 text-red-500' : ''}`} /></button>
             </div>
             <div className="flex flex-1 flex-col p-3 sm:p-4">
