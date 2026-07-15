@@ -1,85 +1,104 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { Quote, RefreshCw, Star } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Star } from 'lucide-react'
 import { useT } from '@/lib/i18n/LanguageContext'
 
 interface HomepageReview {
   id: string
   rating: number
   title: string | null
-  body: string | null
+  comment: string
   skinType: string | null
+  isVerified: boolean
   createdAt: string
-  user: { name: string; avatar: string | null } | null
-  product: { name: string; slug: string } | null
+  user: { displayName: string | null }
+  product: { name: string; slug: string }
 }
 
-interface ReviewResponse {
-  reviews: HomepageReview[]
-  stats: { total: number; average: number }
+interface ReviewStats {
+  totalReviews: number
+  averageRating: number
+  verifiedCount: number
 }
+
+const KNOWN_SKIN_TYPES = new Set(['OILY', 'DRY', 'COMBINATION', 'NORMAL', 'SENSITIVE', 'ALL'])
 
 export function ReviewsSection() {
   const t = useT()
-  const [data, setData] = useState<ReviewResponse | null>(null)
+  const [reviews, setReviews] = useState<HomepageReview[]>([])
+  const [stats, setStats] = useState<ReviewStats | null>(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await fetch('/api/reviews?limit=6', { cache: 'no-store' })
-      if (!response.ok) throw new Error(t('home.reviews_unavailable'))
-      setData(await response.json())
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : t('home.reviews_load_failed'))
-    } finally {
-      setLoading(false)
-    }
-  }, [t])
 
   useEffect(() => {
-    load()
-  }, [load])
+    const controller = new AbortController()
+
+    fetch('/api/reviews/homepage?limit=3', { cache: 'no-store', signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error()
+        return response.json()
+      })
+      .then((data) => {
+        if (data.success && data.data) {
+          setReviews(data.data.reviews || [])
+          setStats(data.data.stats || null)
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false)
+      })
+
+    return () => controller.abort()
+  }, [])
+
+  if (loading || !stats || reviews.length < 3 || stats.totalReviews < 3) return null
 
   return (
-    <section className="bg-gradient-to-b from-[#f8f9fa] to-white py-12 sm:py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto mb-8 max-w-2xl text-center">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#B76E79]">{t('home.real_stories')}</span>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[#1a1a1a] sm:text-3xl">{t('home.loved_rwanda')}</h2>
-          <p className="mt-2 text-sm leading-6 text-gray-500">{t('home.verified_experiences')}</p>
-          {!loading && data && data.stats.total > 0 && <div className="mt-4 flex items-center justify-center gap-2"><div className="flex">{[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= Math.round(data.stats.average) ? 'fill-[#FFD700] text-[#FFD700]' : 'fill-gray-200 text-gray-200'}`} />)}</div><span className="text-sm font-bold">{data.stats.average.toFixed(1)}/5</span><span className="text-xs text-gray-400">{t('product.reviews_count', { count: data.stats.total })}</span></div>}
+    <section className="bg-gray-50 px-4 py-8 md:py-12">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="mb-2 text-xl font-bold text-gray-900 md:text-2xl">{t('home.section_reviews')}</h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex" aria-label={t('home.rating_stars', { rating: stats.averageRating })}>
+                {[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= Math.round(stats.averageRating) ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`} aria-hidden="true" />)}
+              </div>
+              <span className="text-sm font-bold text-gray-900">{stats.averageRating.toFixed(1)}</span>
+              <span className="text-sm text-gray-500">{t('product.reviews_count', { count: stats.totalReviews })}</span>
+              {stats.verifiedCount > 0 && <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">{t('home.verified_reviews_count', { count: stats.verifiedCount })}</span>}
+            </div>
+          </div>
         </div>
 
-        {loading ? (
-          <div className="grid gap-4 md:grid-cols-3">{[0, 1, 2].map((index) => <div key={index} className="h-64 animate-pulse rounded-3xl border border-gray-100 bg-white shadow-sm" />)}</div>
-        ) : error ? (
-          <div className="rounded-3xl border border-dashed border-rose-200 bg-white px-5 py-10 text-center"><Quote className="mx-auto h-8 w-8 text-[#B76E79]" /><p className="mt-3 text-sm font-semibold text-gray-800">{t('home.stories_unavailable')}</p><button type="button" onClick={load} className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#1a1a1a] px-4 py-2 text-xs font-bold text-white"><RefreshCw className="h-3.5 w-3.5" />{t('home.retry_reviews')}</button></div>
-        ) : !data || data.reviews.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-gray-200 bg-white px-5 py-10 text-center"><Quote className="mx-auto h-8 w-8 text-gray-300" /><p className="mt-3 text-sm font-semibold text-gray-700">{t('home.first_share_experience')}</p></div>
-        ) : (
-          <div className="scrollbar-hide -mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-3 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0">
-            {data.reviews.slice(0, 6).map((review) => {
-              const name = review.user?.name || t('product.verified_customer')
-              return (
-                <article key={review.id} className="relative flex min-w-[84vw] snap-center flex-col rounded-3xl border border-gray-100 bg-white p-5 shadow-[0_8px_30px_rgba(26,26,26,0.06)] sm:min-w-[360px] md:min-w-0">
-                  <Quote className="absolute right-5 top-5 h-9 w-9 text-[#B76E79]/12" />
-                  <div className="flex" aria-label={t('home.rating_stars', { rating: review.rating })}>{[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= review.rating ? 'fill-[#FFD700] text-[#FFD700]' : 'fill-gray-200 text-gray-200'}`} />)}</div>
-                  {review.title && <h3 className="mt-4 pr-8 text-sm font-bold text-[#1a1a1a]">{review.title}</h3>}
-                  <p className="mt-2 line-clamp-5 flex-1 text-sm leading-6 text-gray-600">“{review.body || t('home.wonderful_experience')}”</p>
-                  {review.product && <p className="mt-4 truncate text-xs font-bold text-[#B76E79]">{t('home.purchased_product', { product: review.product.name })}</p>}
-                  <div className="mt-4 flex items-center gap-3 border-t border-gray-100 pt-4">
-                    {review.user?.avatar ? <img src={review.user.avatar} alt="" className="h-10 w-10 rounded-full object-cover" /> : <span className="grid h-10 w-10 place-items-center rounded-full bg-[#B76E79] text-sm font-bold text-white">{name.charAt(0).toUpperCase()}</span>}
-                    <div><p className="text-sm font-bold text-gray-800">{name}</p><p className="text-[10px] font-medium uppercase tracking-wider text-emerald-600">✓ {t('product.verified_customer')}</p></div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {reviews.slice(0, 3).map((review) => {
+            const displayName = review.user.displayName || t('checkout.customer')
+            return (
+              <article key={review.id} className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex" aria-label={t('home.rating_stars', { rating: review.rating })}>
+                  {[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-3.5 w-3.5 ${star <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`} aria-hidden="true" />)}
+                </div>
+
+                {review.title && <h3 className="mb-1 text-sm font-bold text-gray-900">{review.title}</h3>}
+                <p className="mb-3 line-clamp-4 text-sm leading-relaxed text-gray-600">“{review.comment}”</p>
+
+                <div className="flex items-center justify-between gap-3 border-t border-gray-100 pt-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#B76E79]/20 text-xs font-bold text-[#B76E79]">{displayName.charAt(0).toUpperCase()}</span>
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-semibold text-gray-900">{displayName}</p>
+                      {review.skinType && KNOWN_SKIN_TYPES.has(review.skinType) && <p className="text-xs text-gray-500">{t(`skin_types.${review.skinType}`)}</p>}
+                    </div>
                   </div>
-                </article>
-              )
-            })}
-          </div>
-        )}
+                  {review.isVerified && <span className="shrink-0 text-xs font-medium text-green-700">✓ {t('product.verified_purchase')}</span>}
+                </div>
+
+                <p className="mt-2 line-clamp-1 text-xs text-gray-500">{t('home.purchased_product', { product: review.product.name })}</p>
+              </article>
+            )
+          })}
+        </div>
       </div>
     </section>
   )

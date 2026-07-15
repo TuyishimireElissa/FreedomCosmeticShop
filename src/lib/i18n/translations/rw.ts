@@ -64,7 +64,11 @@ export const rw = {
     genuine_beauty_products: 'Ibicuruzwa by’ubwiza by’umwimerere', // verified-rw
     guides_preparing: 'Inama nshya z’ubwiza zirimo gutegurwa.', // verified-rw
     hero_subtitle: 'Reba ibita ku ruhu, ibikoresho byo kwisiga n’ibita ku musatsi byiza byahitiwe ikirere cy’u Rwanda n’uruhu rukungahaye kuri melanine.', // verified-rw
-    hero_title: 'Ubwiza bw’umwimerere, tukabukugezaho mu Rwanda hose.', // verified-rw
+    hero_title: 'Ubwisanzure mu bwiza bw’u Rwanda 🇷🇼', // verified-rw
+    hero_description: 'Ibicuruzwa by’umwimerere 100%. Ishyura na MTN MoMo. Tukabikugezaho vuba mu Rwanda hose.', // verified-rw
+    hero_cta_primary: 'Haha nonaha', // verified-rw
+    hero_cta_secondary: 'Ibiciro byo kurangura', // verified-rw
+    hero_alt: 'Ibicuruzwa by’ubwiza bya FreedomCosmeticShop mu Rwanda', // verified-rw
     join_wholesale_program: 'Injira muri gahunda yo kurangura ya FreedomCosmeticShop uzigame kugera kuri 30% ku bicuruzwa byose', // verified-rw
     just_arrived: 'Bimaze kuhagera', // verified-rw
     just_arrived_subtitle: 'Ibicuruzwa bishya, amabara agezweho n’ibindi by’ubwiza bishya biboneka mu Rwanda.', // verified-rw
@@ -141,6 +145,37 @@ export const rw = {
 
     weekend_discount: 'IGABANYIRIZWA RYA 15%', // verified-rw
     brand_logo: 'Ikirango cya {brand}', // verified-rw
+
+    copy_code: 'Koporora', // verified-rw
+    coupon_percent: 'Igabanyirizwa rya {value}%', // verified-rw
+    coupon_fixed: 'Igabanyirizwa rya {amount}', // verified-rw
+    coupon_free_shipping: 'Kubigezwaho ku buntu', // verified-rw
+    coupon_minimum: 'Komande ntoya: {amount}', // verified-rw
+    coupon_maximum: 'Igabanyirizwa ntarengwa: {amount}', // verified-rw
+    coupon_per_user: 'Buri mukiriya ayikoresha inshuro {count}', // verified-rw
+    coupon_selected_products: 'Ikoreshwa ku bicuruzwa cyangwa ibyiciro byatoranyijwe gusa', // verified-rw
+    coupon_valid_until: 'Ikoreshwa kugeza ku wa {date}', // verified-rw
+
+    trust_title: 'Kuki wahaha natwe', // verified-rw
+    trust_subtitle: 'Amakuru asobanutse ku kugeza ibicuruzwa, kwishyura, kubisubiza n’ubucuruzi bwacu.', // verified-rw
+    trust_note: 'Twerekana gusa amakuru y’ubucuruzi yemejwe na politiki z’iduka ziriho ubu.', // verified-rw
+    trust_kigali_delivery: '1,000 RWF · Kubigeza uwo munsi aho bishoboka iyo watumije mbere y’isaha yatangajwe.', // verified-rw
+    trust_district_delivery: 'Tugeza ibicuruzwa mu turere 30 twose. Ikiguzi nyacyo kigaragara mu gihe cyo kwishyura.', // verified-rw
+    trust_returns: 'Gusubiza mu minsi {days} ku bicuruzwa byujuje ibisabwa kandi bidafunguye.', // verified-rw
+    trust_payment_providers: 'MTN MoMo · Airtel Money · Visa · Mastercard', // verified-rw
+    trust_authentic_detail: 'Aho ibicuruzwa byavuye n’amakuru y’ibirango bigaragara ku rupapuro rw’igicuruzwa.', // verified-rw
+    trust_registered_business: 'Ubucuruzi bwanditswe', // verified-rw
+    trust_rdb_number: 'RDB: {number}', // verified-rw
+    trust_location: 'Aho ubucuruzi bukorera', // verified-rw
+    trust_location_detail: '{sector}, {district}, Kigali', // verified-rw
+    trust_support_hours: 'Ubufasha kuri WhatsApp: {hours}', // verified-rw
+
+    section_reviews: 'Ibitekerezo by’abakiriya', // verified-rw
+    verified_reviews_count: 'Ubuguzi {count} bwemejwe', // verified-rw
+
+    whatsapp_title: 'Ukeneye ubufasha?', // verified-rw
+    whatsapp_subtitle: 'Ohereza ubutumwa kuri WhatsApp kugira ngo abagufasha bagufashe.', // verified-rw
+    whatsapp_hours: 'Amasaha y’ubufasha: {hours}', // verified-rw
   },
   categories: {
     all: 'Ibicuruzwa byose', skincare: 'Kwita ku ruhu', makeup: 'Ibikoresho byo kwisiga', haircare: 'Kwita ku musatsi', fragrance: 'Imibavu', body_care: 'Kwita ku mubiri', mens: "Ibikoresho by'abagabo", natural: 'Ibikomoka ku bidukikije', gifts: 'Impano', new_arrivals: 'Ibicuruzwa bishya', best_sellers: 'Ibicuruzwa bikunzwe cyane', on_sale: 'Ibyagabanyijwe', // 🔍 REVIEW
@@ -572,6 +607,14 @@ export const rw = {
   },
   delivery: {
     title: 'Amakuru yo kugeza ibicuruzwa', estimate: 'Reba ikiguzi cyo kukugezaho', select_district: 'Hitamo akarere kawe', kigali_same_day: 'Kubigeza uwo munsi', kigali_fee: '1,000 RWF', kigali_time: 'Uyu munsi mbere ya saa kumi n’ebyiri (utumije mbere ya saa munani)', province_fee_north: '3,000 RWF', province_fee_south: '3,000 RWF', province_fee_east: '3,500 RWF', province_fee_west: '4,000 RWF', province_time: 'Iminsi 2-3 y’akazi', west_time: 'Iminsi 3-4 y’akazi', free_above: 'Kubigezwaho ku buntu ku komande irenze 50,000 RWF', free_delivery: 'Kubigezwaho ku buntu! 🎉', spend_more: 'Ongeraho {amount} RWF ubone kubigezwaho ku buntu', cutoff: 'Tumiza mbere ya saa munani ubigezweho uwo munsi', sms_updates: 'Uzajya ubona ubutumwa bwa SMS kuri buri ntambwe', instructions: { title: 'Amabwiriza yo kukugezaho', include_landmark: 'Andika ikimenyetso kiri hafi y’aho uri', be_available: 'Ba uhari cyangwa usige umuntu wakira ibicuruzwa', call_rider: 'Umumotari azaguhamagara mbere yo kuhagera', kigali_areas: 'Muri Kigali: bigerayo uwo munsi iyo utumije mbere ya saa munani', province_areas: 'Mu ntara: iminsi 2-4 y’akazi' }, districts_load_failed: 'Uturere ntitwashoboye gufunguka', estimate_unavailable: 'Ikigereranyo cyo kukugezaho ntikiboneka', // 🔍 REVIEW // verified-rw
+
+    zone_kigali: 'Kigali', // verified-rw
+    zone_north: 'Intara y’Amajyaruguru', // verified-rw
+    zone_south: 'Intara y’Amajyepfo', // verified-rw
+    zone_east: 'Intara y’Iburasirazuba', // verified-rw
+    zone_west: 'Intara y’Iburengerazuba', // verified-rw
+    zone_other: 'Ahandi', // verified-rw
+    business_days: 'Iminsi {days} y’akazi', // verified-rw
   },
   errors: {
     page_not_found: 'Urupapuro ntirubonetse', page_not_found_message: 'Ihangane, uru rupapuro ntirubaho.', go_home: 'Subira ahabanza', browse_products: 'Reba ibicuruzwa', network_error: 'Nta murongo wa interineti uhari. Reba interineti yawe.', server_error: 'Seriveri yagize ikibazo. Ongera ugerageze.', load_failed: 'Ntibyashoboye gufunguka. Ongera ugerageze.', products_load_failed: 'Ibicuruzwa ntibyashoboye gufunguka.', cart_load_failed: 'Igitebo cyawe nticyashoboye gufunguka.', payment_failed: 'Kwishyura ntibyakunze. Ongera ugerageze.', offline: '⚠️ Nta murongo wa interineti', try_again: 'Ongera ugerageze', contact_support: 'Vugana n’abagufasha', // 🔍 REVIEW
