@@ -211,7 +211,7 @@ export async function verifyRegistration(
     throw e
   }
 
-  const otpResult = verifyOtp(phone, "REGISTER", input.code)
+  const otpResult = await verifyOtp(phone, "REGISTER", input.code)
   if (!otpResult.success) {
     throw new Error(otpResult.error || "OTP verification failed")
   }
@@ -346,7 +346,7 @@ export async function verifyOtpLogin(input: VerifyOtpInput): Promise<AuthResult>
     throw e
   }
 
-  const otpResult = verifyOtp(phone, "LOGIN", input.code)
+  const otpResult = await verifyOtp(phone, "LOGIN", input.code)
   if (!otpResult.success) {
     throw new Error(otpResult.error || "OTP verification failed")
   }
@@ -415,7 +415,7 @@ export async function resetPassword(input: ResetPasswordInput): Promise<AuthResu
     throw e
   }
 
-  const otpResult = verifyOtp(phone, "RESET", input.code)
+  const otpResult = await verifyOtp(phone, "RESET", input.code)
   if (!otpResult.success) {
     throw new Error(otpResult.error || "OTP verification failed")
   }

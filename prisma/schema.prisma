@@ -36,6 +36,7 @@
 //  31. ProductImage   — structured Cloudinary product images
 //  32. ProductBatch   — real stock batches and expiry dates
 //  33. SearchLog      — real search-result analytics and product-gap tracking
+//  34. OtpVerification — durable hashed OTP state for serverless authentication
 //
 // PostgreSQL production schema — uses Supabase.
 // =============================================================================
@@ -1288,6 +1289,28 @@ model SearchLog {
   @@index([hasResults])
   @@index([createdAt])
   @@index([sessionId])
+}
+
+// =============================================================================
+// DURABLE OTP VERIFICATION — registration/login/reset across serverless instances
+// =============================================================================
+
+model OtpVerification {
+  id               String   @id @default(cuid())
+  phone            String
+  type             String
+  codeHash         String
+  registrationData Json?
+  ipAddress        String?
+  attempts         Int      @default(0)
+  isUsed           Boolean  @default(false)
+  usedAt           DateTime?
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  @@index([phone, type, isUsed, createdAt])
+  @@index([ipAddress, createdAt])
+  @@index([expiresAt])
 }
 
 // =============================================================================
