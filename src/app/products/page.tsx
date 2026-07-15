@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from 'lucide-
 import type { Brand, Category, Product } from '@/lib/types'
 import ProductGrid from '@/components/products/ProductGrid'
 import ProductFilters, { type ProductFilterState } from '@/components/products/ProductFilters'
+import { useT } from '@/lib/i18n/LanguageContext'
 
 interface Pagination { page: number; pageSize: number; total: number; totalPages: number; hasMore: boolean }
 const emptyFilters: ProductFilterState = { category: '', brand: '', minPrice: '', maxPrice: '', skinType: '', minRating: '', inStock: false }
@@ -15,6 +16,7 @@ export default function ProductsPage() {
 }
 
 function ProductsContent() {
+  const t = useT()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
@@ -98,7 +100,19 @@ function ProductsContent() {
         </div>
       </div>
 
-      {mobileFilters && <div className="fixed inset-0 z-[80] lg:hidden"><button type="button" className="absolute inset-0 bg-black/50" onClick={() => setMobileFilters(false)} aria-label="Close filters" /><aside className="absolute inset-y-0 left-0 w-[min(88vw,360px)] overflow-y-auto bg-white p-5 shadow-2xl"><div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-black">Filter products</h2><button type="button" onClick={() => setMobileFilters(false)} className="grid h-9 w-9 place-items-center rounded-full bg-gray-100"><X className="h-4 w-4" /></button></div><ProductFilters filters={filters} categories={categories} brands={brands} loading={filtersLoading} onChange={changeFilters} onClear={clearFilters} /><button type="button" onClick={() => setMobileFilters(false)} className="sticky bottom-0 mt-6 w-full rounded-xl bg-[#B76E79] py-3 text-sm font-bold text-white">Show {pagination.total} products</button></aside></div>}
+      <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom)+12px)] left-4 right-20 z-30 md:hidden">
+        <button
+          type="button"
+          onClick={() => setMobileFilters(true)}
+          className="flex min-h-12 w-full touch-manipulation items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 shadow-md active:bg-gray-50"
+        >
+          <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+          {t('search.filters')}
+          {activeCount > 0 && <span className="rounded-full bg-[#B76E79] px-2 py-0.5 text-xs font-bold text-white">{activeCount}</span>}
+        </button>
+      </div>
+
+      {mobileFilters && <div className="fixed inset-0 z-[80] lg:hidden"><button type="button" className="absolute inset-0 bg-black/50" onClick={() => setMobileFilters(false)} aria-label="Close filters" /><aside className="scroll-smooth-ios absolute inset-y-0 left-0 w-[min(88vw,360px)] overflow-y-auto bg-white p-5 shadow-2xl"><div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-black">Filter products</h2><button type="button" onClick={() => setMobileFilters(false)} className="grid h-9 w-9 place-items-center rounded-full bg-gray-100"><X className="h-4 w-4" /></button></div><ProductFilters filters={filters} categories={categories} brands={brands} loading={filtersLoading} onChange={changeFilters} onClear={clearFilters} /><button type="button" onClick={() => setMobileFilters(false)} className="sticky bottom-0 mt-6 w-full rounded-xl bg-[#B76E79] py-3 text-sm font-bold text-white">Show {pagination.total} products</button></aside></div>}
     </div>
   )
 }

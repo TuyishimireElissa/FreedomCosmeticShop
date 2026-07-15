@@ -37,7 +37,7 @@ export const LANGUAGES = [
   available: boolean
 }>
 
-export const DEFAULT_LANGUAGE: Language = 'en'
+export const DEFAULT_LANGUAGE: Language = 'rw'
 
 export type TranslationVariables = Record<string, string | number>
 

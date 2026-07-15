@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Toaster } from 'react-hot-toast'
@@ -7,6 +7,12 @@ import SiteChrome from '@/components/layout/SiteChrome'
 import { BUSINESS } from '@/lib/business-config'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+}
 
 export const metadata: Metadata = {
   title: {
@@ -29,7 +35,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(BUSINESS.url),
   openGraph: {
     type: 'website',
-    locale: 'en_RW',
+    locale: 'rw_RW',
     siteName: BUSINESS.name,
     title: `${BUSINESS.name} | Rwanda Beauty Store`,
     description: BUSINESS.description,
@@ -52,7 +58,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="rw">
       <body className={`${inter.className} bg-white text-[#1a1a1a] antialiased`}>
         <Providers>
           <SiteChrome>{children}</SiteChrome>

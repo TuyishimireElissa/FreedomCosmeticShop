@@ -119,7 +119,7 @@ export function RwandaAddressForm({
     <div className={`space-y-4 ${className}`}>
       {/* Full Name */}
       <div>
-        <Label htmlFor="addr-name" className="flex items-center gap-1.5">
+        <Label htmlFor="addr-name" className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
           <User className="h-3.5 w-3.5" /> {t('checkout.full_name')} *
         </Label>
         <Input
@@ -127,13 +127,13 @@ export function RwandaAddressForm({
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           placeholder={t('checkout.full_name_sample')}
-          className="mt-1"
+          className="mt-1 min-h-12 text-base"
         />
       </div>
 
       {/* Phone */}
       <div>
-        <Label htmlFor="addr-phone" className="flex items-center gap-1.5">
+        <Label htmlFor="addr-phone" className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
           <Phone className="h-3.5 w-3.5" /> {t('checkout.phone')} *
         </Label>
         <Input
@@ -142,17 +142,17 @@ export function RwandaAddressForm({
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           placeholder="+250 780 000 001"
-          className="mt-1"
+          className="mt-1 min-h-12 text-base"
         />
       </div>
 
       {/* Province */}
       <div>
-        <Label htmlFor="addr-province" className="flex items-center gap-1.5">
+        <Label htmlFor="addr-province" className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
           <MapPin className="h-3.5 w-3.5" /> {t('checkout.province')} *
         </Label>
         <Select value={province} onValueChange={setProvince}>
-          <SelectTrigger id="addr-province" className="mt-1">
+          <SelectTrigger id="addr-province" className="mt-1 min-h-12 text-base">
             <SelectValue placeholder={t('checkout.province_select')} />
           </SelectTrigger>
           <SelectContent>
@@ -167,7 +167,7 @@ export function RwandaAddressForm({
 
       {/* District (auto-filtered by province) */}
       <div>
-        <Label htmlFor="addr-district" className="flex items-center gap-1.5">
+        <Label htmlFor="addr-district" className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
           <MapPin className="h-3.5 w-3.5" /> {t('checkout.district')} *
         </Label>
         <Select
@@ -178,7 +178,7 @@ export function RwandaAddressForm({
           }}
           disabled={!province}
         >
-          <SelectTrigger id="addr-district" className="mt-1">
+          <SelectTrigger id="addr-district" className="mt-1 min-h-12 text-base">
             <SelectValue placeholder={province ? t('checkout.district_select') : t('checkout.select_province_first')} />
           </SelectTrigger>
           <SelectContent>
@@ -193,9 +193,9 @@ export function RwandaAddressForm({
 
       {/* Sector (auto-filtered by district) */}
       <div>
-        <Label htmlFor="addr-sector">{t('checkout.sector')}</Label>
+        <Label htmlFor="addr-sector" className="text-sm font-medium text-gray-700">{t('checkout.sector')}</Label>
         <Select value={sector} onValueChange={setSector} disabled={!district}>
-          <SelectTrigger id="addr-sector" className="mt-1">
+          <SelectTrigger id="addr-sector" className="mt-1 min-h-12 text-base">
             <SelectValue placeholder={district ? t('checkout.select_sector') : t('checkout.select_district_first')} />
           </SelectTrigger>
           <SelectContent>
@@ -210,19 +210,19 @@ export function RwandaAddressForm({
 
       {/* Cell */}
       <div>
-        <Label htmlFor="addr-cell">{t('checkout.cell_optional')}</Label>
+        <Label htmlFor="addr-cell" className="text-sm font-medium text-gray-700">{t('checkout.cell_optional')}</Label>
         <Input
           id="addr-cell"
           value={cell}
           onChange={(e) => setCell(e.target.value)}
           placeholder={t('checkout.cell_example')}
-          className="mt-1"
+          className="mt-1 min-h-12 text-base"
         />
       </div>
 
       {/* Landmark / Street */}
       <div>
-        <Label htmlFor="addr-landmark" className="flex items-center gap-1.5">
+        <Label htmlFor="addr-landmark" className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
           <Landmark className="h-3.5 w-3.5" /> {t('checkout.landmark')} *
         </Label>
         <Input
@@ -230,13 +230,13 @@ export function RwandaAddressForm({
           value={landmark}
           onChange={(e) => setLandmark(e.target.value)}
           placeholder={t('checkout.landmark_kct_example')}
-          className="mt-1"
+          className="mt-1 min-h-12 text-base"
         />
       </div>
 
       {/* Additional Notes */}
       <div>
-        <Label htmlFor="addr-notes" className="flex items-center gap-1.5">
+        <Label htmlFor="addr-notes" className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
           <MessageSquare className="h-3.5 w-3.5" /> {t('checkout.additional_notes')}
         </Label>
         <Textarea
@@ -245,7 +245,7 @@ export function RwandaAddressForm({
           onChange={(e) => setNotes(e.target.value)}
           placeholder={t('checkout.call_on_arrival')}
           rows={2}
-          className="mt-1"
+          className="mt-1 min-h-12 text-base"
         />
       </div>
 

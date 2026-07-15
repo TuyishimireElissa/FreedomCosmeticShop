@@ -2,16 +2,36 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import dynamic from "next/dynamic"
 import { RefreshCw, ShieldCheck, Sparkles, Smartphone, Truck } from "lucide-react"
 import type { Category, Product } from "@/lib/types"
 import { HeroBanner, type HomeBanner } from "@/components/home/HeroBanner"
 import { CategoryGrid } from "@/components/home/CategoryGrid"
-import { ProductSection } from "@/components/home/ProductSection"
-import { FlashSale } from "@/components/home/FlashSale"
-import { BrandCarousel } from "@/components/home/BrandCarousel"
-import { WholesaleBanner } from "@/components/home/WholesaleBanner"
-import { ReviewsSection } from "@/components/home/ReviewsSection"
-import { BeautyTips } from "@/components/home/BeautyTips"
+
+const ProductSection = dynamic(
+  () => import('@/components/home/ProductSection').then((module) => module.ProductSection),
+  { ssr: false, loading: () => <ProductSectionSkeleton /> },
+)
+const FlashSale = dynamic(
+  () => import('@/components/home/FlashSale').then((module) => module.FlashSale),
+  { loading: () => <div className="mx-4 h-64 animate-pulse rounded-xl bg-gray-100" /> },
+)
+const BrandCarousel = dynamic(
+  () => import('@/components/home/BrandCarousel').then((module) => module.BrandCarousel),
+  { loading: () => null },
+)
+const WholesaleBanner = dynamic(
+  () => import('@/components/home/WholesaleBanner').then((module) => module.WholesaleBanner),
+  { loading: () => null },
+)
+const ReviewsSection = dynamic(
+  () => import('@/components/home/ReviewsSection').then((module) => module.ReviewsSection),
+  { loading: () => null },
+)
+const BeautyTips = dynamic(
+  () => import('@/components/home/BeautyTips').then((module) => module.BeautyTips),
+  { loading: () => null },
+)
 import {
   useBannerUpdates,
   useBlogUpdates,
@@ -161,6 +181,19 @@ function Homepage() {
           <SectionEmpty message={t('home.guides_preparing')} />
         )}
       </section>
+    </div>
+  )
+}
+
+function ProductSectionSkeleton() {
+  return (
+    <div className="py-6 md:py-12">
+      <div className="scrollbar-hide flex gap-3 overflow-hidden px-4 md:hidden">
+        {[1, 2, 3].map((item) => <div key={item} className="h-64 w-40 flex-none animate-pulse rounded-xl bg-gray-100" />)}
+      </div>
+      <div className="mx-auto hidden max-w-7xl grid-cols-4 gap-4 px-6 md:grid lg:px-8">
+        {[1, 2, 3, 4].map((item) => <div key={item} className="h-72 animate-pulse rounded-xl bg-gray-100" />)}
+      </div>
     </div>
   )
 }

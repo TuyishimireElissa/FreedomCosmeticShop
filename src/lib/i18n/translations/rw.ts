@@ -399,6 +399,8 @@ export const rw = {
     waiting_payment: 'Dutegereje ko wishyura...', // verified-rw
     what_next: 'Ni iki gikurikiraho?', // verified-rw
     where_deliver: 'Komande yawe tuyigeze he?', // verified-rw
+
+    pin_private: 'PIN yawe uyandika kuri telefoni yawe gusa. Ntabwo tuyibona.', // verified-rw
   },
   auth: {
     login_title: 'Murakaza neza', login_subtitle: 'Injira muri konti yawe ya FreedomCosmeticShop', phone_or_email: 'Nimero ya telefoni cyangwa imeyili', phone_placeholder: '+250 7XX XXX XXX', password: 'Ijambo ry’ibanga', show_password: 'Erekana', hide_password: 'Hisha', forgot_password: 'Wibagiwe ijambo ry’ibanga?', login_button: 'Injira', logging_in: 'Birimo kwinjira...', no_account: 'Nta konti ufite?', register_link: 'Iyandikishe hano', register_title: 'Fungura konti', register_subtitle: 'Injira muri FreedomCosmeticShop uyu munsi', full_name: 'Amazina yose', full_name_placeholder: 'Andika amazina yawe yose', email: 'Imeyili (si ngombwa)', email_placeholder: 'Andika imeyili yawe', phone: 'Nimero ya telefoni', phone_hint: 'Nimero yo mu Rwanda (+250 cyangwa 07X)', password_hint: 'Nibura inyuguti 8', confirm_password: 'Emeza ijambo ry’ibanga', skin_type: "Ubwoko bw’uruhu rwawe (si ngombwa)", skin_type_hint: 'Bidufasha kukugira inama y’ibicuruzwa bikubereye', terms_agree: 'Nemeye', terms_link: 'Amabwiriza n’amategeko', register_button: 'Fungura konti', registering: 'Konti irimo gufungurwa...', have_account: 'Usanzwe ufite konti?', login_link: 'Injira hano', otp_title: 'Emeza nimero yawe', otp_subtitle: 'Twohereje kode y’imibare 6 kuri {phone}', otp_placeholder: '000000', otp_verify: 'Emeza kode', otp_verifying: 'Birimo kwemezwa...', otp_resend: 'Ongera wohereze kode', otp_resend_in: 'Ongera wohereze mu masegonda {seconds}', otp_wrong_number: 'Nimero si yo?', otp_change: 'Hindura nimero', otp_hint: 'Reba ubutumwa bwa SMS', otp_expired: 'Kode yararengeje igihe. Saba indi kode.', otp_invalid: 'Kode ntiyemewe. Yigenzure wongere ugerageze.', otp_success: 'Nimero yemejwe neza!', forgot_title: 'Hindura ijambo ry’ibanga', forgot_subtitle: 'Andika nimero ya telefoni kugira ngo urihindure', forgot_send: 'Ohereza kode yo kurihindura', forgot_sending: 'Birimo koherezwa...', forgot_sent: 'Kode yoherejwe kuri {phone}', new_password: 'Ijambo ry’ibanga rishya', reset_password: 'Hindura ijambo ry’ibanga', reset_success: 'Ijambo ry’ibanga ryahinduwe neza!', invalid_credentials: 'Nimero ya telefoni, imeyili cyangwa ijambo ry’ibanga si byo', account_locked: 'Konti yafunzwe iminota {minutes} kubera kugerageza kenshi.', account_inactive: 'Konti yawe yahagaritswe.', phone_taken: 'Iyi nimero ya telefoni isanzwe ikoreshwa.', email_taken: 'Iyi imeyili isanzwe ikoreshwa.', passwords_no_match: 'Amagambo y’ibanga ntabwo ahura.', weak_password: 'Ijambo ry’ibanga rigomba kugira nibura inyuguti 8.', invalid_phone: 'Andika nimero ya telefoni yo mu Rwanda yemewe.', required_field: 'Aha harasabwa.', server_error: 'Habaye ikibazo. Ongera ugerageze.', // 🔍 REVIEW
@@ -634,6 +636,8 @@ export const rw = {
     previous_slide: 'Igibanza', // verified-rw
     slide: 'igice cy’uruhererekane', // verified-rw
     whatsapp_business: 'Ganira na {business} kuri WhatsApp', // verified-rw
+
+    swipe: 'Nyereza', // verified-rw
   },
   wholesale: {
     accept_terms: 'Emera amabwiriza', // verified-rw

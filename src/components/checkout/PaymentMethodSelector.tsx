@@ -219,7 +219,7 @@ export function PaymentMethodSelector({
         {/* MTN MoMo — most prominent */}
         <label
           htmlFor="pay-mtn"
-          className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
+          className={`flex min-h-16 w-full cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
             method === "MTN_MOMO" ? "border-primary bg-secondary/30" : "border-border hover:border-primary/40"
           }`}
         >
@@ -257,7 +257,7 @@ export function PaymentMethodSelector({
         {/* Airtel Money */}
         <label
           htmlFor="pay-airtel"
-          className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
+          className={`flex min-h-16 w-full cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
             method === "AIRTEL_MONEY" ? "border-primary bg-secondary/30" : "border-border hover:border-primary/40"
           }`}
         >
@@ -291,7 +291,7 @@ export function PaymentMethodSelector({
         {/* Card */}
         <label
           htmlFor="pay-card"
-          className={`flex cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
+          className={`flex min-h-16 w-full cursor-pointer items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
             method === "CARD" ? "border-primary bg-secondary/30" : "border-border hover:border-primary/40"
           }`}
         >
@@ -306,7 +306,7 @@ export function PaymentMethodSelector({
         {/* COD */}
         <label
           htmlFor={`pay-cod ${!codAvailable ? "cursor-not-allowed opacity-50" : ""}`}
-          className={`flex items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
+          className={`flex min-h-16 w-full items-start gap-3 rounded-xl border-2 p-4 transition-colors ${
             method === "COD" && codAvailable
               ? "border-primary bg-secondary/30"
               : "border-border"

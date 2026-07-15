@@ -345,6 +345,8 @@ export const en = {
     waiting_payment: 'Waiting for payment...',
     what_next: 'What happens next?',
     where_deliver: 'Where should we deliver your order?',
+
+    pin_private: 'Your PIN is entered only on your phone. We never see it.',
   },
   auth: {
     login_title: 'Welcome Back', login_subtitle: 'Log in to your FreedomCosmeticShop account', phone_or_email: 'Phone Number or Email', phone_placeholder: '+250 7XX XXX XXX', password: 'Password', show_password: 'Show', hide_password: 'Hide', forgot_password: 'Forgot Password?', login_button: 'Login', logging_in: 'Logging in...', no_account: "Don't have an account?", register_link: 'Register here', register_title: 'Create Account', register_subtitle: 'Join FreedomCosmeticShop today', full_name: 'Full Name', full_name_placeholder: 'Your full name', email: 'Email Address (Optional)', email_placeholder: 'Enter your email address', phone: 'Phone Number', phone_hint: 'Rwanda number (+250 or 07X)', password_hint: 'At least 8 characters', confirm_password: 'Confirm Password', skin_type: 'Your Skin Type (Optional)', skin_type_hint: 'Helps us recommend products for you', terms_agree: 'I agree to the', terms_link: 'Terms & Conditions', register_button: 'Create Account', registering: 'Creating account...', have_account: 'Already have an account?', login_link: 'Login here', otp_title: 'Verify Your Number', otp_subtitle: 'We sent a 6-digit code to {phone}', otp_placeholder: '000000', otp_verify: 'Verify Code', otp_verifying: 'Verifying...', otp_resend: 'Resend Code', otp_resend_in: 'Resend in {seconds}s', otp_wrong_number: 'Wrong number?', otp_change: 'Change number', otp_hint: 'Check your SMS messages', otp_expired: 'Code expired. Please request a new one.', otp_invalid: 'Invalid code. Please check and try again.', otp_success: 'Number verified successfully!', forgot_title: 'Reset Password', forgot_subtitle: 'Enter your phone number to reset', forgot_send: 'Send Reset Code', forgot_sending: 'Sending...', forgot_sent: 'Code sent to {phone}', new_password: 'New Password', reset_password: 'Reset Password', reset_success: 'Password reset successfully!', invalid_credentials: 'Wrong phone number or password', account_locked: 'Account locked for {minutes} minutes. Too many failed attempts.', account_inactive: 'Your account has been deactivated.', phone_taken: 'This phone number is already registered.', email_taken: 'This email is already registered.', passwords_no_match: 'Passwords do not match.', weak_password: 'Password must be at least 8 characters.', invalid_phone: 'Please enter a valid Rwanda phone number.', required_field: 'This field is required.', server_error: 'Something went wrong. Please try again.',
@@ -580,6 +582,8 @@ export const en = {
     previous_slide: 'Previous slide',
     slide: 'slide',
     whatsapp_business: 'Chat with {business} on WhatsApp',
+
+    swipe: 'Swipe',
   },
   wholesale: {
     accept_terms: 'Please accept the terms',

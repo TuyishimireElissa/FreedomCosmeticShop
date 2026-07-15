@@ -203,7 +203,7 @@ export function SearchWithSuggestions({
               setSuggestions(null)
               setIsOpen(false)
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-0 top-1/2 grid h-11 w-11 -translate-y-1/2 touch-manipulation place-items-center rounded-full text-muted-foreground hover:bg-gray-100 hover:text-foreground"
             aria-label={t('common.clear')}
           >
             <X className="h-4 w-4" />

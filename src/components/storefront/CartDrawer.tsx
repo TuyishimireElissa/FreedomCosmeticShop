@@ -146,7 +146,7 @@ export function CartDrawer() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 rounded-r-none"
+                          className="h-11 w-11 rounded-r-none"
                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                           disabled={item.quantity <= 1}
                           aria-label={t('product.decrease_quantity')}
@@ -157,7 +157,7 @@ export function CartDrawer() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 rounded-l-none"
+                          className="h-11 w-11 rounded-l-none"
                           onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                           disabled={item.quantity >= item.stock}
                           aria-label={t('product.increase_quantity')}
@@ -172,7 +172,7 @@ export function CartDrawer() {
                   </div>
                   <button
                     onClick={() => removeFromCart(item.productId)}
-                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive self-start rounded-md p-1"
+                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive grid h-11 w-11 shrink-0 place-items-center self-start rounded-md"
                     aria-label={t('cart.remove_product', { product: item.name })}
                   >
                     <Trash2 className="h-3.5 w-3.5" />

@@ -26,7 +26,7 @@ function WhatsAppButtonComponent({
       href={url}
       target="_blank"
       rel="noreferrer"
-      className="safe-bottom group fixed bottom-4 right-4 z-50 grid h-14 w-14 place-items-center rounded-full bg-[#25D366] text-white shadow-[0_12px_30px_rgba(37,211,102,0.35)] ring-4 ring-white/90 transition-all duration-200 hover:-translate-y-1 hover:scale-105 hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#B76E79]/40 sm:bottom-6 sm:right-6"
+      className="group fixed bottom-[calc(64px+env(safe-area-inset-bottom)+12px)] right-4 z-40 grid h-12 w-12 touch-manipulation place-items-center rounded-full bg-[#25D366] text-white shadow-[0_12px_30px_rgba(37,211,102,0.35)] ring-4 ring-white/90 transition-transform duration-200 hover:scale-105 hover:bg-[#20bd5a] active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#B76E79]/40 md:bottom-6 md:right-6"
       aria-label={t('ui.whatsapp_business', { business: BUSINESS.tradingName })}
       aria-disabled={!url}
     >

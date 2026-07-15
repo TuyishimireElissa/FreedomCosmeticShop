@@ -37,13 +37,13 @@ export default function AddressForm({ value, onChange, errors = {} }: AddressFor
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={t('checkout.province')} error={errors.province}><select value={value.province} onChange={(event) => changeProvince(event.target.value as RwandaProvince)} className="input-field">{RWANDA_PROVINCES.map((province) => <option key={province}>{province}</option>)}</select></Field>
-        <Field label={t('checkout.district')} error={errors.district}><select value={value.district} onChange={(event) => changeDistrict(event.target.value)} className="input-field">{RWANDA_DISTRICTS[value.province].map((district) => <option key={district}>{district}</option>)}</select></Field>
+        <Field label={t('checkout.province')} error={errors.province}><select value={value.province} onChange={(event) => changeProvince(event.target.value as RwandaProvince)} className="input-field appearance-none">{RWANDA_PROVINCES.map((province) => <option key={province}>{province}</option>)}</select></Field>
+        <Field label={t('checkout.district')} error={errors.district}><select value={value.district} onChange={(event) => changeDistrict(event.target.value)} className="input-field appearance-none">{RWANDA_DISTRICTS[value.province].map((district) => <option key={district}>{district}</option>)}</select></Field>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={t('checkout.sector_required')} error={errors.sector}>{RWANDA_SECTORS[value.district]?.length ? <select value={value.sector} onChange={(event) => update('sector', event.target.value)} className="input-field">{RWANDA_SECTORS[value.district].map((sector) => <option key={sector}>{sector}</option>)}</select> : <input value={value.sector} onChange={(event) => update('sector', event.target.value)} placeholder={t('checkout.sector_placeholder')} className="input-field" />}</Field>
-        <Field label={t('checkout.landmark')}><input value={value.landmark} onChange={(event) => update('landmark', event.target.value)} placeholder={t('checkout.landmark_example')} className="input-field" /></Field>
+        <Field label={t('checkout.sector_required')} error={errors.sector}>{RWANDA_SECTORS[value.district]?.length ? <select value={value.sector} onChange={(event) => update('sector', event.target.value)} className="input-field appearance-none">{RWANDA_SECTORS[value.district].map((sector) => <option key={sector}>{sector}</option>)}</select> : <input value={value.sector} onChange={(event) => update('sector', event.target.value)} placeholder={t('checkout.sector_placeholder')} className="input-field appearance-none" />}</Field>
+        <Field label={t('checkout.landmark')}><input value={value.landmark} onChange={(event) => update('landmark', event.target.value)} placeholder={t('checkout.landmark_example')} className="input-field appearance-none" /></Field>
       </div>
 
       <Field label={t('checkout.street_delivery_details')} error={errors.address}><div className="relative"><MapPin className="absolute left-3 top-3.5 h-4 w-4 text-gray-400" /><textarea value={value.address} onChange={(event) => update('address', event.target.value)} placeholder={t('checkout.address_directions_placeholder')} rows={3} className="input-field resize-none pl-10" /></div></Field>
@@ -54,5 +54,5 @@ export default function AddressForm({ value, onChange, errors = {} }: AddressFor
 }
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
-  return <label className="block"><span className="mb-1.5 block text-xs font-black uppercase tracking-wider text-gray-500">{label}</span>{children}{error && <span className="mt-1 block text-xs font-semibold text-red-600">{error}</span>}</label>
+  return <label className="block"><span className="mb-1.5 block text-sm font-bold text-gray-700">{label}</span>{children}{error && <span className="mt-1 block text-xs font-semibold text-red-600">{error}</span>}</label>
 }

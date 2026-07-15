@@ -14,6 +14,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
+import Image from "next/image"
 import { Product } from "@/lib/types"
 import { useStore } from "@/store/useStore"
 import { formatRWF } from "@/lib/format"
@@ -25,9 +27,10 @@ import { useT } from "@/lib/i18n/LanguageContext"
 
 interface ProductCardProps {
   product: Product
+  compact?: boolean
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, compact = false }: ProductCardProps) {
   const { addToCart, user } = useStore()
   const router = useRouter()
   const { toast } = useToast()
@@ -67,6 +70,53 @@ export function ProductCard({ product }: ProductCardProps) {
     setTimeout(() => setAdded(false), 1500)
   }
 
+  if (compact) {
+    const compactBadge = outOfStock
+      ? t('common.sold_out')
+      : hasDiscount
+        ? `-${discountPercent}%`
+        : product.featured
+          ? `🔥 ${t('categories.best_sellers')}`
+          : null
+
+    return (
+      <Link
+        href={`/products/${product.slug}`}
+        aria-label={t('product.view_product', { product: product.name })}
+        className="block h-full touch-manipulation rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]"
+      >
+        <article className="h-full w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-transform duration-150 active:scale-[0.98]">
+          <div className="relative aspect-square overflow-hidden bg-gray-50">
+            <Image
+              src={primaryImage}
+              alt={product.name}
+              fill
+              className={`object-cover ${outOfStock ? 'opacity-60' : ''}`}
+              sizes="(max-width: 640px) 50vw, 180px"
+              loading="lazy"
+            />
+            {compactBadge && (
+              <span className="absolute left-1.5 top-1.5 max-w-[calc(100%-12px)] truncate rounded-full bg-[#B76E79] px-1.5 py-0.5 text-xs font-bold text-white shadow-sm">
+                {compactBadge}
+              </span>
+            )}
+          </div>
+          <div className="p-2">
+            <p className="mb-1 line-clamp-2 min-h-[2.5em] text-xs font-medium leading-tight text-gray-900">
+              {product.name}
+            </p>
+            <div className="flex flex-wrap items-baseline gap-1">
+              <span className="text-sm font-bold text-[#B76E79]">{formatRWF(product.price)}</span>
+              {hasDiscount && (
+                <span className="text-xs text-gray-500 line-through">{formatRWF(product.compareAt!)}</span>
+              )}
+            </div>
+          </div>
+        </article>
+      </Link>
+    )
+  }
+
   return (
     <article
       onClick={() => router.push(`/products/${product.slug}`)}
@@ -75,12 +125,14 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Image */}
       <div className="bg-secondary/30 relative aspect-square overflow-hidden">
         {primaryImage ? (
-          <img
+          <Image
             src={primaryImage}
             alt={product.name}
-            className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+            fill
+            className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
               outOfStock ? "opacity-60" : ""
             }`}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             loading="lazy"
           />
         ) : (
@@ -122,7 +174,7 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* Body */}
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         {product.brand?.name && (
-          <p className="text-muted-foreground text-[11px] font-medium tracking-wider uppercase">
+          <p className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
             {product.brand.name}
           </p>
         )}
@@ -143,19 +195,19 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
             <span className="text-foreground/80 font-medium">{product.rating.toFixed(1)}</span>
             <span>({product.reviewsCount})</span>
-          </> : <span className="text-[11px]">{t('product.no_reviews')}</span>}
+          </> : <span className="text-xs">{t('product.no_reviews')}</span>}
         </div>
 
         {/* NEW: Skin type badge */}
         {product.skinType && product.skinType.length > 0 && (
-          <span className="mt-1 inline-block w-fit rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+          <span className="mt-1 inline-block w-fit rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
             {product.skinType[0].charAt(0) + product.skinType[0].slice(1).toLowerCase()} skin
           </span>
         )}
 
         {/* NEW: Low stock indicator */}
         {product.stock > 0 && product.stock <= 5 && (
-          <p className="mt-1 text-[10px] font-semibold text-amber-600">
+          <p className="mt-1 text-xs font-semibold text-amber-600">
             ⚡ {t('common.low_stock', { count: product.stock })}
           </p>
         )}
@@ -163,13 +215,13 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Price — Section 4: Show wholesale price for wholesale users */}
         {isWholesaleUser ? (
           <div className="mt-2">
-            <p className="text-[10px] text-muted-foreground line-through">
+            <p className="text-xs text-muted-foreground line-through">
               {t('product.retail_price', { price: formatRWF(product.price) })}
             </p>
             <p className="text-base font-bold text-violet-700 sm:text-lg">
               {formatRWF(product.price)}
             </p>
-            <p className="text-[10px] font-medium text-violet-600">
+            <p className="text-xs font-medium text-violet-600">
               💛 {t('product.wholesale_price', { count: product.minWholesaleQty || 6 })}
             </p>
           </div>
@@ -194,7 +246,7 @@ export function ProductCard({ product }: ProductCardProps) {
           onClick={handleQuickAdd}
           disabled={outOfStock}
           size="sm"
-          className="mt-3 w-full"
+          className="mt-3 min-h-12 w-full text-base"
           variant={added ? "secondary" : "default"}
         >
           {added ? (

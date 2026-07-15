@@ -78,7 +78,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.stockQuantity > 0 && product.stockQuantity <= 5 && <span className="badge bg-amber-500 text-white shadow-sm">{t('common.low_stock', { count: product.stockQuantity })}</span>}
         </div>
 
-        <span className="absolute right-2 top-2 hidden items-center rounded-full bg-white/95 px-2 py-1 text-[10px] font-bold text-emerald-700 shadow-sm backdrop-blur sm:inline-flex">✓ {t('common.authentic')}</span>
+        <span className="absolute right-2 top-2 hidden items-center rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-emerald-700 shadow-sm backdrop-blur sm:inline-flex">✓ {t('common.authentic')}</span>
 
         {outOfStock && (
           <div className="pointer-events-none absolute inset-0 grid place-items-center bg-white/25">
@@ -89,7 +89,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <button
           type="button"
           onClick={() => setIsWishlisted((wishlisted) => !wishlisted)}
-          className="absolute bottom-2 right-2 grid h-9 w-9 place-items-center rounded-full bg-white text-gray-500 shadow-md transition-all hover:scale-105 hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79] sm:bottom-3 sm:right-3 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"
+          className="absolute bottom-2 right-2 grid h-11 w-11 place-items-center rounded-full bg-white text-gray-500 shadow-md transition-all hover:scale-105 hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79] sm:bottom-3 sm:right-3 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"
           aria-label={isWishlisted ? `${t('product.remove_from_wishlist')}: ${product.name}` : `${t('product.add_to_wishlist')}: ${product.name}`}
           aria-pressed={isWishlisted}
         >
@@ -98,7 +98,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       <div className="flex flex-1 flex-col p-3 sm:p-4">
-        {product.brand && <p className="mb-1 truncate text-[10px] font-bold uppercase tracking-[0.12em] text-gray-400 sm:text-xs">{product.brand.name}</p>}
+        {product.brand && <p className="mb-1 truncate text-xs font-bold uppercase tracking-[0.12em] text-gray-400 sm:text-xs">{product.brand.name}</p>}
         <Link href={`/products/${product.slug}`}>
           <h3 className="line-clamp-2 min-h-10 text-sm font-semibold leading-5 text-[#1a1a1a] transition-colors hover:text-[#B76E79] sm:text-[15px]">{product.name}</h3>
         </Link>
@@ -107,12 +107,12 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="flex" aria-hidden="true">
             {[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-3 w-3 ${star <= Math.round(product.avgRating) ? 'fill-[#FFD700] text-[#FFD700]' : 'fill-gray-200 text-gray-200'}`} />)}
           </div>
-          <span className="text-[11px] text-gray-400">({product.reviewCount})</span>
+          <span className="text-xs text-gray-400">({product.reviewCount})</span>
         </div>
 
         <div className="mt-2.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <span className="text-base font-extrabold text-[#B76E79] sm:text-lg">{formatRWF(product.price)}</span>
-          {product.comparePrice && product.comparePrice > product.price && <span className="text-[11px] text-gray-400 line-through sm:text-xs">{formatRWF(product.comparePrice)}</span>}
+          {product.comparePrice && product.comparePrice > product.price && <span className="text-xs text-gray-400 line-through sm:text-xs">{formatRWF(product.comparePrice)}</span>}
         </div>
 
         <div className="flex-1" />
@@ -120,7 +120,7 @@ export default function ProductCard({ product }: { product: Product }) {
           type="button"
           onClick={handleAddToCart}
           disabled={addingToCart || outOfStock}
-          className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-3 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-[#a55d68] hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-gray-300 sm:text-sm"
+          className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-3 py-2.5 text-base font-bold text-white shadow-sm transition-all hover:bg-[#a55d68] hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-gray-300 sm:text-sm"
         >
           <ShoppingCart className="h-4 w-4" />
           {addingToCart ? t('product.adding') : outOfStock ? t('common.sold_out') : t('product.add_to_cart')}

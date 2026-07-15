@@ -52,13 +52,13 @@ export default function Footer() {
             <ul className="mt-5 space-y-3">
               {shopLinks.map((item) => (
                 <li key={item.key}>
-                  <Link href={item.slug ? `/products?category=${item.slug}` : '/products'} className="text-sm text-gray-400 transition-colors hover:text-[#e6a6b0]">
+                  <Link href={item.slug ? `/products?category=${item.slug}` : '/products'} className="flex min-h-11 items-center py-2 text-sm text-gray-400 transition-colors hover:text-[#e6a6b0]">
                     {t(item.translationKey)}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link href="/wholesale" className="text-sm font-semibold text-[#e6a6b0] transition-colors hover:text-white">
+                <Link href="/wholesale" className="flex min-h-11 items-center py-2 text-sm font-semibold text-[#e6a6b0] transition-colors hover:text-white">
                   {t('footer.wholesale_beauty')}
                 </Link>
               </li>
@@ -68,29 +68,29 @@ export default function Footer() {
           <section>
             <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-white">{t('footer.help')}</h2>
             <ul className="mt-5 space-y-3 text-sm">
-              <li><Link href="/track-order" className="text-gray-400 transition-colors hover:text-white">{t('footer.track_order')}</Link></li>
+              <li><Link href="/track-order" className="flex min-h-11 items-center py-2 text-gray-400 transition-colors hover:text-white">{t('footer.track_order')}</Link></li>
               <li><span className="text-gray-400">{t('footer.delivery_kigali')}</span></li>
               <li><span className="text-gray-400">{t('footer.delivery_provinces')}</span></li>
-              <li><Link href="/shipping" className="text-gray-400 transition-colors hover:text-white">{t('footer.shipping_policy')}</Link></li>
-              <li><Link href="/returns" className="text-gray-400 transition-colors hover:text-white">{t('footer.returns_refunds')}</Link></li>
-              <li><Link href="/faq" className="text-gray-400 transition-colors hover:text-white">{t('footer.faq')}</Link></li>
-              <li><Link href="/privacy" className="text-gray-400 transition-colors hover:text-white">{t('footer.privacy_policy')}</Link></li>
-              <li><Link href="/terms" className="text-gray-400 transition-colors hover:text-white">{t('footer.terms_conditions')}</Link></li>
+              <li><Link href="/shipping" className="flex min-h-11 items-center py-2 text-gray-400 transition-colors hover:text-white">{t('footer.shipping_policy')}</Link></li>
+              <li><Link href="/returns" className="flex min-h-11 items-center py-2 text-gray-400 transition-colors hover:text-white">{t('footer.returns_refunds')}</Link></li>
+              <li><Link href="/faq" className="flex min-h-11 items-center py-2 text-gray-400 transition-colors hover:text-white">{t('footer.faq')}</Link></li>
+              <li><Link href="/privacy" className="flex min-h-11 items-center py-2 text-gray-400 transition-colors hover:text-white">{t('footer.privacy_policy')}</Link></li>
+              <li><Link href="/terms" className="flex min-h-11 items-center py-2 text-gray-400 transition-colors hover:text-white">{t('footer.terms_conditions')}</Link></li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-white">{t('footer.contact')}</h2>
             <div className="mt-5 space-y-4">
-              <a href={BUSINESS.phone.includes('TODO') ? undefined : `tel:${BUSINESS.phone}`} className="flex items-center gap-3 text-sm text-gray-400 transition-colors hover:text-white"><Phone className="h-4 w-4 shrink-0 text-[#d999a3]" />{BUSINESS.phoneDisplay}</a>
-              <a href={BUSINESS.email.includes('TODO') ? undefined : `mailto:${BUSINESS.email}`} className="flex items-start gap-3 break-all text-sm text-gray-400 transition-colors hover:text-white"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#d999a3]" />{BUSINESS.email}</a>
+              <a href={BUSINESS.phone.includes('TODO') ? undefined : `tel:${BUSINESS.phone}`} className="flex min-h-11 items-center gap-3 py-2 text-sm text-gray-400 transition-colors hover:text-white"><Phone className="h-4 w-4 shrink-0 text-[#d999a3]" />{BUSINESS.phoneDisplay}</a>
+              <a href={BUSINESS.email.includes('TODO') ? undefined : `mailto:${BUSINESS.email}`} className="flex min-h-11 items-center gap-3 break-all py-2 text-sm text-gray-400 transition-colors hover:text-white"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#d999a3]" />{BUSINESS.email}</a>
               <p className="flex items-center gap-3 text-sm text-gray-400"><MapPin className="h-4 w-4 shrink-0 text-[#d999a3]" />{BUSINESS.address.short}, {BUSINESS.address.country} 🇷🇼</p>
-              <a href={BUSINESS.whatsapp.includes('TODO') ? undefined : getWhatsAppLink()} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#20bd5a]"><MessageCircle className="h-4 w-4" />{t('footer.whatsapp_chat')}</a>
+              <a href={BUSINESS.whatsapp.includes('TODO') ? undefined : getWhatsAppLink()} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#25D366] px-4 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#20bd5a]"><MessageCircle className="h-4 w-4" />{t('footer.whatsapp_chat')}</a>
             </div>
             <div className="mt-6">
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-gray-500">{t('footer.we_accept')}</p>
+              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-500">{t('footer.we_accept')}</p>
               <div className="flex flex-wrap gap-2">
-                {['💛 MTN MoMo', '🔴 Airtel', '💳 Visa', '💵 COD'].map((payment) => <span key={payment} className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-[11px] text-gray-300">{payment}</span>)}
+                {['💛 MTN MoMo', '🔴 Airtel', '💳 Visa', '💵 COD'].map((payment) => <span key={payment} className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-xs text-gray-300">{payment}</span>)}
               </div>
             </div>
           </section>
@@ -102,7 +102,7 @@ export default function Footer() {
           {trustBadges.map(({ icon: Icon, titleKey, subtitleKey }) => (
             <div key={titleKey} className="flex flex-col items-center px-2 py-3 text-center sm:flex-row sm:items-start sm:justify-center sm:gap-3 sm:text-left">
               <Icon className="mb-2 h-6 w-6 shrink-0 text-[#d999a3] sm:mb-0" />
-              <span><span className="block text-xs font-bold sm:text-sm">{t(titleKey)}</span><span className="mt-0.5 block text-[10px] text-gray-500 sm:text-xs">{t(subtitleKey)}</span></span>
+              <span><span className="block text-xs font-bold sm:text-sm">{t(titleKey)}</span><span className="mt-0.5 block text-xs text-gray-500 sm:text-xs">{t(subtitleKey)}</span></span>
             </div>
           ))}
         </div>

@@ -1,12 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import {
+  DEFAULT_LANGUAGE,
   isAvailableLanguage,
   resolveTranslation,
   resolveTranslationArray,
 } from '@/lib/i18n'
 
 describe('language translation resolution', () => {
-  it('resolves English as the default content source', () => {
+  it('uses Kinyarwanda as the default customer language', () => {
+    expect(DEFAULT_LANGUAGE).toBe('rw')
+    expect(resolveTranslation(DEFAULT_LANGUAGE, 'nav.home')).toBe('Ahabanza')
+  })
+
+  it('keeps English available as a selectable content source', () => {
     expect(resolveTranslation('en', 'nav.home')).toBe('Home')
   })
 

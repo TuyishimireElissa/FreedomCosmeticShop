@@ -54,6 +54,20 @@ const config: Config = {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
+      fontSize: {
+        'xs-accessible': ['12px', { lineHeight: '1.5' }],
+        'sm-accessible': ['14px', { lineHeight: '1.5' }],
+        'base-accessible': ['16px', { lineHeight: '1.6' }],
+        'mobile-label': ['12px', { lineHeight: '1.4' }],
+        'mobile-body': ['14px', { lineHeight: '1.5' }],
+        'mobile-content': ['16px', { lineHeight: '1.6' }],
+        'mobile-heading': ['18px', { lineHeight: '1.3' }],
+      },
+      spacing: {
+        touch: '44px',
+        'touch-lg': '48px',
+        'touch-xl': '56px',
+      },
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'bounce-slow': 'bounce 2s infinite',

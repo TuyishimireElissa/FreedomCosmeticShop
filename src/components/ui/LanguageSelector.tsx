@@ -72,7 +72,7 @@ export default function LanguageSelector({
 
   return (
     <div className={`relative ${className}`} ref={containerRef}>
-      <button type="button" onClick={() => setOpen((value) => !value)} className="flex min-h-10 items-center gap-1.5 rounded-full border border-gray-200 px-2.5 py-1.5 text-sm text-gray-700 transition-all hover:border-[#B76E79] hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]/40" aria-label="Choose language" aria-haspopup="menu" aria-expanded={open} aria-controls={menuId}>
+      <button type="button" onClick={() => setOpen((value) => !value)} className="flex min-h-11 touch-manipulation items-center gap-1.5 rounded-full border border-gray-200 px-2.5 py-1.5 text-sm text-gray-700 transition-all hover:border-[#B76E79] hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]/40" aria-label="Choose language" aria-haspopup="menu" aria-expanded={open} aria-controls={menuId}>
         <Globe className="h-3.5 w-3.5 text-[#B76E79]" aria-hidden="true" />
         <span className="font-bold text-xs">{current.code.toUpperCase()}</span>
         <ChevronDown className={`h-3 w-3 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden="true" />

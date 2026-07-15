@@ -240,7 +240,7 @@ export function LoginView() {
                 setOtpCode("")
                 setDevOtpHint(null)
               }}
-              className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              className={`flex flex-1 items-center justify-center gap-1.5 min-h-11 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 mode === "password" ? "bg-background shadow-sm" : "text-muted-foreground"
               }`}
             >
@@ -253,7 +253,7 @@ export function LoginView() {
                 setOtpCode("")
                 setDevOtpHint(null)
               }}
-              className={`flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+              className={`flex flex-1 items-center justify-center gap-1.5 min-h-11 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 mode === "otp" ? "bg-background shadow-sm" : "text-muted-foreground"
               }`}
             >
@@ -328,7 +328,7 @@ export function LoginView() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-0 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:text-foreground"
                     aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -336,7 +336,7 @@ export function LoginView() {
                 </div>
               </div>
 
-              <Button type="submit" size="lg" className="w-full" disabled={loading}>
+              <Button type="submit" size="lg" className="min-h-12 w-full text-base" disabled={loading}>
                 {loading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
@@ -382,7 +382,7 @@ export function LoginView() {
                     />
                   </div>
                 </div>
-                <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                <Button type="submit" size="lg" className="min-h-12 w-full text-base" disabled={loading}>
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('auth.send_code')}
                 </Button>
               </form>
@@ -457,7 +457,7 @@ export function LoginView() {
                     />
                   </div>
                 </div>
-                <Button type="submit" size="lg" className="w-full" disabled={loading}>
+                <Button type="submit" size="lg" className="min-h-12 w-full text-base" disabled={loading}>
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('auth.forgot_send')}
                 </Button>
                 <button
@@ -504,13 +504,13 @@ export function LoginView() {
                     <button
                       type="button"
                       onClick={() => setShowNewPassword((s) => !s)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      className="absolute right-0 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:text-foreground"
                     >
                       {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
                 </div>
-                <Button size="lg" className="w-full" disabled={loading} onClick={handleResetPassword}>
+                <Button size="lg" className="min-h-12 w-full text-base" disabled={loading} onClick={handleResetPassword}>
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('auth.reset_and_login')}
                 </Button>
               </div>

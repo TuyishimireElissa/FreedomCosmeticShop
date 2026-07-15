@@ -97,8 +97,8 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-rose-100/70 bg-white/95 shadow-[0_4px_20px_rgba(26,26,26,0.05)] backdrop-blur-xl">
-      <div className="border-b border-[#FFD700]/20 bg-[#fff8e7] px-3 py-1.5">
-        <div className="scrollbar-hide mx-auto flex max-w-7xl items-center justify-start gap-3 overflow-x-auto text-[10px] font-medium text-gray-600 sm:justify-center sm:gap-5 sm:text-xs">
+      <div className="hidden border-b border-[#FFD700]/20 bg-[#fff8e7] px-3 py-1.5 md:block">
+        <div className="scrollbar-hide mx-auto flex max-w-7xl items-center justify-start gap-3 overflow-x-auto text-xs font-medium text-gray-600 sm:justify-center sm:gap-5 sm:text-xs">
           <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">💛</span> {t('checkout.mtn_momo')}</span>
           <span className="text-gray-300" aria-hidden="true">|</span>
           <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">🔴</span> {t('checkout.airtel_money')}</span>
@@ -109,7 +109,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-3 sm:h-[72px] sm:gap-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-[52px] max-w-7xl items-center gap-2 px-3 md:h-[72px] md:gap-4 md:px-6 lg:px-8">
         <button
           type="button"
           onClick={() => navigate(() => router.push('/'))}
@@ -124,14 +124,14 @@ export default function Navbar() {
             />
           ) : (
             <>
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#c98892] to-[#9e5964] text-base font-black text-white shadow-md shadow-[#B76E79]/20">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#c98892] to-[#9e5964] text-base font-black text-white shadow-md shadow-[#B76E79]/20">
                 F
               </span>
-              <span className="hidden text-left sm:block">
+              <span className="hidden text-left md:block">
                 <span className="block text-[15px] font-extrabold leading-none tracking-tight text-[#1a1a1a] lg:text-base">
                   {BUSINESS.tradingName}
                 </span>
-                <span className="mt-1 block text-[10px] font-medium leading-none text-[#B76E79] lg:text-[11px]">
+                <span className="mt-1 block text-xs font-medium leading-none text-[#B76E79] lg:text-xs">
                   {BUSINESS.tagline} 🇷🇼
                 </span>
               </span>
@@ -147,14 +147,14 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setSearchOpen((open) => !open)}
-            className="grid h-10 w-10 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 md:hidden"
+            className="grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 md:hidden"
             aria-label={searchOpen ? t('nav.close_search') : t('nav.open_search')}
             aria-expanded={searchOpen}
           >
             {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </button>
 
-          <LanguageSelector variant="navbar" className="hidden sm:block" />
+          <LanguageSelector variant="navbar" className="hidden md:block" />
 
           <a
             href={BUSINESS.whatsapp.includes('TODO') ? undefined : getWhatsAppLink('Hello! I need help with my order.')}
@@ -168,7 +168,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={handleWishlist}
-            className="hidden h-10 w-10 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-[#B76E79] sm:grid"
+            className="hidden h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-[#B76E79] md:grid"
             aria-label={t('nav.wishlist')}
           >
             <Heart className="h-5 w-5" />
@@ -177,21 +177,21 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => router.push('/cart')}
-            className="relative grid h-10 w-10 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-[#B76E79]"
+            className="relative grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-[#B76E79]"
             aria-label={`${t('nav.cart')}: ${count}`}
           >
             <ShoppingCart className="h-5 w-5" />
             {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-[#B76E79] px-1 text-[10px] font-bold text-white ring-2 ring-white">
+              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-[#B76E79] px-1 text-xs font-bold text-white ring-2 ring-white">
                 {count > 99 ? '99+' : count}
               </span>
             )}
           </button>
 
           {authLoading ? (
-            <div className="hidden h-9 w-20 animate-pulse rounded-full bg-gray-100 sm:block" />
+            <div className="hidden h-9 w-20 animate-pulse rounded-full bg-gray-100 md:block" />
           ) : user ? (
-            <div ref={accountRef} className="relative hidden sm:block">
+            <div ref={accountRef} className="relative hidden md:block">
               <button
                 type="button"
                 onClick={() => setAccountOpen((open) => !open)}
@@ -231,7 +231,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => router.push('/login')}
-              className="hidden rounded-full bg-[#B76E79] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#a55d68] hover:shadow-md sm:block"
+              className="hidden rounded-full bg-[#B76E79] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#a55d68] hover:shadow-md md:block"
             >
               {t('nav.login')}
             </button>
@@ -240,7 +240,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setMobileOpen((open) => !open)}
-            className="grid h-10 w-10 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 md:hidden"
+            className="grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 md:hidden"
             aria-label={mobileOpen ? t('nav.close_menu') : t('nav.open_menu')}
             aria-expanded={mobileOpen}
           >

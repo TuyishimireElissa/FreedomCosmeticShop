@@ -279,7 +279,7 @@ export function CartView() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-r-none"
+                          className="h-11 w-11 rounded-r-none"
                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                           disabled={item.quantity <= 1}
                           aria-label={t('product.decrease_quantity')}
@@ -292,7 +292,7 @@ export function CartView() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-l-none"
+                          className="h-11 w-11 rounded-l-none"
                           onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                           disabled={item.quantity >= item.stock}
                           aria-label={t('product.increase_quantity')}
@@ -376,7 +376,7 @@ export function CartView() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      className="h-11 w-11 text-muted-foreground hover:text-destructive"
                       onClick={() => removeFromSaved(item.productId)}
                       aria-label={t('cart.remove_from_saved')}
                     >

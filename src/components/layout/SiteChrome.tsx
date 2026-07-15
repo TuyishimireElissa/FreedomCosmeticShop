@@ -8,6 +8,7 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import WhatsAppButton from '@/components/ui/WhatsAppButton'
 import { CartDrawer } from '@/components/storefront/CartDrawer'
+import BottomNav from '@/components/layout/BottomNav'
 
 export default function SiteChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname()
@@ -34,6 +35,7 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
       <Footer />
       <WhatsAppButton />
       <CartDrawer />
+      <BottomNav />
     </div>
   )
 }

@@ -51,8 +51,8 @@ export default function MFALoginChallenge({
       </div>
       {error && <p className="rounded-xl bg-red-50 p-3 text-center text-sm font-semibold text-red-700" role="alert">{error}</p>}
       <label className="block"><span className="mb-1.5 block text-xs font-black uppercase tracking-wider text-gray-500">{t('auth.authenticator_backup_code')}</span><div className="relative"><KeyRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" /><input value={code} onChange={(event) => setCode(event.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ''))} inputMode="numeric" autoComplete="one-time-code" maxLength={32} autoFocus className="input-field pl-10 text-center font-mono text-xl tracking-[0.2em]" placeholder="000000" /></div></label>
-      <button type="submit" disabled={loading} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#B76E79] text-sm font-black text-white disabled:opacity-50">{loading ? <><Loader2 className="h-4 w-4 animate-spin" />{t('auth.otp_verifying')}</> : t('auth.verify_continue')}</button>
-      <button type="button" onClick={onCancel} disabled={loading} className="flex w-full items-center justify-center gap-1 text-xs font-bold text-gray-500"><ArrowLeft className="h-3.5 w-3.5" />{t('auth.back_password_login')}</button>
+      <button type="submit" disabled={loading} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#B76E79] text-base font-black text-white disabled:opacity-50">{loading ? <><Loader2 className="h-4 w-4 animate-spin" />{t('auth.otp_verifying')}</> : t('auth.verify_continue')}</button>
+      <button type="button" onClick={onCancel} disabled={loading} className="flex min-h-11 w-full items-center justify-center gap-1 text-sm font-bold text-gray-600"><ArrowLeft className="h-3.5 w-3.5" />{t('auth.back_password_login')}</button>
     </form>
   )
 }

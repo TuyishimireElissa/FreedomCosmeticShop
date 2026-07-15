@@ -1212,7 +1212,7 @@ function PaymentOption({
   return (
     <label
       htmlFor={`pay-${value}`}
-      className={`block rounded-xl border-2 p-4 transition-colors ${
+      className={`block min-h-16 w-full rounded-xl border-2 p-4 transition-colors ${
         disabled
           ? "cursor-not-allowed border-border opacity-50"
           : isSelected
