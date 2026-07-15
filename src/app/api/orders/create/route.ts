@@ -65,18 +65,24 @@ export async function POST(request: Request) {
     if (input.couponCode) {
       const code = input.couponCode.toUpperCase().trim()
       const coupon = await prisma.coupon.findFirst({ where: { code, isActive: true } })
-      if (!coupon) {
-        if (code !== 'BEAUTY20') return NextResponse.json({ success: false, error: 'Invalid coupon code' }, { status: 400 })
-        discountAmount = Math.round(subtotal * 0.2)
-      } else {
-        const now = new Date(); const validWindow = coupon.startsAt <= now && (!coupon.endsAt || coupon.endsAt >= now); const usageAvailable = !coupon.usageLimit || coupon.usedCount < coupon.usageLimit; const minimumMet = !coupon.minOrderAmount || subtotal >= coupon.minOrderAmount
-        const customerUses = await prisma.order.count({ where: { couponId: coupon.id, customerPhone: input.customerPhone, status: { not: 'CANCELLED' } } })
-        if (!validWindow || !usageAvailable || !minimumMet || customerUses >= coupon.usageLimitPerUser) return NextResponse.json({ success: false, error: 'Coupon is expired, unavailable, or already used' }, { status: 400 })
-        couponId = coupon.id
-        discountAmount = coupon.type === 'PERCENTAGE' ? Math.round(subtotal * coupon.value / 100) : coupon.type === 'FIXED' ? coupon.value : 0
-        if (coupon.maxDiscountAmount) discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount)
-        freeShipping = coupon.type === 'FREE_SHIPPING'
-      }
+      if (!coupon) return NextResponse.json({ success: false, error: 'Invalid coupon code' }, { status: 400 })
+      const now = new Date()
+      const validWindow = coupon.startsAt <= now && (!coupon.endsAt || coupon.endsAt >= now)
+      const usageAvailable = coupon.usageLimit === null || coupon.usedCount < coupon.usageLimit
+      const minimumMet = coupon.minOrderAmount === null || subtotal >= coupon.minOrderAmount
+      const customerUses = await prisma.order.count({ where: { couponId: coupon.id, customerPhone: input.customerPhone, status: { not: 'CANCELLED' } } })
+      const selectedProductIds = parseIds(coupon.productIds)
+      const selectedCategoryIds = parseIds(coupon.categoryIds)
+      const eligibleSubtotal = productLines.reduce((sum, line) => {
+        const product = products.find((item) => item.id === line.productId)!
+        const eligible = coupon.appliesToAllProducts || selectedProductIds.includes(product.id) || selectedCategoryIds.includes(product.categoryId)
+        return eligible ? sum + product.price * line.quantity : sum
+      }, 0)
+      if (!validWindow || !usageAvailable || !minimumMet || customerUses >= coupon.usageLimitPerUser || eligibleSubtotal <= 0) return NextResponse.json({ success: false, error: 'Coupon is expired, unavailable, already used, or does not apply to these items' }, { status: 400 })
+      couponId = coupon.id
+      discountAmount = coupon.type === 'PERCENTAGE' ? Math.round(eligibleSubtotal * coupon.value / 100) : coupon.type === 'FIXED' ? Math.min(coupon.value, eligibleSubtotal) : 0
+      if (coupon.maxDiscountAmount !== null) discountAmount = Math.min(discountAmount, coupon.maxDiscountAmount)
+      freeShipping = coupon.type === 'FREE_SHIPPING'
     }
     const calculatedDelivery = calculateDelivery(input.district, subtotal - discountAmount)
     const delivery = freeShipping ? { ...calculatedDelivery, fee: 0, feeFormatted: 'FREE', isFreeDelivery: true } : calculatedDelivery
@@ -105,3 +111,4 @@ export async function POST(request: Request) {
   }
 }
 function firstImage(value: string) { try { const images = JSON.parse(value); return Array.isArray(images) ? images[0] || null : null } catch { return null } }
+function parseIds(value: string | null) { try { const ids = JSON.parse(value || '[]'); return Array.isArray(ids) ? ids.filter((id): id is string => typeof id === 'string') : [] } catch { return [] } }

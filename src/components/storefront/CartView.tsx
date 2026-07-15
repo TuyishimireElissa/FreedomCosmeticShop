@@ -1,569 +1,139 @@
-"use client"
+'use client'
 
-/**
- * CartView — enhanced cart with all Rwanda-specific features.
- *
- * Features:
- *   - Cart items with quantity +/- controls
- *   - Price in RWF with formatting
- *   - Remove item with UNDO (toast with undo button, 5-second window)
- *   - Save for later (moves to savedItems, can move back)
- *   - Coupon code input (validates via /api/coupons/validate)
- *   - Order summary (subtotal, discount, delivery estimate, total)
- *   - Loyalty points redemption (1 point = 1 RWF)
- *   - WhatsApp share cart (generates a shareable message)
- *   - Continue shopping button
- *   - Proceed to checkout button
- *   - Empty state with CTA
- */
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { AlertCircle, ArrowRight, Check, Heart, MessageCircle, Minus, Plus, ShoppingCart, Trash2, Truck, X } from 'lucide-react'
+import { useCart } from '@/hooks/useCart'
+import { useStore } from '@/store/useStore'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import type { TranslationVariables } from '@/lib/i18n'
+import { formatRWF } from '@/lib/format'
+import type { CartItem } from '@/store/cartStore'
 
-import { useState, useEffect } from "react"
-import { useStore } from "@/store/useStore"
-import { formatRWF, deliveryFeeFor } from "@/lib/format"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
-import { useT } from '@/lib/i18n/LanguageContext'
-import {
-  Minus,
-  Plus,
-  Trash2,
-  ShoppingBag,
-  ArrowLeft,
-  ArrowRight,
-  ShoppingCart,
-  Heart,
-  Tag,
-  Gift,
-  MessageCircle,
-  Loader2,
-  X,
-} from "lucide-react"
-
-// Province options for delivery estimate in cart
-const PROVINCES = [
-  "Kigali City",
-  "Northern Province",
-  "Southern Province",
-  "Eastern Province",
-  "Western Province",
-]
-
-export function CartView() {
-  const t = useT()
-  const {
-    items,
-    savedItems,
-    updateQuantity,
-    removeFromCart,
-    saveForLater,
-    moveToCart,
-    removeFromSaved,
-    cartSubtotal,
-    goCatalog,
-    goCheckout,
-    clearCart,
-    appliedCoupon,
-    setAppliedCoupon,
-    clearCoupon,
-    redeemPoints,
-    setRedeemPoints,
-    user,
-  } = useStore()
-  const { toast } = useToast()
-
-  const [province, setProvince] = useState("Kigali City")
-  const [couponCode, setCouponCode] = useState(appliedCoupon?.code || "")
-  const [couponLoading, setCouponLoading] = useState(false)
-  const [undoTimer, setUndoTimer] = useState<ReturnType<typeof setTimeout> | null>(null)
-
-  const subtotal = cartSubtotal()
-
-  // Calculate discount
-  const couponDiscount = appliedCoupon?.discountAmount || 0
-  const loyaltyDiscount = Math.min(redeemPoints, Math.max(0, subtotal - couponDiscount))
-  const totalDiscount = couponDiscount + loyaltyDiscount
-  const deliveryFee = items.length > 0 ? deliveryFeeFor(province) : 0
-  const finalDeliveryFee = appliedCoupon?.freeShipping ? 0 : deliveryFee
-  const total = Math.max(0, subtotal - totalDiscount + finalDeliveryFee)
-
-  // Cleanup undo timer on unmount
-  useEffect(() => {
-    return () => {
-      if (undoTimer) clearTimeout(undoTimer)
-    }
-  }, [undoTimer])
-
-  // ─── Remove with undo ────────────────────────────────────────────
-  const handleRemove = (item: typeof items[0]) => {
-    removeFromCart(item.productId)
-
-    if (undoTimer) clearTimeout(undoTimer)
-    const timer = setTimeout(() => {
-      if (undoTimer) clearTimeout(undoTimer)
-    }, 5000)
-    setUndoTimer(timer)
-
-    toast({
-      title: t('cart.removed_from_cart'),
-      description: item.name,
-      action: (
-        <button
-          className="rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-          onClick={() => {
-            useStore.getState().addToCart({
-              productId: item.productId,
-              slug: item.slug,
-              name: item.name,
-              price: item.price,
-              image: item.image,
-              stock: item.stock,
-            }, item.quantity)
-            if (undoTimer) clearTimeout(undoTimer)
-          }}
-        >
-          {t('cart.undo')}
-        </button>
-      ),
-    })
-  }
-
-  // ─── Coupon validation ───────────────────────────────────────────
-  const handleApplyCoupon = async () => {
-    if (!couponCode.trim()) return
-    setCouponLoading(true)
-    try {
-      const res = await fetch("/api/coupons/validate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: couponCode, subtotal }),
-      })
-      const data = await res.json()
-      if (!res.ok || !data.valid) {
-        toast({
-          title: t('cart.invalid_coupon'),
-          description: data.error,
-          variant: "destructive",
-        })
-        return
-      }
-      setAppliedCoupon({
-        code: data.coupon.code,
-        type: data.coupon.type,
-        value: data.coupon.value,
-        discountAmount: data.discountAmount,
-        freeShipping: data.freeShipping,
-      })
-      toast({
-        title: t('cart.coupon_applied_title'),
-        description: data.message,
-      })
-    } catch {
-      toast({ title: t('cart.coupon_validation_failed'), variant: "destructive" })
-    } finally {
-      setCouponLoading(false)
-    }
-  }
-
-  // ─── WhatsApp share cart ─────────────────────────────────────────
-  const handleShareCart = () => {
-    const message = t('cart.share_message', {
-      items: items.map((i) => `• ${i.name} × ${i.quantity} — ${formatRWF(i.price * i.quantity)}`).join("\n"),
-      subtotal: formatRWF(subtotal),
-    })
-    const url = `https://wa.me/?text=${encodeURIComponent(message)}`
-    window.open(url, "_blank")
-  }
-
-  // ─── Empty cart state ────────────────────────────────────────────
-  if (items.length === 0 && savedItems.length === 0) {
-    return (
-      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
-        <div className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-secondary">
-          <ShoppingBag className="h-12 w-12 text-primary/60" />
-        </div>
-        <h1 className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">
-          {t('cart.empty')}
-        </h1>
-        <p className="mt-2 text-muted-foreground">
-          {t('cart.empty_friendly_hint')}
-        </p>
-        <Button size="lg" className="mt-6" onClick={() => goCatalog(null)}>
-          <ShoppingCart className="mr-2 h-5 w-5" /> {t('cart.start_shopping')}
-        </Button>
-      </div>
-    )
-  }
-
-  return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t('cart.your_cart')}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t('cart.items_in_cart', { count: items.length })}
-            {savedItems.length > 0 && ` · ${t('cart.saved_count', { count: savedItems.length })}`}
-          </p>
-        </div>
-        <Button variant="ghost" size="sm" onClick={() => goCatalog(null)}>
-          <ArrowLeft className="mr-1.5 h-4 w-4" /> {t('cart.continue_shopping')}
-        </Button>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* ─── Cart items ────────────────────────────────────────── */}
-        <div className="lg:col-span-2">
-          {items.length > 0 ? (
-            <ul className="space-y-3">
-              {items.map((item) => (
-                <li
-                  key={item.productId}
-                  className="flex gap-3 rounded-2xl border bg-card p-3 sm:gap-4 sm:p-4"
-                >
-                  {/* Image */}
-                  <button
-                    onClick={() => useStore.getState().goProduct(item.slug)}
-                    className="aspect-square w-20 shrink-0 overflow-hidden rounded-xl bg-secondary/30 sm:w-28"
-                  >
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="grid h-full w-full place-items-center text-xs text-muted-foreground">
-                        {t('product.no_image')}
-                      </div>
-                    )}
-                  </button>
-
-                  {/* Info + actions */}
-                  <div className="flex flex-1 flex-col">
-                    <div className="flex items-start justify-between gap-2">
-                      <button
-                        onClick={() => useStore.getState().goProduct(item.slug)}
-                        className="line-clamp-2 text-left text-sm font-medium leading-snug hover:text-primary sm:text-base"
-                      >
-                        {item.name}
-                      </button>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => saveForLater(item.productId)}
-                          className="shrink-0 rounded-lg p-1.5 text-muted-foreground hover:bg-secondary hover:text-primary"
-                          aria-label={t('cart.save_product_later', { product: item.name })}
-                          title={t('cart.save_for_later')}
-                        >
-                          <Heart className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleRemove(item)}
-                          className="shrink-0 rounded-lg p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                          aria-label={t('cart.remove_product', { product: item.name })}
-                          title={t('cart.remove')}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {t('cart.price_each', { price: formatRWF(item.price) })}
-                    </p>
-
-                    <div className="mt-auto flex items-end justify-between pt-2">
-                      {/* Qty selector */}
-                      <div className="flex items-center rounded-lg border">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-11 w-11 rounded-r-none"
-                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                          disabled={item.quantity <= 1}
-                          aria-label={t('product.decrease_quantity')}
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </Button>
-                        <span className="w-10 text-center text-sm font-medium">
-                          {item.quantity}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-11 w-11 rounded-l-none"
-                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                          disabled={item.quantity >= item.stock}
-                          aria-label={t('product.increase_quantity')}
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                      <p className="text-sm font-semibold sm:text-base">
-                        {formatRWF(item.price * item.quantity)}
-                      </p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="rounded-2xl border border-dashed py-12 text-center">
-              <ShoppingBag className="mx-auto h-10 w-10 text-muted-foreground/50" />
-              <p className="mt-2 text-sm text-muted-foreground">
-                {t('cart.empty_or_restore')}
-              </p>
-            </div>
-          )}
-
-          {/* WhatsApp share + clear cart */}
-          {items.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={handleShareCart}>
-                <MessageCircle className="mr-1.5 h-4 w-4" /> {t('cart.share_whatsapp')}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-muted-foreground"
-                onClick={() => {
-                  if (window.confirm(t('cart.clear_confirm'))) {
-                    clearCart()
-                    toast({ title: t('cart.cleared') })
-                  }
-                }}
-              >
-                <Trash2 className="mr-1.5 h-4 w-4" /> {t('cart.clear_cart')}
-              </Button>
-            </div>
-          )}
-
-          {/* ─── Saved for later ──────────────────────────────────── */}
-          {savedItems.length > 0 && (
-            <div className="mt-8">
-              <h2 className="mb-3 text-lg font-semibold">
-                {t('cart.saved_for_later_count', { count: savedItems.length })}
-              </h2>
-              <ul className="space-y-2">
-                {savedItems.map((item) => (
-                  <li
-                    key={item.productId}
-                    className="flex items-center gap-3 rounded-xl border bg-secondary/20 p-3"
-                  >
-                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-secondary/30">
-                      {item.image && (
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="h-full w-full object-cover"
-                        />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="line-clamp-1 text-sm font-medium">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatRWF(item.price)}
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => moveToCart(item.productId)}
-                    >
-                      {t('cart.move_to_cart')}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-11 w-11 text-muted-foreground hover:text-destructive"
-                      onClick={() => removeFromSaved(item.productId)}
-                      aria-label={t('cart.remove_from_saved')}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-
-        {/* ─── Order summary sidebar ──────────────────────────────── */}
-        <aside className="lg:col-span-1">
-          <div className="sticky top-24 space-y-4">
-            {/* Coupon */}
-            <div className="rounded-2xl border bg-card p-4 shadow-sm">
-              <h2 className="flex items-center gap-1.5 text-sm font-semibold">
-                <Tag className="h-4 w-4 text-primary" /> {t('cart.coupon')}
-              </h2>
-              {appliedCoupon ? (
-                <div className="mt-3 flex items-center justify-between rounded-lg bg-emerald-50 px-3 py-2">
-                  <div>
-                    <p className="text-sm font-medium text-emerald-700">
-                      {t('cart.code_applied', { code: appliedCoupon.code })}
-                    </p>
-                    {appliedCoupon.discountAmount > 0 && (
-                      <p className="text-xs text-emerald-600">
-                        −{formatRWF(appliedCoupon.discountAmount)}
-                      </p>
-                    )}
-                    {appliedCoupon.freeShipping && (
-                      <p className="text-xs text-emerald-600">{t('cart.free_shipping')}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => {
-                      clearCoupon()
-                      setCouponCode("")
-                      toast({ title: t('cart.coupon_removed') })
-                    }}
-                    className="rounded-md p-1 text-emerald-700 hover:bg-emerald-100"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="mt-3 flex gap-2">
-                  <Input
-                    placeholder={t('cart.coupon_example', { code: 'WELCOME10' })}
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    className="h-9"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") handleApplyCoupon()
-                    }}
-                  />
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={handleApplyCoupon}
-                    disabled={couponLoading || !couponCode.trim()}
-                  >
-                    {couponLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      t('cart.apply_coupon')
-                    )}
-                  </Button>
-                </div>
-              )}
-              <p className="mt-2 text-xs text-muted-foreground">
-                {t('cart.coupon_suggestions')}
-              </p>
-            </div>
-
-            {/* Loyalty points */}
-            {user && (
-              <div className="rounded-2xl border bg-card p-4 shadow-sm">
-                <h2 className="flex items-center gap-1.5 text-sm font-semibold">
-                  <Gift className="h-4 w-4 text-primary" /> {t('cart.loyalty_points')}
-                </h2>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {t('cart.points_balance', { points: 0 })}
-                </p>
-                <div className="mt-3 flex items-center gap-2">
-                  <Input
-                    type="number"
-                    placeholder={t('cart.points_redeem_placeholder')}
-                    value={redeemPoints || ""}
-                    onChange={(e) => setRedeemPoints(Number(e.target.value) || 0)}
-                    className="h-9"
-                    min="0"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setRedeemPoints(0)}
-                    disabled={redeemPoints === 0}
-                  >
-                    {t('common.clear')}
-                  </Button>
-                </div>
-                {redeemPoints > 0 && (
-                  <p className="mt-1 text-xs text-emerald-600">
-                    −{t('cart.amount_applied', { amount: formatRWF(loyaltyDiscount) })}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Order summary */}
-            <div className="rounded-2xl border bg-card p-4 shadow-sm">
-              <h2 className="text-sm font-semibold">{t('checkout.order_summary')}</h2>
-
-              {/* Province selector for delivery estimate */}
-              <div className="mt-3">
-                <Label className="mb-1 block text-xs text-muted-foreground">
-                  {t('cart.delivery_province_estimate')}
-                </Label>
-                <select
-                  value={province}
-                  onChange={(e) => setProvince(e.target.value)}
-                  className="h-9 w-full rounded-lg border bg-background px-3 text-sm"
-                >
-                  {PROVINCES.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Totals */}
-              <div className="mt-3 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('cart.subtotal')}</span>
-                  <span className="font-medium">{formatRWF(subtotal)}</span>
-                </div>
-                {couponDiscount > 0 && (
-                  <div className="flex justify-between text-emerald-600">
-                    <span>{t('cart.coupon_discount')}</span>
-                    <span className="font-medium">−{formatRWF(couponDiscount)}</span>
-                  </div>
-                )}
-                {loyaltyDiscount > 0 && (
-                  <div className="flex justify-between text-emerald-600">
-                    <span>{t('cart.loyalty_points')}</span>
-                    <span className="font-medium">−{formatRWF(loyaltyDiscount)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">{t('checkout.delivery_fee')}</span>
-                  {finalDeliveryFee === 0 && appliedCoupon?.freeShipping ? (
-                    <span className="font-medium text-emerald-600">{t('common.free')}</span>
-                  ) : (
-                    <span className="font-medium">{formatRWF(finalDeliveryFee)}</span>
-                  )}
-                </div>
-                <div className="border-t pt-2">
-                  <div className="flex items-baseline justify-between">
-                    <span className="font-semibold">{t('cart.total')}</span>
-                    <span className="text-xl font-bold">{formatRWF(total)}</span>
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                size="lg"
-                className="mt-4 w-full"
-                onClick={goCheckout}
-                disabled={items.length === 0}
-              >
-                {t('cart.checkout')} <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-2 w-full"
-                onClick={() => goCatalog(null)}
-              >
-                {t('cart.continue_shopping')}
-              </Button>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
-  )
+interface DeliveryResult { fee: number; deliveryTime: string; isFreeDelivery: boolean; freeDeliveryThreshold: number; amountNeededForFree: number }
+interface CouponPreview {
+  coupon: { code: string; type: string; value: number; description?: string | null; minOrderAmount: number | null; maxDiscountAmount: number | null; endsAt: string | null; usageRemaining: number | null; usageLimitPerUser: number; appliesToAllProducts: boolean }
+  discountAmount: number
+  freeShipping: boolean
+  canApply: boolean
+  rejectionReason: string | null
 }
+interface CrossSell { id: string; name: string; slug: string; price: number; compareAt: number | null; stock: number; volume: string | null; categorySlug: string; brandName: string | null; imageUrl: string | null; imagePublicId: string | null; imageAlt: string }
+
+export default function CartView() {
+  const { t } = useLanguage()
+  const cart = useCart()
+  const appliedCoupon = useStore((state) => state.appliedCoupon)
+  const setAppliedCoupon = useStore((state) => state.setAppliedCoupon)
+  const clearCoupon = useStore((state) => state.clearCoupon)
+  const [districts, setDistricts] = useState<Array<{ province: string; districts: string[] }>>([])
+  const [delivery, setDelivery] = useState<DeliveryResult | null>(null)
+  const [couponCode, setCouponCode] = useState(appliedCoupon?.code || '')
+  const [couponPreview, setCouponPreview] = useState<CouponPreview | null>(null)
+  const [crossSells, setCrossSells] = useState<CrossSell[]>([])
+  const [couponError, setCouponError] = useState('')
+  const [couponLoading, setCouponLoading] = useState(false)
+
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch('/api/delivery/districts', { signal: controller.signal }).then((response) => response.json()).then((result) => setDistricts(result.provinces || [])).catch(() => {})
+    return () => controller.abort()
+  }, [])
+
+  const productIds = cart.items.filter((item) => !item.isBundle).map((item) => item.productId).join(',')
+  useEffect(() => {
+    if (!productIds) { setCrossSells([]); return }
+    const controller = new AbortController()
+    fetch(`/api/products/cross-sells?productIds=${encodeURIComponent(productIds)}&limit=6`, { signal: controller.signal, cache: 'no-store' })
+      .then((response) => { if (!response.ok) throw new Error(); return response.json() })
+      .then((result) => setCrossSells(result.data?.products || result.products || []))
+      .catch((reason) => { if (!(reason instanceof DOMException && reason.name === 'AbortError')) setCrossSells([]) })
+    return () => controller.abort()
+  }, [productIds])
+
+  useEffect(() => {
+    if (!cart.selectedDistrict) { setDelivery(null); return }
+    const controller = new AbortController()
+    fetch(`/api/delivery/calculate?district=${encodeURIComponent(cart.selectedDistrict)}&orderTotal=${cart.subtotal}`, { signal: controller.signal, cache: 'no-store' })
+      .then((response) => { if (!response.ok) throw new Error(); return response.json() })
+      .then((result) => setDelivery(result.data || result))
+      .catch((reason) => { if (!(reason instanceof DOMException && reason.name === 'AbortError')) setDelivery(null) })
+    return () => controller.abort()
+  }, [cart.selectedDistrict, cart.subtotal])
+
+  useEffect(() => {
+    if (!appliedCoupon?.code) return
+    const controller = new AbortController()
+    fetch('/api/coupons/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal, body: JSON.stringify({ code: appliedCoupon.code, items: cart.items.filter((item) => !item.isBundle).map((item) => ({ productId: item.productId, quantity: item.quantity })) }) })
+      .then((response) => { if (!response.ok) throw new Error(); return response.json() })
+      .then((result) => { const preview = result.data || result; if (!preview.canApply) clearCoupon(); else setAppliedCoupon({ code: preview.coupon.code, type: preview.coupon.type, value: preview.coupon.value, discountAmount: preview.discountAmount, freeShipping: preview.freeShipping }) })
+      .catch((reason) => { if (!(reason instanceof DOMException && reason.name === 'AbortError')) clearCoupon() })
+    return () => controller.abort()
+  }, [appliedCoupon?.code, cart.items, cart.subtotal, clearCoupon, productIds, setAppliedCoupon])
+
+  const previewCoupon = async () => {
+    if (!couponCode.trim()) return
+    setCouponLoading(true); setCouponError(''); setCouponPreview(null)
+    try {
+      const response = await fetch('/api/coupons/preview', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: couponCode.trim(), items: cart.items.filter((item) => !item.isBundle).map((item) => ({ productId: item.productId, quantity: item.quantity })) }) })
+      const result = await response.json()
+      if (!response.ok) throw new Error(t('cart.coupon_invalid'))
+      const preview = result.data || result
+      setCouponPreview(preview)
+      if (!preview.canApply) setCouponError(couponRejectionMessage(preview.rejectionReason, preview.coupon.minOrderAmount, cart.subtotal, t))
+    } catch (error) { setCouponError(error instanceof Error ? error.message : t('cart.coupon_invalid')) }
+    finally { setCouponLoading(false) }
+  }
+  const applyCoupon = () => {
+    if (!couponPreview || !couponPreview.canApply) return
+    setAppliedCoupon({ code: couponPreview.coupon.code, type: couponPreview.coupon.type, value: couponPreview.coupon.value, discountAmount: couponPreview.discountAmount, freeShipping: couponPreview.freeShipping })
+    setCouponPreview(null)
+  }
+  const discount = appliedCoupon?.discountAmount || 0
+  const deliveryFee = appliedCoupon?.freeShipping ? 0 : delivery?.fee || 0
+  const total = Math.max(0, cart.subtotal - discount + deliveryFee)
+
+  const share = () => {
+    const items = cart.items.map((item) => `• ${item.name} ×${item.quantity} — ${formatRWF(item.price * item.quantity)}`).join('\n')
+    const message = t('cart.share_message', { items, subtotal: formatRWF(cart.subtotal) })
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+  }
+
+  if (cart.items.length === 0 && cart.savedItems.length === 0) return <main className="mx-auto grid min-h-[65vh] max-w-2xl place-items-center px-4 py-16 text-center"><div><span className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-rose-50"><ShoppingCart className="h-10 w-10 text-[#B76E79]" /></span><h1 className="mt-5 text-3xl font-black">{t('empty.cart')}</h1><p className="mt-2 text-sm text-gray-500">{t('empty.cart_hint')}</p><Link href="/products" className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-[#B76E79] px-6 font-bold text-white">{t('cart.browse_products')}</Link></div></main>
+
+  return <main className="mx-auto max-w-6xl px-4 py-6"><h1 className="text-2xl font-black">{t('cart.title')} <span className="text-sm font-medium text-gray-400">({t('cart.items', { count: cart.itemCount })})</span></h1>
+    {cart.lastRemoved && Date.now() - cart.lastRemoved.timestamp <= 10_000 && <div className="fixed bottom-[calc(76px+env(safe-area-inset-bottom))] left-4 right-4 z-[70] flex items-center gap-3 rounded-2xl bg-gray-900 p-3 text-white shadow-xl sm:left-auto sm:w-96"><span className="min-w-0 flex-1 truncate text-sm">{t('cart.undo_remove', { name: cart.lastRemoved.item.name })}</span><button type="button" onClick={cart.undoRemove} className="min-h-11 rounded-xl bg-white px-4 text-sm font-black text-[#B76E79]">{t('cart.undo')}</button></div>}
+    <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]"><div className="space-y-4">
+      {delivery && <section className="rounded-2xl border bg-white p-4"><p className="flex items-center gap-2 text-sm font-bold"><Truck className="h-4 w-4 text-[#B76E79]" />{delivery.isFreeDelivery ? t('cart.free_delivery_achieved') : t('cart.free_delivery_hint', { amount: formatRWF(delivery.amountNeededForFree) })}</p><div className="mt-3 h-2 overflow-hidden rounded-full bg-gray-100"><div className="h-full bg-[#B76E79]" style={{ width: `${Math.min(100, delivery.freeDeliveryThreshold > 0 ? cart.subtotal / delivery.freeDeliveryThreshold * 100 : 0)}%` }} /></div></section>}
+      {cart.items.map((item) => <CartRow key={item.productId} item={item} onRemove={() => cart.removeItem(item.productId)} onSave={() => cart.saveForLater(item.productId)} onQuantity={(quantity) => cart.updateQuantity(item.productId, quantity)} />)}
+      {cart.savedItems.length > 0 && <section className="rounded-2xl border bg-white p-4"><h2 className="font-black">{t('cart.saved_for_later', { count: cart.savedItems.length })}</h2><div className="mt-3 space-y-2">{cart.savedItems.map((item) => <div key={item.productId} className="flex items-center gap-3 border-t pt-2"><span className="min-w-0 flex-1 truncate text-sm font-bold">{item.name}</span><button type="button" onClick={() => cart.moveToCart(item.productId)} className="min-h-11 px-3 text-xs font-bold text-[#B76E79]">{t('cart.move_to_cart')}</button><button type="button" onClick={() => cart.removeSaved(item.productId)} className="grid h-11 w-11 place-items-center text-red-500"><X className="h-4 w-4" /></button></div>)}</div></section>}
+      <section className="rounded-2xl border bg-white p-4"><h2 className="flex items-center gap-2 font-black"><Truck className="h-4 w-4 text-[#B76E79]" />{t('cart.delivery_estimate')}</h2><select value={cart.selectedDistrict} onChange={(event) => cart.setDistrict(event.target.value)} className="mt-3 min-h-12 w-full rounded-xl border-2 border-gray-200 bg-white px-3 text-base"><option value="">{t('delivery.select_district')}</option>{districts.map((group) => <optgroup key={group.province} label={group.province}>{group.districts.map((district) => <option key={district}>{district}</option>)}</optgroup>)}</select>{delivery && <div className="mt-3 rounded-xl bg-gray-50 p-3 text-sm"><p className="flex justify-between"><span>{delivery.deliveryTime}</span><strong>{delivery.fee === 0 ? t('common.free') : formatRWF(delivery.fee)}</strong></p></div>}</section>
+      <button type="button" onClick={share} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-green-50 font-bold text-green-700"><MessageCircle className="h-5 w-5" />{t('cart.share_whatsapp')}</button>
+      {crossSells.length > 0 && <section className="rounded-2xl border bg-white p-4"><h2 className="font-black">{t('cart.complete_routine')}</h2><p className="mt-1 text-xs text-gray-500">{t('cart.same_category_suggestions')}</p><div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">{crossSells.map((product) => <article key={product.id} className="overflow-hidden rounded-xl border"><Link href={`/products/${product.slug}`} className="relative block aspect-square bg-gray-50">{product.imageUrl && <Image src={product.imageUrl} alt={product.imageAlt} fill sizes="(max-width: 640px) 45vw, 180px" className="object-contain p-2" />}</Link><div className="p-3"><Link href={`/products/${product.slug}`} className="line-clamp-2 text-xs font-bold">{product.name}</Link><p className="mt-2 text-sm font-black text-[#B76E79]">{formatRWF(product.price)}</p><button type="button" onClick={() => cart.addToCart({ productId: product.id, name: product.name, slug: product.slug, price: product.price, comparePrice: product.compareAt || undefined, quantity: 1, maxQuantity: product.stock, image: product.imageUrl || undefined, imagePublicId: product.imagePublicId || undefined, imageAlt: product.imageAlt, volume: product.volume || undefined, brandName: product.brandName || undefined, categorySlug: product.categorySlug })} className="mt-2 flex min-h-11 w-full items-center justify-center gap-1 rounded-xl bg-rose-50 px-2 text-xs font-black text-[#B76E79]"><Plus className="h-4 w-4" />{t('product.add_to_cart')}</button></div></article>)}</div></section>}
+    </div>
+    <aside className="rounded-2xl border bg-white p-5 lg:sticky lg:top-36"><h2 className="font-black">{t('cart.total')}</h2><Summary label={t('cart.subtotal')} value={formatRWF(cart.subtotal)} />{discount > 0 && <Summary label={t('cart.discount')} value={`−${formatRWF(discount)}`} green />}{cart.selectedDistrict && <Summary label={t('cart.delivery')} value={deliveryFee === 0 ? t('common.free') : formatRWF(deliveryFee)} />}<div className="mt-4 border-t pt-4"><Summary label={t('cart.total')} value={formatRWF(total)} strong /></div>
+      {!appliedCoupon ? <div className="mt-5 border-t pt-4"><div className="flex gap-2"><input value={couponCode} onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponPreview(null); setCouponError('') }} placeholder={t('cart.coupon_placeholder')} className="min-h-11 min-w-0 flex-1 rounded-xl border px-3" /><button type="button" onClick={previewCoupon} disabled={couponLoading} className="min-h-11 rounded-xl bg-gray-900 px-4 text-sm font-bold text-white">{couponLoading ? t('cart.applying') : t('cart.apply_coupon')}</button></div>{couponError && <p className="mt-2 flex gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-700"><AlertCircle className="h-4 w-4 shrink-0" />{couponError}</p>}{couponPreview && <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3"><h3 className="font-bold text-amber-900">{t('cart.coupon_terms_title')}</h3>{couponPreview.coupon.description && <p className="mt-1 text-xs text-amber-800">{couponPreview.coupon.description}</p>}<ul className="mt-2 space-y-1 text-xs text-amber-900"><li>{couponBenefit(couponPreview, t)}</li>{couponPreview.coupon.minOrderAmount !== null && <li>{t('cart.coupon_minimum', { amount: formatRWF(couponPreview.coupon.minOrderAmount) })}</li>}{couponPreview.coupon.maxDiscountAmount !== null && <li>{t('cart.coupon_maximum', { amount: formatRWF(couponPreview.coupon.maxDiscountAmount) })}</li>}{couponPreview.coupon.endsAt && <li>{t('cart.coupon_expires', { date: new Date(couponPreview.coupon.endsAt).toLocaleDateString() })}</li>}{couponPreview.coupon.usageRemaining !== null && <li>{t('cart.coupon_uses_remaining', { count: couponPreview.coupon.usageRemaining })}</li>}<li>{t('cart.coupon_per_customer', { count: couponPreview.coupon.usageLimitPerUser })}</li>{!couponPreview.coupon.appliesToAllProducts && <li>{t('cart.coupon_selected_only')}</li>}</ul>{couponPreview.canApply && <p className="mt-2 flex items-center gap-1 text-sm font-bold text-emerald-700"><Check className="h-4 w-4" />{couponPreview.freeShipping ? t('cart.coupon_free_delivery') : t('cart.coupon_will_save', { amount: formatRWF(couponPreview.discountAmount) })}</p>}<button type="button" onClick={applyCoupon} disabled={!couponPreview.canApply} className="mt-3 min-h-11 w-full rounded-xl bg-[#B76E79] font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">{t('cart.apply_coupon')}</button></div>}</div> : <div className="mt-4 flex items-center justify-between rounded-xl bg-emerald-50 p-3"><span className="text-sm font-bold text-emerald-800">{appliedCoupon.code}</span><button type="button" onClick={() => { clearCoupon(); setCouponCode('') }} className="grid h-11 w-11 place-items-center"><X className="h-4 w-4" /></button></div>}
+      <Link href="/checkout" className="mt-5 hidden min-h-12 items-center justify-center gap-2 rounded-xl bg-[#B76E79] font-black text-white md:flex">{t('cart.checkout')}<ArrowRight className="h-4 w-4" /></Link></aside></div>
+    {cart.items.length > 0 && <div className="h-24 md:hidden" />}<div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 z-40 border-t bg-white p-3 shadow-[0_-4px_20px_rgba(0,0,0,.08)] md:hidden"><div className="flex items-center gap-3"><div className="min-w-0 flex-1"><p className="text-xs text-gray-500">{t('cart.items', { count: cart.itemCount })}</p><p className="text-lg font-black text-[#B76E79]">{formatRWF(total)}</p></div><Link href="/checkout" className="flex min-h-[52px] items-center rounded-2xl bg-[#B76E79] px-6 font-black text-white">{t('cart.checkout')}</Link></div></div>
+  </main>
+}
+
+
+type Translate = (key: string, params?: TranslationVariables) => string
+function couponBenefit(preview: CouponPreview, t: Translate) {
+  if (preview.coupon.type === 'FREE_SHIPPING') return t('cart.coupon_free_delivery')
+  if (preview.coupon.type === 'PERCENTAGE') return t('cart.coupon_percent_off', { value: preview.coupon.value })
+  return t('cart.coupon_fixed_off', { amount: formatRWF(preview.coupon.value) })
+}
+function couponRejectionMessage(reason: string | null, minimum: number | null, subtotal: number, t: Translate) {
+  if (reason === 'MINIMUM_ORDER' && minimum !== null) return t('cart.coupon_cannot_apply', { amount: formatRWF(Math.max(0, minimum - subtotal)) })
+  if (reason === 'EXPIRED') return t('cart.coupon_expired')
+  if (reason === 'NOT_STARTED') return t('cart.coupon_not_started')
+  if (reason === 'USAGE_LIMIT' || reason === 'USER_LIMIT') return t('cart.coupon_usage_reached')
+  if (reason === 'NO_ELIGIBLE_ITEMS') return t('cart.coupon_no_eligible_items')
+  if (reason === 'EMPTY_CART') return t('cart.coupon_empty_cart')
+  return t('cart.coupon_invalid')
+}
+function CartRow({ item, onRemove, onSave, onQuantity }: { item: CartItem; onRemove: () => void; onSave: () => void; onQuantity: (quantity: number) => void }) { const { t } = useLanguage(); const image = item.imagePublicId ? `https://res.cloudinary.com/dohoc0tmp/image/upload/w_300,h_300,c_fill,q_auto,f_auto/${item.imagePublicId}` : item.image; return <article className="rounded-2xl border bg-white p-4"><div className="flex gap-3"><Link href={item.isBundle ? `/bundles/${item.slug}` : `/products/${item.slug}`} className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-gray-50">{image && <Image src={image} alt={item.imageAlt || item.name} fill sizes="80px" className="object-contain p-1" />}</Link><div className="min-w-0 flex-1"><h2 className="line-clamp-2 text-sm font-bold">{item.name}</h2>{item.volume && <p className="text-xs text-gray-400">{item.volume}</p>}<p className="mt-1 font-black text-[#B76E79]">{formatRWF(item.price * item.quantity)}</p><p className="mt-1 text-xs text-gray-500">{t('cart.stock_available', { count: item.maxQuantity })}</p></div><button type="button" onClick={onRemove} className="grid h-11 w-11 place-items-center rounded-full text-gray-400 hover:bg-red-50 hover:text-red-500" aria-label={t('cart.remove')}><Trash2 className="h-4 w-4" /></button></div><div className="mt-3 flex items-center justify-between border-t pt-3"><div className="flex h-11 items-center overflow-hidden rounded-xl border"><button type="button" onClick={() => onQuantity(item.quantity - 1)} disabled={item.quantity <= 1} className="grid h-11 w-11 place-items-center disabled:opacity-30"><Minus className="h-4 w-4" /></button><span className="grid h-11 min-w-11 place-items-center border-x text-sm font-black">{item.quantity}</span><button type="button" onClick={() => onQuantity(item.quantity + 1)} disabled={item.quantity >= item.maxQuantity} className="grid h-11 w-11 place-items-center disabled:opacity-30"><Plus className="h-4 w-4" /></button></div><button type="button" onClick={onSave} className="flex min-h-11 items-center gap-1.5 px-2 text-xs font-bold text-gray-500"><Heart className="h-4 w-4" />{t('cart.save_for_later')}</button></div>{item.quantity >= item.maxQuantity && <p className="mt-2 text-xs font-semibold text-amber-700">{t('cart.max_reached')}</p>}</article> }
+function Summary({ label, value, green, strong }: { label: string; value: string; green?: boolean; strong?: boolean }) { return <p className={`mt-3 flex justify-between text-sm ${strong ? 'text-base font-black' : ''} ${green ? 'text-emerald-700' : ''}`}><span>{label}</span><span>{value}</span></p> }
