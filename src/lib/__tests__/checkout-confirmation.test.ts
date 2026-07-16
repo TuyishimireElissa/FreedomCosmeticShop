@@ -17,14 +17,14 @@ describe('honest order confirmation view', () => {
 
   it('provides tracking, WhatsApp sharing, shopping and support actions', () => {
     expect(view).toContain('href="/track-order"')
-    expect(view).toContain('https://wa.me/?text=')
+    expect(view).toContain('buildWhatsAppShareUrl(message)')
     expect(view).toContain('href="/products"')
     expect(view).toContain('href="/contact"')
-    expect(view).toContain('getWhatsAppLink')
+    expect(view).toContain('buildWhatsAppUrl(supportMessage)')
   })
 
   it('does not expose unconfigured business contact details or claim notifications were sent', () => {
-    expect(view).toContain("const hasWhatsApp = whatsappSupport.startsWith('https://')")
+    expect(view).toContain('const whatsappSupport = buildWhatsAppUrl(supportMessage)')
     expect(view).toContain("const hasPhone = !BUSINESS.phone.includes('TODO:')")
     expect(view).not.toContain('SMS sent')
     expect(view).not.toContain('Email sent')

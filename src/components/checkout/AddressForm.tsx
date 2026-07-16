@@ -12,8 +12,9 @@ import {
   getVillagesForCell,
   type RwandaProvince,
 } from '@/lib/rwanda-locations'
-import { useT } from '@/lib/i18n/LanguageContext'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { useStore } from '@/store/useStore'
+import { buildWhatsAppShareUrl, trackWhatsAppClick } from '@/lib/whatsapp-service'
 
 export interface CheckoutAddress {
   fullName: string
@@ -47,7 +48,7 @@ interface AddressFormProps {
 }
 
 export default function AddressForm({ value, onChange, errors = {} }: AddressFormProps) {
-  const t = useT()
+  const { t, language } = useLanguage()
   const user = useStore((state) => state.user)
   const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([])
   const [showSaved, setShowSaved] = useState(false)
@@ -90,7 +91,8 @@ export default function AddressForm({ value, onChange, errors = {} }: AddressFor
   }
   const shareLocation = () => {
     const message = t('checkout.whatsapp_location_message', { name: value.fullName, province: value.province, district: value.district, sector: value.sector, cell: value.cell, village: value.village, landmark: value.landmark || value.address })
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+    window.open(buildWhatsAppShareUrl(message), '_blank', 'noopener,noreferrer')
+    trackWhatsAppClick('delivery_inquiry', { district: value.district, language: language === 'en' ? 'en' : 'rw', pagePath: '/checkout' })
   }
 
   return <div className="space-y-5">

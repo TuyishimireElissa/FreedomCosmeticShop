@@ -9,8 +9,8 @@ import {
   Heart,
   LogOut,
   Menu,
+  MessageCircle,
   Package,
-  Phone,
   Search,
   Shield,
   ShoppingCart,
@@ -24,7 +24,7 @@ import { useT } from '@/lib/i18n/LanguageContext'
 import { useSettings } from '@/hooks/use-settings'
 import { useToast } from '@/hooks/use-toast'
 import { useStore } from '@/store/useStore'
-import { BUSINESS, getWhatsAppLink } from '@/lib/business-config'
+import { BUSINESS } from '@/lib/business-config'
 
 const categories = [
   { name: 'Skincare', slug: 'skincare', icon: '🧴', translationKey: 'categories.skincare' },
@@ -162,14 +162,13 @@ export default function Navbar() {
             <Sparkles className="h-4 w-4" /> {t('nav.quiz')}
           </button>
 
-          <a
-            href={BUSINESS.whatsapp.includes('TODO') ? undefined : getWhatsAppLink('Hello! I need help with my order.')}
-            target="_blank"
-            rel="noreferrer"
-            className="hidden items-center gap-1.5 rounded-full px-2.5 py-2 text-xs font-medium text-gray-600 transition-colors hover:bg-green-50 hover:text-green-700 lg:flex"
+          <button
+            type="button"
+            onClick={() => router.push('/support/whatsapp')}
+            className="hidden min-h-11 items-center gap-1.5 rounded-full px-2.5 py-2 text-xs font-medium text-gray-600 transition-colors hover:bg-green-50 hover:text-green-700 lg:flex"
           >
-            <Phone className="h-4 w-4" /> {t('nav.help')}
-          </a>
+            <MessageCircle className="h-4 w-4" /> {t('nav.whatsapp_support')}
+          </button>
 
           <button
             type="button"
@@ -329,7 +328,7 @@ export default function Navbar() {
             </div>
 
             <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#1a1a1a] p-4 text-xs text-white">
-              <a href={BUSINESS.whatsapp.includes('TODO') ? undefined : getWhatsAppLink('Hello! I need help with my order.')} target="_blank" rel="noreferrer" className="flex items-center gap-2 font-semibold text-green-300"><Phone className="h-4 w-4" /> WhatsApp {t('nav.help')}</a>
+              <button type="button" onClick={() => navigate(() => router.push('/support/whatsapp'))} className="flex min-h-11 items-center gap-2 font-semibold text-green-300"><MessageCircle className="h-4 w-4" />{t('nav.whatsapp_support')}</button>
               <span className="flex items-center gap-1 text-white/70"><Globe className="h-4 w-4" /> RW</span>
             </div>
           </nav>

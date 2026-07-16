@@ -1381,6 +1381,23 @@ model StoreSettings {
 // SEARCH ANALYTICS — real customer searches and zero-result product gaps
 // =============================================================================
 
+model WhatsAppClick {
+  id          String   @id @default(cuid())
+  eventType   String
+  productId   String?
+  productSlug String?
+  cartTotal   Int?
+  district    String?
+  language    String   @default("rw")
+  pagePath    String?
+  createdAt   DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+  @@index([productId])
+  @@index([language])
+}
+
 model SearchLog {
   id          String   @id @default(cuid())
   query       String

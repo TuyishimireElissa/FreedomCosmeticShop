@@ -29,7 +29,8 @@ export const BUSINESS = {
   // ═══════════════════════════════════
   phone: OWNER_TODO,
   phoneDisplay: OWNER_TODO,
-  whatsapp: OWNER_TODO,
+  // Owner-confirmed WhatsApp Business contact (international format).
+  whatsapp: '+250780000000',
   whatsappMessage: 'Hello FreedomCosmeticShop! I need help with my order.',
   email: OWNER_TODO,
   emailSupport: OWNER_TODO,
@@ -140,7 +141,6 @@ export const BUSINESS = {
     'Replace rdbNumber with RDB registration number',
     'Replace tinNumber with Rwanda TIN',
     'Replace phone with real working phone number',
-    'Replace whatsapp with real WhatsApp number',
     'Replace email with real monitored email',
     'Replace address.street with real street',
     'Replace address.sector with real sector',

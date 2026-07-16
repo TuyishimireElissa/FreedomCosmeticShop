@@ -50,6 +50,7 @@ import {
   ResponsiveContainer,
 } from "recharts"
 import { useStore } from "@/store/useStore"
+import WhatsAppAnalytics from '@/components/admin/WhatsAppAnalytics'
 
 // Removed unused imports: TrendingDown, ArrowRight, Clock, Legend, toast
 
@@ -214,6 +215,8 @@ export function AdminAnalytics() {
           </SelectContent>
         </Select>
       </div>
+
+      <WhatsAppAnalytics />
 
       {/* Revenue cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

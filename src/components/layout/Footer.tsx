@@ -9,7 +9,7 @@ import {
   Truck,
 } from 'lucide-react'
 import Link from 'next/link'
-import { BUSINESS, getWhatsAppLink } from '@/lib/business-config'
+import { BUSINESS } from '@/lib/business-config'
 import { useT } from '@/lib/i18n/LanguageContext'
 
 const shopLinks = [
@@ -69,6 +69,7 @@ export default function Footer() {
             <h2 className="text-sm font-bold uppercase tracking-[0.16em] text-white">{t('footer.help')}</h2>
             <ul className="mt-5 space-y-3 text-sm">
               <li><Link href="/track-order" className="flex min-h-11 items-center py-2 text-gray-400 transition-colors hover:text-white">{t('footer.track_order')}</Link></li>
+              <li><Link href="/support/whatsapp" className="flex min-h-11 items-center gap-2 py-2 font-semibold text-green-400 transition-colors hover:text-green-300"><MessageCircle className="h-4 w-4" />{t('footer.whatsapp_support')}</Link></li>
               <li><span className="text-gray-400">{t('footer.delivery_kigali')}</span></li>
               <li><span className="text-gray-400">{t('footer.delivery_provinces')}</span></li>
               <li><Link href="/shipping" className="flex min-h-11 items-center py-2 text-gray-400 transition-colors hover:text-white">{t('footer.shipping_policy')}</Link></li>
@@ -85,7 +86,7 @@ export default function Footer() {
               <a href={BUSINESS.phone.includes('TODO') ? undefined : `tel:${BUSINESS.phone}`} className="flex min-h-11 items-center gap-3 py-2 text-sm text-gray-400 transition-colors hover:text-white"><Phone className="h-4 w-4 shrink-0 text-[#d999a3]" />{BUSINESS.phoneDisplay}</a>
               <a href={BUSINESS.email.includes('TODO') ? undefined : `mailto:${BUSINESS.email}`} className="flex min-h-11 items-center gap-3 break-all py-2 text-sm text-gray-400 transition-colors hover:text-white"><Mail className="mt-0.5 h-4 w-4 shrink-0 text-[#d999a3]" />{BUSINESS.email}</a>
               <p className="flex items-center gap-3 text-sm text-gray-400"><MapPin className="h-4 w-4 shrink-0 text-[#d999a3]" />{BUSINESS.address.short}, {BUSINESS.address.country} 🇷🇼</p>
-              <a href={BUSINESS.whatsapp.includes('TODO') ? undefined : getWhatsAppLink()} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#25D366] px-4 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#20bd5a]"><MessageCircle className="h-4 w-4" />{t('footer.whatsapp_chat')}</a>
+              <Link href="/support/whatsapp" className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#25D366] px-4 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#20bd5a]"><MessageCircle className="h-4 w-4" />{t('footer.whatsapp_chat')}</Link>
             </div>
             <div className="mt-6">
               <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-500">{t('footer.we_accept')}</p>

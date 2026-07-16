@@ -19,7 +19,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
-import { useT } from '@/lib/i18n/LanguageContext'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { buildWhatsAppShareUrl, trackWhatsAppClick } from '@/lib/whatsapp-service'
 import { useOrderUpdates, useDeliveryUpdates } from "@/hooks/use-realtime"
 import {
   Package,
@@ -76,7 +77,7 @@ interface TimelineStep {
 export function TrackOrderView() {
   const { goHome } = useStore()
   const { toast } = useToast()
-  const t = useT()
+  const { t, language } = useLanguage()
   const [orderNumber, setOrderNumber] = useState("")
   const [order, setOrder] = useState<TrackedOrder | null>(null)
   const [timeline, setTimeline] = useState<TimelineStep[]>([])
@@ -202,7 +203,8 @@ export function TrackOrderView() {
       .map((i) => `• ${i.name} × ${i.quantity}`)
       .join("\n")
     const msg = t('orders.share_tracking_message', { order: order.orderNumber, status: order.status, items, total: formatRWF(order.total) })
-    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank")
+    window.open(buildWhatsAppShareUrl(msg), '_blank', 'noopener,noreferrer')
+    trackWhatsAppClick('track_order', { language: language === 'en' ? 'en' : 'rw', pagePath: '/track-order' })
   }
 
   return (

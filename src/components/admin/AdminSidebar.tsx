@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LogOut,
   Megaphone,
+  MessageCircle,
   MessageSquare,
   Package,
   Settings,
@@ -32,6 +33,8 @@ interface MenuItem {
   tab: AdminTab
   icon: LucideIcon
   roles?: string[]
+  href?: string
+  translationKey?: string
 }
 
 const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
@@ -55,6 +58,8 @@ const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
     group: 'Growth',
     items: [
       { label: 'Analytics', tab: 'analytics', icon: BarChart3 },
+      { label: 'WA Analytics', tab: 'analytics', icon: BarChart3, href: '/admin/analytics', translationKey: 'whatsapp.admin_analytics' },
+      { label: 'WhatsApp Guide', tab: 'analytics', icon: MessageCircle, href: '/admin/whatsapp-guide', translationKey: 'whatsapp.admin_guide' },
       { label: 'Reports', tab: 'reports', icon: FileText },
       { label: 'Marketing', tab: 'marketing', icon: Megaphone },
       { label: 'SMS Campaigns', tab: 'sms', icon: MessageSquare },
@@ -133,23 +138,24 @@ export default function AdminSidebar() {
                 {group.items.map((item) => {
                   if (item.roles && (!user || !item.roles.includes(user.role))) return null
                   const Icon = item.icon
-                  const active = activeTab === item.tab
+                  const active = !item.href && activeTab === item.tab
+                  const label = item.translationKey ? t(item.translationKey) : item.tab === 'bundles' ? t('nav.bundles') : item.label
                   return (
                     <button
                       key={item.tab}
                       type="button"
-                      onClick={() => selectTab(item.tab)}
-                      className={`group relative flex min-h-10 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-all ${
+                      onClick={() => { if (item.href) { router.push(item.href); setMobileOpen(false) } else selectTab(item.tab) }}
+                      className={`group relative flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-all ${
                         active
                           ? 'bg-[#B76E79] font-semibold text-white shadow-lg shadow-[#B76E79]/15'
                           : 'text-gray-400 hover:bg-white/[0.07] hover:text-white'
                       } ${collapsed ? 'md:justify-center md:px-2' : ''}`}
-                      title={collapsed ? (item.tab === 'bundles' ? t('nav.bundles') : item.label) : undefined}
+                      title={collapsed ? label : undefined}
                       aria-current={active ? 'page' : undefined}
                     >
                       {active && <span className="absolute -left-2 h-6 w-1 rounded-r-full bg-[#FFD700]" aria-hidden="true" />}
                       <Icon className="h-[18px] w-[18px] shrink-0" />
-                      <span className={collapsed ? 'md:hidden' : ''}>{item.tab === 'bundles' ? t('nav.bundles') : item.label}</span>
+                      <span className={collapsed ? 'md:hidden' : ''}>{label}</span>
                     </button>
                   )
                 })}

@@ -23,7 +23,7 @@ describe('mobile-first cart view', () => {
     expect(source).toContain('setAppliedCoupon({ code: couponPreview.coupon.code')
   })
   it('supports save for later, undo, WhatsApp, and real stock limits', () => {
-    for (const term of ['cart.saveForLater', 'cart.undoRemove', 'https://wa.me/', 'item.maxQuantity']) expect(source).toContain(term)
+    for (const term of ['cart.saveForLater', 'cart.undoRemove', 'buildWhatsAppShareUrl', 'item.maxQuantity']) expect(source).toContain(term)
   })
   it('provides a mobile-only sticky checkout bar above bottom navigation', () => {
     expect(source).toContain('fixed bottom-[calc(64px+env(safe-area-inset-bottom))]')

@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast'
 import ProductImageGallery from '@/components/products/ProductImageGallery'
 import ProductTabs from '@/components/products/ProductTabs'
 import DeliveryEstimator from '@/components/products/DeliveryEstimator'
+import OrderViaWhatsApp from '@/components/products/OrderViaWhatsApp'
 import ProductGrid from '@/components/products/ProductGrid'
 import { useT } from '@/lib/i18n/LanguageContext'
 import { getProductPrimaryImage } from '@/lib/cloudinary-images'
@@ -74,6 +75,9 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             {product.shades && product.shades.length > 0 && <div className="mt-6"><p className="text-xs font-black uppercase tracking-wider text-gray-500">{t('product.select_shade')} <span className="ml-1 normal-case text-[#B76E79]">{shade}</span></p><div className="mt-2 flex flex-wrap gap-2">{product.shades.map((value) => <button key={value} type="button" onClick={() => setShade(value)} className={`rounded-xl border-2 px-3 py-2 text-sm font-bold ${shade === value ? 'border-[#B76E79] bg-rose-50 text-[#B76E79]' : 'border-gray-200 text-gray-600'}`}>{value}</button>)}</div></div>}
 
             <div className="mt-7 flex flex-wrap gap-3"><div className="flex h-12 items-center overflow-hidden rounded-xl border border-gray-200"><button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1} className="grid h-full w-11 place-items-center hover:bg-gray-50 disabled:opacity-40"><Minus className="h-4 w-4" /></button><span className="grid h-full min-w-11 place-items-center border-x border-gray-200 text-sm font-black">{quantity}</span><button type="button" onClick={() => setQuantity((value) => Math.min(product.stock, value + 1))} disabled={quantity >= product.stock} className="grid h-full w-11 place-items-center hover:bg-gray-50 disabled:opacity-40"><Plus className="h-4 w-4" /></button></div><button type="button" onClick={add} disabled={outOfStock} className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 text-sm font-black text-white shadow-lg shadow-[#B76E79]/20 hover:bg-[#a55d68] disabled:bg-gray-300"><ShoppingBag className="h-5 w-5" />{outOfStock ? t('common.sold_out') : `${t('product.add_to_cart')} · ${formatRWF(product.price * quantity)}`}</button><button type="button" onClick={() => setWishlisted((value) => !value)} className="grid h-12 w-12 place-items-center rounded-xl border border-gray-200" aria-label={t('product.add_to_wishlist')}><Heart className={`h-5 w-5 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} /></button></div>
+
+            <div className="my-4 flex items-center gap-3"><span className="h-px flex-1 bg-gray-100" /><span className="text-xs text-gray-400">{t('common.or')}</span><span className="h-px flex-1 bg-gray-100" /></div>
+            <OrderViaWhatsApp product={{ id: product.id, name: product.name, slug: product.slug, price: product.price, stock: product.stock }} selectedShade={shade || undefined} selectedSize={product.volume || product.size || undefined} quantity={quantity} variant="compact" className="w-full" />
 
             <div className="mt-6"><DeliveryEstimator orderTotal={product.price * quantity} /></div>
           </div>

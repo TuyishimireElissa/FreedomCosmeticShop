@@ -54,6 +54,6 @@ describe('complete Rwanda checkout address system', () => {
     expect(form).toContain("onChange({ ...value, [key]: fieldValue })")
     expect(form).toContain('getCellsForSector')
     expect(form).toContain('getVillagesForCell')
-    expect(form).toContain('https://wa.me/?text=')
+    expect(form).toContain('buildWhatsAppShareUrl(message)')
   })
 })

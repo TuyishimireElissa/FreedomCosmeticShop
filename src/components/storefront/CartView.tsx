@@ -5,11 +5,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { AlertCircle, ArrowRight, Check, Heart, MessageCircle, Minus, Plus, ShoppingCart, Trash2, Truck, X } from 'lucide-react'
 import { useCart } from '@/hooks/useCart'
+import CartWhatsAppOrder from '@/components/cart/CartWhatsAppOrder'
 import { useStore } from '@/store/useStore'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import type { TranslationVariables } from '@/lib/i18n'
 import { formatRWF } from '@/lib/format'
 import type { CartItem } from '@/store/cartStore'
+import { buildWhatsAppShareUrl, trackWhatsAppClick } from '@/lib/whatsapp-service'
 
 interface DeliveryResult { fee: number; deliveryTime: string; isFreeDelivery: boolean; freeDeliveryThreshold: number; amountNeededForFree: number }
 interface CouponPreview {
@@ -22,7 +24,7 @@ interface CouponPreview {
 interface CrossSell { id: string; name: string; slug: string; price: number; compareAt: number | null; stock: number; volume: string | null; categorySlug: string; brandName: string | null; imageUrl: string | null; imagePublicId: string | null; imageAlt: string }
 
 export default function CartView() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const cart = useCart()
   const appliedCoupon = useStore((state) => state.appliedCoupon)
   const setAppliedCoupon = useStore((state) => state.setAppliedCoupon)
@@ -97,7 +99,8 @@ export default function CartView() {
   const share = () => {
     const items = cart.items.map((item) => `• ${item.name} ×${item.quantity} — ${formatRWF(item.price * item.quantity)}`).join('\n')
     const message = t('cart.share_message', { items, subtotal: formatRWF(cart.subtotal) })
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
+    window.open(buildWhatsAppShareUrl(message), '_blank', 'noopener,noreferrer')
+    trackWhatsAppClick('share_cart', { cartTotal: cart.subtotal, district: cart.selectedDistrict || undefined, language: language === 'en' ? 'en' : 'rw', pagePath: '/cart' })
   }
 
   if (cart.items.length === 0 && cart.savedItems.length === 0) return <main className="mx-auto grid min-h-[65vh] max-w-2xl place-items-center px-4 py-16 text-center"><div><span className="mx-auto grid h-24 w-24 place-items-center rounded-full bg-rose-50"><ShoppingCart className="h-10 w-10 text-[#B76E79]" /></span><h1 className="mt-5 text-3xl font-black">{t('empty.cart')}</h1><p className="mt-2 text-sm text-gray-500">{t('empty.cart_hint')}</p><Link href="/products" className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-[#B76E79] px-6 font-bold text-white">{t('cart.browse_products')}</Link></div></main>
@@ -114,7 +117,7 @@ export default function CartView() {
     </div>
     <aside className="rounded-2xl border bg-white p-5 lg:sticky lg:top-36"><h2 className="font-black">{t('cart.total')}</h2><Summary label={t('cart.subtotal')} value={formatRWF(cart.subtotal)} />{discount > 0 && <Summary label={t('cart.discount')} value={`−${formatRWF(discount)}`} green />}{cart.selectedDistrict && <Summary label={t('cart.delivery')} value={deliveryFee === 0 ? t('common.free') : formatRWF(deliveryFee)} />}<div className="mt-4 border-t pt-4"><Summary label={t('cart.total')} value={formatRWF(total)} strong /></div>
       {!appliedCoupon ? <div className="mt-5 border-t pt-4"><div className="flex gap-2"><input value={couponCode} onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponPreview(null); setCouponError('') }} placeholder={t('cart.coupon_placeholder')} className="min-h-11 min-w-0 flex-1 rounded-xl border px-3" /><button type="button" onClick={previewCoupon} disabled={couponLoading} className="min-h-11 rounded-xl bg-gray-900 px-4 text-sm font-bold text-white">{couponLoading ? t('cart.applying') : t('cart.apply_coupon')}</button></div>{couponError && <p className="mt-2 flex gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-700"><AlertCircle className="h-4 w-4 shrink-0" />{couponError}</p>}{couponPreview && <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3"><h3 className="font-bold text-amber-900">{t('cart.coupon_terms_title')}</h3>{couponPreview.coupon.description && <p className="mt-1 text-xs text-amber-800">{couponPreview.coupon.description}</p>}<ul className="mt-2 space-y-1 text-xs text-amber-900"><li>{couponBenefit(couponPreview, t)}</li>{couponPreview.coupon.minOrderAmount !== null && <li>{t('cart.coupon_minimum', { amount: formatRWF(couponPreview.coupon.minOrderAmount) })}</li>}{couponPreview.coupon.maxDiscountAmount !== null && <li>{t('cart.coupon_maximum', { amount: formatRWF(couponPreview.coupon.maxDiscountAmount) })}</li>}{couponPreview.coupon.endsAt && <li>{t('cart.coupon_expires', { date: new Date(couponPreview.coupon.endsAt).toLocaleDateString() })}</li>}{couponPreview.coupon.usageRemaining !== null && <li>{t('cart.coupon_uses_remaining', { count: couponPreview.coupon.usageRemaining })}</li>}<li>{t('cart.coupon_per_customer', { count: couponPreview.coupon.usageLimitPerUser })}</li>{!couponPreview.coupon.appliesToAllProducts && <li>{t('cart.coupon_selected_only')}</li>}</ul>{couponPreview.canApply && <p className="mt-2 flex items-center gap-1 text-sm font-bold text-emerald-700"><Check className="h-4 w-4" />{couponPreview.freeShipping ? t('cart.coupon_free_delivery') : t('cart.coupon_will_save', { amount: formatRWF(couponPreview.discountAmount) })}</p>}<button type="button" onClick={applyCoupon} disabled={!couponPreview.canApply} className="mt-3 min-h-11 w-full rounded-xl bg-[#B76E79] font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">{t('cart.apply_coupon')}</button></div>}</div> : <div className="mt-4 flex items-center justify-between rounded-xl bg-emerald-50 p-3"><span className="text-sm font-bold text-emerald-800">{appliedCoupon.code}</span><button type="button" onClick={() => { clearCoupon(); setCouponCode('') }} className="grid h-11 w-11 place-items-center"><X className="h-4 w-4" /></button></div>}
-      <Link href="/checkout" className="mt-5 hidden min-h-12 items-center justify-center gap-2 rounded-xl bg-[#B76E79] font-black text-white md:flex">{t('cart.checkout')}<ArrowRight className="h-4 w-4" /></Link></aside></div>
+      <Link href="/checkout" className="mt-5 hidden min-h-12 items-center justify-center gap-2 rounded-xl bg-[#B76E79] font-black text-white md:flex">{t('cart.checkout')}<ArrowRight className="h-4 w-4" /></Link><CartWhatsAppOrder items={cart.items} subtotal={cart.subtotal} discount={discount} district={cart.selectedDistrict} deliveryFee={delivery ? deliveryFee : null} /></aside></div>
     {cart.items.length > 0 && <div className="h-24 md:hidden" />}<div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom))] left-0 right-0 z-40 border-t bg-white p-3 shadow-[0_-4px_20px_rgba(0,0,0,.08)] md:hidden"><div className="flex items-center gap-3"><div className="min-w-0 flex-1"><p className="text-xs text-gray-500">{t('cart.items', { count: cart.itemCount })}</p><p className="text-lg font-black text-[#B76E79]">{formatRWF(total)}</p></div><Link href="/checkout" className="flex min-h-[52px] items-center rounded-2xl bg-[#B76E79] px-6 font-black text-white">{t('cart.checkout')}</Link></div></div>
   </main>
 }
