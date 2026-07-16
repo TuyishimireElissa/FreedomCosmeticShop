@@ -18,6 +18,8 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { cashin, normalizePhoneForPaypack, PaypackError } from "@/server/services/paypack"
+import { isValidForNetwork } from '@/lib/paypack'
+import { validateOrderStockForPayment } from '@/server/services/payment-order-validation'
 
 export async function POST(req: Request) {
   try {
@@ -26,13 +28,18 @@ export async function POST(req: Request) {
       orderId: string
       phone: string
       network: "MTN" | "AIRTEL"
+      language?: 'en' | 'rw'
     }
+    const language = body.language === 'en' ? 'en' : 'rw'
 
-    if (!orderId || !phone) {
+    if (!orderId || !phone || (network !== 'MTN' && network !== 'AIRTEL')) {
       return NextResponse.json(
-        { error: "Order ID and phone are required" },
+        { error: "Invalid payment request" },
         { status: 400 }
       )
+    }
+    if (!isValidForNetwork(phone, network)) {
+      return NextResponse.json({ error: 'INVALID_NETWORK_PHONE' }, { status: 400 })
     }
 
     // Normalize phone
@@ -62,6 +69,8 @@ export async function POST(req: Request) {
         { status: 400 }
       )
     }
+    const stock = await validateOrderStockForPayment(order.id)
+    if (!stock.available) return NextResponse.json({ error: 'ORDER_STOCK_CHANGED' }, { status: 409 })
 
     // ─── Simulation mode (MVP) ────────────────────────────────────────
     // When real payments are disabled, we still create the payment record
@@ -79,6 +88,7 @@ export async function POST(req: Request) {
         where: { id: payment.id },
         data: {
           phoneNumber: normalizedPhone,
+          webhookData: JSON.stringify({ checkoutLanguage: language }),
         },
       })
     } else {
@@ -90,14 +100,13 @@ export async function POST(req: Request) {
           amount: order.total,
           status: "PENDING",
           phoneNumber: normalizedPhone,
+          webhookData: JSON.stringify({ checkoutLanguage: language }),
         },
       })
     }
 
     if (isSimulation) {
-      console.log(
-        `[MOCK MoMo] ${network} ${order.total} RWF from ${normalizedPhone} for ${order.orderNumber}`
-      )
+      console.log(`[MOCK MoMo] Initiated simulated payment for order ${order.orderNumber}`)
 
       // Simulate payment success after 3 seconds
       setTimeout(async () => {

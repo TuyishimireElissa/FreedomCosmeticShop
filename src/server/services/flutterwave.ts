@@ -21,6 +21,7 @@
  *   FLW_WEBHOOK_HASH — Webhook verification hash
  */
 
+import { timingSafeEqual } from 'node:crypto'
 import { env, features } from "@/lib/env"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -462,8 +463,11 @@ export function verifyWebhookEvent(
     return null
   }
 
-  // Verify signature
-  if (!signature || signature !== env.FLW_WEBHOOK_HASH) {
+  // Verify the configured hash without a direct string comparison.
+  if (!signature) return null
+  const supplied = Buffer.from(signature)
+  const expected = Buffer.from(env.FLW_WEBHOOK_HASH)
+  if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) {
     console.error("[Flutterwave Webhook] Invalid signature")
     return null
   }
@@ -472,7 +476,7 @@ export function verifyWebhookEvent(
     const event = JSON.parse(body) as FlutterwaveWebhookEvent
 
     // Basic validation
-    if (!event.event || !event.data?.tx_ref) {
+    if (!event.event || !event.data?.tx_ref || !Number.isFinite(event.data.amount) || event.data.amount <= 0 || event.data.currency !== 'RWF') {
       console.error("[Flutterwave Webhook] Invalid event structure")
       return null
     }

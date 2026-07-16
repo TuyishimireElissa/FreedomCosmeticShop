@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth'
 import { calculateDelivery, getAllDistricts, getProvinceByDistrict } from '@/server/services/delivery.service'
 import { calculateBundleFacts } from '@/lib/bundle-pricing'
+import { sendOrderConfirmation } from '@/server/services/order-confirmation'
 
 const lineSchema = z.object({
   productId: z.string().min(1).optional(),
@@ -13,7 +14,7 @@ const lineSchema = z.object({
   quantity: z.number().int().min(1).max(99),
 }).refine((line) => Boolean(line.productId) !== Boolean(line.bundleId), 'Provide either productId or bundleId')
 const schema = z.object({
-  customerName: z.string().trim().min(2).max(100), customerPhone: z.string().regex(/^(?:\+250|250|0)?7[2389]\d{7}$/), customerEmail: z.string().email().optional().or(z.literal('')),
+  customerName: z.string().trim().min(2).max(100), customerPhone: z.string().regex(/^(?:\+250|250|0)?7[2389]\d{7}$/), customerEmail: z.string().email().optional().or(z.literal('')), language: z.enum(['en', 'rw']).default('rw'),
   address: z.string().trim().min(5).max(300), district: z.string(), sector: z.string().trim().min(2).max(100), notes: z.string().max(500).optional(), paymentMethod: z.enum(['MTN_MOMO','AIRTEL_MONEY','CARD','COD']), couponCode: z.string().max(50).optional(), items: z.array(lineSchema).min(1),
 })
 
@@ -88,11 +89,12 @@ export async function POST(request: Request) {
     const delivery = freeShipping ? { ...calculatedDelivery, fee: 0, feeFormatted: 'FREE', isFreeDelivery: true } : calculatedDelivery
     const total = Math.max(0, subtotal - discountAmount + delivery.fee)
     const orderNumber = `FCS-${new Date().getFullYear()}-${Date.now().toString(36).toUpperCase()}`
+    const estimatedArrival = new Date(Date.now() + (delivery.isSameDay ? 1 : 4) * 86400000)
 
     const order = await prisma.$transaction(async (tx) => {
       const created = await tx.order.create({ data: { orderNumber, customerName: input.customerName, customerPhone: input.customerPhone, customerEmail: input.customerEmail || null, userId: user?.id || null, address: input.address, city: input.sector, district: input.district, sector: input.sector, province, notes: input.notes || null, subtotal, discountAmount, deliveryFee: delivery.fee, total, couponId, loyaltyPointsEarned: Math.floor(total / 1000), status: input.paymentMethod === 'COD' ? 'CONFIRMED' : 'PENDING', items: { create: orderItems } }, include: { items: true } })
       await tx.payment.create({ data: { orderId: created.id, method: input.paymentMethod, amount: total, status: 'PENDING', phoneNumber: input.paymentMethod.includes('MONEY') || input.paymentMethod === 'MTN_MOMO' ? input.customerPhone : null } })
-      await tx.delivery.create({ data: { orderId: created.id, status: 'PENDING', estimatedArrival: new Date(Date.now() + (delivery.isSameDay ? 1 : 4) * 86400000) } })
+      await tx.delivery.create({ data: { orderId: created.id, status: 'PENDING', estimatedArrival } })
       if (input.paymentMethod === 'COD') {
         for (const needed of stockNeeded.values()) {
           const updated = await tx.product.updateMany({ where: { id: needed.product.id, stock: { gte: needed.quantity } }, data: { stock: { decrement: needed.quantity } } })
@@ -103,7 +105,10 @@ export async function POST(request: Request) {
       if (couponId) await tx.coupon.update({ where: { id: couponId }, data: { usedCount: { increment: 1 } } })
       return created
     })
-    return NextResponse.json({ success: true, data: { order }, order }, { status: 201 })
+    const confirmationDelivery = input.paymentMethod === 'COD'
+      ? await sendOrderConfirmation({ orderId: order.id, orderNumber: order.orderNumber, customerName: order.customerName, customerPhone: order.customerPhone, customerEmail: order.customerEmail, totalAmount: order.total, deliveryDistrict: order.district || order.city, estimatedDelivery: estimatedArrival, paymentMethod: input.paymentMethod, language: input.language, paymentConfirmed: false }).catch(() => ({ sms: 'failed' as const, email: 'failed' as const }))
+      : { sms: 'not_requested' as const, email: 'not_requested' as const }
+    return NextResponse.json({ success: true, data: { order, confirmationDelivery }, order, confirmationDelivery }, { status: 201 })
   } catch (error) {
     console.error('Order create API error:', error)
     const message = error instanceof Error && error.message.startsWith('Insufficient stock') ? error.message : 'Failed to create order'

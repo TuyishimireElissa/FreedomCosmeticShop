@@ -10,6 +10,8 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/auth"
 import { z } from "zod"
+import { isValidRwandaLocation } from '@/lib/rwanda-locations'
+import { isValidRwandaPhone, normalizeRwandaPhone } from '@/lib/phone'
 
 const CreateAddressSchema = z.object({
   label: z.string().min(1).max(50),
@@ -48,9 +50,9 @@ export async function POST(req: Request) {
 
     const body = await req.json()
     const parsed = CreateAddressSchema.safeParse(body)
-    if (!parsed.success) {
+    if (!parsed.success || !isValidRwandaPhone(parsed.data?.recipientPhone || '') || !isValidRwandaLocation(parsed.data?.province || '', parsed.data?.district || '', parsed.data?.sector, parsed.data?.cell || undefined, parsed.data?.village || undefined)) {
       return NextResponse.json(
-        { error: "Invalid input", details: parsed.error.flatten() },
+        { error: "Invalid Rwanda address", details: parsed.success ? undefined : parsed.error.flatten() },
         { status: 400 }
       )
     }
@@ -68,7 +70,7 @@ export async function POST(req: Request) {
         userId: user.id,
         label: parsed.data.label!,
         recipientName: parsed.data.recipientName!,
-        recipientPhone: parsed.data.recipientPhone!,
+        recipientPhone: normalizeRwandaPhone(parsed.data.recipientPhone!),
         province: parsed.data.province!,
         district: parsed.data.district!,
         sector: parsed.data.sector!,

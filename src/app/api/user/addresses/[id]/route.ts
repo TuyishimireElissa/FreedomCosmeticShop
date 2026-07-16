@@ -10,6 +10,8 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/auth"
 import { z } from "zod"
+import { isValidRwandaLocation } from '@/lib/rwanda-locations'
+import { isValidRwandaPhone, normalizeRwandaPhone } from '@/lib/phone'
 
 const UpdateAddressSchema = z.object({
   label: z.string().min(1).max(50).optional(),
@@ -43,6 +45,10 @@ export async function PUT(
       where: { id, userId: user.id },
     })
     if (!existing) return NextResponse.json({ error: "Address not found" }, { status: 404 })
+    const merged = { ...existing, ...parsed.data }
+    if (!isValidRwandaPhone(merged.recipientPhone) || !isValidRwandaLocation(merged.province, merged.district, merged.sector, merged.cell || undefined, merged.village || undefined)) {
+      return NextResponse.json({ error: 'Invalid Rwanda address' }, { status: 400 })
+    }
 
     // If setting as default, unset previous
     if (parsed.data.isDefault) {
@@ -52,7 +58,8 @@ export async function PUT(
       })
     }
 
-    const updated = await db.address.update({ where: { id }, data: parsed.data })
+    const data = { ...parsed.data, ...(parsed.data.recipientPhone ? { recipientPhone: normalizeRwandaPhone(parsed.data.recipientPhone) } : {}) }
+    const updated = await db.address.update({ where: { id }, data })
     return NextResponse.json({ address: updated })
   } catch (error) {
     console.error("Address PUT error:", error)

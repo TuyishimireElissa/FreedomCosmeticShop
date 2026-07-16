@@ -15,7 +15,7 @@
  *   5. If FAILED: update payment, notify customer
  *
  * Security:
- *   - Verifies webhook signature (if configured)
+ *   - Requires and verifies the PayPack webhook signature
  *   - Idempotent — safe to receive the same webhook multiple times
  *   - Returns 200 immediately to acknowledge receipt (PayPack retries on non-200)
  *
@@ -27,6 +27,8 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { verifyWebhookEvent } from "@/server/services/paypack"
 import { handlePaymentSuccess, handlePaymentFailure } from "@/server/services/payment-events"
+import { normalizeRwandaPhone } from '@/lib/phone'
+import { recordPaymentSecurityAlert } from '@/server/services/payment-security'
 
 export async function POST(req: Request) {
   try {
@@ -58,6 +60,13 @@ export async function POST(req: Request) {
       console.error(`[PayPack Webhook] Payment not found for tx ${event.id} / ref ${event.ref}`)
       // Return 200 to stop PayPack from retrying — the payment may have been deleted
       return NextResponse.json({ received: true, message: "Payment not found" })
+    }
+
+    let phoneMatches = false
+    try { phoneMatches = !payment.phoneNumber || normalizeRwandaPhone(event.phone || event.number || '') === normalizeRwandaPhone(payment.phoneNumber) } catch { phoneMatches = false }
+    if (event.amount !== payment.amount || !phoneMatches) {
+      await recordPaymentSecurityAlert({ provider: 'PAYPACK', orderId: payment.orderId, orderNumber: payment.order.orderNumber, paymentId: payment.id, reason: event.amount !== payment.amount ? 'Amount mismatch' : 'Phone mismatch', expectedAmount: payment.amount, receivedAmount: event.amount })
+      return NextResponse.json({ error: 'Webhook payment details do not match' }, { status: 422 })
     }
 
     // Handle based on status

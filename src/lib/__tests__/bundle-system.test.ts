@@ -41,7 +41,7 @@ describe('honest bundle system', () => {
   it('deducts bundle component stock only on COD confirmation or verified payment', () => {
     expect(orderApi).toContain("if (input.paymentMethod === 'COD')")
     expect(paymentEvents).toContain('component.quantity * item.quantity')
-    expect(paymentEvents).toContain('totalSales: { increment: item.quantity }')
+    expect(paymentEvents).toContain('totalSales: { increment: quantity }')
   })
 
   it('contains no fictional bundle seeding', () => {

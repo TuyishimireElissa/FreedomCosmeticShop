@@ -22,6 +22,7 @@
  *   PAYPACK_ENVIRONMENT — "production" | "sandbox"
  */
 
+import { createHmac, timingSafeEqual } from 'node:crypto'
 import { env, features } from "@/lib/env"
 import { normalizeRwandaPhone, PhoneValidationError } from "@/lib/phone"
 
@@ -74,7 +75,8 @@ export interface PaypackWebhookEvent {
   ref: string
   status: "success" | "failed"
   amount: number
-  phone: string
+  phone?: string
+  number?: string
   network: string
   // PayPack webhook payload
 }
@@ -431,28 +433,27 @@ export async function getTransactionStatus(
  * @param signature Header value (if PayPack provides one)
  * @returns Parsed webhook event, or null if invalid
  */
-export function verifyWebhookEvent(
-  body: string,
-  _signature?: string
-): PaypackWebhookEvent | null {
+export function verifyWebhookEvent(body: string, signature?: string): PaypackWebhookEvent | null {
+  const secret = env.PAYPACK_WEBHOOK_SECRET
+  if (!secret || !signature) {
+    console.error('[PayPack Webhook] Signing secret or signature missing')
+    return null
+  }
+  const supplied = signature.trim().replace(/^sha256=/i, '').toLowerCase()
+  const expected = createHmac('sha256', secret).update(body, 'utf8').digest('hex')
+  if (!/^[a-f0-9]{64}$/.test(supplied)) return null
+  const suppliedBuffer = Buffer.from(supplied, 'hex')
+  const expectedBuffer = Buffer.from(expected, 'hex')
+  if (suppliedBuffer.length !== expectedBuffer.length || !timingSafeEqual(suppliedBuffer, expectedBuffer)) return null
   try {
     const event = JSON.parse(body) as PaypackWebhookEvent
-
-    // Basic validation
-    if (!event.id || !event.ref || !event.status) {
-      console.error("[PayPack Webhook] Invalid event structure:", event)
+    if (!event.id || !event.ref || !['success', 'failed'].includes(event.status) || !Number.isFinite(event.amount) || event.amount <= 0 || typeof (event.phone || event.number) !== 'string') {
+      console.error('[PayPack Webhook] Invalid event structure')
       return null
     }
-
-    // In production, verify the signature here using PAYPACK_WEBHOOK_SECRET
-    // if (signature !== expectedSignature) {
-    //   console.error("[PayPack Webhook] Invalid signature")
-    //   return null
-    // }
-
     return event
-  } catch (e) {
-    console.error("[PayPack Webhook] Failed to parse body:", e)
+  } catch {
+    console.error('[PayPack Webhook] Failed to parse body')
     return null
   }
 }

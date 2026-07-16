@@ -344,6 +344,56 @@ export const rw = {
     coupon_no_eligible_items: 'Nta gicuruzwa kiri mu gitebo cyujuje ibisabwa n’iyi kode', // verified-rw
     coupon_empty_cart: 'Banza ushyire mu gitebo igicuruzwa cyujuje ibisabwa', // verified-rw
   },
+  confirmation: {
+    title: 'Komande yemejwe', // verified-rw
+    thank_you: 'Murakoze, {name}. Komande yawe yakiriwe.', // verified-rw
+    received: 'Komande yawe yakiriwe.', // verified-rw
+    order_number_label: 'Nimero ya komande', // verified-rw
+    payment_title: 'Amakuru yo kwishyura', // verified-rw
+    payment_method: 'Uburyo', // verified-rw
+    payment_status: 'Imiterere yo kwishyura', // verified-rw
+    paid: 'Yishyuwe', // verified-rw
+    pending: 'Hategerejwe icyemezo cy’utanga serivisi', // verified-rw
+    pay_on_delivery: 'Kwishyura ugejejweho', // verified-rw
+    delivery_title: 'Igihe cyo kukugezaho', // verified-rw
+    expected_delivery: 'Igihe biteganyijwe kugerera', // verified-rw
+    estimate_pending: 'Igihe cyo kukugezaho kirimo gutegurwa', // verified-rw
+    delivery_fee_label: 'Ikiguzi cyo kukugezaho: {amount}', // verified-rw
+    delivery_to: 'Aho ibicuruzwa bigezwa', // verified-rw
+    destination_pending: 'Aho ibicuruzwa bigezwa harimo gufunguka', // verified-rw
+    landmark_value: 'Ikimenyetso cy’aho uri: {landmark}', // verified-rw
+    updates_linked: 'Amakuru ya komande ahujwe na {phone}. Kubona SMS cyangwa imeyili biterwa na serivisi y’ubutumwa yashyizweho.', // verified-rw
+    track_order: 'Kurikirana komande yanjye', // verified-rw
+    share_whatsapp: 'Sangiza kuri WhatsApp', // verified-rw
+    continue_shopping: 'Komeza guhaha', // verified-rw
+    support_title: 'Ukeneye ubufasha?', // verified-rw
+    support_hint: 'Koresha uburyo bwemejwe bwo kuvugana natwe buboneka cyangwa ufungure urupapuro rwo kutwandikira.', // verified-rw
+    call_support: 'Hamagara abagufasha', // verified-rw
+    contact_support: 'Vugana n’abagufasha', // verified-rw
+    direct_contact_unavailable: 'Nimero yemejwe yo kuvugana n’abagufasha ntirashyirwaho. Koresha urupapuro rwo kutwandikira.', // verified-rw
+    share_message: 'Komande {order} ya FreedomCosmeticShop\nIgiteranyo: {total}\nAho igezwa: {destination}\nIgihe giteganyijwe: {expected}', // verified-rw
+    support_message: 'Muraho FreedomCosmeticShop. Nkeneye ubufasha kuri komande {order}.', // verified-rw
+    confirming_payment: 'Turimo kwemeza ko wishyuye', // verified-rw
+    keep_open: 'Reka uru rupapuro rufunguye mu gihe dutegereje igisubizo cy’utanga serivisi.', // verified-rw
+    verification_attention: 'Kwemeza ubwishyu bikeneye kugenzurwa', // verified-rw
+    verification_attention_hint: 'Banza ugenzure imiterere ya komande mbere yo kongera kwishyura.', // verified-rw
+    payment_not_completed: 'Kwishyura ntikwarangiye', // verified-rw
+    order_details_unavailable: 'Kwishyura byemejwe ariko amakuru ya komande ntiyashoboye gufunguka. Kurikirana komande cyangwa uvugane n’abagufasha.', // verified-rw
+    email_payment_title: 'Kwishyura byemejwe', // verified-rw
+    email_order_title: 'Komande yemejwe', // verified-rw
+    email_intro: 'Muraho {name}, amakuru ya komande yawe ya FreedomCosmeticShop ari hasi.', // verified-rw
+    sms_provider_accepted: 'Utanga serivisi ya SMS yakiriye ubutumwa bwo kwemeza bwoherezwa kuri {phone}.', // verified-rw
+    sms_send_failed: 'SMS yo kwemeza ntiyashoboye koherezwa. Komande yawe irabitswe kandi ushobora kuyikurikirana hano.', // verified-rw
+    email_provider_accepted: 'Utanga serivisi ya imeyili yakiriye ubutumwa bwo kwemeza bwoherezwa kuri {email}.', // verified-rw
+    email_send_failed: 'Imeyili yo kwemeza ntiyashoboye koherezwa. Komande yawe irabitswe.', // verified-rw
+    email_not_configured: 'Serivisi yo kwemeza kuri imeyili ntirashyirwaho ubu.', // verified-rw
+    stock_review_notice: 'Twakiriye ubwishyu bwawe, ariko ububiko bugomba kugenzurwa. Tuzakuvugisha mbere yo kukugezaho.', // verified-rw
+    notification_payment_title: 'Kwishyura byemejwe', // verified-rw
+    notification_payment_body: 'Komande {order} yemejwe kandi irimo gutegurwa.', // verified-rw
+    notification_stock_review: 'Twakiriye ubwishyu bwa komande {order}. Ububiko bugomba kugenzurwa kandi tuzakuvugisha mbere yo kukugezaho.', // verified-rw
+    payment_review_notice: 'Twakiriye ubundi bwishyu bw’iyi komande. Ntukongere kwishyura; tuzabugenzura kandi tukuvugishe.', // verified-rw
+    notification_payment_review: 'Twakiriye ubundi bwishyu bwa komande {order}. Ntukongere kwishyura; tuzabugenzura kandi tukuvugishe.', // verified-rw
+  },
   checkout: {
     title: 'Kwishyura', step_address: 'Aho ibicuruzwa bigezwa', step_payment: 'Kwishyura', step_review: 'Kugenzura ibyo utumije', step_confirm: 'Kwemeza', full_name: 'Amazina yose', full_name_placeholder: 'Andika amazina yawe yose', phone: 'Nimero ya telefoni', phone_placeholder: '+250 7XX XXX XXX', phone_hint: 'Tuzajya twohereza amakuru y’ibyo watumije kuri iyi nimero', province: 'Intara', province_select: 'Hitamo intara', district: 'Akarere', district_select: 'Hitamo akarere', sector: 'Umurenge (si ngombwa)', sector_placeholder: 'Andika umurenge', landmark: 'Ikimenyetso cy’aho utuye / Umuhanda', landmark_placeholder: 'Andika ikimenyetso kiri hafi cyangwa umuhanda', landmark_hint: 'Fasha umumotari kubona aho uherereye', notes: 'Amabwiriza yo kukugezaho (si ngombwa)', notes_placeholder: 'Andika amabwiriza yo kukugezaho', save_address: 'Bika iyi aderesi uzayikoreshe ubutaha', saved_addresses: 'Aderesi zabitswe', use_saved: 'Koresha iyi aderesi', delivery_fee: 'Amafaranga yo kukugezaho', delivery_time: 'Igihe biteganyijwe kugerera', same_day: 'Uyu munsi mbere ya saa kumi n’ebyiri', free_delivery: 'Kubigezwaho ku buntu', payment_method: 'Wifuza kwishyura ute?', mtn_momo: 'MTN Mobile Money', mtn_popular: 'Ikoreshwa cyane mu Rwanda', airtel_money: 'Airtel Money', card_payment: 'Visa / Mastercard', cod: 'Kwishyura ugejejweho', cod_kigali_only: 'Muri Kigali gusa', credit: 'Inguzanyo yo kurangura', credit_available: 'Ufite {amount} RWF ushobora gukoresha', momo_title: 'Ishyura ukoresheje MTN Mobile Money', momo_enter_number: 'Andika nimero yawe ya MTN MoMo', momo_number_placeholder: '078 XXX XXXX', momo_hint: 'Igomba kuba nimero ya MTN itangira 078 cyangwa 079', momo_airtel_hint: 'Igomba kuba nimero ya Airtel itangira 073 cyangwa 072', momo_pay_button: 'Ishyura {amount} RWF ukoresheje MoMo', momo_waiting_title: 'Reba telefoni yawe!', momo_waiting_message: 'Twohereje ubusabe bwo kwishyura kuri {phone}. Fungura MTN MoMo wemeze {amount} RWF.', momo_waiting_hint: 'Dutegereje ko wishyura...', momo_timeout: 'Igihe cyo kwishyura cyarangiye. Ongera ugerageze.', momo_cancel: 'Hagarika kwishyura', momo_success: 'Kwishyura byemejwe! ✅', momo_failed: 'Kwishyura ntibyakunze. Ongera ugerageze.', momo_wrong_number: 'Andika nimero ya MTN yemewe itangira 078 cyangwa 079', momo_steps: ['Kanda ahanditse “Ishyura ukoresheje MoMo”', 'Reba ubusabe bwa MTN kuri telefoni yawe', 'Andika PIN yawe ya MTN wemeze', 'Ibyo watumije bihita byemezwa! 🎉'], order_summary: 'Incamake y’ibyo utumije', items_ordered: 'Ibicuruzwa watumije', place_order: 'Emeza ibyo utumije', agree_terms: 'Mu kwemeza ibyo utumije, wemeye', terms: 'Amabwiriza n’amategeko', order_confirmed: 'Ibyo watumije byemejwe! 🎉', order_number: 'Nimero y’ibyo watumije', thank_you: 'Murakoze {name}!', order_confirmed_message: 'Ibyo watumije byakiriwe neza. Tuzabigeza mu karere ka {district}, Kigali.', sms_sent: 'Ubutumwa bwa SMS bwoherejwe kuri {phone}', track_order: 'Kurikirana ibyo natumije', continue_shopping: 'Komeza guhaha', share_order: 'Sangiza kuri WhatsApp', download_app: 'Shyira porogaramu yacu kuri telefoni ugure vuba!', // 🔍 REVIEW
 
@@ -503,6 +553,47 @@ export const rw = {
     where_deliver: 'Komande yawe tuyigeze he?', // verified-rw
 
     pin_private: 'PIN yawe uyandika kuri telefoni yawe gusa. Ntabwo tuyibona.', // verified-rw
+    cell_required: 'Akagari', // verified-rw
+    village_required: 'Umudugudu', // verified-rw
+    select_cell: 'Hitamo akagari', // verified-rw
+    select_sector_first: 'Banza uhitemo umurenge', // verified-rw
+    select_village: 'Hitamo umudugudu', // verified-rw
+    select_cell_first: 'Banza uhitemo akagari', // verified-rw
+    error_select_province: 'Hitamo intara', // verified-rw
+    error_select_cell: 'Hitamo akagari', // verified-rw
+    error_select_village: 'Hitamo umudugudu', // verified-rw
+    phone_format_hint: 'Nimero yo mu Rwanda ihita yandikwa itangijwe na +250.', // verified-rw
+    use_saved_count: 'Koresha aderesi yabitswe ({count})', // verified-rw
+    address_home_label: 'Mu rugo', // verified-rw
+    address_saved: 'Aderesi yabitswe', // verified-rw
+    whatsapp_location: 'Sangiza aho ibicuruzwa bigezwa kuri WhatsApp', // verified-rw
+    whatsapp_location_message: 'Aho FreedomCosmeticShop igeza ibicuruzwa:\nAmazina: {name}\nIntara: {province}\nAkarere: {district}\nUmurenge: {sector}\nAkagari: {cell}\nUmudugudu: {village}\nIkimenyetso cy’aho uri: {landmark}', // verified-rw
+    cod_kigali_warning: 'Kwishyura ugejejweho biboneka muri Kigali gusa.', // verified-rw
+    cod_kigali_warning_detail: 'Aderesi wahisemo iri hanze ya Kigali. Hitamo MTN MoMo, Airtel Money cyangwa ikarita.', // verified-rw
+    kigali_only: 'Muri Kigali gusa', // verified-rw
+    cod_exact_amount: 'Uzishyura umumotari {amount}. Tegura amafaranga nyayo.', // verified-rw
+    secure_amount: 'Kwishyura na Mobile Money bitekanye · {amount}', // verified-rw
+    recommended: 'Ni byo tugusaba', // verified-rw
+    network_phone: 'Nimero ya {network} Mobile Money', // verified-rw
+    mtn_prefix_hint: 'Koresha nimero ya MTN Rwanda itangira 078 cyangwa 079.', // verified-rw
+    airtel_prefix_hint: 'Koresha nimero ya Airtel Rwanda itangira 072 cyangwa 073.', // verified-rw
+    invalid_network_phone: 'Andika nimero ya {network} yo mu Rwanda yemewe.', // verified-rw
+    amount_to_approve: 'Amafaranga nyayo yo kwemeza', // verified-rw
+    charging_phone: 'Telefoni iri bwishyure', // verified-rw
+    change_phone: 'Hindura nimero ya telefoni', // verified-rw
+    merchant: 'Ugurishije', // verified-rw
+    pin_on_phone: 'Andika PIN kuri telefoni yawe gusa', // verified-rw
+    pin_warning: 'FreedomCosmeticShop ntizigera igusaba PIN ya Mobile Money. Emeza ubusabe bw’utanga serivisi kandi wandike PIN kuri telefoni yawe bwite gusa.', // verified-rw
+    payment_timeout_safe_help: 'Ntabwo twabonye icyemezo mu gihe cyari giteganyijwe. Banza ugenzure amafaranga ya Mobile Money n’imiterere ya komande mbere yo kongera kugerageza, kuko uwatanze serivisi ashobora kuba akiri gutunganya ubwishyu.', // verified-rw
+    payment_failed_recovery: 'Kwishyura ntikwemejwe. Genzura nimero ya telefoni n’amafaranga ahari, wongere ugerageze cyangwa uhitemo ubundi buryo.', // verified-rw
+    retry_payment: 'Ongera ugerageze kwishyura', // verified-rw
+    get_whatsapp_help: 'Saba ubufasha kuri WhatsApp', // verified-rw
+    payment_help_message: 'Muraho FreedomCosmeticShop. Nkeneye ubufasha ku kwishyura komande.', // verified-rw
+    check_phone_title: 'Reba telefoni yawe', // verified-rw
+    prompt_sent_to: 'Ubusabe bwo kwishyura bwa {network} bwoherejwe kuri {phone}.', // verified-rw
+    waiting_with_time: 'Dutegereje icyemezo cy’utanga serivisi · hasigaye {time}', // verified-rw
+    cancel_waiting: 'Hagarika gutegereza usubire ku buryo bwo kwishyura', // verified-rw
+    stock_changed_before_payment: 'Ububiko bwahindutse mbere yo kwishyura. Kwishyura ntikwatangiye. Subira mu gitebo ugenzure umubare w’ibicuruzwa bikiboneka.', // verified-rw
   },
   auth: {
     login_title: 'Murakaza neza', login_subtitle: 'Injira muri konti yawe ya FreedomCosmeticShop', phone_or_email: 'Nimero ya telefoni cyangwa imeyili', phone_placeholder: '+250 7XX XXX XXX', password: 'Ijambo ry’ibanga', show_password: 'Erekana', hide_password: 'Hisha', forgot_password: 'Wibagiwe ijambo ry’ibanga?', login_button: 'Injira', logging_in: 'Birimo kwinjira...', no_account: 'Nta konti ufite?', register_link: 'Iyandikishe hano', register_title: 'Fungura konti', register_subtitle: 'Injira muri FreedomCosmeticShop uyu munsi', full_name: 'Amazina yose', full_name_placeholder: 'Andika amazina yawe yose', email: 'Imeyili (si ngombwa)', email_placeholder: 'Andika imeyili yawe', phone: 'Nimero ya telefoni', phone_hint: 'Nimero yo mu Rwanda (+250 cyangwa 07X)', password_hint: 'Nibura inyuguti 8', confirm_password: 'Emeza ijambo ry’ibanga', skin_type: "Ubwoko bw’uruhu rwawe (si ngombwa)", skin_type_hint: 'Bidufasha kukugira inama y’ibicuruzwa bikubereye', terms_agree: 'Nemeye', terms_link: 'Amabwiriza n’amategeko', register_button: 'Fungura konti', registering: 'Konti irimo gufungurwa...', have_account: 'Usanzwe ufite konti?', login_link: 'Injira hano', otp_title: 'Emeza nimero yawe', otp_subtitle: 'Twohereje kode y’imibare 6 kuri {phone}', otp_placeholder: '000000', otp_verify: 'Emeza kode', otp_verifying: 'Birimo kwemezwa...', otp_resend: 'Ongera wohereze kode', otp_resend_in: 'Ongera wohereze mu masegonda {seconds}', otp_wrong_number: 'Nimero si yo?', otp_change: 'Hindura nimero', otp_hint: 'Reba ubutumwa bwa SMS', otp_expired: 'Kode yararengeje igihe. Saba indi kode.', otp_invalid: 'Kode ntiyemewe. Yigenzure wongere ugerageze.', otp_success: 'Nimero yemejwe neza!', forgot_title: 'Hindura ijambo ry’ibanga', forgot_subtitle: 'Andika nimero ya telefoni kugira ngo urihindure', forgot_send: 'Ohereza kode yo kurihindura', forgot_sending: 'Birimo koherezwa...', forgot_sent: 'Kode yoherejwe kuri {phone}', new_password: 'Ijambo ry’ibanga rishya', reset_password: 'Hindura ijambo ry’ibanga', reset_success: 'Ijambo ry’ibanga ryahinduwe neza!', invalid_credentials: 'Nimero ya telefoni, imeyili cyangwa ijambo ry’ibanga si byo', account_locked: 'Konti yafunzwe iminota {minutes} kubera kugerageza kenshi.', account_inactive: 'Konti yawe yahagaritswe.', phone_taken: 'Iyi nimero ya telefoni isanzwe ikoreshwa.', email_taken: 'Iyi imeyili isanzwe ikoreshwa.', passwords_no_match: 'Amagambo y’ibanga ntabwo ahura.', weak_password: 'Ijambo ry’ibanga rigomba kugira nibura inyuguti 8.', invalid_phone: 'Andika nimero ya telefoni yo mu Rwanda yemewe.', required_field: 'Aha harasabwa.', server_error: 'Habaye ikibazo. Ongera ugerageze.', // 🔍 REVIEW
@@ -707,6 +798,10 @@ export const rw = {
     order_delivered_description: 'Bwoherezwa komande imaze kugezwa, buriho ihuza ryo gutanga igitekerezo', // verified-rw
     order_delivered_label: 'Komande yagejejwe', // verified-rw
     order_placed: 'Murakoze! Komande yawe {{orderNumber}} yakiriwe. Tuzayitunganya vuba. {business} 📦', // verified-rw
+    order_confirmation_detailed: 'FreedomCosmeticShop: Komande {order} yemejwe. Igiteranyo {amount}. Igezwa muri {district}, biteganyijwe {expected}.', // verified-rw
+    payment_confirmation_detailed: 'FreedomCosmeticShop: Kwishyura komande {order} byemejwe. Igiteranyo {amount}. Igezwa muri {district}, biteganyijwe {expected}.', // verified-rw
+    payment_stock_review: 'FreedomCosmeticShop: Twakiriye ubwishyu bwa komande {order}. Ububiko bugomba kugenzurwa; tuzakuvugisha mbere yo kukugezaho.', // verified-rw
+    duplicate_payment_review: 'FreedomCosmeticShop: Twakiriye ubundi bwishyu bwa komande {order}. Ntukongere kwishyura; tuzabugenzura kandi tukuvugishe.', // verified-rw
     order_placed_description: 'Bwoherezwa umukiriya amaze gutumiza', // verified-rw
     order_placed_label: 'Komande yakiriwe', // verified-rw
     order_shipped: 'Komande yawe {{orderNumber}} iri mu nzira! Umumotari: {{riderName}} - {{riderPhone}}. Izagera mu minsi {{etaDays}}. {business} 🏍️', // verified-rw

@@ -37,6 +37,7 @@ const envSchema = z.object({
   // PayPack (MTN MoMo)
   PAYPACK_CLIENT_ID: z.string().optional(),
   PAYPACK_CLIENT_SECRET: z.string().optional(),
+  PAYPACK_WEBHOOK_SECRET: z.string().optional(),
   PAYPACK_ENVIRONMENT: z.enum(["production", "sandbox"]).default("sandbox"),
   PAYPACK_WEBHOOK_URL: z.string().url().optional(),
 

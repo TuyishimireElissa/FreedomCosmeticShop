@@ -28,6 +28,7 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { verifyWebhookEvent, verifyPayment } from "@/server/services/flutterwave"
 import { handlePaymentSuccess, handlePaymentFailure } from "@/server/services/payment-events"
+import { recordPaymentSecurityAlert } from '@/server/services/payment-security'
 
 export async function POST(req: Request) {
   try {
@@ -78,6 +79,12 @@ export async function POST(req: Request) {
       )
     }
 
+    const detailsMatch = verification.txRef === event.data.tx_ref && verification.amount === payment.amount && event.data.amount === payment.amount && verification.currency === 'RWF' && event.data.currency === 'RWF'
+    if (!detailsMatch) {
+      await recordPaymentSecurityAlert({ provider: 'FLUTTERWAVE', orderId: payment.orderId, orderNumber: payment.order.orderNumber, paymentId: payment.id, reason: 'Reference, amount, or currency mismatch', expectedAmount: payment.amount, receivedAmount: verification.amount })
+      return NextResponse.json({ error: 'Verified payment details do not match order' }, { status: 422 })
+    }
+
     // Process based on verified status
     if (verification.success && verification.status === "success") {
       await handlePaymentSuccess({
@@ -89,14 +96,11 @@ export async function POST(req: Request) {
       })
 
       console.log(`[Flutterwave Webhook] Payment ${payment.id} verified + marked as PAID`)
-    } else {
-      await handlePaymentFailure({
-        paymentId: payment.id,
-        orderId: payment.orderId,
-        reason: verification.message || "Payment verification failed",
-      })
-
+    } else if (verification.status === 'failed' || verification.status === 'cancelled') {
+      await handlePaymentFailure({ paymentId: payment.id, orderId: payment.orderId, reason: verification.message || 'Payment verification failed' })
       console.log(`[Flutterwave Webhook] Payment ${payment.id} marked as FAILED`)
+    } else {
+      return NextResponse.json({ received: true, processed: false, status: 'pending' })
     }
 
     return NextResponse.json({ received: true, processed: true })

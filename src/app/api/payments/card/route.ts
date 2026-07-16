@@ -22,11 +22,13 @@ import {
   generateTxRef,
   FlutterwaveError,
 } from "@/server/services/flutterwave"
+import { validateOrderStockForPayment } from '@/server/services/payment-order-validation'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { orderId } = body as { orderId: string }
+    const { orderId } = body as { orderId: string; language?: 'en' | 'rw' }
+    const language = body.language === 'en' ? 'en' : 'rw'
 
     if (!orderId) {
       return NextResponse.json({ error: "Order ID is required" }, { status: 400 })
@@ -48,6 +50,8 @@ export async function POST(req: Request) {
         { status: 400 }
       )
     }
+    const stock = await validateOrderStockForPayment(order.id)
+    if (!stock.available) return NextResponse.json({ error: 'ORDER_STOCK_CHANGED' }, { status: 409 })
 
     // Generate unique transaction reference
     const txRef = generateTxRef(order.orderNumber)
@@ -58,7 +62,7 @@ export async function POST(req: Request) {
     if (payment) {
       payment = await db.payment.update({
         where: { id: payment.id },
-        data: { providerTransactionId: txRef },
+        data: { providerTransactionId: txRef, webhookData: JSON.stringify({ checkoutLanguage: language }) },
       })
     } else {
       payment = await db.payment.create({
@@ -68,6 +72,7 @@ export async function POST(req: Request) {
           amount: order.total,
           status: "PENDING",
           providerTransactionId: txRef,
+          webhookData: JSON.stringify({ checkoutLanguage: language }),
         },
       })
     }

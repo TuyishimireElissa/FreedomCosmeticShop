@@ -1,160 +1,133 @@
+import rawRwandaHierarchy from '@/data/rwanda-administrative.json'
+
 /**
- * Rwanda administrative divisions reference data.
+ * Rwanda administrative hierarchy: Province → District → Sector → Cell → Village.
  *
- * Structure: Province → District → Sector
+ * Dataset: ngabovictor/Rwanda, data.json, commit 33ef6ca58b1bd631c476ea1d27644d1f450c1ea8.
+ * The dataset credits Rwanda administrative location data and is vendored locally
+ * so checkout never depends on a third-party network request.
  *
- * Rwanda has:
- *   - 5 provinces (intara)
- *   - 30 districts (akarere)
- *   - 416 sectors (umurenge)
- *
- * Source: Rwanda Ministry of Local Government (MINALOC)
- *
- * For the full hierarchy including cells and villages, see:
- *   https://www.minaloc.gov.rw/index.php?id=34
+ * Counts in this pinned dataset: 5 provinces, 30 districts, 416 sectors,
+ * 2,149 cells and 14,837 villages.
  */
 
-export const RWANDA_PROVINCES = [
-  "Kigali City",
-  "Northern Province",
-  "Southern Province",
-  "Eastern Province",
-  "Western Province",
-] as const
-
+export const RWANDA_PROVINCES = ['Kigali City', 'Northern Province', 'Southern Province', 'Eastern Province', 'Western Province'] as const
 export type RwandaProvince = (typeof RWANDA_PROVINCES)[number]
 
-/**
- * Districts grouped by province.
- * Key = province name, Value = array of district names.
- */
-export const RWANDA_DISTRICTS: Record<RwandaProvince, string[]> = {
-  "Kigali City": ["Nyarugenge", "Gasabo", "Kicukiro"],
-  "Northern Province": [
-    "Musanze",
-    "Burera",
-    "Gicumbi",
-    "Rulindo",
-    "Gakenke",
-  ],
-  "Southern Province": [
-    "Nyanza",
-    "Gisagara",
-    "Nyaruguru",
-    "Huye",
-    "Nyamagabe",
-    "Ruhango",
-    "Muhanga",
-    "Kamonyi",
-  ],
-  "Eastern Province": [
-    "Rwamagana",
-    "Nyagatare",
-    "Gatsibo",
-    "Kayonza",
-    "Kirehe",
-    "Ngoma",
-    "Bugesera",
-  ],
-  "Western Province": [
-    "Karongi",
-    "Rutsiro",
-    "Rubavu",
-    "Nyabihu",
-    "Ngororero",
-    "Rusizi",
-    "Nyamasheke",
-  ],
+type RwandaHierarchy = Record<string, Record<string, Record<string, Record<string, string[]>>>>
+const HIERARCHY = rawRwandaHierarchy as RwandaHierarchy
+const DATA_KEY_BY_PROVINCE: Record<RwandaProvince, string> = {
+  'Kigali City': 'Kigali',
+  'Northern Province': 'North',
+  'Southern Province': 'South',
+  'Eastern Province': 'East',
+  'Western Province': 'West',
 }
 
-/**
- * Major sectors per district (abbreviated — full list has 416 sectors).
- * Used for the address form dropdown.
- */
-export const RWANDA_SECTORS: Record<string, string[]> = {
-  // Kigali City
-  Nyarugenge: ["Nyarugenge", "Gitega", "Kigali", "Kimirombe", "Nyakabanda", "Rwezamenyo", "Mageragere", "Kanyinya", "Gisozi"],
-  Gasabo: ["Remera", "Ndera", "Rutunga", "Gikomero", "Gatsata", "Jali", "Gisozi", "Kimihurura", "Kimironko", "Ndera"],
-  Kicukiro: ["Gikondo", "Kagarama", "Kicukiro", "Gatenga", "Niboye", "Kanombe", "Kagugu", "Masaka", "Niboyi"],
-  // Northern Province
-  Musanze: ["Musanze", "Cyuve", "Gataraga", "Kimonyi", "Kinigi", "Muko", "Musanze", "Nyange", "Shingiro", "Buhabwa"],
-  Burera: ["Bungwe", "Butaro", "Cyanika", "Cyeru", "Gahunga", "Gitovu", "Kagogo", "Kinoni", "Kinyababa", "Nemba"],
-  Gicumbi: ["Bukure", "Bwisige", "Cyumba", "Giti", "Kaniga", "Manyagiro", "Miyove", "Kageyo", "Muko", "Rubaya", "Rukozo", "Rutare", "Ruvune", "Shangasha"],
-  Rulindo: ["Burega", "Bushoki", "Buyoga", "Cyungo", "Kinihira", "Kisaro", "Masoro", "Mbuye", "Murambi", "Ngoma", "Ntarabana", "Rukozo", "Rusiga", "Shyorongi", "Tumba"],
-  Gakenke: ["Coko", "Gakenke", "Gashyamba", "Janja", "Kamubuga", "Karambo", "Mugongo", "Muhondo", "Muzo", "Nemba", "Ruli", "Rusaza", "Rutake", "Rwerere"],
-  // Southern Province
-  Nyanza: ["Busasamana", "Busoro", "Cyabakamyi", "Kibirizi", "Mukingo", "Muyira", "Ntyazo", "Nyagisozi", "Rwabicuma"],
-  Gisagara: ["Gishubi", "Kansi", "Mamba", "Muganza", "Mugombwa", "Mukindo", "Musha", "Ndora", "Nyanza", "Save"],
-  Nyaruguru: ["Busanze", "Cyanika", "Gasharu", "Kibeho", "Kivu", "Mata", "Matyazo", "Muganza", "Ngera", "Ngoma", "Nyabimata", "Nyamagabe", "Ruhuha", "Rusenge"],
-  Huye: ["Busoro", "Mbazi", "Mukura", "Ngoma", "Ruhashya", "Rusatira", "Rwaniro", "Simbi", "Tumba", "Gishamvu", "Huye", "Karama", "Kigoma", "Maraba", "Mbazi", "Rusatira", "Save"],
-  Nyamagabe: ["Buruhukiro", "Cyanika", "Gasaka", "Gatare", "Kaduha", "Kamegeri", "Kibumbwe", "Kitabi", "Mbazi", "Mugano", "Musange", "Musange", "Nshili", "Tare", "Uwinkingi"],
-  Ruhango: ["Bweramana", "Byimana", "Kabagari", "Kigoma", "Kinazi", "Mbuye", "Mwendo", "Ntongwe", "Ruhango", "Rwimbogo"],
-  Muhanga: ["Cyeza", "Gashali", "Kabacuzi", "Kibangu", "Kiyumba", "Muhanga", "Mushishiro", "Nyabinoni", "Nyamabuye", "Nyarusange", "Rongi", "Rugendabari", "Shyogwe"],
-  Kamonyi: ["Gacurabwenge", "Karama", "Kayenzi", "Kibangu", "Mugina", "Musambira", "Ngomba", "Nyarubaka", "Rilima", "Rukoma", "Rusamvura", "Gitaraga"],
-  // Eastern Province
-  Rwamagana: ["Fumbwe", "Gahengeri", "Gishari", "Karengenge", "Kigabiro", "Muhazi", "Munyaga", "Munyiginya", "Musha", "Muyumbu", "Mwulire", "Nyakaliro", "Nzige", "Rubona"],
-  Nyagatare: ["Gatunda", "Kiyombe", "Matimba", "Mimuli", "Mukama", "Musheri", "Nyagatare", "Rukomo", "Rwempasha", "Rwimiyaga", "Tabagwe", "Karangazi", "Gatunda"],
-  Gatsibo: ["Gatsibo", "Gitoki", "Kabarore", "Kagarama", "Kageyo", "Kiramuruzi", "Muhura", "Murambi", "Ngarama", "Nyagihanga", "Remera", "Rugarama", "Rwimbogo"],
-  Kayonza: ["Gahara", "Gatore", "Kabare", "Kabarondo", "Kagarama", "Murama", "Mukarange", "Mwiri", "Ndego", "Nyamirama", "Rukara", "Ruramira", "Rwinkwavu"],
-  Kirehe: ["Gahara", "Gatore", "Kigarama", "Kigina", "Kirehe", "Mahama", "Mpanga", "Musaza", "Mushikiri", "Nasho", "Nyamugari", "Nyarubuye"],
-  Ngoma: ["Gashanda", "Jarama", "Karembo", "Kayonza", "Kibungo", "Mugesera", "Murama", "Mutenderi", "Rukira", "Rukumberi", "Rurenge", "Sake", "Zaza"],
-  Bugesera: ["Gashora", "Juru", "Kamabuye", "Mareba", "Mayange", "Musenyi", "Mwogo", "Ngeruka", "Ntarama", "Nyamata", "Nyarugenge", "Rilima", "Ruhuha", "Rweru", "Shyara"],
-  // Western Province
-  Karongi: ["Bwishyura", "Gashali", "Gishyita", "Gisovu", "Gitovu", "Mubuga", "Murambi", "Mutuntu", "Rubengera", "Rugabano", "Ruganda", "Rwankuba", "Twumba"],
-  Rutsiro: ["Boneza", "Gihango", "Kigeyo", "Kivumu", "Manihira", "Mukura", "Murunda", "Musasa", "Mushonyi", "Mushubati", "Nyabirasi", "Ruhango", "Rusebeya"],
-  Rubavu: ["Bugeshi", "Busasamana", "Cyanzarwe", "Gisenyi", "Gisenyi", "Kanzenze", "Mudende", "Nyakiriba", "Nyundo", "Rubavu", "Rugera", "Kanzenze"],
-  Nyabihu: ["Bigogwe", "Jenda", "Kintobo", "Mukamira", "Muringa", "Nyabihu", "Rambura", "Ruga", "Shyira", "Karago"],
-  Ngororero: ["Bwira", "Gatumba", "Hindiro", "Kabaya", "Kageyo", "Kavumu", "Matyazo", "Muhanda", "Musebeya", "Ngororero", "Nyange", "Sovu"],
-  Rusizi: ["Bugarama", "Butare", "Gashonga", "Gihundwe", "Giheke", "Gikundamvura", "Gitambi", "Kamembe", "Mushaka", "Mashesha", "Nkanka", "Nkombo", "Nyakabuye", "Nyakarenzo"],
-  Nyamasheke: ["Bigogwe", "Bugarama", "Choyo", "Gihombo", "Kagano", "Kanjongo", "Karambi", "Karengera", "Kirimbi", "Macuba", "Mahembe", "Nyabitekeri", "Ruharambuga", "Rusebeya", "Shangi"],
+export interface RwandaDistrictLocation {
+  name: string
+  deliveryFee: number
+  deliveryDays: number
+  isSameDay: boolean
+  sectors: string[]
+}
+export interface RwandaLocation {
+  province: RwandaProvince
+  districts: RwandaDistrictLocation[]
 }
 
-/**
- * Get all districts as a flat array.
- */
-export function getAllDistricts(): string[] {
-  return Object.values(RWANDA_DISTRICTS).flat()
+const DELIVERY_BY_PROVINCE: Record<RwandaProvince, { fee: number; days: number; sameDay: boolean }> = {
+  'Kigali City': { fee: 1000, days: 0, sameDay: true },
+  'Northern Province': { fee: 3000, days: 2, sameDay: false },
+  'Southern Province': { fee: 3000, days: 2, sameDay: false },
+  'Eastern Province': { fee: 3500, days: 2, sameDay: false },
+  'Western Province': { fee: 4000, days: 3, sameDay: false },
 }
 
-/**
- * Get sectors for a given district.
- * Falls back to an empty array if the district isn't in our reference data.
- */
-export function getSectorsForDistrict(district: string): string[] {
-  return RWANDA_SECTORS[district] || []
+function provinceTree(province: RwandaProvince) {
+  return HIERARCHY[DATA_KEY_BY_PROVINCE[province]] || {}
 }
 
-/**
- * Get districts for a given province.
- */
-export function getDistrictsForProvince(province: string): string[] {
-  return RWANDA_DISTRICTS[province as RwandaProvince] || []
-}
-
-/**
- * Validate that a province/district/sector combination is valid.
- */
-export function isValidRwandaLocation(
-  province: string,
-  district: string,
-  sector?: string
-): boolean {
-  const districts = getDistrictsForProvince(province)
-  if (!districts.includes(district)) return false
-  if (sector) {
-    const sectors = getSectorsForDistrict(district)
-    if (sectors.length > 0 && !sectors.includes(sector)) return false
+export const RWANDA_LOCATION_DATA: RwandaLocation[] = RWANDA_PROVINCES.map((province) => {
+  const tree = provinceTree(province)
+  const delivery = DELIVERY_BY_PROVINCE[province]
+  return {
+    province,
+    districts: Object.keys(tree).map((name) => ({
+      name,
+      deliveryFee: delivery.fee,
+      deliveryDays: name === 'Nyagatare' ? 3 : delivery.days,
+      isSameDay: delivery.sameDay,
+      sectors: Object.keys(tree[name]),
+    })),
   }
+})
+
+// Backward-compatible exports used by existing checkout and delivery APIs.
+export const RWANDA_DISTRICTS = Object.fromEntries(
+  RWANDA_LOCATION_DATA.map(({ province, districts }) => [province, districts.map(({ name }) => name)]),
+) as Record<RwandaProvince, string[]>
+export const RWANDA_SECTORS = Object.fromEntries(
+  RWANDA_LOCATION_DATA.flatMap(({ districts }) => districts.map(({ name, sectors }) => [name, sectors])),
+) as Record<string, string[]>
+export const DISTRICT_TO_PROVINCE_MAP = Object.fromEntries(
+  RWANDA_LOCATION_DATA.flatMap(({ province, districts }) => districts.map(({ name }) => [name, province])),
+) as Record<string, RwandaProvince>
+
+export function getAllDistricts() { return RWANDA_LOCATION_DATA.flatMap(({ districts }) => districts.map(({ name }) => name)) }
+export function getDistrictsForProvince(province: string) { return RWANDA_DISTRICTS[province as RwandaProvince] || [] }
+export function getProvinceByDistrict(district: string): RwandaProvince | null { return DISTRICT_TO_PROVINCE_MAP[district] || null }
+export function getSectorsForDistrict(district: string) { return RWANDA_SECTORS[district] || [] }
+export const getSectorsByDistrict = getSectorsForDistrict
+
+function districtTree(district: string) {
+  const province = getProvinceByDistrict(district)
+  return province ? provinceTree(province)[district] || {} : {}
+}
+export function getCellsForSector(district: string, sector: string) { return Object.keys(districtTree(district)[sector] || {}) }
+export function getVillagesForCell(district: string, sector: string, cell: string) { return districtTree(district)[sector]?.[cell] || [] }
+
+export function getDistrictInfo(district: string) {
+  for (const location of RWANDA_LOCATION_DATA) {
+    const found = location.districts.find(({ name }) => name === district)
+    if (found) return { ...found, province: location.province }
+  }
+  return null
+}
+export function getDeliveryInfoForDistrict(district: string) {
+  const info = getDistrictInfo(district)
+  if (!info) return null
+  return {
+    fee: info.deliveryFee,
+    days: info.deliveryDays,
+    isSameDay: info.isSameDay,
+    province: info.province,
+    deliveryLabel: info.isSameDay ? 'Same day where available' : `${info.deliveryDays}-${info.deliveryDays + 1} business days`,
+  }
+}
+export function isValidRwandaLocation(province: string, district: string, sector?: string, cell?: string, village?: string) {
+  if (!getDistrictsForProvince(province).includes(district)) return false
+  if (sector && !getSectorsForDistrict(district).includes(sector)) return false
+  if (cell && (!sector || !getCellsForSector(district, sector).includes(cell))) return false
+  if (village && (!sector || !cell || !getVillagesForCell(district, sector, cell).includes(village))) return false
   return true
 }
 
-/**
- * District → Province mapping (reverse lookup).
- * Used for auto-selecting province from district in checkout.
- */
-export const DISTRICT_TO_PROVINCE_MAP: Record<string, string> = {}
-;(Object.keys(RWANDA_DISTRICTS) as RwandaProvince[]).forEach((province) => {
-  RWANDA_DISTRICTS[province].forEach((district) => {
-    DISTRICT_TO_PROVINCE_MAP[district] = province
-  })
-})
+/** Format partial Rwanda mobile input without inventing digits. */
+export function formatRwandaPhone(input: string) {
+  let digits = input.replace(/\D/g, '')
+  if (digits.startsWith('250')) digits = digits.slice(3)
+  else if (digits.startsWith('0')) digits = digits.slice(1)
+  digits = digits.slice(0, 9)
+  const groups = [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 9)].filter(Boolean)
+  return `+250${groups.length ? ` ${groups.join(' ')}` : ' '}`
+}
+export function normalizeRwandaPhone(input: string) {
+  let digits = input.replace(/\D/g, '')
+  if (digits.startsWith('250')) digits = digits.slice(3)
+  else if (digits.startsWith('0')) digits = digits.slice(1)
+  return `+250${digits.slice(0, 9)}`
+}
+function localPhone(input: string) { return normalizeRwandaPhone(input).slice(4) }
+export function isMTNNumber(input: string) { return /^7[89]\d{7}$/.test(localPhone(input)) }
+export function isAirtelNumber(input: string) { return /^7[23]\d{7}$/.test(localPhone(input)) }
