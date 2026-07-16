@@ -15,17 +15,6 @@ export const dynamic = 'force-dynamic'
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
-import { requireAuth } from "@/lib/auth"
-import { z } from "zod"
-
-const CreateReviewSchema = z.object({
-  productId: z.string().min(1),
-  rating: z.number().int().min(1).max(5),
-  title: z.string().max(200).optional(),
-  body: z.string().max(2000).optional(),
-  skinType: z.string().optional(),
-  shadeUsed: z.string().optional(),
-})
 
 export async function GET(req: Request) {
   try {
@@ -37,6 +26,8 @@ export async function GET(req: Request) {
       where: {
         ...(productId ? { productId } : {}),
         isApproved: true,
+        isVerified: true,
+        isHidden: false,
         isDeleted: false,
       },
       orderBy: [{ helpfulVotes: "desc" }, { createdAt: "desc" }],
@@ -80,87 +71,11 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
-  try {
-    const user = await requireAuth()
-    if (!user) {
-      return NextResponse.json(
-        { error: "Please log in to leave a review" },
-        { status: 401 }
-      )
-    }
-
-    const body = await req.json()
-    const parsed = CreateReviewSchema.safeParse(body)
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid review data", details: parsed.error.flatten() },
-        { status: 400 }
-      )
-    }
-
-    // Verify product exists
-    const product = await db.product.findFirst({
-      where: { id: parsed.data.productId, isActive: true, isDeleted: false },
-    })
-    if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 })
-    }
-
-    // Check if user already reviewed this product
-    const existing = await db.review.findFirst({
-      where: { productId: parsed.data.productId, userId: user.id },
-    })
-    if (existing) {
-      return NextResponse.json(
-        { error: "You've already reviewed this product" },
-        { status: 400 }
-      )
-    }
-
-    // Create review (auto-approve in dev)
-    const review = await db.review.create({
-      data: {
-        productId: parsed.data.productId,
-        userId: user.id,
-        rating: parsed.data.rating,
-        title: parsed.data.title || null,
-        body: parsed.data.body || null,
-        skinType: parsed.data.skinType || null,
-        shadeUsed: parsed.data.shadeUsed || null,
-        photos: JSON.stringify([]),
-        isApproved: process.env.NODE_ENV !== "production",
-      },
-    })
-
-    // Update product's denormalized rating + reviewsCount
-    const allReviews = await db.review.findMany({
-      where: {
-        productId: parsed.data.productId,
-        isApproved: true,
-        isDeleted: false,
-      },
-      select: { rating: true },
-    })
-    const newCount = allReviews.length
-    const newAvg =
-      newCount > 0
-        ? allReviews.reduce((s, r) => s + r.rating, 0) / newCount
-        : 0
-    await db.product.update({
-      where: { id: parsed.data.productId },
-      data: {
-        rating: Math.round(newAvg * 10) / 10,
-        reviewsCount: newCount,
-      },
-    })
-
-    return NextResponse.json({ review }, { status: 201 })
-  } catch (error) {
-    console.error("Failed to create review:", error)
-    return NextResponse.json(
-      { error: "Failed to create review" },
-      { status: 500 }
-    )
-  }
+export async function POST() {
+  // The legacy endpoint cannot prove delivery or order ownership. Keep it
+  // closed so unverified reviews can never enter the public review funnel.
+  return NextResponse.json(
+    { success: false, error: 'VERIFIED_ORDER_REQUIRED', submitAt: '/api/reviews/submit' },
+    { status: 410 },
+  )
 }

@@ -50,6 +50,7 @@ export const PERMISSIONS = {
   // Insights
   ANALYTICS_READ: "analytics.read",
   REPORTS_READ: "reports.read",
+  REVIEWS_MODERATE: "reviews.moderate",
   // Admin
   STAFF_MANAGE: "staff.manage",
   SETTINGS_UPDATE: "settings.update",

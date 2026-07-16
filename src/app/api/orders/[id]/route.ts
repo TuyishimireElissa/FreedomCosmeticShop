@@ -20,6 +20,9 @@ import { enqueueSms } from "@/server/services/sms-queue"
 import { logActivity } from "@/server/services/activity"
 import { requirePermission, PERMISSIONS, rateLimit } from "@/lib/permissions"
 import { features } from "@/lib/env"
+import { createReviewRequests } from '@/lib/review-requests'
+import { resolveTranslation } from '@/lib/i18n'
+import { BUSINESS } from '@/lib/business-config'
 
 const VALID_STATUSES = [
   "PENDING",
@@ -188,6 +191,9 @@ export async function PATCH(
     // ─── Section 3: Real-time broadcast + SMS auto-trigger ──────────
     if (statusChanged && updated && serializedOrder) {
       const newStatus = parsed.data.status!
+      if (newStatus === 'DELIVERED') {
+        await createReviewRequests(updated.id).catch((error) => console.error('Review request creation failed:', error instanceof Error ? error.message : 'unknown'))
+      }
       // Map order status to broadcast action
       const actionMap: Record<string, "confirmed" | "processing" | "shipped" | "delivered" | "cancelled"> = {
         CONFIRMED: "confirmed",
@@ -237,9 +243,8 @@ export async function PATCH(
           })
           enqueueSms(customerPhone, message, { priority: 1, template: "ORDER_SHIPPED" })
         } else if (newStatus === "DELIVERED") {
-          const reviewLink = `${process.env.NEXT_PUBLIC_BASE_URL || ""}/?order=${orderNumber}`
-          const message = getSmsMessage("ORDER_DELIVERED", "en", { orderNumber, reviewLink })
-          enqueueSms(customerPhone, message, { priority: 1, template: "ORDER_DELIVERED" })
+          const message = resolveTranslation('rw', 'sms.order_delivered_status', { order: orderNumber, business: BUSINESS.tradingName })
+          enqueueSms(customerPhone, message, { priority: 1, template: "ORDER_PLACED" })
         } else if (newStatus === "CANCELLED") {
           // Custom cancellation SMS (no template exists yet)
           const message = `Order ${orderNumber} has been cancelled. If you paid, a refund of ${updated.total} RWF will be processed. Questions? Call +250780000000. FreedomCosmeticShop`

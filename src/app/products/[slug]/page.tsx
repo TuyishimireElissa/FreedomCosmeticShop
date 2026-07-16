@@ -22,7 +22,7 @@ async function getProduct(slug: string) {
       },
       brand: { select: { name: true } },
       reviews: {
-        where: { isApproved: true, isDeleted: false },
+        where: { isApproved: true, isVerified: true, isHidden: false, isDeleted: false },
         select: { rating: true },
       },
     },

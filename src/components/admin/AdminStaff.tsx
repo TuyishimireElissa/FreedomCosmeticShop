@@ -175,6 +175,7 @@ const PERMISSION_GROUPS: { label: string; permissions: { key: string; label: str
     permissions: [
       { key: "sms.send", label: "Send SMS" },
       { key: "sms.schedule", label: "Schedule SMS campaigns" },
+      { key: "reviews.moderate", label: "Moderate reported reviews" },
     ],
   },
   {
@@ -202,7 +203,7 @@ const ROLE_DEFAULTS: Record<string, string[]> = {
     "deliveries.read", "deliveries.update",
     "coupons.read", "coupons.update",
     "banners.read", "banners.update",
-    "sms.send", "analytics.read", "reports.read",
+    "sms.send", "analytics.read", "reports.read", "reviews.moderate",
   ],
   STAFF: [
     "orders.read", "orders.update",

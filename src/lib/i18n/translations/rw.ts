@@ -732,6 +732,118 @@ export const rw = {
     view_my_orders: 'Reba komande zanjye', // verified-rw
     wishlist_ready: 'Ibicuruzwa ukunda, biteguye igihe ubishakiye.', // verified-rw
   },
+  reviews: {
+    checking_eligibility: 'Turimo kugenzura niba wemerewe gutanga igitekerezo ku byo wagejejweho...', // verified-rw
+    not_eligible: 'Iki gicuruzwa cyo muri komande nticyemerewe gutangwaho igitekerezo.', // verified-rw
+    form_title: 'Tanga igitekerezo cyawe cy’ukuri', // verified-rw
+    equal_reward_notice: 'Buri gitekerezo cy’ukuri cyujuje ibisabwa gihabwa amanota {points}. Igitekerezo cy’inyenyeri imwe gihabwa angana neza n’ay’inyenyeri eshanu.', // verified-rw
+    order_value: 'Komande {order}', // verified-rw
+    verified_purchase: 'Ubuguzi bwagejejwe kandi bwemejwe', // verified-rw
+    rating_label: 'Amanota yawe', // verified-rw
+    stars_label: 'Inyenyeri {count}', // verified-rw
+    rating_1: 'Sinanyuzwe na gato', rating_2: 'Sinanyuzwe', rating_3: 'Ni hagati', rating_4: 'Naranyuzwe', rating_5: 'Naranyuzwe cyane', // verified-rw
+    title_optional: 'Umutwe (si ngombwa)', // verified-rw
+    title_placeholder: 'Vuga muri make uko byagenze', // verified-rw
+    comment_optional: 'Igitekerezo cyawe (si ngombwa)', // verified-rw
+    comment_placeholder: 'Ni iki cyagenze neza? Ni iki cyakosorwa? Ibitekerezo binenga cyangwa bitishimiye igicuruzwa biremewe.', // verified-rw
+    skin_optional: 'Ubwoko bw’uruhu rwawe (si ngombwa)', // verified-rw
+    hair_optional: 'Ubwoko bw’umusatsi wawe (si ngombwa)', // verified-rw
+    shade_match: 'Ibara ryahuye n’uruhu rwawe?', // verified-rw
+    photos_optional: 'Amafoto (si ngombwa · ntarengwa {count})', // verified-rw
+    photo_alt: 'Ifoto y’igitekerezo {number}', // verified-rw
+    remove_photo: 'Kuraho ifoto', // verified-rw
+    add_photo: 'Ongeraho ifoto', // verified-rw
+    submitting: 'Birimo koherezwa...', // verified-rw
+    submit_equal: 'Ohereza igitekerezo cy’ukuri · ubone amanota {points}', // verified-rw
+    negative_welcome: 'Ibihembo bishingira ku gitekerezo cy’ukuri cyujuje ibisabwa—ntibishingira ku kuba amanota ari meza cyangwa mabi.', // verified-rw
+    thank_you: 'Murakoze gutanga igitekerezo cy’ukuri', // verified-rw
+    points_awarded_equal: 'Wahawe amanota {points}, angana n’ahabwa buri gitekerezo cyujuje ibisabwa uko amanota yatanzwe yaba angana kose.', // verified-rw
+    back_to_product: 'Subira ku gicuruzwa', // verified-rw
+    back_to_orders: 'Subira kuri komande zanjye', // verified-rw
+    review_delivered_products: 'Tanga ibitekerezo ku bicuruzwa wagejejweho', // verified-rw
+    review_product: 'Tanga igitekerezo kuri {product}', // verified-rw
+    error_auth_required: 'Injira kugira ngo utange igitekerezo ku byo wagejejweho.', // verified-rw
+    error_delivered_order_required: 'Ibicuruzwa byo muri komande wagejejweho gusa ni byo bitangwaho igitekerezo.', // verified-rw
+    error_product_not_in_order: 'Iki gicuruzwa nticyari muri iyo komande.', // verified-rw
+    error_review_window_expired: 'Igihe cy’iminsi 90 cyo gutanga igitekerezo cyarangiye.', // verified-rw
+    error_already_reviewed: 'Warangije gutanga igitekerezo kuri iki gicuruzwa cyo muri iyi komande.', // verified-rw
+    error_invalid_review_photo: 'Koresha ifoto ya JPEG, PNG cyangwa WebP iri munsi ya MB 5.', // verified-rw
+    error_review_photo_upload_failed: 'Ifoto ntiyashoboye koherezwa.', // verified-rw
+    error_rating_required: 'Hitamo amanota kuva ku nyenyeri imwe kugeza kuri eshanu.', // verified-rw
+    error_review_submission_failed: 'Igitekerezo nticyashoboye koherezwa. Ongera ugerageze.', // verified-rw
+    error_eligibility_unavailable: 'Kugenzura niba wemerewe gutanga igitekerezo ntibyashobotse. Ongera ugerageze.', // verified-rw
+    loading: 'Ibitekerezo byemejwe birimo gufunguka...', // verified-rw
+    load_failed: 'Ibitekerezo byemejwe ntibyashoboye gufunguka.', // verified-rw
+    empty_title: 'Nta bitekerezo byemejwe biraboneka', // verified-rw
+    empty_hint: 'Ibitekerezo byemejwe bizagaragara nyuma y’uko abakiriya bagejejweho iki gicuruzwa bakagitangaho igitekerezo.', // verified-rw
+    real_count: 'Ibitekerezo nyabyo byemejwe {count}', // verified-rw
+    all_verified: 'Ibitekerezo byose bigaragara ni iby’abakiriya bagejejweho ibicuruzwa', // verified-rw
+    filtered_stars: 'Byashunguwe: inyenyeri {count}', // verified-rw
+    sort_label: 'Tondeka', // verified-rw
+    sort_helpful: 'Ibyafashije cyane', // verified-rw
+    sort_recent: 'Ibiheruka', // verified-rw
+    sort_high: 'Amanota menshi mbere', // verified-rw
+    sort_low: 'Amanota make mbere', // verified-rw
+    skin_value: 'Uruhu: {value}', // verified-rw
+    hair_value: 'Umusatsi: {value}', // verified-rw
+    shade_matched: 'Ibara ryahuye', // verified-rw
+    shade_not_matched: 'Ibara ntiryahuye', // verified-rw
+    merchant_response: 'Igisubizo cya FreedomCosmeticShop', // verified-rw
+    helpful_question: 'Iki gitekerezo cyagufashije?', // verified-rw
+    report: 'Tanga raporo', // verified-rw
+    report_reason: 'Impamvu', // verified-rw
+    report_spam: 'Ubutumwa budakenewe', // verified-rw
+    report_abuse: 'Amagambo atukana', // verified-rw
+    report_privacy: 'Ikibazo cy’amakuru bwite', // verified-rw
+    report_irrelevant: 'Ibidafitanye isano', // verified-rw
+    report_other: 'Indi mpamvu', // verified-rw
+    report_details: 'Ongeraho ibisobanuro igihe bikenewe', // verified-rw
+    submit_report: 'Ohereza raporo', // verified-rw
+    report_received: 'Raporo yakiriwe kugira ngo igenzurwe n’umuyobozi.', // verified-rw
+    load_more: 'Fungura ibindi bitekerezo byemejwe', // verified-rw
+    error_self_vote_not_allowed: 'Ntushobora gutora ku gitekerezo cyawe.', // verified-rw
+    error_already_reported: 'Warangije gutanga raporo kuri iki gitekerezo.', // verified-rw
+    error_self_report_not_allowed: 'Ntushobora gutanga raporo ku gitekerezo cyawe.', // verified-rw
+    error_invalid_report: 'Hitamo impamvu yemewe kandi utange ibisobanuro bikenewe.', // verified-rw
+    action_failed: 'Igikorwa ku gitekerezo nticyashoboye kurangira.', // verified-rw
+    admin_nav: 'Ibitekerezo by’abakiriya', // verified-rw
+    admin_title: 'Ibitekerezo by’abakiriya', // verified-rw
+    admin_subtitle: 'Subiza mu buryo bw’umwuga kandi ugenzure gusa ubutumwa budakenewe, ibitutsi, amakuru bwite, amategeko cyangwa ibyisubiramo.', // verified-rw
+    admin_guidelines: 'Amabwiriza yo kugenzura', // verified-rw
+    admin_keep_negative: 'Ntuzigere uhisha igitekerezo cy’ukuri kubera gusa ko kinenga cyangwa kitishimye.', // verified-rw
+    admin_hide_only_abuse: 'Hisha gusa ubutumwa budakenewe, ibitutsi, amakuru bwite, ikibazo cy’amategeko cyangwa ibyasubiwemo.', // verified-rw
+    admin_respond_professionally: 'Subiza mu buryo bw’umwuga utajya impaka n’umukiriya cyangwa ngo umushinje.', // verified-rw
+    admin_no_rating_bias: 'Koresha amabwiriza amwe ku bitekerezo by’amanota yose.', // verified-rw
+    admin_filters: 'Inshungura zo kugenzura ibitekerezo', // verified-rw
+    admin_tab_all: 'Ibitekerezo byose', // verified-rw
+    admin_tab_reported: 'Byatanzweho raporo', // verified-rw
+    admin_tab_needs_response: 'Bikeneye igisubizo', // verified-rw
+    admin_tab_hidden: 'Byahishwe', // verified-rw
+    admin_load_failed: 'Ibitekerezo ntibyashoboye gufunguka.', // verified-rw
+    admin_empty: 'Nta bitekerezo bihuye n’iyi nshungura.', // verified-rw
+    admin_hidden_label: 'Cyahishwe kugira ngo kigenzurwe', // verified-rw
+    admin_order_unavailable: 'Nimero ya komande ntiboneka', // verified-rw
+    admin_open_reports: 'Raporo {count} zitarakemurwa', // verified-rw
+    admin_keep_visible: 'Kemura raporo kandi ugumishe igitekerezo kigaragara', // verified-rw
+    admin_response_placeholder: 'Andika igisubizo cyubaha umukiriya kandi gishingiye ku kuri...', // verified-rw
+    admin_post_response: 'Tangaza igisubizo', // verified-rw
+    admin_respond: 'Subiza iki gitekerezo', // verified-rw
+    admin_response_saved: 'Igisubizo cy’umucuruzi cyabitswe', // verified-rw
+    admin_restore: 'Subiza igitekerezo ku mugaragaro', // verified-rw
+    admin_restored: 'Igitekerezo cyasubijwe ku mugaragaro', // verified-rw
+    admin_hide_spam: 'Genzura ubutumwa budakenewe cyangwa ibitutsi', // verified-rw
+    admin_hide_reason: 'Impamvu yemewe yo kugenzura irakenewe', // verified-rw
+    admin_reason_spam: 'Ubutumwa budakenewe', // verified-rw
+    admin_reason_abuse: 'Amagambo atukana', // verified-rw
+    admin_reason_privacy: 'Kurenga ku makuru bwite', // verified-rw
+    admin_reason_legal: 'Icyemezo cy’amategeko', // verified-rw
+    admin_reason_duplicate: 'Ibyasubiwemo', // verified-rw
+    admin_moderation_details: 'Andika ibisobanuro by’ukuri byo kugenzura', // verified-rw
+    admin_confirm_hide: 'Hisha kubera iyi mpamvu', // verified-rw
+    admin_hidden: 'Igitekerezo cyahishwe kugira ngo kigenzurwe', // verified-rw
+    admin_reports_resolved: 'Raporo zakemuwe; igitekerezo kiracyagaragara', // verified-rw
+    admin_action_failed: 'Igikorwa cyo kugenzura nticyashoboye kurangira.', // verified-rw
+  },
   orders: {
     title: 'Ibyo natumije', empty: 'Nta byo uratumiza', empty_hint: 'Tangira guhaha, ibyo utumije bizagaragara hano', order_number: 'Komande #{number}', placed_on: 'Byatumijwe ku wa {date}', total: 'Igiteranyo: {amount} RWF', status_pending: 'Bitegereje', status_confirmed: 'Byemejwe', status_processing: 'Birimo gutegurwa', status_shipped: 'Biri mu nzira', status_delivered: 'Byagejejwe', status_cancelled: 'Byahagaritswe', status_returned: 'Byasubijwe', status_refunded: 'Amafaranga yasubijwe', track: 'Kurikirana komande', view_details: 'Reba ibisobanuro', reorder: 'Ongera utumize', cancel_order: 'Hagarika komande', tracking_title: 'Kurikirana komande #{number}', tracking_live: '🔴 AKO KANYA', step_placed: 'Komande yakiriwe', step_confirmed: 'Komande yemejwe', step_processing: 'Irimo gutegurwa', step_shipped: 'Iri mu nzira', step_delivered: 'Yagejejwe', rider_info: 'Umumotari wawe', rider_name: 'Amazina: {name}', rider_phone: 'Telefoni: {phone}', estimated: 'Biteganyijwe: {time}', call_rider: 'Hamagara umumotari', whatsapp_rider: 'Andikira umumotari kuri WhatsApp', delivery_address: 'Aho ibicuruzwa bigezwa', payment_info: 'Amakuru yo kwishyura', leave_review: 'Tanga igitekerezo', review_prompt: 'Serivisi yakunyuze ite?', // 🔍 REVIEW
 
@@ -907,6 +1019,8 @@ export const rw = {
     low_stock_label: 'Imenyesha ry’ububiko buke', // verified-rw
     not_sent: 'SMS ntiyoherejwe: {reason}', // verified-rw
     order_delivered: 'Komande yawe {{orderNumber}} yagejejwe! Murakoze guhitamo {business}. Tanga igitekerezo: {{reviewLink}} 🌟', // verified-rw
+    order_delivered_status: '{business}: Komande {order} yagejejwe. Murakoze guhaha natwe.', // verified-rw
+    review_request: '{business}: Tanga igitekerezo cy’ukuri kuri komande {order}: {url}. Buri gitekerezo cyujuje ibisabwa gihabwa amanota {points}, uko amanota watanze yaba angana kose.', // verified-rw
     order_delivered_description: 'Bwoherezwa komande imaze kugezwa, buriho ihuza ryo gutanga igitekerezo', // verified-rw
     order_delivered_label: 'Komande yagejejwe', // verified-rw
     order_placed: 'Murakoze! Komande yawe {{orderNumber}} yakiriwe. Tuzayitunganya vuba. {business} 📦', // verified-rw

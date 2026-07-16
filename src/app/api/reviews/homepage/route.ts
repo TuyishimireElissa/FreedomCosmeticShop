@@ -5,6 +5,8 @@ export const dynamic = 'force-dynamic'
 
 const REVIEW_WHERE = {
   isApproved: true,
+  isVerified: true,
+  isHidden: false,
   isDeleted: false,
 } as const
 
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
           title: true,
           body: true,
           skinType: true,
-          orderId: true,
+          isVerified: true,
           createdAt: true,
           user: { select: { name: true } },
           product: { select: { name: true, slug: true } },
@@ -55,7 +57,7 @@ export async function GET(request: NextRequest) {
         title: review.title,
         comment: review.body,
         skinType: review.skinType,
-        isVerified: review.orderId !== null,
+        isVerified: review.isVerified,
         createdAt: review.createdAt,
         user: {
           displayName: review.user?.name ? formatDisplayName(review.user.name) : null,

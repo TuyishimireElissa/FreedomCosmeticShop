@@ -72,7 +72,7 @@ export const PUBLIC_PRODUCT_SELECT = {
     orderBy: { sortOrder: 'asc' },
   },
   reviews: {
-    where: { isApproved: true, isDeleted: false },
+    where: { isApproved: true, isVerified: true, isHidden: false, isDeleted: false },
     select: { rating: true },
   },
 } satisfies Prisma.ProductSelect

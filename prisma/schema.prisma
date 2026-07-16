@@ -646,6 +646,7 @@ model Order {
   payments         Payment[]
   delivery         Delivery?
   reviews          Review[]
+  reviewRequests   ReviewRequest[]
   wholesaleInvoice WholesaleInvoice?
 
   @@index([orderNumber])
@@ -812,43 +813,121 @@ model Review {
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  // Kept nullable for legacy rows. Every new review API must require a real user,
+  // delivered order, and matching order item before setting isVerified=true.
   userId String?
   user   User?   @relation(fields: [userId], references: [id])
-
   orderId String?
   order   Order?  @relation(fields: [orderId], references: [id])
+  orderNumber String?
 
-  // Review content
-  rating Int // 1-5 stars
+  // Review content. Existing `body` is retained to avoid destructive renames.
+  rating Int // 1-5, validated by the API
   title  String?
-  body   String?
+  body   String? @db.Text
 
-  // Photos — JSON array of image URLs
+  // Existing JSON string representation is retained for backward compatibility.
+  // Submission APIs validate a maximum of five Cloudinary URLs.
   photos String? // '["url1", "url2"]'
 
-  // Cosmetics-specific context
-  skinType  String? // Reviewer's skin type
-  shadeUsed String? // Which shade they used
+  // Customer context
+  skinType    String?
+  hairType    HairType?
+  shadeUsed   String?
+  shadeMatched Boolean?
 
-  // Moderation
-  isApproved Boolean @default(false)
-  isFeatured Boolean @default(false)
+  // Verification is false for legacy/unlinked reviews and can only be set after
+  // checking a delivered order containing this product.
+  isVerified Boolean @default(false)
 
-  // Engagement
-  helpfulVotes Int @default(0)
+  // Moderation. Negative ratings are never a reason to hide a review.
+  isApproved       Boolean @default(false)
+  isFeatured       Boolean @default(false)
+  isHidden         Boolean @default(false)
+  moderationReason String?
 
-  // Soft delete
+  // Existing helpfulVotes is the canonical helpful counter.
+  helpfulVotes    Int @default(0)
+  notHelpfulCount Int @default(0)
+  votes           ReviewVote[]
+  reports         ReviewReport[]
+
+  merchantResponse   String? @db.Text
+  merchantResponseAt DateTime?
+
+  // Equal reward bookkeeping; rating never affects these values.
+  pointsAwarded   Int @default(0)
+  pointsAwardedAt DateTime?
+
+  // Legacy soft-delete fields are preserved. Moderation APIs may use them only
+  // for spam, abuse, legal, or privacy reasons—not negative sentiment.
   isDeleted Boolean   @default(false)
   deletedAt DateTime?
 
+  reviewRequest ReviewRequest?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([userId, productId, orderId])
   @@index([productId])
   @@index([userId])
   @@index([orderId])
+  @@index([isVerified])
   @@index([isApproved])
+  @@index([isHidden])
   @@index([rating])
+  @@index([createdAt])
+}
+
+model ReviewRequest {
+  id              String   @id @default(cuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId          String
+  productId       String
+  requestedAt     DateTime @default(now())
+  smsSent         Boolean  @default(false)
+  smsSentAt       DateTime?
+  smsClaimedAt    DateTime?
+  smsAttempts     Int      @default(0)
+  lastSmsError    String?
+  reviewSubmitted Boolean  @default(false)
+  reviewId        String?  @unique
+  review          Review?  @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+
+  @@unique([orderId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@index([requestedAt])
+}
+
+model ReviewVote {
+  id        String   @id @default(cuid())
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  userId    String
+  isHelpful Boolean
+  createdAt DateTime @default(now())
+
+  @@unique([reviewId, userId])
+  @@index([reviewId])
+  @@index([userId])
+}
+
+model ReviewReport {
+  id         String   @id @default(cuid())
+  reviewId   String
+  review     Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reportedBy String
+  reason     String
+  resolved   Boolean  @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+  createdAt  DateTime @default(now())
+
+  @@unique([reviewId, reportedBy])
+  @@index([reviewId])
+  @@index([resolved])
   @@index([createdAt])
 }
 
