@@ -22,6 +22,8 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { buildWhatsAppShareUrl, trackWhatsAppClick } from '@/lib/whatsapp-service'
 import { useOrderUpdates, useDeliveryUpdates } from "@/hooks/use-realtime"
+import OrderStatusBadge from '@/components/a11y/OrderStatusBadge'
+import PaymentStatusBadge from '@/components/a11y/PaymentStatusBadge'
 import {
   Package,
   Search,
@@ -287,17 +289,7 @@ export function TrackOrderView() {
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">{t('orders.status_label')}</p>
-                <p
-                  className={`text-lg font-bold ${
-                    order.status === "DELIVERED"
-                      ? "text-emerald-700"
-                      : order.status === "CANCELLED"
-                      ? "text-destructive"
-                      : "text-primary"
-                  }`}
-                >
-                  {t(`orders.status_${order.status.toLowerCase()}`)}
-                </p>
+                <OrderStatusBadge status={order.status} className="mt-1" />
               </div>
             </div>
             <div className="mt-3 flex items-center gap-2 text-sm">
@@ -427,9 +419,9 @@ export function TrackOrderView() {
             </div>
             <div className="mt-3 flex items-center justify-between rounded-lg bg-secondary/40 px-4 py-2 text-sm">
               <span className="text-muted-foreground">{t('checkout.step_payment')}</span>
-              <span className="font-medium">
-                {PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod}{" "}
-                · <span className={order.paymentStatus === "PAID" ? "text-emerald-600" : "text-amber-600"}>{order.paymentStatus}</span>
+              <span className="flex flex-wrap items-center justify-end gap-2 font-medium">
+                <span>{PAYMENT_METHODS[order.paymentMethod as PaymentMethodKey]?.label || order.paymentMethod}</span>
+                <PaymentStatusBadge status={order.paymentStatus} />
               </span>
             </div>
           </div>

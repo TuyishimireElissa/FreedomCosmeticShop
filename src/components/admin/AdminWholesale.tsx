@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
 import { useT } from '@/lib/i18n/LanguageContext'
+import OrderStatusBadge from '@/components/a11y/OrderStatusBadge'
 import {
   Store,
   Users,
@@ -503,11 +504,7 @@ function OrdersTab() {
                         ) : <span className="text-xs text-muted-foreground">—</span>}
                       </td>
                       <td className="px-3 py-3 text-center">
-                        <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                          order.status === "DELIVERED" ? "bg-emerald-100 text-emerald-700" :
-                          order.status === "CANCELLED" ? "bg-red-100 text-red-700" :
-                          "bg-amber-100 text-amber-700"
-                        }`}>{order.status}</span>
+                        <OrderStatusBadge status={order.status} />
                       </td>
                     </tr>
                   )

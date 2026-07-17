@@ -18,20 +18,11 @@ import { useState, useEffect, useCallback } from "react"
 import { useStore } from "@/store/useStore"
 import { RWANDA_DISTRICTS, RWANDA_PROVINCES } from "@/lib/rwanda-locations"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 import {
   ArrowLeft,
+  AlertCircle,
   CheckCircle2,
   Clock,
   Store,
@@ -46,6 +37,9 @@ import { WholesaleDashboard } from "./WholesaleDashboard"
 import { WholesaleInvoices } from "./WholesaleInvoices"
 import { useT } from '@/lib/i18n/LanguageContext'
 import { WHOLESALE_CONFIG } from '@/lib/wholesale-config'
+import FormField from '@/components/a11y/FormField'
+import FormSelect from '@/components/a11y/FormSelect'
+import FormTextarea from '@/components/a11y/FormTextarea'
 
 type InternalView = "landing" | "apply" | "status" | "success" | "dashboard" | "invoices"
 
@@ -275,6 +269,8 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
   const { toast } = useToast()
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
+  const [formError, setFormError] = useState('')
 
   // Step 1: Business Info
   const [businessName, setBusinessName] = useState("")
@@ -313,34 +309,43 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
   }
 
   const validateStep1 = () => {
-    if (!businessName.trim()) return t('wholesale.business_name_required')
-    if (!businessPhone.trim()) return t('wholesale.business_phone_required')
-    if (!businessDistrict) return t('wholesale.business_district_required')
-    if (!businessAddress.trim()) return t('wholesale.business_address_required')
-    return null
+    const errors: Record<string, string> = {}
+    if (!businessName.trim()) errors.businessName = t('wholesale.business_name_required')
+    if (!businessPhone.trim()) errors.businessPhone = t('wholesale.business_phone_required')
+    if (!businessDistrict) errors.businessDistrict = t('wholesale.business_district_required')
+    if (!businessAddress.trim()) errors.businessAddress = t('wholesale.business_address_required')
+    return errors
   }
 
   const validateStep2 = () => {
-    if (!ownerName.trim()) return t('wholesale.owner_name_required')
-    if (!ownerPhone.trim()) return t('wholesale.owner_phone_required')
-    return null
+    const errors: Record<string, string> = {}
+    if (!ownerName.trim()) errors.ownerName = t('wholesale.owner_name_required')
+    if (!ownerPhone.trim()) errors.ownerPhone = t('wholesale.owner_phone_required')
+    return errors
   }
 
   const handleNext = () => {
-    const error = step === 1 ? validateStep1() : step === 2 ? validateStep2() : null
-    if (error) {
-      toast({ title: t('wholesale.fix_errors'), description: error, variant: "destructive" })
+    const errors = step === 1 ? validateStep1() : step === 2 ? validateStep2() : {}
+    setFieldErrors(errors)
+    const firstError = Object.values(errors)[0]
+    if (firstError) {
+      setFormError(firstError)
+      toast({ title: t('wholesale.fix_errors'), description: firstError, variant: "destructive" })
       return
     }
+    setFormError('')
     setStep(step + 1)
   }
 
   const handleSubmit = async () => {
     if (!agreeTerms || !confirmAccurate) {
-      toast({ title: t('wholesale.accept_terms'), description: t('wholesale.accept_terms_hint'), variant: "destructive" })
+      const message = t('wholesale.accept_terms_hint')
+      setFormError(message)
+      toast({ title: t('wholesale.accept_terms'), description: message, variant: "destructive" })
       return
     }
 
+    setFormError('')
     setSubmitting(true)
     try {
       const res = await fetch("/api/wholesale/apply", {
@@ -368,9 +373,11 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
 
       onSuccess()
     } catch (e) {
+      const message = e instanceof Error ? e.message : t('common.error')
+      setFormError(message)
       toast({
         title: t('wholesale.submission_failed'),
-        description: e instanceof Error ? e.message : t('common.error'),
+        description: message,
         variant: "destructive",
       })
     } finally {
@@ -401,60 +408,19 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
       <p className="mb-6 text-center text-sm text-muted-foreground">
         {t('wholesale.step_of', { step })}: {step === 1 ? t('wholesale.business_details') : step === 2 ? t('wholesale.owner_details') : t('wholesale.documents_submit')}
       </p>
+      {formError && <p id="wholesale-form-error" className="mb-4 flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700" role="alert" aria-live="assertive"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />{formError}</p>}
 
       {/* Step 1: Business Information */}
       {step === 1 && (
         <div className="space-y-4 rounded-2xl border bg-card p-6">
-          <div>
-            <Label htmlFor="biz-name">{t('wholesale.business_name')}</Label>
-            <Input id="biz-name" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="Amina Beauty Salon" className="mt-1" />
-          </div>
-          <div>
-            <Label htmlFor="biz-type">{t('wholesale.business_type')}</Label>
-            <Select value={businessType} onValueChange={setBusinessType}>
-              <SelectTrigger id="biz-type" className="mt-1"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {BUSINESS_TYPES.map((bt) => (
-                  <SelectItem key={bt.value} value={bt.value}>{t(bt.label)}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="biz-phone">{t('wholesale.business_phone')}</Label>
-            <Input id="biz-phone" value={businessPhone} onChange={(e) => setBusinessPhone(e.target.value)} placeholder="+250 780 000 001" className="mt-1" />
-          </div>
-          <div>
-            <Label htmlFor="biz-district">{t('wholesale.business_district')}</Label>
-            <Select value={businessDistrict} onValueChange={setBusinessDistrict}>
-              <SelectTrigger id="biz-district" className="mt-1"><SelectValue placeholder={t('checkout.district_select')} /></SelectTrigger>
-              <SelectContent>
-                {allDistricts.map((d) => (
-                  <SelectItem key={d} value={d}>{d}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="biz-address">{t('wholesale.business_address')}</Label>
-            <Input id="biz-address" value={businessAddress} onChange={(e) => setBusinessAddress(e.target.value)} placeholder="KG 123 St, near KCT Building" className="mt-1" />
-          </div>
+          <FormField id="biz-name" label={t('wholesale.business_name')} required error={fieldErrors.businessName} value={businessName} onChange={(event) => { setBusinessName(event.target.value); setFieldErrors((current) => ({ ...current, businessName: '' })) }} placeholder="Amina Beauty Salon" />
+          <FormSelect id="biz-type" label={t('wholesale.business_type')} required value={businessType} onChange={(event) => setBusinessType(event.target.value)} options={BUSINESS_TYPES.map((businessTypeOption) => ({ value: businessTypeOption.value, label: t(businessTypeOption.label) }))} />
+          <FormField id="biz-phone" label={t('wholesale.business_phone')} required error={fieldErrors.businessPhone} type="tel" value={businessPhone} onChange={(event) => { setBusinessPhone(event.target.value); setFieldErrors((current) => ({ ...current, businessPhone: '' })) }} placeholder="+250 780 000 001" autoComplete="tel" />
+          <FormSelect id="biz-district" label={t('wholesale.business_district')} required error={fieldErrors.businessDistrict} value={businessDistrict} onChange={(event) => { setBusinessDistrict(event.target.value); setFieldErrors((current) => ({ ...current, businessDistrict: '' })) }} placeholder={t('checkout.district_select')} options={allDistricts.map((district) => ({ value: district, label: district }))} />
+          <FormField id="biz-address" label={t('wholesale.business_address')} required error={fieldErrors.businessAddress} value={businessAddress} onChange={(event) => { setBusinessAddress(event.target.value); setFieldErrors((current) => ({ ...current, businessAddress: '' })) }} placeholder="KG 123 St, near KCT Building" />
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label htmlFor="years">{t('wholesale.years_business')}</Label>
-              <Select value={yearsInBusiness} onValueChange={setYearsInBusiness}>
-                <SelectTrigger id="years" className="mt-1"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 5, 10, 20].map((y) => (
-                    <SelectItem key={y} value={String(y)}>{t('wholesale.years_count', { count: y })}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="tin">{t('wholesale.tin_optional')}</Label>
-              <Input id="tin" value={tinNumber} onChange={(e) => setTinNumber(e.target.value)} placeholder="123456789" className="mt-1" />
-            </div>
+            <FormSelect id="years" label={t('wholesale.years_business')} value={yearsInBusiness} onChange={(event) => setYearsInBusiness(event.target.value)} options={[1, 2, 3, 5, 10, 20].map((year) => ({ value: String(year), label: t('wholesale.years_count', { count: year }) }))} />
+            <FormField id="tin" label={t('wholesale.tin_optional')} value={tinNumber} onChange={(event) => setTinNumber(event.target.value)} placeholder="123456789" />
           </div>
           <div className="flex justify-end pt-2">
             <Button onClick={handleNext}>{t('wholesale.next_step')} →</Button>
@@ -465,40 +431,11 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
       {/* Step 2: Owner Information */}
       {step === 2 && (
         <div className="space-y-4 rounded-2xl border bg-card p-6">
-          <div>
-            <Label htmlFor="owner-name">{t('wholesale.owner_full_name')}</Label>
-            <Input id="owner-name" value={ownerName} onChange={(e) => setOwnerName(e.target.value)} placeholder="Amina Uwase" className="mt-1" />
-          </div>
-          <div>
-            <Label htmlFor="owner-phone">{t('wholesale.owner_phone')}</Label>
-            <Input id="owner-phone" value={ownerPhone} onChange={(e) => setOwnerPhone(e.target.value)} placeholder="+250 780 000 001" className="mt-1" />
-          </div>
-          <div>
-            <Label htmlFor="owner-email">{t('wholesale.owner_email_optional')}</Label>
-            <Input id="owner-email" type="email" value={ownerEmail} onChange={(e) => setOwnerEmail(e.target.value)} placeholder="amina@gmail.com" className="mt-1" />
-          </div>
-          <div>
-            <Label htmlFor="revenue">{t('wholesale.monthly_order')}</Label>
-            <Select value={monthlyRevenue} onValueChange={setMonthlyRevenue}>
-              <SelectTrigger id="revenue" className="mt-1"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {REVENUE_RANGES.map((r, index) => (
-                  <SelectItem key={r} value={r}>{t(`wholesale.revenue_${index}`)}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="heard">{t('wholesale.heard_about')}</Label>
-            <Select value={heardFrom} onValueChange={setHeardFrom}>
-              <SelectTrigger id="heard" className="mt-1"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                {HEARD_FROM_OPTIONS.map((h, index) => (
-                  <SelectItem key={h} value={h}>{t(`wholesale.heard_${index}`)}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <FormField id="owner-name" label={t('wholesale.owner_full_name')} required error={fieldErrors.ownerName} value={ownerName} onChange={(event) => { setOwnerName(event.target.value); setFieldErrors((current) => ({ ...current, ownerName: '' })) }} placeholder="Amina Uwase" autoComplete="name" />
+          <FormField id="owner-phone" label={t('wholesale.owner_phone')} required error={fieldErrors.ownerPhone} type="tel" value={ownerPhone} onChange={(event) => { setOwnerPhone(event.target.value); setFieldErrors((current) => ({ ...current, ownerPhone: '' })) }} placeholder="+250 780 000 001" autoComplete="tel" />
+          <FormField id="owner-email" label={t('wholesale.owner_email_optional')} type="email" value={ownerEmail} onChange={(event) => setOwnerEmail(event.target.value)} placeholder="amina@gmail.com" autoComplete="email" />
+          <FormSelect id="revenue" label={t('wholesale.monthly_order')} value={monthlyRevenue} onChange={(event) => setMonthlyRevenue(event.target.value)} options={REVENUE_RANGES.map((range, index) => ({ value: range, label: t(`wholesale.revenue_${index}`) }))} />
+          <FormSelect id="heard" label={t('wholesale.heard_about')} value={heardFrom} onChange={(event) => setHeardFrom(event.target.value)} options={HEARD_FROM_OPTIONS.map((source, index) => ({ value: source, label: t(`wholesale.heard_${index}`) }))} />
           <div className="flex justify-between pt-2">
             <Button variant="outline" onClick={() => setStep(1)}>← {t('common.back')}</Button>
             <Button onClick={handleNext}>{t('wholesale.next_step')} →</Button>
@@ -515,25 +452,14 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
               {t('wholesale.documents_hint')}
             </p>
           </div>
-          <div>
-            <Label htmlFor="notes">{t('wholesale.additional_notes')}</Label>
-            <Textarea
-              id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder={t('wholesale.notes_placeholder')}
-              rows={3}
-              className="mt-1 resize-none"
-              maxLength={1000}
-            />
-          </div>
+          <FormTextarea id="notes" label={t('wholesale.additional_notes')} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder={t('wholesale.notes_placeholder')} rows={3} textareaClassName="resize-none" maxLength={1000} />
           <div className="space-y-2">
             <label className="flex items-start gap-2 text-sm">
-              <input type="checkbox" checked={agreeTerms} onChange={(e) => setAgreeTerms(e.target.checked)} className="mt-1 h-4 w-4 rounded" />
+              <input type="checkbox" required aria-required="true" aria-invalid={formError && !agreeTerms ? true : undefined} aria-describedby={formError && !agreeTerms ? 'wholesale-form-error' : undefined} checked={agreeTerms} onChange={(event) => setAgreeTerms(event.target.checked)} className="mt-1 h-4 w-4 rounded" />
               <span>{t('wholesale.agree_terms')}</span>
             </label>
             <label className="flex items-start gap-2 text-sm">
-              <input type="checkbox" checked={confirmAccurate} onChange={(e) => setConfirmAccurate(e.target.checked)} className="mt-1 h-4 w-4 rounded" />
+              <input type="checkbox" required aria-required="true" aria-invalid={formError && !confirmAccurate ? true : undefined} aria-describedby={formError && !confirmAccurate ? 'wholesale-form-error' : undefined} checked={confirmAccurate} onChange={(event) => setConfirmAccurate(event.target.checked)} className="mt-1 h-4 w-4 rounded" />
               <span>{t('wholesale.confirm_accurate')}</span>
             </label>
           </div>

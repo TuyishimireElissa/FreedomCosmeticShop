@@ -48,6 +48,8 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
 import {
   Search,
   Truck,
@@ -1212,6 +1214,7 @@ function BulkAssignModal({
   onSubmit: () => void
   onClose: () => void
 }) {
+  const t = useT()
   const allSelected = bulkSelected.size === pendingDeliveries.length && pendingDeliveries.length > 0
 
   return (
@@ -1229,13 +1232,7 @@ function BulkAssignModal({
             <Users className="h-5 w-5 text-primary" />
             <h3 className="text-lg font-bold">Bulk assign rider</h3>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-md text-muted-foreground hover:bg-secondary"
-          >
-            <XCircle className="h-4 w-4" />
-          </button>
+          <IconButton label={t('accessibility.close')} icon={<XCircle className="h-4 w-4" />} onClick={onClose} variant="ghost" className="rounded-md" />
         </div>
 
         {/* Body */}

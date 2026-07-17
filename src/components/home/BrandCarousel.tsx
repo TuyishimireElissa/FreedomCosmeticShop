@@ -13,9 +13,10 @@
 
 import { useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 interface Brand {
   id: string
@@ -35,13 +36,14 @@ export function BrandCarousel({ brands }: BrandCarouselProps) {
   const t = useT()
   const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollRef.current) return
     const amount = 280 // Approximate card width + gap
     scrollRef.current.scrollBy({
       left: direction === "left" ? -amount : amount,
-      behavior: "smooth",
+      behavior: prefersReducedMotion ? "auto" : "smooth",
     })
   }
 
@@ -61,23 +63,9 @@ export function BrandCarousel({ brands }: BrandCarouselProps) {
         </div>
 
         {/* Navigation arrows (desktop) */}
-        <div className="hidden gap-2 sm:flex">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => scroll("left")}
-            aria-label={t('home.scroll_brands_left')}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => scroll("right")}
-            aria-label={t('home.scroll_brands_right')}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+        <div className="flex gap-2">
+          <IconButton label={t('home.scroll_brands_left')} icon={<ChevronLeft className="h-4 w-4" />} onClick={() => scroll('left')} className="border bg-white" />
+          <IconButton label={t('home.scroll_brands_right')} icon={<ChevronRight className="h-4 w-4" />} onClick={() => scroll('right')} className="border bg-white" />
         </div>
       </div>
 

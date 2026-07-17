@@ -12,9 +12,10 @@
  */
 
 import { useEffect, useState, useCallback } from "react"
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Star, Quote, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react"
 import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 interface Review {
   name: string
@@ -77,6 +78,12 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
   const t = useT()
   const [current, setCurrent] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [interactionPaused, setInteractionPaused] = useState(false)
+  const [reducedMotionOverride, setReducedMotionOverride] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
+  const reducedMotionPause = prefersReducedMotion && !reducedMotionOverride
+  const controlPaused = isPaused || reducedMotionPause
+  const autoAdvancePaused = controlPaused || interactionPaused
 
   // Number of reviews to show at once (1 on mobile, 3 on desktop)
   // We'll use CSS to handle the responsive layout, and advance by 1
@@ -85,19 +92,31 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
   }, [reviews.length])
 
   useEffect(() => {
-    if (isPaused) return
-    const timer = setInterval(advance, 6000)
-    return () => clearInterval(timer)
-  }, [isPaused, advance])
+    if (autoAdvancePaused || reviews.length < 2) return
+    const timer = window.setInterval(advance, 6000)
+    return () => window.clearInterval(timer)
+  }, [advance, autoAdvancePaused, reviews.length])
 
   const prev = () => setCurrent((c) => (c - 1 + reviews.length) % reviews.length)
   const next = () => setCurrent((c) => (c + 1) % reviews.length)
+  const togglePlayback = () => {
+    if (reducedMotionPause) {
+      setReducedMotionOverride(true)
+      setIsPaused(false)
+    } else {
+      setIsPaused((value) => !value)
+    }
+  }
 
   return (
     <section
       className="bg-secondary/30 py-12"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      onMouseEnter={() => setInteractionPaused(true)}
+      onMouseLeave={() => setInteractionPaused(false)}
+      onFocusCapture={() => setInteractionPaused(true)}
+      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setInteractionPaused(false) }}
+      aria-roledescription="carousel"
+      aria-label={t('accessibility.reviews_carousel')}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -134,7 +153,10 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
               const review = reviews[idx]
               return (
                 <div
-                  key={`${review.name}-${idx}`}
+                  key={`${review.name}-${idx}-${offset}`}
+                  role="group"
+                  aria-roledescription="slide"
+                  aria-label={t('accessibility.slide_position', { current: idx + 1, total: reviews.length })}
                   className="relative rounded-2xl border bg-card p-5 shadow-sm transition-all hover:shadow-md"
                 >
                   <Quote className="absolute right-4 top-4 h-8 w-8 text-primary/20" />
@@ -179,36 +201,27 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
           </div>
 
           {/* Navigation */}
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={prev}
-              aria-label={t('home.previous_reviews')}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex gap-1.5">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <IconButton label={t('home.previous_reviews')} icon={<ChevronLeft className="h-4 w-4" />} onClick={prev} className="border bg-white" />
+            <div className="flex max-w-full gap-0.5 overflow-x-auto" role="tablist" aria-label={t('accessibility.reviews_carousel')}>
               {reviews.map((_, i) => (
                 <button
                   key={i}
+                  type="button"
+                  role="tab"
                   onClick={() => setCurrent(i)}
-                  className={`h-2 rounded-full transition-all ${
-                    i === current ? "w-6 bg-primary" : "w-2 bg-muted-foreground/30"
-                  }`}
+                  className="grid h-11 w-11 place-items-center rounded-full"
                   aria-label={t('home.review_group', { number: i + 1 })}
-                />
+                  aria-selected={i === current}
+                >
+                  <span aria-hidden="true" className={`h-2 rounded-full transition-all ${i === current ? 'w-6 bg-primary' : 'w-2 bg-muted-foreground/40'}`} />
+                </button>
               ))}
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={next}
-              aria-label={t('home.next_reviews')}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+            <IconButton label={t('home.next_reviews')} icon={<ChevronRight className="h-4 w-4" />} onClick={next} className="border bg-white" />
+            <IconButton label={controlPaused ? t('accessibility.play_carousel') : t('accessibility.pause_carousel')} icon={controlPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />} onClick={togglePlayback} className="border bg-white" />
           </div>
+          <div className="sr-only" aria-live="polite" aria-atomic="true">{t('accessibility.slide_position', { current: current + 1, total: reviews.length })}</div>
         </div>
       </div>
     </section>

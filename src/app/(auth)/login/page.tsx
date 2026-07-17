@@ -7,6 +7,7 @@ import { ArrowRight, CheckCircle2, Eye, EyeOff, Loader2, Lock, ShieldCheck, User
 import { useStore } from '@/store/useStore'
 import MFALoginChallenge from '@/components/auth/MFALoginChallenge'
 import { useT } from '@/lib/i18n/LanguageContext'
+import FormField from '@/components/a11y/FormField'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -51,10 +52,30 @@ export default function LoginPage() {
           <div className="rounded-[2rem] border border-gray-100 bg-white p-6 shadow-[0_20px_60px_rgba(26,26,26,0.08)] sm:p-8">
             {mfaChallenge ? <MFALoginChallenge challengeToken={mfaChallenge} onCancel={() => { setMfaChallenge(null); setPassword(''); setError(null) }} onSuccess={(authenticatedUser) => { const user = authenticatedUser as { role: string; mustChangePassword?: boolean }; setUser(authenticatedUser as never); router.push(user.mustChangePassword ? '/change-password' : ['ADMIN', 'STAFF', 'MANAGER', 'SUPER_ADMIN'].includes(user.role) ? '/admin' : '/'); router.refresh() }} /> : <>
             <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-rose-50 text-[#B76E79]"><User className="h-5 w-5" /></span><h2 className="mt-5 text-center text-3xl font-black text-[#1a1a1a]">{t('auth.login_title')}</h2><p className="mt-2 text-center text-sm text-gray-500">{t('auth.login_rwanda_identifier')}</p>
-            {error && <div className="mt-5 rounded-xl bg-red-50 p-3 text-center text-sm font-semibold text-red-700">{error}</div>}
             <form onSubmit={submit} className="mt-6 space-y-4">
-              <label className="block"><span className="mb-1.5 block text-sm font-bold text-gray-700">{t('auth.phone_or_email')}</span><input value={identifier} onChange={(event) => setIdentifier(event.target.value)} placeholder="+250780000000 or you@email.com" autoComplete="username" className="input-field" required /></label>
-              <label className="block"><span className="mb-1.5 flex items-center justify-between text-sm font-bold text-gray-700">{t('auth.password')}<Link href="/forgot-password" className="inline-flex min-h-11 items-center normal-case tracking-normal text-[#B76E79] hover:underline">{t('auth.forgot_password')}</Link></span><div className="relative"><Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" /><input type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder={t('auth.password_placeholder')} autoComplete="current-password" className="input-field pl-10 pr-11" required /><button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-0 top-1/2 grid h-11 w-11 -translate-y-1/2 touch-manipulation place-items-center rounded-full text-gray-500" aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div></label>
+              <FormField
+                id="login-identifier"
+                label={t('auth.phone_or_email')}
+                value={identifier}
+                onChange={(event) => setIdentifier(event.target.value)}
+                placeholder="+250780000000 or you@email.com"
+                autoComplete="username"
+                required
+              />
+              <FormField
+                id="login-password"
+                label={t('auth.password')}
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder={t('auth.password_placeholder')}
+                autoComplete="current-password"
+                required
+                error={error || undefined}
+                startAdornment={<Lock className="h-4 w-4 text-gray-500" />}
+                labelExtra={<Link href="/forgot-password" className="inline-flex min-h-11 items-center text-sm font-bold text-[#B76E79] hover:underline">{t('auth.forgot_password')}</Link>}
+                endAdornment={<button type="button" onClick={() => setShowPassword((value) => !value)} className="grid h-11 w-11 place-items-center rounded-full text-gray-600" aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>}
+              />
               <button type="submit" disabled={loading} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#B76E79] text-base font-black text-white shadow-lg shadow-[#B76E79]/20 hover:bg-[#a55d68] disabled:opacity-50">{loading ? <><Loader2 className="h-4 w-4 animate-spin" />{t('auth.logging_in')}</> : <>{t('auth.login_button')} <ArrowRight className="h-4 w-4" /></>}</button>
             </form>
             <p className="mt-5 text-center text-sm text-gray-500">{t('auth.new_customer')} <Link href="/register" className="inline-flex min-h-11 items-center font-black text-[#B76E79] hover:underline">{t('auth.register_link')}</Link></p><p className="mt-5 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-500"><ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />{t('auth.secure_login')}</p>

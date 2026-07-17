@@ -9,6 +9,8 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowLeft, FileText, MessageCircle, Package, RefreshCw, ShoppingBag, Truck } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
+import OrderStatusBadge from '@/components/a11y/OrderStatusBadge'
 
 interface DashboardData {
   credit: null
@@ -118,7 +120,7 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
       <div className="mb-6 flex items-center gap-2">
-        <button onClick={goHome} className="grid h-8 w-8 place-items-center rounded-lg hover:bg-secondary"><ArrowLeft className="h-4 w-4" /></button>
+        <IconButton label={t('wholesale.back_store')} icon={<ArrowLeft className="h-4 w-4" />} onClick={goHome} variant="ghost" className="rounded-lg" />
         <div><h1 className="text-xl font-bold">{t('wholesale.dashboard')}</h1><p className="text-xs text-muted-foreground">{data.user.businessName}</p></div>
       </div>
 
@@ -142,7 +144,7 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
         {data.recentOrders.length === 0 ? <p className="rounded-xl border border-dashed p-4 text-center text-xs text-muted-foreground">{t('wholesale.no_orders')}</p> : (
           <div className="space-y-2">{data.recentOrders.map((order) => (
             <div key={order.id} className="flex items-center justify-between gap-3 rounded-xl border bg-card p-3 text-sm">
-              <div><p className="font-mono text-xs font-bold">{order.orderNumber}</p><p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleDateString('en-RW', { day: 'numeric', month: 'short' })} · {order.status}</p></div>
+              <div><p className="font-mono text-xs font-bold">{order.orderNumber}</p><p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleDateString('en-RW', { day: 'numeric', month: 'short' })}</p><OrderStatusBadge status={order.status} className="mt-1" /></div>
               <div className="flex items-center gap-3"><p className="font-bold">{formatRWF(order.total)}</p><Button size="sm" variant="ghost" disabled={reorderingOrderId !== null} onClick={() => reorder(order.id)}>{t('wholesale.reorder_action')}</Button></div>
             </div>
           ))}</div>

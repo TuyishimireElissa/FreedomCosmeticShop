@@ -25,6 +25,7 @@ import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
 import { useCartUpdates } from "@/hooks/use-realtime"
 import { useToast } from "@/hooks/use-toast"
 import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
 
 export function CartDrawer() {
   const t = useT()
@@ -117,6 +118,7 @@ export function CartDrawer() {
                       goProduct(item.slug)
                     }}
                     className="bg-secondary/30 h-16 w-16 shrink-0 overflow-hidden rounded-lg"
+                    aria-label={t('product.view_product', { product: item.name })}
                   >
                     {item.image ? (
                       <img
@@ -143,40 +145,16 @@ export function CartDrawer() {
                     <p className="text-muted-foreground text-xs">{formatRWF(item.price)}</p>
                     <div className="mt-auto flex items-center justify-between pt-1">
                       <div className="flex items-center rounded-md border">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-11 w-11 rounded-r-none"
-                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                          disabled={item.quantity <= 1}
-                          aria-label={t('product.decrease_quantity')}
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
+                        <IconButton label={`${t('product.decrease_quantity')}: ${item.name}`} icon={<Minus className="h-3 w-3" />} onClick={() => updateQuantity(item.productId, item.quantity - 1)} disabled={item.quantity <= 1} variant="ghost" className="rounded-r-none" />
                         <span className="w-7 text-center text-xs font-medium">{item.quantity}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-11 w-11 rounded-l-none"
-                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                          disabled={item.quantity >= item.stock}
-                          aria-label={t('product.increase_quantity')}
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
+                        <IconButton label={`${t('product.increase_quantity')}: ${item.name}`} icon={<Plus className="h-3 w-3" />} onClick={() => updateQuantity(item.productId, item.quantity + 1)} disabled={item.quantity >= item.stock} variant="ghost" className="rounded-l-none" />
                       </div>
                       <span className="text-sm font-semibold">
                         {formatRWF(item.price * item.quantity)}
                       </span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => removeFromCart(item.productId)}
-                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive grid h-11 w-11 shrink-0 place-items-center self-start rounded-md"
-                    aria-label={t('cart.remove_product', { product: item.name })}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  <IconButton label={t('cart.remove_product', { product: item.name })} icon={<Trash2 className="h-3.5 w-3.5" />} variant="danger" onClick={() => removeFromCart(item.productId)} className="self-start rounded-md" />
                 </li>
               ))}
             </ul>

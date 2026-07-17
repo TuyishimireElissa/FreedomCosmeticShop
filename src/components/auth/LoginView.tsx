@@ -22,6 +22,7 @@
 import { useState, useEffect, type FormEvent } from "react"
 import { useStore } from "@/store/useStore"
 import { Button } from "@/components/ui/button"
+import FormField from '@/components/a11y/FormField'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { OTPInput } from "./OTPInput"
@@ -262,8 +263,8 @@ export function LoginView() {
           </div>
         ) : null}
 
-        {error && (
-          <div className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+        {error && mode !== 'password' && (
+          <div id="login-form-error" className="mb-4 rounded-lg bg-destructive/10 p-3 text-sm font-semibold text-red-700" role="alert" aria-live="assertive">
             {error}
           </div>
         )}
@@ -277,64 +278,9 @@ export function LoginView() {
             </p>
 
             <form onSubmit={handlePasswordLogin} className="mt-6 space-y-4">
-              <div>
-                <Label htmlFor="login-phone">{t('auth.phone')}</Label>
-                <div className="relative mt-1">
-                  <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="login-phone"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="0788123456"
-                    className="pl-9"
-                    autoComplete="tel"
-                    disabled={loading}
-                    required
-                  />
-                </div>
-              </div>
+              <FormField id="login-phone" label={t('auth.phone')} required type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="0788123456" autoComplete="tel" disabled={loading} startAdornment={<Phone className="h-4 w-4 text-gray-500" />} />
 
-              <div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="login-password">{t('auth.password')}</Label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode("forgot")
-                      setError(null)
-                      setOtpCode("")
-                      setNewPassword("")
-                      setDevOtpHint(null)
-                    }}
-                    className="text-xs font-medium text-primary hover:underline"
-                  >
-                    {t('auth.forgot_password')}
-                  </button>
-                </div>
-                <div className="relative mt-1">
-                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="login-password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t('auth.password_placeholder')}
-                    className="pl-9 pr-9"
-                    autoComplete="current-password"
-                    disabled={loading}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((s) => !s)}
-                    className="absolute right-0 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:text-foreground"
-                    aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
+              <FormField id="login-password" label={t('auth.password')} required error={error || undefined} type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder={t('auth.password_placeholder')} autoComplete="current-password" disabled={loading} startAdornment={<Lock className="h-4 w-4 text-gray-500" />} labelExtra={<button type="button" onClick={() => { setMode('forgot'); setError(null); setOtpCode(''); setNewPassword(''); setDevOtpHint(null) }} className="min-h-11 text-xs font-medium text-primary hover:underline">{t('auth.forgot_password')}</button>} endAdornment={<button type="button" onClick={() => setShowPassword((shown) => !shown)} className="grid h-11 w-11 place-items-center rounded-full text-gray-600" aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>} />
 
               <Button type="submit" size="lg" className="min-h-12 w-full text-base" disabled={loading}>
                 {loading ? (
@@ -505,6 +451,8 @@ export function LoginView() {
                       type="button"
                       onClick={() => setShowNewPassword((s) => !s)}
                       className="absolute right-0 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:text-foreground"
+                      aria-label={showNewPassword ? t('auth.hide_password') : t('auth.show_password')}
+                      title={showNewPassword ? t('auth.hide_password') : t('auth.show_password')}
                     >
                       {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>

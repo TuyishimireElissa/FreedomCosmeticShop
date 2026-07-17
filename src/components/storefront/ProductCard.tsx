@@ -25,6 +25,7 @@ import { Star, Plus, Check, ShieldCheck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
 import { getCloudinaryUrl, getImageSizes, getProductPrimaryImage } from "@/lib/cloudinary-images"
+import StockStatus from '@/components/a11y/StockStatus'
 
 interface ProductCardProps {
   product: Product
@@ -101,7 +102,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
               loading="lazy"
             />
             {compactBadge && (
-              <span className="absolute left-1.5 top-1.5 max-w-[calc(100%-12px)] truncate rounded-full bg-[#B76E79] px-1.5 py-0.5 text-xs font-bold text-white shadow-sm">
+              <span aria-hidden="true" className="absolute left-1.5 top-1.5 max-w-[calc(100%-12px)] truncate rounded-full bg-[#B76E79] px-1.5 py-0.5 text-xs font-bold text-white shadow-sm">
                 {compactBadge}
               </span>
             )}
@@ -110,6 +111,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             <p className="mb-1 line-clamp-2 min-h-[2.5em] text-xs font-medium leading-tight text-gray-900">
               {product.name}
             </p>
+            <StockStatus stock={product.stock} lowStockThreshold={product.lowStockThreshold} compact className="mb-1" />
             <div className="flex flex-wrap items-baseline gap-1">
               <span className="text-sm font-bold text-[#B76E79]">{formatRWF(product.price)}</span>
               {hasDiscount && (
@@ -153,7 +155,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           )}
           {isBestSeller && <Badge className="bg-orange-500 text-white shadow">🔥 {t('categories.best_sellers')}</Badge>}
           {isNewArrival && <Badge className="bg-emerald-600 text-white shadow">{t('common.new')}</Badge>}
-          {lowStock && <Badge className="bg-amber-500 text-white shadow">{t('common.low_stock', { count: product.stock })}</Badge>}
+          {lowStock && <Badge aria-hidden="true" className="bg-amber-500 text-white shadow">{t('common.low_stock', { count: product.stock })}</Badge>}
         </div>
 
         {product.isAuthentic === true && (
@@ -171,7 +173,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
 
         {/* Out-of-stock overlay */}
         {outOfStock && (
-          <div className="bg-background/40 absolute inset-0 grid place-items-center">
+          <div aria-hidden="true" className="bg-background/40 absolute inset-0 grid place-items-center">
             <span className="bg-foreground/80 text-background rounded-full px-3 py-1 text-xs font-semibold tracking-wider uppercase">
               {t('common.sold_out')}
             </span>
@@ -213,12 +215,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           </span>
         )}
 
-        {/* NEW: Low stock indicator */}
-        {lowStock && (
-          <p className="mt-1 text-xs font-semibold text-amber-600">
-            ⚡ {t('common.low_stock', { count: product.stock })}
-          </p>
-        )}
+        <StockStatus stock={product.stock} lowStockThreshold={product.lowStockThreshold} compact className="mt-1" />
 
         <div className="mt-2 flex items-baseline gap-2">
           <span className="text-foreground text-base font-semibold sm:text-lg">

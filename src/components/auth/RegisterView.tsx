@@ -20,8 +20,7 @@
 import { useState, useEffect, type FormEvent } from "react"
 import { useStore } from "@/store/useStore"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import FormField from '@/components/a11y/FormField'
 import { OTPInput } from "./OTPInput"
 import { useToast } from "@/hooks/use-toast"
 import {
@@ -207,98 +206,18 @@ export function RegisterView() {
 
             <form onSubmit={handleSubmitForm} className="mt-6 space-y-4">
               {errors.form && (
-                <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                <div className="rounded-lg bg-destructive/10 p-3 text-sm font-semibold text-red-700" role="alert" aria-live="assertive">
                   {errors.form}
                 </div>
               )}
 
-              {/* Name */}
-              <div>
-                <Label htmlFor="reg-name">{t('auth.full_name')} *</Label>
-                <div className="relative mt-1">
-                  <UserIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="reg-name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Aline Mugisha"
-                    className="pl-9"
-                    autoComplete="name"
-                    disabled={loading}
-                  />
-                </div>
-                {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
-              </div>
+              <FormField id="reg-name" label={t('auth.full_name')} required error={errors.name} value={name} onChange={(event) => { setName(event.target.value); setErrors((current) => ({ ...current, name: '' })) }} placeholder="Aline Mugisha" autoComplete="name" disabled={loading} startAdornment={<UserIcon className="h-4 w-4 text-gray-500" />} />
 
-              {/* Phone */}
-              <div>
-                <Label htmlFor="reg-phone">{t('auth.phone')} *</Label>
-                <div className="relative mt-1">
-                  <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="reg-phone"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="0788123456"
-                    className="pl-9"
-                    autoComplete="tel"
-                    disabled={loading}
-                  />
-                </div>
-                {errors.phone && <p className="mt-1 text-xs text-destructive">{errors.phone}</p>}
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {t('auth.sms_verification_hint')}
-                </p>
-              </div>
+              <FormField id="reg-phone" label={t('auth.phone')} required error={errors.phone} hint={t('auth.sms_verification_hint')} type="tel" value={phone} onChange={(event) => { setPhone(event.target.value); setErrors((current) => ({ ...current, phone: '' })) }} placeholder="0788123456" autoComplete="tel" disabled={loading} startAdornment={<Phone className="h-4 w-4 text-gray-500" />} />
 
-              {/* Email (optional) */}
-              <div>
-                <Label htmlFor="reg-email">{t('auth.email_optional')}</Label>
-                <div className="relative mt-1">
-                  <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="reg-email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="pl-9"
-                    autoComplete="email"
-                    disabled={loading}
-                  />
-                </div>
-                {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
-              </div>
+              <FormField id="reg-email" label={t('auth.email_optional')} error={errors.email} type="email" value={email} onChange={(event) => { setEmail(event.target.value); setErrors((current) => ({ ...current, email: '' })) }} placeholder="you@example.com" autoComplete="email" disabled={loading} startAdornment={<Mail className="h-4 w-4 text-gray-500" />} />
 
-              {/* Password */}
-              <div>
-                <Label htmlFor="reg-password">{t('auth.password')} *</Label>
-                <div className="relative mt-1">
-                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="reg-password"
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={t('auth.password_hint')}
-                    className="pl-9 pr-9"
-                    autoComplete="new-password"
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((s) => !s)}
-                    className="absolute right-0 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-muted-foreground hover:text-foreground"
-                    aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p className="mt-1 text-xs text-destructive">{errors.password}</p>
-                )}
-              </div>
+              <FormField id="reg-password" label={t('auth.password')} required error={errors.password} type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => { setPassword(event.target.value); setErrors((current) => ({ ...current, password: '' })) }} placeholder={t('auth.password_hint')} autoComplete="new-password" disabled={loading} startAdornment={<Lock className="h-4 w-4 text-gray-500" />} endAdornment={<button type="button" onClick={() => setShowPassword((shown) => !shown)} className="grid h-11 w-11 place-items-center rounded-full text-gray-600" aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>} />
 
               <Button type="submit" size="lg" className="min-h-12 w-full text-base" disabled={loading}>
                 {loading ? (

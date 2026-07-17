@@ -8,6 +8,7 @@ import type { Product } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { getQuizStep, type QuizAnswers } from '@/lib/quiz-logic'
+import IconButton from '@/components/a11y/IconButton'
 
 interface RecommendedBundle {
   id: string
@@ -120,7 +121,7 @@ export default function RoutineQuiz() {
       <div className="mx-auto max-w-2xl">
         {phase === 'questions' && <section aria-labelledby="quiz-question">
           <div className="mb-6 flex items-center gap-3">
-            {stepNumber > 1 && <button type="button" onClick={back} className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-white shadow-sm" aria-label={t('common.back')}><ArrowLeft className="h-5 w-5" /></button>}
+            {stepNumber > 1 && <IconButton label={t('common.back')} icon={<ArrowLeft className="h-5 w-5" />} onClick={back} size="lg" className="bg-white shadow-sm" />}
             <div className="flex-1"><p className="mb-2 text-xs font-bold text-gray-500">{t('quiz.step', { step: stepNumber, total: 6 })}</p><div className="h-2 overflow-hidden rounded-full bg-gray-200"><div className="h-full rounded-full bg-[#B76E79] transition-[width] duration-300" style={{ width: `${progress}%` }} /></div></div>
           </div>
           <div className="mb-6"><span className="mb-4 grid h-12 w-12 place-items-center rounded-2xl bg-[#B76E79] text-white"><Sparkles className="h-5 w-5" /></span><h1 id="quiz-question" className="text-2xl font-black text-gray-900 sm:text-3xl">{t(step.questionKey)}</h1>{step.subtitleKey && <p className="mt-2 text-sm leading-6 text-gray-500">{t(step.subtitleKey)}</p>}</div>

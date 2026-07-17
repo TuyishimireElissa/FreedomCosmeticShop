@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowRight, Clock, Loader2, Search, Tag, TrendingUp, X } from 'lucide-react'
 import { formatRWF } from '@/lib/format'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
 import {
   getAlternativeSuggestions,
   getSearchSuggestions,
@@ -297,7 +298,7 @@ export function SearchWithSuggestions({
           aria-controls="search-suggestions-listbox"
           aria-activedescendant={activeIndex >= 0 ? `search-option-${activeIndex}` : undefined}
         />
-        {query && <button type="button" onClick={() => { setQuery(''); setSuggestions(null); setActiveIndex(-1); inputRef.current?.focus() }} className="absolute right-0 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full text-gray-400 hover:bg-gray-100" aria-label={t('common.clear')}><X className="h-4 w-4" /></button>}
+        {query && <IconButton label={t('common.clear')} icon={<X className="h-4 w-4" />} onClick={() => { setQuery(''); setSuggestions(null); setActiveIndex(-1); inputRef.current?.focus() }} variant="ghost" className="absolute right-0 top-1/2 -translate-y-1/2" />}
       </div>
 
       {isOpen && (showEmptyMenu || showResults) && (

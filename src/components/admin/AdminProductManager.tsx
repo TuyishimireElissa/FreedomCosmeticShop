@@ -49,6 +49,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
 import {
   Plus,
   Search,
@@ -155,6 +156,7 @@ const EMPTY_FORM: ProductFormState = {
 }
 
 export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps) {
+  const t = useT()
   const { toast } = useToast()
 
   const [products, setProducts] = useState<AdminProduct[]>([])
@@ -1066,6 +1068,7 @@ Legacy URL images. Save the product, then use “Manage product images” for st
                           })
                         }
                         className="text-muted-foreground hover:text-foreground"
+                        aria-label={t('accessibility.remove_item', { item: s })}
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -1133,6 +1136,7 @@ Legacy URL images. Save the product, then use “Manage product images” for st
                           })
                         }
                         className="text-muted-foreground hover:text-foreground"
+                        aria-label={t('accessibility.remove_item', { item: ing })}
                       >
                         <X className="h-3 w-3" />
                       </button>

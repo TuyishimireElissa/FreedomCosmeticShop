@@ -9,6 +9,29 @@ export const rw = {
   common: {
     loading: 'Birimo gutegurwa...', error: 'Habaye ikibazo', retry: 'Ongera ugerageze', save: 'Bika', cancel: 'Hagarika', confirm: 'Emeza', delete: 'Siba', edit: 'Hindura', view: 'Reba', close: 'Funga', back: 'Subira inyuma', next: 'Komeza', previous: 'Ibibanza', search: 'Shakisha', filter: 'Shungura', sort: 'Tondeka', clear: 'Siba byose', apply: 'Koresha', submit: 'Ohereza', yes: 'Yego', no: 'Oya', or: 'cyangwa', and: 'na', currency: 'RWF', free: 'UBUNTU', required: 'Birasabwa', optional: 'Si ngombwa', new: 'Gishya', hot: 'Gikunzwe', sale: 'Cyagabanyijwe', sold_out: 'Byashize', in_stock: 'Birahari', low_stock: 'Hasigaye {count} gusa!', authentic: '100% Umwimerere', // 🔍 REVIEW
   },
+  accessibility: {
+    skip_to_content: 'Simbukira ku bikubiye ku rupapuro', // verified-rw
+    required: '(birasabwa)', // verified-rw
+    close: 'Funga', // verified-rw
+    go_back: 'Subira inyuma', // verified-rw
+    remove_item: 'Kuraho {item}', // verified-rw
+    payment_status_paid: 'Yishyuwe', // verified-rw
+    payment_status_pending: 'Kwishyura birategerejwe', // verified-rw
+    payment_status_failed: 'Kwishyura ntibyakunze', // verified-rw
+    payment_status_refunded: 'Amafaranga yasubijwe', // verified-rw
+    payment_status_overdue: 'Kwishyura byarengeje igihe', // verified-rw
+    pause_carousel: 'Hagarika uruhererekane rw’amashusho', // verified-rw
+    play_carousel: 'Komeza uruhererekane rw’amashusho', // verified-rw
+    slide_position: 'Ishusho {current} kuri {total}', // verified-rw
+    reviews_carousel: 'Uruhererekane rw’ibitekerezo by’abakiriya', // verified-rw
+    cart_added: '{product} yashyizwe mu gitebo. Umubare ni {quantity}.', // verified-rw
+    cart_removed: '{product} yakuwe mu gitebo.', // verified-rw
+    cart_quantity: 'Umubare wa {product} wahinduwe uba {quantity}.', // verified-rw
+    cart_restored: '{product} yasubijwe mu gitebo.', // verified-rw
+    cart_cleared: 'Igitebo cyasigaye kirimo ubusa.', // verified-rw
+    cart_saved_for_later: '{product} yimuriwe mu byo kubika.', // verified-rw
+    cart_moved_from_saved: '{product} yimuriwe mu gitebo.', // verified-rw
+  },
   nav: {
     home: 'Ahabanza', products: 'Ibicuruzwa', categories: 'Ibyiciro', brands: 'Ibirango', bundles: 'Gahunda n’amatsinda', quiz: 'Shakisha gahunda yanjye', wholesale: 'Kurangura', wholesale_offer: 'Kurangura — ibiciro bya buri gicuruzwa', blog: 'Inkuru', about: 'Abo turi bo', contact: 'Twandikire', account: 'Konti yanjye', orders: 'Ibyo natumije', wishlist: 'Ibyo nifuza', cart: 'Igitebo', login: 'Injira', register: 'Iyandikishe', logout: 'Sohoka', admin: 'Ubuyobozi', help: 'Ubufasha', language: 'Ururimi', signed_out: 'Wasohotse neza', sign_in_wishlist: 'Injira kugira ngo ubike ibyo ukunda', payment_methods: 'Uburyo bwo kwishyura twemera', account_menu: 'Ibikubiye muri konti', product_categories: 'Ibyiciro by’ibicuruzwa', mobile_navigation: 'Ibikubiye kuri telefoni', language_selected: 'Ururimi: {language}', english_selected: 'Hahiswemo Icyongereza.', french_coming: 'Igifaransa kizongerwamo vuba.', kinyarwanda_selected: 'Hahiswemo Ikinyarwanda.', language_change: 'Ururimi: {language}. Kanda uhindure.', open_search: 'Fungura ahashakirwa', close_search: 'Funga ahashakirwa', open_menu: 'Fungura urutonde', close_menu: 'Funga urutonde', whatsapp_support: 'Ubufasha kuri WhatsApp', search_placeholder: 'Shakisha ibita ku ruhu, ibikoresho byo kwisiga, ibita ku musatsi...', // 🔍 REVIEW // verified-rw
   },

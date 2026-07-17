@@ -27,6 +27,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
 import {
   TrendingUp,
   Package,
@@ -76,6 +78,7 @@ interface MobileDashboard {
 }
 
 export function AdminMobilePanel() {
+  const t = useT()
   const { goHome } = useStore()
   const { toast } = useToast()
   const [data, setData] = useState<MobileDashboard | null>(null)
@@ -223,12 +226,7 @@ export function AdminMobilePanel() {
       <div className="sticky top-0 z-10 border-b bg-card/95 backdrop-blur">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <button
-              onClick={goHome}
-              className="grid h-8 w-8 place-items-center rounded-lg hover:bg-secondary"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </button>
+            <IconButton label={t('accessibility.go_back')} icon={<ArrowLeft className="h-4 w-4" />} onClick={goHome} variant="ghost" className="rounded-lg" />
             <div>
               <h1 className="text-base font-bold">Admin Panel</h1>
               <p className="text-[10px] text-muted-foreground">Mobile mini-panel · auto-refresh 10s</p>

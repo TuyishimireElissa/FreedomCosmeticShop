@@ -53,6 +53,7 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { useProductUpdates } from "@/hooks/use-realtime"
 import { useT } from "@/lib/i18n/LanguageContext"
+import StockStatus from '@/components/a11y/StockStatus'
 import {
   Star,
   Minus,
@@ -61,7 +62,6 @@ import {
   Truck,
   ShieldCheck,
   Smartphone,
-  Check,
   ChevronRight,
   ArrowLeft,
   Heart,
@@ -293,7 +293,6 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
       )
     : 0
   const outOfStock = product.stock === 0
-  const lowStock = product.stock > 0 && product.stock <= 5
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -463,17 +462,7 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
 
           {/* Badges: stock + skin type + authentic */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {outOfStock ? (
-              <Badge variant="destructive">{t('common.sold_out')}</Badge>
-            ) : lowStock ? (
-              <Badge className="bg-amber-100 text-amber-700">
-                Only {product.stock} left!
-              </Badge>
-            ) : (
-              <Badge className="bg-emerald-100 text-emerald-700">
-                <Check className="mr-1 h-3 w-3" /> In stock
-              </Badge>
-            )}
+            <StockStatus stock={product.stock} lowStockThreshold={5} className="rounded-full border border-current/20 px-3 py-1" />
             {product.skinType && product.skinType.length > 0 && (
               <Badge variant="outline" className="border-primary/30 text-primary">
                 {product.skinType

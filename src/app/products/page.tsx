@@ -11,6 +11,7 @@ import SearchWithSuggestions from '@/components/storefront/SearchWithSuggestions
 import { useProductFilters } from '@/hooks/useProductFilters'
 import { useT } from '@/lib/i18n/LanguageContext'
 import { cn } from '@/lib/utils'
+import IconButton from '@/components/a11y/IconButton'
 
 interface Pagination {
   page: number
@@ -115,11 +116,11 @@ function ProductsContent() {
             <ProductGrid products={products} loading={loading} error={error} onRetry={() => setRequest((value) => value + 1)} />
             {!loading && !error && pagination.totalPages > 1 && (
               <nav className="mt-8 flex items-center justify-center gap-2" aria-label={t('ui.pagination')}>
-                <button type="button" onClick={() => setFilter('page', String(Math.max(1, page - 1)))} disabled={page <= 1} className="grid h-11 w-11 place-items-center rounded-xl border border-gray-200 bg-white disabled:opacity-40" aria-label={t('ui.go_previous_page')}><ChevronLeft className="h-4 w-4" /></button>
+                <IconButton label={t('ui.go_previous_page')} icon={<ChevronLeft className="h-4 w-4" />} onClick={() => setFilter('page', String(Math.max(1, page - 1)))} disabled={page <= 1} className="rounded-xl border border-gray-200 bg-white" />
                 {Array.from({ length: pagination.totalPages }, (_, index) => index + 1)
                   .filter((number) => number === 1 || number === pagination.totalPages || Math.abs(number - page) <= 1)
                   .map((number, index, visible) => <span key={number} className="contents">{index > 0 && number - visible[index - 1] > 1 && <span className="px-1 text-gray-400">…</span>}<button type="button" onClick={() => setFilter('page', String(number))} className={cn('h-11 min-w-11 rounded-xl px-3 text-sm font-bold', number === page ? 'bg-[#B76E79] text-white' : 'border border-gray-200 bg-white text-gray-600')}>{number}</button></span>)}
-                <button type="button" onClick={() => setFilter('page', String(Math.min(pagination.totalPages, page + 1)))} disabled={page >= pagination.totalPages} className="grid h-11 w-11 place-items-center rounded-xl border border-gray-200 bg-white disabled:opacity-40" aria-label={t('ui.go_next_page')}><ChevronRight className="h-4 w-4" /></button>
+                <IconButton label={t('ui.go_next_page')} icon={<ChevronRight className="h-4 w-4" />} onClick={() => setFilter('page', String(Math.min(pagination.totalPages, page + 1)))} disabled={page >= pagination.totalPages} className="rounded-xl border border-gray-200 bg-white" />
               </nav>
             )}
           </main>

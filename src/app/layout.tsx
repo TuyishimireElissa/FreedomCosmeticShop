@@ -4,6 +4,8 @@ import './globals.css'
 import { Toaster } from 'react-hot-toast'
 import Providers from '@/components/Providers'
 import SiteChrome from '@/components/layout/SiteChrome'
+import SkipToContent from '@/components/a11y/SkipToContent'
+import LiveAnnouncer from '@/components/a11y/LiveAnnouncer'
 import { BUSINESS } from '@/lib/business-config'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
@@ -61,6 +63,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="rw">
       <body className={`${inter.className} bg-white text-[#1a1a1a] antialiased`}>
         <Providers>
+          <SkipToContent />
+          <LiveAnnouncer />
           <SiteChrome>{children}</SiteChrome>
           <Toaster
             position="top-center"

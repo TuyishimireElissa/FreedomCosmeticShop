@@ -128,6 +128,64 @@
     border: none;
     background: none;
   }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  :focus-visible {
+    border-radius: 4px;
+    outline: 3px solid #B76E79;
+    outline-offset: 3px;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [role='button']:focus-visible {
+    outline: 3px solid #B76E79;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px #B76E79;
+  }
+
+  html {
+    scroll-padding-block-start: 8rem;
+    scroll-padding-block-end: 6rem;
+  }
+
+  :where([id], [tabindex='-1'], button, a, input, select, textarea, [role='button']) {
+    scroll-margin-block: 8rem 6rem;
+  }
+
+  .main-focus-target:focus {
+    outline-offset: -3px;
+  }
+
+  .sr-only,
+  .sr-only:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 @layer components {
@@ -220,5 +278,22 @@
 
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@media (max-width: 768px) {
+  button,
+  a[href],
+  [role='button'],
+  input[type='checkbox'],
+  input[type='radio'] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .btn-icon-small {
+    min-width: unset;
+    min-height: unset;
+    padding: 12px;
   }
 }

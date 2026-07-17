@@ -1,9 +1,11 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { ArrowRight, ChevronLeft, ChevronRight, RefreshCw, ShieldCheck, Sparkles, Truck } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play, RefreshCw, ShieldCheck, Sparkles, Truck } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 export interface HomeBanner {
   id: string
@@ -30,6 +32,12 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
   const router = useRouter()
   const [current, setCurrent] = useState(0)
   const [paused, setPaused] = useState(false)
+  const [interactionPaused, setInteractionPaused] = useState(false)
+  const [reducedMotionOverride, setReducedMotionOverride] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
+  const reducedMotionPause = prefersReducedMotion && !reducedMotionOverride
+  const controlPaused = paused || reducedMotionPause
+  const autoAdvancePaused = controlPaused || interactionPaused
 
   const next = useCallback(() => {
     if (banners.length > 1) setCurrent((value) => (value + 1) % banners.length)
@@ -39,11 +47,20 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
     if (banners.length > 1) setCurrent((value) => (value - 1 + banners.length) % banners.length)
   }
 
+  const togglePlayback = () => {
+    if (reducedMotionPause) {
+      setReducedMotionOverride(true)
+      setPaused(false)
+    } else {
+      setPaused((value) => !value)
+    }
+  }
+
   useEffect(() => {
-    if (paused || banners.length < 2) return
+    if (autoAdvancePaused || banners.length < 2) return
     const timer = window.setInterval(next, AUTO_ADVANCE_MS)
     return () => window.clearInterval(timer)
-  }, [banners.length, next, paused])
+  }, [autoAdvancePaused, banners.length, next])
 
   useEffect(() => {
     if (current >= banners.length) setCurrent(0)
@@ -90,12 +107,29 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
   }
 
   return (
-    <section className="relative overflow-hidden bg-[#1a1a1a]" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} aria-roledescription="carousel" aria-label={t('home.featured_campaigns')}>
+    <section
+      className="relative overflow-hidden bg-[#1a1a1a]"
+      onMouseEnter={() => setInteractionPaused(true)}
+      onMouseLeave={() => setInteractionPaused(false)}
+      onFocusCapture={() => setInteractionPaused(true)}
+      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setInteractionPaused(false) }}
+      aria-roledescription="carousel"
+      aria-label={t('home.featured_campaigns')}
+    >
       <div className="relative h-[300px] sm:h-[320px] md:h-[480px] lg:h-[560px]">
         {banners.map((banner, index) => {
           const active = index === current
           return (
-            <article key={banner.id} className={`absolute inset-0 transition-all duration-700 ${active ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'}`} aria-hidden={!active}>
+            <article
+              key={banner.id}
+              id={`hero-slide-${index}`}
+              role="group"
+              aria-roledescription="slide"
+              aria-label={t('accessibility.slide_position', { current: index + 1, total: banners.length })}
+              aria-hidden={!active}
+              inert={active ? undefined : true}
+              className={`absolute inset-0 transition-all duration-700 ${active ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'}`}
+            >
               <picture className="absolute inset-0 block">
                 {banner.mobileImage && <source media="(max-width: 639px)" srcSet={banner.mobileImage} />}
                 <img src={banner.image} alt="" loading={index === 0 ? 'eager' : 'lazy'} fetchPriority={index === 0 ? 'high' : 'auto'} decoding="async" className={`h-full w-full object-cover transition-transform duration-500 ease-out md:duration-[7000ms] ${active ? 'md:scale-105' : 'scale-100'}`} />
@@ -126,11 +160,13 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
 
       {banners.length > 1 && (
         <>
-          <button type="button" onClick={previous} className="absolute left-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/20 text-white backdrop-blur transition-colors hover:bg-black/40 sm:grid lg:left-6" aria-label={t('home.previous_banner')}><ChevronLeft className="h-5 w-5" /></button>
-          <button type="button" onClick={next} className="absolute right-3 top-1/2 z-20 hidden h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/20 bg-black/20 text-white backdrop-blur transition-colors hover:bg-black/40 sm:grid lg:right-6" aria-label={t('home.next_banner')}><ChevronRight className="h-5 w-5" /></button>
-          <div className="absolute bottom-3 left-1/2 md:bottom-6 z-20 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/20 px-3 py-2 backdrop-blur">
-            {banners.map((banner, index) => <button key={banner.id} type="button" onClick={() => setCurrent(index)} className={`h-2 rounded-full transition-all ${index === current ? 'w-8 bg-[#B76E79]' : 'w-2 bg-white/50 hover:bg-white'}`} aria-label={t('home.show_banner', { number: index + 1 })} aria-current={index === current} />)}
+          <IconButton label={t('home.previous_banner')} icon={<ChevronLeft className="h-5 w-5" />} onClick={previous} className="absolute left-3 top-1/2 z-20 hidden -translate-y-1/2 border border-white/20 bg-black/20 text-white backdrop-blur hover:bg-black/40 sm:inline-flex lg:left-6" />
+          <IconButton label={t('home.next_banner')} icon={<ChevronRight className="h-5 w-5" />} onClick={next} className="absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 border border-white/20 bg-black/20 text-white backdrop-blur hover:bg-black/40 sm:inline-flex lg:right-6" />
+          <div className="absolute bottom-2 left-1/2 z-20 flex max-w-[calc(100%-7rem)] -translate-x-1/2 items-center gap-0.5 overflow-x-auto rounded-full bg-black/30 px-2 backdrop-blur md:bottom-5" role="tablist" aria-label={t('home.featured_campaigns')}>
+            {banners.map((banner, index) => <button key={banner.id} type="button" role="tab" onClick={() => setCurrent(index)} className="grid h-11 w-11 place-items-center rounded-full" aria-label={t('home.show_banner', { number: index + 1 })} aria-selected={index === current} aria-controls={`hero-slide-${index}`}><span aria-hidden="true" className={`h-2 rounded-full transition-all ${index === current ? 'w-7 bg-[#B76E79]' : 'w-2 bg-white/60'}`} /></button>)}
           </div>
+          <IconButton label={controlPaused ? t('accessibility.play_carousel') : t('accessibility.pause_carousel')} icon={controlPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />} onClick={togglePlayback} className="absolute bottom-2 right-3 z-20 border border-white/20 bg-black/30 text-white backdrop-blur hover:bg-black/50 md:bottom-5 md:right-6" />
+          <div className="sr-only" aria-live="polite" aria-atomic="true">{t('accessibility.slide_position', { current: current + 1, total: banners.length })}</div>
         </>
       )}
     </section>

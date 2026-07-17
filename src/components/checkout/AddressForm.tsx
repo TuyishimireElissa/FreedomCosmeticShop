@@ -15,6 +15,9 @@ import {
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { useStore } from '@/store/useStore'
 import { buildWhatsAppShareUrl, trackWhatsAppClick } from '@/lib/whatsapp-service'
+import FormField from '@/components/a11y/FormField'
+import FormSelect from '@/components/a11y/FormSelect'
+import FormTextarea from '@/components/a11y/FormTextarea'
 
 export interface CheckoutAddress {
   fullName: string
@@ -99,25 +102,128 @@ export default function AddressForm({ value, onChange, errors = {} }: AddressFor
     {user && savedAddresses.length > 0 && <section className="rounded-2xl border border-rose-100 bg-rose-50/50 p-3"><button type="button" onClick={() => setShowSaved((open) => !open)} className="flex min-h-12 w-full items-center gap-2 rounded-xl px-2 text-left text-sm font-bold text-[#B76E79]"><Home className="h-4 w-4" />{t('checkout.use_saved_count', { count: savedAddresses.length })}<ChevronDown className={`ml-auto h-4 w-4 transition-transform ${showSaved ? 'rotate-180' : ''}`} /></button>{showSaved && <div className="mt-2 space-y-2">{savedAddresses.map((address) => <button type="button" key={address.id} onClick={() => applySaved(address)} className="flex min-h-[60px] w-full items-start gap-3 rounded-xl bg-white p-3 text-left shadow-sm"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#B76E79]" /><span className="min-w-0 flex-1"><span className="flex items-center gap-1 text-sm font-black">{address.label}{address.isDefault && <Star className="h-3 w-3 fill-amber-400 text-amber-400" />}</span><span className="block text-xs text-gray-500">{address.recipientName} · {address.village}, {address.cell}, {address.district}</span></span></button>)}</div>}</section>}
 
     <div className="grid gap-4 sm:grid-cols-2">
-      <Field label={t('checkout.full_name')} error={errors.fullName}><div className="relative"><User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" /><input value={value.fullName} onChange={(event) => update('fullName', event.target.value)} placeholder={t('checkout.full_name_example')} autoComplete="name" className="input-field min-h-12 pl-10 text-base" /></div></Field>
-      <Field label={t('checkout.phone_rwanda')} error={errors.phone}><div className="relative"><Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" /><input type="tel" value={value.phone} onChange={(event) => update('phone', formatRwandaPhone(event.target.value))} placeholder="+250 78X XXX XXX" autoComplete="tel" inputMode="tel" className="input-field min-h-12 pl-10 text-base" /></div><span className="mt-1 block text-xs text-gray-400">{t('checkout.phone_format_hint')}</span></Field>
+      <FormField
+        id="checkout-full-name"
+        label={t('checkout.full_name')}
+        required
+        error={errors.fullName}
+        value={value.fullName}
+        onChange={(event) => update('fullName', event.target.value)}
+        placeholder={t('checkout.full_name_example')}
+        autoComplete="name"
+        startAdornment={<User className="h-4 w-4 text-gray-500" />}
+      />
+      <FormField
+        id="checkout-phone"
+        label={t('checkout.phone_rwanda')}
+        required
+        error={errors.phone}
+        hint={t('checkout.phone_format_hint')}
+        type="tel"
+        value={value.phone}
+        onChange={(event) => update('phone', formatRwandaPhone(event.target.value))}
+        placeholder="+250 78X XXX XXX"
+        autoComplete="tel"
+        inputMode="tel"
+        startAdornment={<Phone className="h-4 w-4 text-gray-500" />}
+      />
     </div>
-    <Field label={t('checkout.email_optional')} error={errors.email}><div className="relative"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" /><input type="email" value={value.email} onChange={(event) => update('email', event.target.value)} placeholder="name@example.com" autoComplete="email" inputMode="email" className="input-field min-h-12 pl-10 text-base" /></div></Field>
+    <FormField
+      id="checkout-email"
+      label={t('checkout.email_optional')}
+      error={errors.email}
+      type="email"
+      value={value.email}
+      onChange={(event) => update('email', event.target.value)}
+      placeholder="name@example.com"
+      autoComplete="email"
+      inputMode="email"
+      startAdornment={<Mail className="h-4 w-4 text-gray-500" />}
+    />
 
     <div className="grid gap-4 sm:grid-cols-2">
-      <Field label={t('checkout.province')} error={errors.province}><select value={value.province} onChange={(event) => changeProvince(event.target.value as RwandaProvince | '')} className="input-field min-h-12 appearance-none text-base"><option value="">{t('checkout.province_select')}</option>{RWANDA_PROVINCES.map((province) => <option key={province}>{province}</option>)}</select></Field>
-      <Field label={t('checkout.district')} error={errors.district}><select value={value.district} onChange={(event) => changeDistrict(event.target.value)} disabled={!value.province} className="input-field min-h-12 appearance-none text-base disabled:bg-gray-100"><option value="">{value.province ? t('checkout.district_select') : t('checkout.select_province_first')}</option>{value.province && RWANDA_DISTRICTS[value.province].map((district) => <option key={district}>{district}</option>)}</select></Field>
+      <FormSelect
+        id="checkout-province"
+        label={t('checkout.province')}
+        required
+        error={errors.province}
+        value={value.province}
+        onChange={(event) => changeProvince(event.target.value as RwandaProvince | '')}
+        placeholder={t('checkout.province_select')}
+        options={RWANDA_PROVINCES.map((province) => ({ value: province, label: province }))}
+      />
+      <FormSelect
+        id="checkout-district"
+        label={t('checkout.district')}
+        required
+        error={errors.district}
+        value={value.district}
+        onChange={(event) => changeDistrict(event.target.value)}
+        disabled={!value.province}
+        placeholder={value.province ? t('checkout.district_select') : t('checkout.select_province_first')}
+        options={(value.province ? RWANDA_DISTRICTS[value.province] : []).map((district) => ({ value: district, label: district }))}
+        selectClassName="disabled:bg-gray-100"
+      />
     </div>
 
     <div className="grid gap-4 sm:grid-cols-3">
-      <Field label={t('checkout.sector_required')} error={errors.sector}><select value={value.sector} onChange={(event) => changeSector(event.target.value)} disabled={!value.district} className="input-field min-h-12 appearance-none text-base disabled:bg-gray-100"><option value="">{value.district ? t('checkout.select_sector') : t('checkout.select_district_first')}</option>{sectors.map((sector) => <option key={sector}>{sector}</option>)}</select></Field>
-      <Field label={t('checkout.cell_required')} error={errors.cell}><select value={value.cell} onChange={(event) => changeCell(event.target.value)} disabled={!value.sector} className="input-field min-h-12 appearance-none text-base disabled:bg-gray-100"><option value="">{value.sector ? t('checkout.select_cell') : t('checkout.select_sector_first')}</option>{cells.map((cell) => <option key={cell}>{cell}</option>)}</select></Field>
-      <Field label={t('checkout.village_required')} error={errors.village}><select value={value.village} onChange={(event) => update('village', event.target.value)} disabled={!value.cell} className="input-field min-h-12 appearance-none text-base disabled:bg-gray-100"><option value="">{value.cell ? t('checkout.select_village') : t('checkout.select_cell_first')}</option>{villages.map((village) => <option key={village}>{village}</option>)}</select></Field>
+      <FormSelect
+        id="checkout-sector"
+        label={t('checkout.sector_required')}
+        required
+        error={errors.sector}
+        value={value.sector}
+        onChange={(event) => changeSector(event.target.value)}
+        disabled={!value.district}
+        placeholder={value.district ? t('checkout.select_sector') : t('checkout.select_district_first')}
+        options={sectors.map((sector) => ({ value: sector, label: sector }))}
+        selectClassName="disabled:bg-gray-100"
+      />
+      <FormSelect
+        id="checkout-cell"
+        label={t('checkout.cell_required')}
+        required
+        error={errors.cell}
+        value={value.cell}
+        onChange={(event) => changeCell(event.target.value)}
+        disabled={!value.sector}
+        placeholder={value.sector ? t('checkout.select_cell') : t('checkout.select_sector_first')}
+        options={cells.map((cell) => ({ value: cell, label: cell }))}
+        selectClassName="disabled:bg-gray-100"
+      />
+      <FormSelect
+        id="checkout-village"
+        label={t('checkout.village_required')}
+        required
+        error={errors.village}
+        value={value.village}
+        onChange={(event) => update('village', event.target.value)}
+        disabled={!value.cell}
+        placeholder={value.cell ? t('checkout.select_village') : t('checkout.select_cell_first')}
+        options={villages.map((village) => ({ value: village, label: village }))}
+        selectClassName="disabled:bg-gray-100"
+      />
     </div>
 
     <div className="grid gap-4 sm:grid-cols-2">
-      <Field label={t('checkout.landmark')}><input value={value.landmark} onChange={(event) => update('landmark', event.target.value)} placeholder={t('checkout.landmark_kct_example')} className="input-field min-h-12 text-base" /></Field>
-      <Field label={t('checkout.street_delivery_details')} error={errors.address}><textarea value={value.address} onChange={(event) => update('address', event.target.value)} placeholder={t('checkout.address_directions_placeholder')} rows={2} className="input-field min-h-12 resize-none text-base" /></Field>
+      <FormField
+        id="checkout-landmark"
+        label={t('checkout.landmark')}
+        value={value.landmark}
+        onChange={(event) => update('landmark', event.target.value)}
+        placeholder={t('checkout.landmark_kct_example')}
+      />
+      <FormTextarea
+        id="checkout-address-details"
+        label={t('checkout.street_delivery_details')}
+        required
+        error={errors.address}
+        value={value.address}
+        onChange={(event) => update('address', event.target.value)}
+        placeholder={t('checkout.address_directions_placeholder')}
+        rows={2}
+        textareaClassName="min-h-12 resize-none text-base"
+      />
     </div>
 
     <div className="grid gap-3 sm:grid-cols-2">
@@ -126,8 +232,4 @@ export default function AddressForm({ value, onChange, errors = {} }: AddressFor
     </div>
     <div className="rounded-2xl bg-[#f8f9fa] p-4 text-xs leading-5 text-gray-500"><strong className="text-gray-700">{t('checkout.all_rwanda_covered')}</strong> {t('checkout.district_coverage')}</div>
   </div>
-}
-
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
-  return <label className="block"><span className="mb-1.5 block text-sm font-bold text-gray-700">{label}</span>{children}{error && <span className="mt-1 block text-xs font-semibold text-red-600">{error}</span>}</label>
 }

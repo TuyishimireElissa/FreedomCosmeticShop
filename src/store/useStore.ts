@@ -11,6 +11,7 @@
 
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
+import { announceTranslated } from '@/components/a11y/LiveAnnouncer'
 
 /* ---------- Types ---------- */
 
@@ -253,7 +254,6 @@ export const useStore = create<StoreState>()(
       addToCart: (item, qty = 1) => {
         const existing = get().items.find((i) => i.productId === item.productId)
         if (existing) {
-          // Don't exceed stock
           const newQty = Math.min(existing.quantity + qty, item.stock)
           set({
             items: get().items.map((i) =>
@@ -267,9 +267,14 @@ export const useStore = create<StoreState>()(
             isCartOpen: true,
           })
         }
+        const current = get().items.find((value) => value.productId === item.productId)
+        if (current) announceTranslated('accessibility.cart_added', { product: current.name, quantity: current.quantity })
       },
-      removeFromCart: (productId) =>
-        set({ items: get().items.filter((i) => i.productId !== productId) }),
+      removeFromCart: (productId) => {
+        const item = get().items.find((value) => value.productId === productId)
+        set({ items: get().items.filter((i) => i.productId !== productId) })
+        if (item) announceTranslated('accessibility.cart_removed', { product: item.name })
+      },
       updateQuantity: (productId, qty) => {
         if (qty <= 0) {
           get().removeFromCart(productId)
@@ -280,8 +285,14 @@ export const useStore = create<StoreState>()(
             i.productId === productId ? { ...i, quantity: Math.min(qty, i.stock) } : i
           ),
         })
+        const item = get().items.find((value) => value.productId === productId)
+        if (item) announceTranslated('accessibility.cart_quantity', { product: item.name, quantity: item.quantity })
       },
-      clearCart: () => set({ items: [], appliedCoupon: null, redeemPoints: 0 }),
+      clearCart: () => {
+        const hadItems = get().items.length > 0
+        set({ items: [], appliedCoupon: null, redeemPoints: 0 })
+        if (hadItems) announceTranslated('accessibility.cart_cleared')
+      },
       setCartOpen: (open) => set({ isCartOpen: open }),
 
       /* ---------- Save for later ---------- */
@@ -292,6 +303,7 @@ export const useStore = create<StoreState>()(
           items: get().items.filter((i) => i.productId !== productId),
           savedItems: [...get().savedItems.filter((i) => i.productId !== productId), item],
         })
+        announceTranslated('accessibility.cart_saved_for_later', { product: item.name })
       },
       moveToCart: (productId) => {
         const item = get().savedItems.find((i) => i.productId === productId)
@@ -300,6 +312,7 @@ export const useStore = create<StoreState>()(
           savedItems: get().savedItems.filter((i) => i.productId !== productId),
           items: [...get().items, item],
         })
+        announceTranslated('accessibility.cart_moved_from_saved', { product: item.name })
       },
       removeFromSaved: (productId) =>
         set({ savedItems: get().savedItems.filter((i) => i.productId !== productId) }),

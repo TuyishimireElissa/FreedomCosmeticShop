@@ -45,6 +45,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
 import {
   Shield,
   UserPlus,
@@ -305,6 +306,7 @@ export function AdminStaff() {
 // ============================================================================
 
 function StaffTab() {
+  const t = useT()
   const { toast } = useToast()
   const [staff, setStaff] = useState<StaffUser[]>([])
   const [loading, setLoading] = useState(true)
@@ -632,6 +634,8 @@ function StaffTab() {
                   type="button"
                   className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? t('auth.hide_password') : t('auth.show_password')}
+                  title={showPassword ? t('auth.hide_password') : t('auth.show_password')}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>

@@ -25,13 +25,19 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
     pathname === '/forgot-password' ||
     pathname === '/change-password'
 
-  if (isolatedRoute) return <>{children}</>
+  if (isolatedRoute) {
+    return (
+      <div id="main-content" tabIndex={-1} className="main-focus-target">
+        {children}
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-dvh flex-col bg-white text-[#1a1a1a]">
       <AnnouncementBar />
       <Navbar />
-      <main className="min-h-[50vh] flex-1">{children}</main>
+      <main id="main-content" tabIndex={-1} className="main-focus-target min-h-[50vh] flex-1">{children}</main>
       <Footer />
       <WhatsAppButton />
       <CartDrawer />

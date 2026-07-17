@@ -7,6 +7,8 @@ import { Heart, ShoppingCart, Star } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { formatRWF } from '@/lib/utils'
 import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
+import StockStatus from '@/components/a11y/StockStatus'
 
 interface Product {
   id: string
@@ -77,26 +79,24 @@ export default function ProductCard({ product }: { product: Product }) {
           {discount > 0 && <span className="badge bg-red-500 text-white shadow-sm">-{discount}%</span>}
           {product.isNewArrival && <span className="badge bg-emerald-600 text-white shadow-sm">{t('common.new')}</span>}
           {product.isBestSeller && <span className="badge bg-[#B76E79] text-white shadow-sm">🔥 {t('categories.best_sellers')}</span>}
-          {product.stockQuantity > 0 && product.stockQuantity <= (product.lowStockThreshold ?? 5) && <span className="badge bg-amber-500 text-white shadow-sm">{t('common.low_stock', { count: product.stockQuantity })}</span>}
+          {product.stockQuantity > 0 && product.stockQuantity <= (product.lowStockThreshold ?? 5) && <span aria-hidden="true" className="badge bg-amber-500 text-white shadow-sm">{t('common.low_stock', { count: product.stockQuantity })}</span>}
         </div>
 
         {product.isAuthentic === true && <span className="absolute right-2 top-2 hidden items-center rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-emerald-700 shadow-sm backdrop-blur sm:inline-flex">✓ {t('common.authentic')}</span>}
 
         {outOfStock && (
-          <div className="pointer-events-none absolute inset-0 grid place-items-center bg-white/25">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 grid place-items-center bg-white/25">
             <span className="rounded-full bg-[#1a1a1a]/90 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">{t('common.sold_out')}</span>
           </div>
         )}
 
-        <button
-          type="button"
+        <IconButton
+          label={isWishlisted ? `${t('product.remove_from_wishlist')}: ${product.name}` : `${t('product.add_to_wishlist')}: ${product.name}`}
+          icon={<Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />}
           onClick={() => setIsWishlisted((wishlisted) => !wishlisted)}
-          className="absolute bottom-2 right-2 grid h-11 w-11 place-items-center rounded-full bg-white text-gray-500 shadow-md transition-all hover:scale-105 hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79] sm:bottom-3 sm:right-3 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"
-          aria-label={isWishlisted ? `${t('product.remove_from_wishlist')}: ${product.name}` : `${t('product.add_to_wishlist')}: ${product.name}`}
           aria-pressed={isWishlisted}
-        >
-          <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
-        </button>
+          className="absolute bottom-2 right-2 bg-white shadow-md hover:scale-105 hover:text-red-600 sm:bottom-3 sm:right-3 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100"
+        />
       </div>
 
       <div className="flex flex-1 flex-col p-3 sm:p-4">
@@ -111,6 +111,8 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
           <span className="text-xs text-gray-400">({product.reviewCount})</span></> : <span className="text-xs text-gray-400">{t('product.no_reviews')}</span>}
         </div>
+
+        <StockStatus stock={product.stockQuantity} lowStockThreshold={product.lowStockThreshold ?? 5} compact className="mt-2" />
 
         <div className="mt-2.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <span className="text-base font-extrabold text-[#B76E79] sm:text-lg">{formatRWF(product.price)}</span>

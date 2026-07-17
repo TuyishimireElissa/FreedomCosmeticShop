@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, ChevronLeft, Heart, Minus, Plus, RefreshCw, ShieldCheck, ShoppingBag, Star } from 'lucide-react'
+import { ChevronLeft, Heart, Minus, Plus, RefreshCw, ShieldCheck, ShoppingBag, Star } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
 import { useStore } from '@/store/useStore'
@@ -13,6 +13,8 @@ import DeliveryEstimator from '@/components/products/DeliveryEstimator'
 import OrderViaWhatsApp from '@/components/products/OrderViaWhatsApp'
 import ProductGrid from '@/components/products/ProductGrid'
 import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
+import StockStatus from '@/components/a11y/StockStatus'
 import { getProductPrimaryImage } from '@/lib/cloudinary-images'
 
 interface ProductResponse { product: Product; related: Product[] }
@@ -45,7 +47,6 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
   const { product, related } = data
   const outOfStock = product.stock < 1
-  const lowStock = product.stock > 0 && product.stock <= product.lowStockThreshold
   const discount = product.compareAt && product.compareAt > product.price ? Math.round((1 - product.price / product.compareAt) * 100) : 0
   const primaryImage = getProductPrimaryImage(product)
 
@@ -69,12 +70,12 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
             <button type="button" onClick={() => document.getElementById('product-details')?.scrollIntoView({ behavior: 'smooth' })} className="mt-3 flex items-center gap-2">{product.reviewsCount > 0 ? <><span className="flex">{[1,2,3,4,5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= Math.round(product.rating) ? 'fill-[#FFD700] text-[#FFD700]' : 'fill-gray-200 text-gray-200'}`} />)}</span><span className="text-sm font-bold">{product.rating.toFixed(1)}</span><span className="text-xs text-gray-400">{t('product.reviews_count', { count: product.reviewsCount })}</span></> : <span className="text-sm font-semibold text-gray-500">{t('product.no_reviews')}</span>}</button>
 
             <div className="mt-5 flex flex-wrap items-baseline gap-3"><span className="text-3xl font-black text-[#B76E79]">{formatRWF(product.price)}</span>{product.compareAt && product.compareAt > product.price && <span className="text-base text-gray-400 line-through">{formatRWF(product.compareAt)}</span>}{discount > 0 && <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-600">{t('product.save_percent', { percent: discount })}</span>}</div>
-            <div className="mt-3 flex flex-wrap gap-2">{outOfStock ? <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-bold text-gray-600">{t('common.sold_out')}</span> : lowStock ? <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">{t('common.low_stock', { count: product.stock })}</span> : <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700"><Check className="h-3.5 w-3.5" />{t('common.in_stock')}</span>}{product.isAuthentic === true && <span className="flex items-center gap-1 rounded-full border border-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"><ShieldCheck className="h-3.5 w-3.5" />{t('common.authentic')}</span>}</div>
+            <div className="mt-3 flex flex-wrap gap-2"><StockStatus stock={product.stock} lowStockThreshold={product.lowStockThreshold} className="rounded-full border border-current/20 px-3 py-1" />{product.isAuthentic === true && <span className="flex items-center gap-1 rounded-full border border-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"><ShieldCheck className="h-3.5 w-3.5" />{t('common.authentic')}</span>}</div>
             {product.shortDescription && <p className="mt-5 text-sm leading-7 text-gray-600">{product.shortDescription}</p>}
 
             {product.shades && product.shades.length > 0 && <div className="mt-6"><p className="text-xs font-black uppercase tracking-wider text-gray-500">{t('product.select_shade')} <span className="ml-1 normal-case text-[#B76E79]">{shade}</span></p><div className="mt-2 flex flex-wrap gap-2">{product.shades.map((value) => <button key={value} type="button" onClick={() => setShade(value)} className={`rounded-xl border-2 px-3 py-2 text-sm font-bold ${shade === value ? 'border-[#B76E79] bg-rose-50 text-[#B76E79]' : 'border-gray-200 text-gray-600'}`}>{value}</button>)}</div></div>}
 
-            <div className="mt-7 flex flex-wrap gap-3"><div className="flex h-12 items-center overflow-hidden rounded-xl border border-gray-200"><button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1} className="grid h-full w-11 place-items-center hover:bg-gray-50 disabled:opacity-40"><Minus className="h-4 w-4" /></button><span className="grid h-full min-w-11 place-items-center border-x border-gray-200 text-sm font-black">{quantity}</span><button type="button" onClick={() => setQuantity((value) => Math.min(product.stock, value + 1))} disabled={quantity >= product.stock} className="grid h-full w-11 place-items-center hover:bg-gray-50 disabled:opacity-40"><Plus className="h-4 w-4" /></button></div><button type="button" onClick={add} disabled={outOfStock} className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 text-sm font-black text-white shadow-lg shadow-[#B76E79]/20 hover:bg-[#a55d68] disabled:bg-gray-300"><ShoppingBag className="h-5 w-5" />{outOfStock ? t('common.sold_out') : `${t('product.add_to_cart')} · ${formatRWF(product.price * quantity)}`}</button><button type="button" onClick={() => setWishlisted((value) => !value)} className="grid h-12 w-12 place-items-center rounded-xl border border-gray-200" aria-label={t('product.add_to_wishlist')}><Heart className={`h-5 w-5 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} /></button></div>
+            <div className="mt-7 flex flex-wrap gap-3"><div className="flex h-12 items-center overflow-hidden rounded-xl border border-gray-200"><IconButton label={t('product.decrease_quantity')} icon={<Minus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1} variant="ghost" className="h-full rounded-none" /><span className="grid h-full min-w-11 place-items-center border-x border-gray-200 text-sm font-black">{quantity}</span><IconButton label={t('product.increase_quantity')} icon={<Plus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.min(product.stock, value + 1))} disabled={quantity >= product.stock} variant="ghost" className="h-full rounded-none" /></div><button type="button" onClick={add} disabled={outOfStock} className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 text-sm font-black text-white shadow-lg shadow-[#B76E79]/20 hover:bg-[#a55d68] disabled:bg-gray-300"><ShoppingBag className="h-5 w-5" />{outOfStock ? t('common.sold_out') : `${t('product.add_to_cart')} · ${formatRWF(product.price * quantity)}`}</button><IconButton label={wishlisted ? t('product.remove_from_wishlist') : t('product.add_to_wishlist')} icon={<Heart className={`h-5 w-5 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} />} aria-pressed={wishlisted} onClick={() => setWishlisted((value) => !value)} size="lg" className="rounded-xl border border-gray-200" /></div>
 
             <div className="my-4 flex items-center gap-3"><span className="h-px flex-1 bg-gray-100" /><span className="text-xs text-gray-400">{t('common.or')}</span><span className="h-px flex-1 bg-gray-100" /></div>
             <OrderViaWhatsApp product={{ id: product.id, name: product.name, slug: product.slug, price: product.price, stock: product.stock }} selectedShade={shade || undefined} selectedSize={product.volume || product.size || undefined} quantity={quantity} variant="compact" className="w-full" />

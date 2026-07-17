@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowLeft, FileText, MessageCircle, Printer } from 'lucide-react'
 import { useT } from '@/lib/i18n/LanguageContext'
+import IconButton from '@/components/a11y/IconButton'
+import PaymentStatusBadge from '@/components/a11y/PaymentStatusBadge'
 
 type InvoicePaymentStatus = 'PAID' | 'PENDING' | 'FAILED' | 'REFUNDED' | 'OVERDUE'
 
@@ -50,13 +52,6 @@ function configured(value: string) {
   return value !== OWNER_TODO && !value.includes('TODO: OWNER_MUST_ADD_THIS_BEFORE_LAUNCH')
 }
 
-function statusClass(status: InvoicePaymentStatus) {
-  if (status === 'PAID') return 'text-emerald-700'
-  if (status === 'FAILED' || status === 'OVERDUE') return 'text-red-700'
-  if (status === 'REFUNDED') return 'text-sky-700'
-  return 'text-amber-700'
-}
-
 export function WholesaleInvoices({ onBack }: { onBack: () => void }) {
   const t = useT()
   const [invoices, setInvoices] = useState<InvoiceListItem[]>([])
@@ -85,7 +80,7 @@ export function WholesaleInvoices({ onBack }: { onBack: () => void }) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
       <div className="mb-6 flex items-center gap-2">
-        <button onClick={onBack} className="grid h-8 w-8 place-items-center rounded-lg hover:bg-secondary"><ArrowLeft className="h-4 w-4" /></button>
+        <IconButton label={t('wholesale.back_info')} icon={<ArrowLeft className="h-4 w-4" />} onClick={onBack} variant="ghost" className="rounded-lg" />
         <div><h1 className="flex items-center gap-2 text-xl font-bold"><FileText className="h-5 w-5 text-primary" />{t('wholesale.invoices')}</h1><p className="text-xs text-muted-foreground">{t('wholesale.invoice_count', { count: invoices.length })}</p></div>
       </div>
 
@@ -95,7 +90,7 @@ export function WholesaleInvoices({ onBack }: { onBack: () => void }) {
         <div className="space-y-2">{invoices.map((invoice) => (
           <button key={invoice.id} onClick={() => openInvoice(invoice.id)} className="flex w-full items-center justify-between rounded-xl border bg-card p-4 text-left hover:bg-secondary/20">
             <div><p className="font-mono text-sm font-bold">{invoice.invoiceNumber}</p><p className="text-xs text-muted-foreground">{new Date(invoice.issuedAt).toLocaleDateString('en-RW', { day: 'numeric', month: 'short', year: 'numeric' })}</p></div>
-            <div className="text-right"><p className="font-bold">{formatRWF(invoice.totalAmount)}</p><p className={`text-[10px] font-semibold ${statusClass(invoice.paymentStatus)}`}>{t(`wholesale.invoice_status_${invoice.paymentStatus.toLowerCase()}`)}</p></div>
+            <div className="text-right"><p className="font-bold">{formatRWF(invoice.totalAmount)}</p><PaymentStatusBadge status={invoice.paymentStatus} className="mt-1" /></div>
           </button>
         ))}</div>
       )}
@@ -151,7 +146,7 @@ function InvoiceDetail({ invoice, onBack }: { invoice: InvoiceDetailData; onBack
         </div>
 
         <section className="mt-6 rounded-lg bg-secondary/20 p-4 text-xs">
-          <div className="flex justify-between"><span className="text-muted-foreground">{t('orders.status_label')}</span><span className={`font-semibold ${statusClass(invoice.paymentStatus)}`}>{t(`wholesale.invoice_status_${invoice.paymentStatus.toLowerCase()}`)}</span></div>
+          <div className="flex justify-between"><span className="text-muted-foreground">{t('orders.status_label')}</span><PaymentStatusBadge status={invoice.paymentStatus} /></div>
           {invoice.paymentMethod && <div className="mt-1 flex justify-between"><span className="text-muted-foreground">{t('wholesale.invoice_payment_method')}</span><span>{invoice.paymentMethod}</span></div>}
           <div className="mt-1 flex justify-between"><span className="text-muted-foreground">{t('wholesale.invoice_paid_amount')}</span><span>{formatRWF(invoice.paidAmount)}</span></div>
           <div className="mt-1 flex justify-between"><span className="text-muted-foreground">{t('wholesale.invoice_balance')}</span><span>{formatRWF(invoice.balanceDue)}</span></div>
