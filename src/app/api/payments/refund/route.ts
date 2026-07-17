@@ -26,6 +26,7 @@ import { cashout, PaypackError } from "@/server/services/paypack"
 import { enqueueSms } from "@/server/services/sms-queue"
 import { getSmsMessage } from "@/server/services/sms-templates"
 import { features } from "@/lib/env"
+import { refreshWholesaleRetentionMetric } from '@/server/services/wholesale-retention'
 import { z } from "zod"
 
 const RefundSchema = z.object({
@@ -96,6 +97,11 @@ export async function POST(req: Request) {
           },
         })
 
+        await db.wholesaleInvoice.updateMany({
+          where: { orderId },
+          data: { isPaid: false, paidAt: null, paidAmount: 0, balanceDue: 0, isOverdue: false, daysOverdue: 0 },
+        })
+
         // Update order status
         await db.order.update({
           where: { id: orderId },
@@ -135,6 +141,7 @@ export async function POST(req: Request) {
           req,
         })
 
+        if (order.userId && order.orderType === 'WHOLESALE') await refreshWholesaleRetentionMetric(order.userId)
         return NextResponse.json({
           success: true,
           refundReference: refundResult.transactionId,
@@ -168,6 +175,10 @@ export async function POST(req: Request) {
           failureReason: "COD order cancelled — no refund needed",
         },
       })
+      await db.wholesaleInvoice.updateMany({
+        where: { orderId },
+        data: { isPaid: false, paidAt: null, paidAmount: 0, balanceDue: 0, isOverdue: false, daysOverdue: 0 },
+      })
       await db.order.update({
         where: { id: orderId },
         data: { status: "CANCELLED" },
@@ -185,6 +196,7 @@ export async function POST(req: Request) {
         req,
       })
 
+      if (order.userId && order.orderType === 'WHOLESALE') await refreshWholesaleRetentionMetric(order.userId)
       return NextResponse.json({
         success: true,
         message: "COD order cancelled. No refund needed.",

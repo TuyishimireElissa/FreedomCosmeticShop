@@ -91,16 +91,6 @@ export type OrderStatus = (typeof ORDER_STATUSES)[number]
 export const PAYMENT_STATUSES = ["PENDING", "PAID", "FAILED", "REFUNDED"] as const
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number]
 
-export const WHOLESALE_TIERS = [
-  { minQty: 1, maxQty: 5, discount: 0, label: "1-5 units: Retail price" },
-  { minQty: 6, maxQty: 11, discount: 12, label: "6-11 units: 12% off" },
-  { minQty: 12, maxQty: 23, discount: 18, label: "12-23 units: 18% off" },
-  { minQty: 24, maxQty: 47, discount: 24, label: "24-47 units: 24% off" },
-  { minQty: 48, maxQty: null, discount: 29, label: "48+ units: 29% off" },
-]
-
-export const WHOLESALE_MIN_ORDER = 50000
-
 export const STORE_INFO = {
   name: "FreedomCosmeticShop",
   shortName: "Freedom Cosmetic",

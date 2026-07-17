@@ -1,50 +1,20 @@
 "use client"
 
-/**
- * WholesaleDashboard — dashboard for approved wholesale customers.
- *
- * Section 6: Wholesale Shopping Experience
- *
- * Shows:
- *   - Credit balance + usage bar
- *   - Total saved + this month saved
- *   - Recent wholesale orders
- *   - Recent invoices
- *   - Quick actions (New Order, My Invoices, Track Orders)
- *   - Account manager contact
- *
- * Accessible via wholesale view → "Dashboard" tab.
- */
-
-import { useState, useEffect, useCallback } from "react"
-import { useStore } from "@/store/useStore"
-import { formatRWF, formatRWFCompact } from "@/lib/format"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  ArrowLeft,
-  TrendingDown,
-  CreditCard,
-  Package,
-  FileText,
-  Truck,
-  Phone,
-  MessageCircle,
-  ShoppingBag,
-  RefreshCw,
-} from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { useCallback, useEffect, useState } from 'react'
+import { useStore } from '@/store/useStore'
+import { formatRWF } from '@/lib/format'
+import { WHOLESALE_CONFIG } from '@/lib/wholesale-config'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { ArrowLeft, FileText, MessageCircle, Package, RefreshCw, ShoppingBag, Truck } from 'lucide-react'
+import { useToast } from '@/hooks/use-toast'
 import { useT } from '@/lib/i18n/LanguageContext'
 
 interface DashboardData {
-  credit: {
-    limit: number
-    used: number
-    available: number
-    paymentTermDays: number
-  } | null
-  totalSaved: number
-  thisMonthSaved: number
+  credit: null
+  orderCount: number
+  invoiceCount: number
+  reorderCount: number
   recentOrders: Array<{
     id: string
     orderNumber: string
@@ -57,15 +27,22 @@ interface DashboardData {
     id: string
     invoiceNumber: string
     totalAmount: number
-    isPaid: boolean
+    paymentStatus: 'PAID' | 'PENDING' | 'FAILED' | 'REFUNDED' | 'OVERDUE'
+    balanceDue: number
     dueDate: string | null
     issuedAt: string
   }>
-  user: {
-    name: string
-    businessName: string
-    phone: string
-  }
+  user: { name: string; businessName: string; phone: string }
+}
+
+interface ReorderItem {
+  productId: string
+  slug: string
+  name: string
+  price: number
+  image: string
+  stock: number
+  quantity: number
 }
 
 export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () => void; onCatalog: () => void }) {
@@ -74,248 +51,122 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
   const { goHome } = useStore()
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [reorderingOrderId, setReorderingOrderId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
+    setLoading(true)
     try {
-      const res = await fetch("/api/wholesale/dashboard")
-      if (!res.ok) return
-      const json = await res.json()
-      setData(json)
-    } catch {
-      // ignore
+      const response = await fetch('/api/wholesale/dashboard')
+      if (response.ok) setData(await response.json())
     } finally {
       setLoading(false)
     }
   }, [])
 
-  useEffect(() => {
-    load()
-  }, [load])
+  useEffect(() => { load() }, [load])
+
+  const openWholesaleCatalog = () => {
+    if (typeof window !== 'undefined') sessionStorage.setItem('wholesaleShoppingMode', '1')
+    onCatalog()
+  }
+
+  const reorder = async (orderId: string) => {
+    setReorderingOrderId(orderId)
+    try {
+      const response = await fetch('/api/wholesale/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId }),
+      })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.error || t('wholesale.reorder_failed'))
+
+      for (const item of result.items as ReorderItem[]) {
+        useStore.getState().addToCart({
+          productId: item.productId,
+          slug: item.slug,
+          name: item.name,
+          price: item.price,
+          image: item.image,
+          stock: item.stock,
+        }, item.quantity)
+      }
+
+      if (typeof window !== 'undefined') sessionStorage.setItem('wholesaleReorderId', result.reorder.id)
+      toast({
+        title: t('wholesale.reorder_prepared'),
+        description: result.unavailableCount > 0
+          ? t('wholesale.reorder_partial', { added: result.addedProductCount, unavailable: result.unavailableCount })
+          : t('wholesale.reorder_all_available', { count: result.addedProductCount }),
+      })
+      await load()
+      openWholesaleCatalog()
+    } catch (error) {
+      toast({ title: t('wholesale.reorder_failed'), description: error instanceof Error ? error.message : t('common.error'), variant: 'destructive' })
+    } finally {
+      setReorderingOrderId(null)
+    }
+  }
 
   if (loading) {
-    return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
-        <Skeleton className="h-24 w-full rounded-2xl" />
-        <Skeleton className="mt-4 h-48 w-full rounded-2xl" />
-        <Skeleton className="mt-4 h-32 w-full rounded-2xl" />
-      </div>
-    )
+    return <div className="mx-auto max-w-4xl px-4 py-8"><Skeleton className="h-24 w-full rounded-2xl" /><Skeleton className="mt-4 h-48 w-full rounded-2xl" /></div>
   }
-
   if (!data) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-20 text-center">
-        <p className="text-sm text-muted-foreground">{t('wholesale.dashboard_failed')}</p>
-        <Button variant="outline" className="mt-3" onClick={load}>{t('common.retry')}</Button>
-      </div>
-    )
+    return <div className="mx-auto max-w-md px-4 py-20 text-center"><p className="text-sm text-muted-foreground">{t('wholesale.dashboard_failed')}</p><Button variant="outline" className="mt-3" onClick={load}>{t('common.retry')}</Button></div>
   }
-
-  const creditPct = data.credit && data.credit.limit > 0
-    ? Math.round((data.credit.used / data.credit.limit) * 100)
-    : 0
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <button onClick={goHome} className="grid h-8 w-8 place-items-center rounded-lg hover:bg-secondary">
-            <ArrowLeft className="h-4 w-4" />
-          </button>
-          <div>
-            <h1 className="flex items-center gap-2 text-xl font-bold">
-              🏪 {t('wholesale.dashboard')}
-            </h1>
-            <p className="text-xs text-muted-foreground">{data.user.businessName}</p>
-          </div>
-        </div>
+      <div className="mb-6 flex items-center gap-2">
+        <button onClick={goHome} className="grid h-8 w-8 place-items-center rounded-lg hover:bg-secondary"><ArrowLeft className="h-4 w-4" /></button>
+        <div><h1 className="text-xl font-bold">{t('wholesale.dashboard')}</h1><p className="text-xs text-muted-foreground">{data.user.businessName}</p></div>
       </div>
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl border bg-card p-4">
-          <CreditCard className="h-4 w-4 text-violet-500" />
-          <p className="mt-1 text-lg font-bold">{data.credit ? formatRWFCompact(data.credit.available) : "N/A"}</p>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.credit_available')}</p>
-        </div>
-        <div className="rounded-2xl border bg-card p-4">
-          <TrendingDown className="h-4 w-4 text-emerald-500" />
-          <p className="mt-1 text-lg font-bold text-emerald-600">{formatRWFCompact(data.totalSaved)}</p>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.total_saved')}</p>
-        </div>
-        <div className="rounded-2xl border bg-card p-4 col-span-2 sm:col-span-1">
-          <Package className="h-4 w-4 text-sky-500" />
-          <p className="mt-1 text-lg font-bold text-sky-600">{formatRWFCompact(data.thisMonthSaved)}</p>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.saved_month')}</p>
-        </div>
+      <div className="grid grid-cols-3 gap-3">
+        <div className="rounded-2xl border bg-card p-4"><Package className="h-4 w-4 text-sky-600" /><p className="mt-1 text-lg font-bold">{data.orderCount}</p><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.dashboard_order_count')}</p></div>
+        <div className="rounded-2xl border bg-card p-4"><FileText className="h-4 w-4 text-primary" /><p className="mt-1 text-lg font-bold">{data.invoiceCount}</p><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.dashboard_invoice_count')}</p></div>
+        <div className="rounded-2xl border bg-card p-4"><RefreshCw className="h-4 w-4 text-violet-600" /><p className="mt-1 text-lg font-bold">{data.reorderCount}</p><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.dashboard_reorder_count')}</p></div>
       </div>
 
-      {/* Credit usage bar */}
-      {data.credit && (
-        <div className="mt-4 rounded-2xl border bg-card p-4">
-          <div className="flex items-center justify-between text-sm">
-            <span className="font-semibold">{t('wholesale.credit_usage')}</span>
-            <span className="text-muted-foreground">
-              {t('wholesale.credit_used', { used: formatRWF(data.credit.used), limit: formatRWF(data.credit.limit) })}
-            </span>
-          </div>
-          <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-secondary">
-            <div
-              className={`h-full rounded-full ${creditPct > 80 ? "bg-red-500" : creditPct > 50 ? "bg-amber-500" : "bg-violet-500"}`}
-              style={{ width: `${creditPct}%` }}
-            />
-          </div>
-          <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
-            <span>{t('wholesale.percent_used', { percent: creditPct })}</span>
-            <span>{t('wholesale.payment_terms_days', { days: data.credit.paymentTermDays })}</span>
-          </div>
-        </div>
-      )}
+      <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">{t('wholesale.honest_credit_disabled')}</div>
 
-      {/* Quick actions */}
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
-        <Button variant="outline" className="h-auto flex-col gap-1 py-3" onClick={onCatalog}>
-          <ShoppingBag className="h-5 w-5 text-primary" />
-          <span className="text-xs">{t('wholesale.new_order')}</span>
-        </Button>
-        {/* Section 9B: Quick Reorder — adds last order items to cart */}
-        {data.recentOrders.length > 0 && (
-          <Button
-            variant="outline"
-            className="h-auto flex-col gap-1 py-3"
-            onClick={async () => {
-              const lastOrder = data.recentOrders[0]
-              try {
-                const res = await fetch(`/api/orders/${lastOrder.orderNumber}`)
-                if (!res.ok) return
-                const orderData = await res.json()
-                const items = orderData.order?.items || []
-                for (const item of items) {
-                  useStore.getState().addToCart({
-                    productId: item.productId || item.id,
-                    slug: item.productId || item.id,
-                    name: item.name,
-                    price: item.price,
-                    image: item.image || "",
-                    stock: 999,
-                  }, item.quantity)
-                }
-                toast({ title: `🛒 ${t('wholesale.items_added')}`, description: t('wholesale.items_from_order', { count: items.length, order: lastOrder.orderNumber }) })
-                onCatalog()
-              } catch {
-                toast({ title: t('wholesale.reorder_failed'), variant: "destructive" })
-              }
-            }}
-          >
-            <RefreshCw className="h-5 w-5 text-violet-500" />
-            <span className="text-xs">{t('wholesale.quick_reorder')}</span>
-          </Button>
-        )}
-        <Button variant="outline" className="h-auto flex-col gap-1 py-3" onClick={onInvoices}>
-          <FileText className="h-5 w-5 text-primary" />
-          <span className="text-xs">{t('wholesale.my_invoices')}</span>
-        </Button>
-        <Button variant="outline" className="h-auto flex-col gap-1 py-3" onClick={() => useStore.getState().setView("trackOrder")}>
-          <Truck className="h-5 w-5 text-primary" />
-          <span className="text-xs">{t('orders.track')}</span>
-        </Button>
-        <a href="https://wa.me/250780000000" target="_blank" rel="noopener noreferrer">
-          <Button variant="outline" className="h-auto w-full flex-col gap-1 py-3">
-            <MessageCircle className="h-5 w-5 text-emerald-500" />
-            <span className="text-xs">{t('footer.help')}</span>
-          </Button>
-        </a>
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Button variant="outline" className="h-auto flex-col gap-1 py-3" onClick={openWholesaleCatalog}><ShoppingBag className="h-5 w-5 text-primary" /><span className="text-xs">{t('wholesale.new_order')}</span></Button>
+        {data.recentOrders[0] && <Button variant="outline" className="h-auto flex-col gap-1 py-3" disabled={reorderingOrderId !== null} onClick={() => reorder(data.recentOrders[0].id)}><RefreshCw className={`h-5 w-5 text-violet-600 ${reorderingOrderId ? 'animate-spin' : ''}`} /><span className="text-xs">{t('wholesale.quick_reorder')}</span></Button>}
+        <Button variant="outline" className="h-auto flex-col gap-1 py-3" onClick={onInvoices}><FileText className="h-5 w-5 text-primary" /><span className="text-xs">{t('wholesale.my_invoices')}</span></Button>
+        <Button variant="outline" className="h-auto flex-col gap-1 py-3" onClick={() => useStore.getState().setView('trackOrder')}><Truck className="h-5 w-5 text-primary" /><span className="text-xs">{t('orders.track')}</span></Button>
       </div>
 
-      {/* Recent orders */}
       <div className="mt-6">
         <h2 className="mb-2 text-sm font-semibold">{t('wholesale.recent_orders')}</h2>
-        {data.recentOrders.length === 0 ? (
-          <p className="rounded-xl border border-dashed p-4 text-center text-xs text-muted-foreground">
-            {t('wholesale.no_orders')} <button onClick={onCatalog} className="text-primary hover:underline">{t('wholesale.place_first_order')} →</button>
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {data.recentOrders.map((o) => (
-              <div key={o.id} className="flex items-center justify-between rounded-xl border bg-card p-3 text-sm">
-                <div>
-                  <p className="font-mono text-xs font-bold">{o.orderNumber}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(o.createdAt).toLocaleDateString("en-RW", { day: "numeric", month: "short" })}
-                    {o.isCredit && <span className="ml-2 text-violet-600">· 💳 {t('wholesale.credit')}</span>}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold">{formatRWF(o.total)}</p>
-                  <span className={`text-[10px] font-medium ${
-                    o.status === "DELIVERED" ? "text-emerald-600" :
-                    o.status === "CANCELLED" ? "text-red-600" :
-                    "text-amber-600"
-                  }`}>{o.status}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+        {data.recentOrders.length === 0 ? <p className="rounded-xl border border-dashed p-4 text-center text-xs text-muted-foreground">{t('wholesale.no_orders')}</p> : (
+          <div className="space-y-2">{data.recentOrders.map((order) => (
+            <div key={order.id} className="flex items-center justify-between gap-3 rounded-xl border bg-card p-3 text-sm">
+              <div><p className="font-mono text-xs font-bold">{order.orderNumber}</p><p className="text-xs text-muted-foreground">{new Date(order.createdAt).toLocaleDateString('en-RW', { day: 'numeric', month: 'short' })} · {order.status}</p></div>
+              <div className="flex items-center gap-3"><p className="font-bold">{formatRWF(order.total)}</p><Button size="sm" variant="ghost" disabled={reorderingOrderId !== null} onClick={() => reorder(order.id)}>{t('wholesale.reorder_action')}</Button></div>
+            </div>
+          ))}</div>
         )}
       </div>
 
-      {/* Recent invoices */}
       <div className="mt-6">
-        <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-sm font-semibold">{t('wholesale.recent_invoices')}</h2>
-          <button onClick={onInvoices} className="text-xs text-primary hover:underline">{t('home.view_all')} →</button>
-        </div>
-        {data.recentInvoices.length === 0 ? (
-          <p className="rounded-xl border border-dashed p-4 text-center text-xs text-muted-foreground">
-            {t('wholesale.no_invoices_auto')}
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {data.recentInvoices.map((inv) => (
-              <div key={inv.id} className="flex items-center justify-between rounded-xl border bg-card p-3 text-sm">
-                <div>
-                  <p className="font-mono text-xs font-bold">{inv.invoiceNumber}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(inv.issuedAt).toLocaleDateString("en-RW", { day: "numeric", month: "short" })}
-                    {inv.dueDate && !inv.isPaid && (
-                      <span className="ml-2 text-amber-600">· {t('wholesale.due')}: {new Date(inv.dueDate).toLocaleDateString("en-RW", { day: "numeric", month: "short" })}</span>
-                    )}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold">{formatRWF(inv.totalAmount)}</p>
-                  <span className={`text-[10px] font-medium ${inv.isPaid ? "text-emerald-600" : "text-amber-600"}`}>
-                    {inv.isPaid ? `✅ ${t('wholesale.paid')}` : `⏳ ${t('wholesale.due')}`}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className="mb-2 flex items-center justify-between"><h2 className="text-sm font-semibold">{t('wholesale.recent_invoices')}</h2><button onClick={onInvoices} className="text-xs text-primary hover:underline">{t('home.view_all')} →</button></div>
+        {data.recentInvoices.length === 0 ? <p className="rounded-xl border border-dashed p-4 text-center text-xs text-muted-foreground">{t('wholesale.no_invoices_auto')}</p> : (
+          <div className="space-y-2">{data.recentInvoices.map((invoice) => (
+            <button key={invoice.id} onClick={onInvoices} className="flex w-full items-center justify-between rounded-xl border bg-card p-3 text-left text-sm">
+              <div><p className="font-mono text-xs font-bold">{invoice.invoiceNumber}</p><p className="text-xs text-muted-foreground">{new Date(invoice.issuedAt).toLocaleDateString('en-RW', { day: 'numeric', month: 'short' })}</p></div>
+              <div className="text-right"><p className="font-bold">{formatRWF(invoice.totalAmount)}</p><p className="text-[10px] font-semibold">{t(`wholesale.invoice_status_${invoice.paymentStatus.toLowerCase()}`)}</p></div>
+            </button>
+          ))}</div>
         )}
       </div>
 
-      {/* Account manager */}
       <div className="mt-6 rounded-2xl border bg-secondary/20 p-4">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t('wholesale.account_manager')}</h3>
-        <div className="mt-2 flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium">Jean Paul — {t('wholesale.manager')}</p>
-            <p className="text-xs text-muted-foreground">{t('wholesale.manager_hours')}</p>
-          </div>
-          <div className="flex gap-2">
-            <a href="tel:+250789000001">
-              <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                <Phone className="h-3.5 w-3.5" />
-              </Button>
-            </a>
-            <a href="https://wa.me/250789000001" target="_blank" rel="noopener noreferrer">
-              <Button size="sm" variant="outline" className="h-8 w-8 p-0">
-                <MessageCircle className="h-3.5 w-3.5" />
-              </Button>
-            </a>
-          </div>
-        </div>
+        <h2 className="text-sm font-semibold">{t('wholesale.honest_questions_title')}</h2>
+        <p className="mt-1 text-xs text-muted-foreground">{t('wholesale.honest_no_hours_promise')}</p>
+        <div className="mt-3 flex flex-wrap gap-2">{WHOLESALE_CONFIG.contacts.map((contact) => (
+          <a key={contact.whatsappE164} href={`https://wa.me/${contact.whatsappE164}`} target="_blank" rel="noopener noreferrer"><Button size="sm" variant="outline"><MessageCircle className="mr-1.5 h-4 w-4" />{t('wholesale.honest_whatsapp_contact', { phone: contact.displayPhone })}</Button></a>
+        ))}</div>
       </div>
     </div>
   )

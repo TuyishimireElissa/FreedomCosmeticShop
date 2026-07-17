@@ -375,6 +375,11 @@ export function CheckoutView() {
 
     try {
       // Step 1: Create the order first
+      const approvedWholesale = user?.wholesaleStatus === 'APPROVED' && (user.userType === 'WHOLESALE' || user.userType === 'BOTH')
+      const wholesaleShoppingMode = approvedWholesale && typeof window !== 'undefined' && sessionStorage.getItem('wholesaleShoppingMode') === '1'
+      const wholesaleReorderId = wholesaleShoppingMode && typeof window !== 'undefined'
+        ? sessionStorage.getItem('wholesaleReorderId') || undefined
+        : undefined
       const payload = {
         customerName: delivery.customerName.trim(),
         customerPhone: delivery.customerPhone.trim(),
@@ -390,6 +395,8 @@ export function CheckoutView() {
         paymentMethod: payment.method,
         couponCode: appliedCoupon?.code,
         useLoyaltyPoints: redeemPoints,
+        isWholesale: wholesaleShoppingMode,
+        wholesaleReorderId,
         items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
       }
 
@@ -406,6 +413,10 @@ export function CheckoutView() {
 
       const data = await res.json()
       const orderId = data.order.id
+      if (typeof window !== 'undefined') {
+        if (wholesaleReorderId) sessionStorage.removeItem('wholesaleReorderId')
+        if (wholesaleShoppingMode) sessionStorage.removeItem('wholesaleShoppingMode')
+      }
 
       // Step 2: For MoMo/Airtel, initiate payment with the real orderId
       if (payment.method === "MTN_MOMO" || payment.method === "AIRTEL_MONEY") {

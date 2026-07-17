@@ -23,6 +23,7 @@ import { features } from "@/lib/env"
 import { createReviewRequests } from '@/lib/review-requests'
 import { resolveTranslation } from '@/lib/i18n'
 import { BUSINESS } from '@/lib/business-config'
+import { refreshWholesaleRetentionMetric } from '@/server/services/wholesale-retention'
 
 const VALID_STATUSES = [
   "PENDING",
@@ -163,13 +164,26 @@ export async function PATCH(
 
     // Update payment status if provided (updates the first payment record)
     if (parsed.data.paymentStatus && existing.payments.length > 0) {
+      const completedAt = parsed.data.paymentStatus === "PAID" ? new Date() : null
       await db.payment.update({
         where: { id: existing.payments[0].id },
+        data: { status: parsed.data.paymentStatus, completedAt },
+      })
+      const refunded = parsed.data.paymentStatus === "REFUNDED"
+      const paid = parsed.data.paymentStatus === "PAID"
+      await db.wholesaleInvoice.updateMany({
+        where: { orderId: existing.id },
         data: {
-          status: parsed.data.paymentStatus,
-          completedAt: parsed.data.paymentStatus === "PAID" ? new Date() : null,
+          isPaid: paid,
+          paidAt: completedAt,
+          paidAmount: paid ? existing.total : 0,
+          balanceDue: paid || refunded ? 0 : existing.total,
+          paymentMethod: existing.payments[0].method,
+          isOverdue: false,
+          daysOverdue: 0,
         },
       })
+      if (existing.userId && existing.orderType === 'WHOLESALE') await refreshWholesaleRetentionMetric(existing.userId)
     }
 
     // Re-fetch the updated order with relations

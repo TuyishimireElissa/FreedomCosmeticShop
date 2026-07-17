@@ -923,16 +923,16 @@ export function ProductDetailView({ slug }: ProductDetailViewProps) {
       ) : (
         <div className="mt-8 rounded-2xl border border-violet-100 bg-violet-50/50 p-4 text-center">
           <p className="text-sm font-medium text-violet-900">
-            💡 Buy in bulk & save up to 30%
+            {t('product.wholesale_application_hint')}
           </p>
           <p className="mt-0.5 text-xs text-violet-700">
-            Available for wholesale accounts · Min. order 50,000 RWF
+            {t('product.wholesale_terms_hint')}
           </p>
           <button
             onClick={() => useStore.getState().setView("wholesale" as never)}
             className="mt-2 text-xs font-medium text-violet-600 hover:underline"
           >
-            Apply for Wholesale →
+            {t('product.apply_wholesale')} →
           </button>
         </div>
       )}

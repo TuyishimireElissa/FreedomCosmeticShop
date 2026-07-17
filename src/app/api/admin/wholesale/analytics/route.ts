@@ -4,10 +4,12 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireRole } from "@/lib/auth"
+import { refreshAllWholesaleRetentionMetrics } from '@/server/services/wholesale-retention'
 
 export async function GET() {
   try {
     await requireRole("ADMIN")
+    const approvedWholesaleUsers = await refreshAllWholesaleRetentionMetrics()
 
     const now = new Date()
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -23,23 +25,23 @@ export async function GET() {
       businessTypes,
     ] = await Promise.all([
       db.order.aggregate({
-        where: { orderType: "WHOLESALE", status: { not: "CANCELLED" }, createdAt: { gte: monthStart } },
+        where: { orderType: "WHOLESALE", status: { notIn: ["CANCELLED", "RETURNED"] }, payments: { some: { status: "PAID" } }, createdAt: { gte: monthStart } },
         _sum: { total: true },
       }),
       db.order.aggregate({
-        where: { orderType: "RETAIL", status: { not: "CANCELLED" }, createdAt: { gte: monthStart } },
+        where: { orderType: "RETAIL", status: { notIn: ["CANCELLED", "RETURNED"] }, payments: { some: { status: "PAID" } }, createdAt: { gte: monthStart } },
         _sum: { total: true },
       }),
       db.order.count({
-        where: { orderType: "WHOLESALE", createdAt: { gte: monthStart } },
+        where: { orderType: "WHOLESALE", status: { notIn: ["CANCELLED", "RETURNED"] }, payments: { some: { status: "PAID" } }, createdAt: { gte: monthStart } },
       }),
       db.order.count({
-        where: { orderType: "RETAIL", createdAt: { gte: monthStart } },
+        where: { orderType: "RETAIL", status: { notIn: ["CANCELLED", "RETURNED"] }, payments: { some: { status: "PAID" } }, createdAt: { gte: monthStart } },
       }),
       // Top 10 wholesale customers by revenue
       db.order.groupBy({
         by: ["userId"],
-        where: { orderType: "WHOLESALE", status: { not: "CANCELLED" } },
+        where: { orderType: "WHOLESALE", status: { notIn: ["CANCELLED", "RETURNED"] }, payments: { some: { status: "PAID" } } },
         _sum: { total: true },
         _count: true,
         orderBy: { _sum: { total: "desc" } },
@@ -48,7 +50,7 @@ export async function GET() {
       // Top wholesale products
       db.orderItem.groupBy({
         by: ["productId"],
-        where: { order: { orderType: "WHOLESALE" } },
+        where: { order: { orderType: "WHOLESALE", status: { notIn: ["CANCELLED", "RETURNED"] }, payments: { some: { status: "PAID" } } } },
         _sum: { quantity: true },
         _count: true,
         orderBy: { _sum: { quantity: "desc" } },
@@ -65,6 +67,16 @@ export async function GET() {
         _count: true,
       }),
     ])
+
+    const [retentionMetrics, reorderAttempts] = await Promise.all([
+      db.wholesaleRetentionMetric.findMany({
+        select: { status: true, totalOrders: true, totalSpent: true, reorderCount: true },
+      }),
+      db.wholesaleReorder.count(),
+    ])
+    const retentionPaidOrders = retentionMetrics.reduce((sum, metric) => sum + metric.totalOrders, 0)
+    const retentionPaidRevenue = retentionMetrics.reduce((sum, metric) => sum + metric.totalSpent, 0)
+    const completedReorders = retentionMetrics.reduce((sum, metric) => sum + metric.reorderCount, 0)
 
     // Enrich top customers with names
     const topCustomerIds = topCustomers.filter((c) => c.userId).map((c) => c.userId!)
@@ -112,6 +124,19 @@ export async function GET() {
           orderCount: p._count,
         }
       }),
+      retention: {
+        approvedWholesaleUsers,
+        trackedUsers: retentionMetrics.length,
+        customersWithPaidOrders: retentionMetrics.filter((metric) => metric.totalOrders > 0).length,
+        returningCustomers: retentionMetrics.filter((metric) => metric.status === 'RETURNING').length,
+        paidOrders: retentionPaidOrders,
+        paidRevenue: retentionPaidRevenue,
+        reorderAttempts,
+        completedReorders,
+        reorderConversionBps: reorderAttempts > 0 ? Math.min(10_000, Math.round((completedReorders / reorderAttempts) * 10_000)) : 0,
+        churnPolicyConfigured: false,
+        churnedCustomers: 0,
+      },
       credit: {
         totalLimit: creditOverview._sum.creditLimit || 0,
         totalUsed: creditOverview._sum.usedCredit || 0,

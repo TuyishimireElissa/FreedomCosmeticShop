@@ -25,6 +25,7 @@ import { sendOrderConfirmation } from '@/server/services/order-confirmation'
 import { features } from "@/lib/env"
 import { BUSINESS } from "@/lib/business-config"
 import { resolveTranslation } from '@/lib/i18n'
+import { refreshWholesaleRetentionMetric } from '@/server/services/wholesale-retention'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -89,6 +90,18 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
       },
     })
     if (claimed.count !== 1) return { processed: false, stockIssue: false, duplicatePayment: false }
+    await tx.wholesaleInvoice.updateMany({
+      where: { orderId },
+      data: {
+        isPaid: true,
+        paidAt: new Date(),
+        paidAmount: order.total,
+        balanceDue: 0,
+        paymentMethod: payment.method,
+        isOverdue: false,
+        daysOverdue: 0,
+      },
+    })
     const otherPaid = await tx.payment.findFirst({ where: { orderId, id: { not: paymentId }, status: 'PAID' }, select: { id: true } })
     if (otherPaid) {
       await tx.securityAlert.create({ data: { type: 'DUPLICATE_PAYMENT', severity: 'CRITICAL', title: 'Duplicate payment received', message: `Order ${order.orderNumber} has more than one paid transaction and requires review.`, metadata: { orderId, orderNumber: order.orderNumber, paymentId, previousPaymentId: otherPaid.id } } })
@@ -135,6 +148,9 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
     return { processed: true, stockIssue: false, duplicatePayment: false }
   })
   if (!result.processed) return
+  if (order.userId && order.orderType === 'WHOLESALE') {
+    await refreshWholesaleRetentionMetric(order.userId)
+  }
 
   // Award loyalty points (if user is authenticated)
   if (!result.duplicatePayment && order.userId && order.loyaltyPointsEarned > 0) {
@@ -209,6 +225,9 @@ export async function handlePaymentFailure(payload: PaymentFailurePayload): Prom
   if (claimedFailure.count !== 1) return
 
   const order = payment.order
+  if (order.userId && order.orderType === 'WHOLESALE') {
+    await refreshWholesaleRetentionMetric(order.userId)
+  }
 
   // Send SMS about failed payment
   if (features.sms) {

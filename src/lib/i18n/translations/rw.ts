@@ -10,7 +10,7 @@ export const rw = {
     loading: 'Birimo gutegurwa...', error: 'Habaye ikibazo', retry: 'Ongera ugerageze', save: 'Bika', cancel: 'Hagarika', confirm: 'Emeza', delete: 'Siba', edit: 'Hindura', view: 'Reba', close: 'Funga', back: 'Subira inyuma', next: 'Komeza', previous: 'Ibibanza', search: 'Shakisha', filter: 'Shungura', sort: 'Tondeka', clear: 'Siba byose', apply: 'Koresha', submit: 'Ohereza', yes: 'Yego', no: 'Oya', or: 'cyangwa', and: 'na', currency: 'RWF', free: 'UBUNTU', required: 'Birasabwa', optional: 'Si ngombwa', new: 'Gishya', hot: 'Gikunzwe', sale: 'Cyagabanyijwe', sold_out: 'Byashize', in_stock: 'Birahari', low_stock: 'Hasigaye {count} gusa!', authentic: '100% Umwimerere', // 🔍 REVIEW
   },
   nav: {
-    home: 'Ahabanza', products: 'Ibicuruzwa', categories: 'Ibyiciro', brands: 'Ibirango', bundles: 'Gahunda n’amatsinda', quiz: 'Shakisha gahunda yanjye', wholesale: 'Kurangura', wholesale_offer: 'Kurangura ibicuruzwa by’ubwiza — zigama kugera kuri 30%', blog: 'Inkuru', about: 'Abo turi bo', contact: 'Twandikire', account: 'Konti yanjye', orders: 'Ibyo natumije', wishlist: 'Ibyo nifuza', cart: 'Igitebo', login: 'Injira', register: 'Iyandikishe', logout: 'Sohoka', admin: 'Ubuyobozi', help: 'Ubufasha', language: 'Ururimi', signed_out: 'Wasohotse neza', sign_in_wishlist: 'Injira kugira ngo ubike ibyo ukunda', payment_methods: 'Uburyo bwo kwishyura twemera', account_menu: 'Ibikubiye muri konti', product_categories: 'Ibyiciro by’ibicuruzwa', mobile_navigation: 'Ibikubiye kuri telefoni', language_selected: 'Ururimi: {language}', english_selected: 'Hahiswemo Icyongereza.', french_coming: 'Igifaransa kizongerwamo vuba.', kinyarwanda_selected: 'Hahiswemo Ikinyarwanda.', language_change: 'Ururimi: {language}. Kanda uhindure.', open_search: 'Fungura ahashakirwa', close_search: 'Funga ahashakirwa', open_menu: 'Fungura urutonde', close_menu: 'Funga urutonde', whatsapp_support: 'Ubufasha kuri WhatsApp', search_placeholder: 'Shakisha ibita ku ruhu, ibikoresho byo kwisiga, ibita ku musatsi...', // 🔍 REVIEW // verified-rw
+    home: 'Ahabanza', products: 'Ibicuruzwa', categories: 'Ibyiciro', brands: 'Ibirango', bundles: 'Gahunda n’amatsinda', quiz: 'Shakisha gahunda yanjye', wholesale: 'Kurangura', wholesale_offer: 'Kurangura — ibiciro bya buri gicuruzwa', blog: 'Inkuru', about: 'Abo turi bo', contact: 'Twandikire', account: 'Konti yanjye', orders: 'Ibyo natumije', wishlist: 'Ibyo nifuza', cart: 'Igitebo', login: 'Injira', register: 'Iyandikishe', logout: 'Sohoka', admin: 'Ubuyobozi', help: 'Ubufasha', language: 'Ururimi', signed_out: 'Wasohotse neza', sign_in_wishlist: 'Injira kugira ngo ubike ibyo ukunda', payment_methods: 'Uburyo bwo kwishyura twemera', account_menu: 'Ibikubiye muri konti', product_categories: 'Ibyiciro by’ibicuruzwa', mobile_navigation: 'Ibikubiye kuri telefoni', language_selected: 'Ururimi: {language}', english_selected: 'Hahiswemo Icyongereza.', french_coming: 'Igifaransa kizongerwamo vuba.', kinyarwanda_selected: 'Hahiswemo Ikinyarwanda.', language_change: 'Ururimi: {language}. Kanda uhindure.', open_search: 'Fungura ahashakirwa', close_search: 'Funga ahashakirwa', open_menu: 'Fungura urutonde', close_menu: 'Funga urutonde', whatsapp_support: 'Ubufasha kuri WhatsApp', search_placeholder: 'Shakisha ibita ku ruhu, ibikoresho byo kwisiga, ibita ku musatsi...', // 🔍 REVIEW // verified-rw
   },
   announcement: {
     free_delivery: 'Kubigezwaho ni ubuntu ku bicuruzwa birengeje {amount} RWF', // verified-rw
@@ -69,7 +69,7 @@ export const rw = {
     hero_cta_primary: 'Haha nonaha', // verified-rw
     hero_cta_secondary: 'Ibiciro byo kurangura', // verified-rw
     hero_alt: 'Ibicuruzwa by’ubwiza bya FreedomCosmeticShop mu Rwanda', // verified-rw
-    join_wholesale_program: 'Injira muri gahunda yo kurangura ya FreedomCosmeticShop uzigame kugera kuri 30% ku bicuruzwa byose', // verified-rw
+    join_wholesale_program: 'Saba kubona ibiciro byo kurangura byashyizweho kuri buri gicuruzwa.', // verified-rw
     just_arrived: 'Bimaze kuhagera', // verified-rw
     just_arrived_subtitle: 'Ibicuruzwa bishya, amabara agezweho n’ibindi by’ubwiza bishya biboneka mu Rwanda.', // verified-rw
     kigali_all_districts: 'Kigali n’uturere 30 twose', // verified-rw
@@ -129,7 +129,7 @@ export const rw = {
     today_only: 'Uyu munsi gusa', // verified-rw
     top_brands: 'Ibirango bikunzwe', // verified-rw
     top_rated: '★ Byahawe amanota menshi', // verified-rw
-    up_to_off: 'Igabanyirizwa rigera kuri 30%', // verified-rw
+    up_to_off: 'Bishyirwaho kuri buri gicuruzwa', // verified-rw
     verified_experiences: 'Ibitekerezo byemejwe by’abakiriya babonye ibicuruzwa bishya bakunda.', // verified-rw
     view_all: 'Reba byose', // verified-rw
     weekend_offer: 'Gabanyirizwa 15% mu mpera z’icyumweru. Ishyura na MTN MoMo cyangwa ugejejweho. Komande ntoya ni 10,000 RWF.', // verified-rw
@@ -137,8 +137,8 @@ export const rw = {
     wholesale_load_failed: 'Amakuru yo kurangura ntiyashoboye gufunguka', // verified-rw
     wholesale_minimum_audience: 'Komande ntoya: 50,000 RWF · Kuri salon, amaduka, spa n’abacuruzi bo mu Rwanda', // verified-rw
     wholesale_savings: 'Zigama kugera kuri {percent}% · Komande ntoya {amount}', // verified-rw
-    wholesale_subtitle: 'Byagenewe salon, spa, amaduka n’abacuruzi bo mu Rwanda—hamwe n’ubufasha bw’umwuga no kubigeza mu gihugu hose.', // verified-rw
-    wholesale_title: 'Teza imbere ubucuruzi bwawe bw’ubwiza ku biciro byiza.', // verified-rw
+    wholesale_subtitle: 'Saba kubona ibiciro byo kurangura byashyizweho kuri buri gicuruzwa. Igabanyirizwa, inguzanyo na komande ntoya bitashyizweho ntibitangazwa.', // verified-rw
+    wholesale_title: 'Ubusabe bwo kurangura ku bucuruzi bwanditswe mu Rwanda.', // verified-rw
     wholesale_unavailable: 'Amakuru yo kurangura ntashobora kuboneka', // verified-rw
     wonderful_experience: 'Igicuruzwa na serivisi byo guhaha byaranshimishije.', // verified-rw
     write_code: 'Andika iyi kode: {code}', // verified-rw
@@ -182,9 +182,12 @@ export const rw = {
     quiz_time: 'Ibibazo bitandatu · kugura si ngombwa', // verified-rw
   },
   categories: {
-    all: 'Ibicuruzwa byose', skincare: 'Kwita ku ruhu', makeup: 'Ibikoresho byo kwisiga', haircare: 'Kwita ku musatsi', fragrance: 'Imibavu', body_care: 'Kwita ku mubiri', mens: "Ibikoresho by'abagabo", natural: 'Ibikomoka ku bidukikije', gifts: 'Impano', new_arrivals: 'Ibicuruzwa bishya', best_sellers: 'Ibicuruzwa bikunzwe cyane', on_sale: 'Ibyagabanyijwe', // 🔍 REVIEW
+    all: 'Ibicuruzwa byose', skincare: 'Kwita ku ruhu', makeup: 'Ibikoresho byo kwisiga', haircare: 'Kwita ku musatsi', fragrance: 'Imibavu', body_care: 'Kwita ku mubiri', mens: "Ibikoresho by'abagabo", natural: 'Ibikomoka ku bidukikije', gifts: 'Impano', new_arrivals: 'Ibicuruzwa bishya', best_sellers: 'Ibicuruzwa bikunzwe cyane', on_sale: 'Ibyagabanyijwe', // 🔍 REVIEW // verified-rw
   },
   product: {
+    wholesale_application_hint: 'Igiciro cyo kurangura gishobora kuboneka iyo cyashyizweho kuri iki gicuruzwa.', // verified-rw
+    wholesale_terms_hint: 'Saba konti yo kurangura kugira ngo urebe ibiciro byashyizweho ku gicuruzwa n’ingano.', // verified-rw
+    apply_wholesale: 'Saba konti yo kurangura', // verified-rw
     add_to_cart: 'Shyira mu gitebo', adding: 'Birimo gushyirwa...', added: 'Byashyizwemo!', buy_now: 'Gura nonaha', add_to_wishlist: 'Shyira mu byo wifuza', remove_from_wishlist: 'Kura mu byo wifuza', share: 'Sangiza abandi', share_whatsapp: 'Sangiza kuri WhatsApp', description: 'Ibisobanuro', ingredients: 'Ibigize igicuruzwa', how_to_use: 'Uko gikoreshwa', reviews: 'Ibitekerezo', delivery: 'Kugeza no gusubiza ibicuruzwa', related: 'Ibindi wakunda', also_bought: 'Abandi bakiriya baguze na byo', no_reviews: 'Nta gitekerezo kiratangwa. Ba uwa mbere!', write_review: 'Tanga igitekerezo', verified_purchase: 'Ubuguzi bwemejwe', helpful: 'Byamfashije', skin_type: "Ubwoko bw'uruhu", shade: 'Ibara', volume: 'Ingano', for_skin: 'Ku ruhu rwa {skinType}', out_of_stock_notify: 'Mumenyeshe nibigaruka', price_from: 'Guhera kuri {price} RWF', original_price: 'Igiciro cya mbere: {price} RWF', you_save: 'Uzigama {amount} RWF ({percent}%)', earn_points: 'Urahabwa amanota {points} ugura iki gicuruzwa', authentic_guarantee: '✅ Igicuruzwa cy’umwimerere 100%', delivery_estimate: 'Reba ikiguzi cyo kukugezaho', select_district: 'Hitamo akarere kawe', no_image: 'Nta shusho', view_product: 'Reba {product}', rating_label: 'Amanota {rating} kuri 5, ibitekerezo {count}', login_to_add: 'Injira kugira ngo ushyire ibicuruzwa mu gitebo', select_shade: 'Hitamo ibara', save_percent: 'Zigama {percent}%', complete_routine: 'Uzuza ibikoresho ukoresha', product_not_found: 'Igicuruzwa nticyabonetse', unavailable_hint: 'Igicuruzwa gishobora kuba cyimuwe cyangwa kitariho by’akanya.', browse_products: 'Reba ibicuruzwa', beauty: 'Ubwiza', about_product: 'Ibyerekeye {product}', key_ingredients: 'Iby’ingenzi bikigize', ingredients_missing: 'Ibigize iki gicuruzwa ntibirongerwamo.', loading_reviews: 'Ibitekerezo byemejwe birimo gufunguka...', based_on_reviews: 'Bishingiye ku bitekerezo {count} byemejwe', positive_experience: 'Igitekerezo cyiza kuri iki gicuruzwa.', reviews_count: 'Ibitekerezo {count}', verified_customer: 'Umukiriya wemejwe', verified: 'Byemejwe', no_approved_reviews: 'Nta bitekerezo byemejwe biraboneka.', first_review: 'Ba uwa mbere gutanga igitekerezo kuri iki gicuruzwa.', delivery_across_rwanda: 'Kugeza ibicuruzwa mu Rwanda hose', free_delivery_returns: 'Kubigezwaho ni ubuntu ku byujuje ibisabwa birengeje 50,000 RWF. Ibicuruzwa bidafunguye bishobora gusubizwa mu minsi 7.', delivery_estimator: 'Kubara ikiguzi cyo kukugezaho', available_districts: 'Biboneka mu turere 30 twose tw’u Rwanda', calculating_delivery: 'Ikiguzi cyo kukugezaho kirimo kubarwa...', delivery_fee_label: 'Amafaranga yo kukugezaho', estimated_time: 'Igihe biteganyijwe', decrease_quantity: 'Gabanya umubare', increase_quantity: 'Ongera umubare', size_label: 'Ingano', fast_delivery: 'Kubigeza vuba', payment_flexible: 'Ishyura uko wifuza', easy_returns: 'Gusubiza byoroshye', officially_rwanda: 'Biri mu Rwanda ku mugaragaro', local_business: 'Ubucuruzi bwo mu Rwanda bukorera i Kigali', authorized_distributors: 'Bivuye ku bacuruzi babyemerewe', zone: 'Agace', fee: 'Ikiguzi', time: 'Igihe', quantity_label: 'Umubare', unit_price: 'Igiciro cya kimwe', retail_price: 'Igiciro cyo kudandaza: {price}', wholesale_price: 'Igiciro cyawe cyo kurangura (nibura ibice {count})', price_updated: 'Igiciro cyahindutse', out_of_stock_update: 'Byashize mu bubiko', product_removed: 'Igicuruzwa ntikikiboneka', product_removed_hint: 'Iki gicuruzwa cyakuwe ku rubuga.', link_copied: 'Ihuza ryakoporowe!', instagram_copy_hint: 'Rishyire mu nkuru ya Instagram cyangwa mu butumwa bwihariye.', share_anywhere: 'Risangize aho ushaka.', delivery_times_short: 'Kigali iminsi 1–2, mu ntara iminsi 3–5', payment_methods_short: 'MTN MoMo cyangwa kwishyura ugejejweho', return_policy_short: 'Ibicuruzwa bidafunguye bisubizwa mu minsi 7', pay_mobile_short: 'Ishyura ako kanya ukoresheje Mobile Money', same_day: 'Uwo munsi', days_2_3: 'Iminsi 2–3', days_3_4: 'Iminsi 3–4', you_save_label: 'Ibyo uzigama', // 🔍 REVIEW // verified-rw
 
     hover_zoom: 'Shyiraho akambi ubone ishusho nini', // verified-rw
@@ -714,7 +717,7 @@ export const rw = {
     wholesale_dashboard: 'Urubuga rwo kurangura', // verified-rw
     wholesale_dashboard_hint: 'Reba inguzanyo, inyemezabwishyu, ongera utumize kandi urebe ibyo wazigamye', // verified-rw
     wholesale_pending: 'Ubusabe bwo kurangura butegereje', // verified-rw
-    wholesale_save: 'Zigama kugera kuri 30% ku bicuruzwa byinshi', // verified-rw
+    wholesale_save: 'Reba ibiciro byo kurangura byashyizweho kuri buri gicuruzwa', // verified-rw
 
     account_role: 'Uruhare rwa konti', // verified-rw
     discover_products: 'Reba ibicuruzwa', // verified-rw
@@ -1071,6 +1074,67 @@ export const rw = {
     swipe: 'Nyereza', // verified-rw
   },
   wholesale: {
+    honest_hero_title: 'Kurangura ku bucuruzi bwanditswe mu Rwanda', // verified-rw
+    honest_hero_subtitle: 'Saba kubona ibiciro byo kurangura byashyizweho kuri buri gicuruzwa. Ibiciro n’ingano ntarengwa bigaragazwa gusa iyo byashyizweho kuri icyo gicuruzwa.', // verified-rw
+    honest_current_terms: 'Amabwiriza yo kurangura akoreshwa ubu', // verified-rw
+    honest_terms_intro: 'Aya ni yo mahitamo yashyizweho ubu. Ntidusezeranya igabanyirizwa, inguzanyo, komande ntoya cyangwa igihe cyo gusuzuma bitaremezwa.', // verified-rw
+    honest_pricing_title: 'Ibiciro bya buri gicuruzwa', // verified-rw
+    honest_pricing_desc: 'Nta rutonde rw’igabanyirizwa ruhita rukoreshwa. Ubucuruzi bwemejwe bubona ibiciro byo kurangura gusa ku bicuruzwa byashyiriweho ingano n’ibiciro.', // verified-rw
+    honest_minimum_title: 'Komande ntoya', // verified-rw
+    honest_minimum_unconfigured: 'Nta gaciro gato ka komande yo kurangura kashyizweho ubu. Igicuruzwa cyashyiriweho ibiciro gishobora kugira ingano ntoya isabwa.', // verified-rw
+    honest_credit_title: 'Inguzanyo yo kurangura', // verified-rw
+    honest_credit_disabled: 'Inguzanyo ntitangwa ubu. Uko kwishyura kuboneka kuri gahunda yo kwishyura ni ko gukoreshwa.', // verified-rw
+    honest_review_title: 'Gusuzuma ubusabe', // verified-rw
+    honest_review_no_promise: 'Ubusabe burasuzumwa ariko nta gihe ntarengwa cyatangajwe. Reba aho ubusabe bugeze nyuma yo kubwohereza.', // verified-rw
+    honest_documents_title: 'Ibimenyetso by’ubucuruzi', // verified-rw
+    honest_documents_initial: 'Inyandiko ntizisabwa kuri iyi fishi ya mbere. Mu gihe cyo gusuzuma, dushobora gusaba ibimenyetso byihariye bijyanye n’ubucuruzi.', // verified-rw
+    honest_document_tin: 'Icyemezo cya TIN', // verified-rw
+    honest_document_rdb: 'Icyemezo cya RDB cyangwa icyandikisha ubucuruzi', // verified-rw
+    honest_document_business: 'Icyemezo ko ubucuruzi bukora', // verified-rw
+    honest_document_owner: 'Icyemezo cy’umwirondoro wa nyir’ubucuruzi, niba gikenewe mu gusuzuma', // verified-rw
+    honest_documents_upload_notice: 'Iyi fishi ntiyohereza amadosiye y’inyandiko. Ntugashyire amashusho y’indangamuntu cyangwa amahuza y’inyandiko bwite mu nyandiko y’inyongera.', // verified-rw
+    honest_process_title: 'Uko ubusabe bukorwa', // verified-rw
+    honest_step_1_title: 'Ohereza amakuru y’ubucuruzi', // verified-rw
+    honest_step_1_desc: 'Tanga amakuru y’ukuri y’ubucuruzi n’ayo kuvugisha nyirabwo.', // verified-rw
+    honest_step_2_title: 'Gusuzuma ubusabe', // verified-rw
+    honest_step_2_desc: 'Amakuru watanze arasuzumwa. Dushobora kugusaba ibindi bimenyetso by’ubucuruzi.', // verified-rw
+    honest_step_3_title: 'Reba icyemezo', // verified-rw
+    honest_step_3_desc: 'Reba aho ubusabe bugeze. Kwemezwa biguha gusa ibiciro by’ibicuruzwa byashyiriweho ibiciro byo kurangura.', // verified-rw
+    honest_questions_title: 'Ibibazo ku kurangura', // verified-rw
+    honest_contact_intro: 'Vugisha FreedomCosmeticShop kuri imwe muri nimero za WhatsApp zemejwe na nyir’ubucuruzi.', // verified-rw
+    honest_whatsapp_contact: 'WhatsApp {phone}', // verified-rw
+    honest_no_hours_promise: 'Nta masaha y’akazi ko kurangura cyangwa igihe cyo gusubiza byatangajwe ubu.', // verified-rw
+    honest_apply_title: 'Saba ukoresheje amakuru y’ubucuruzi y’ukuri', // verified-rw
+    honest_approved_pricing: 'Ubusabe bwawe bwemejwe. Ibiciro byo kurangura biboneka gusa ku bicuruzwa byashyiriweho ingano n’ibiciro; kwemezwa ntibivuga ko buri gicuruzwa kigabanyirizwa.', // verified-rw
+    honest_submit_updated_application: 'Ohereza ubusabe buvuguruye', // verified-rw
+    honest_submission_received: 'Ubusabe bwawe bwakiriwe. Koresha urupapuro rw’aho bugeze kugira ngo urebe icyemezo.', // verified-rw
+    dashboard_order_count: 'Komande zo kurangura', // verified-rw
+    dashboard_invoice_count: 'Inyemezabwishyu za komande', // verified-rw
+    dashboard_reorder_count: 'Kongera gutumiza byageragejwe', // verified-rw
+    reorder_prepared: 'Kongera gutumiza byateguwe', // verified-rw
+    reorder_partial: 'Hongewe ibicuruzwa {added}; ibicuruzwa {unavailable} bitaboneka ntibyongewemo.', // verified-rw
+    reorder_all_available: 'Hongewe ibicuruzwa {count} hakurikijwe ibihari n’ibiciro biriho ubu.', // verified-rw
+    reorder_action: 'Ongera utumize', // verified-rw
+    order_invoice: 'Inyemezabwishyu ya komande yo kurangura', // verified-rw
+    invoice_status_paid: 'Yishyuwe', // verified-rw
+    invoice_status_pending: 'Kwishyura birategerejwe', // verified-rw
+    invoice_status_failed: 'Kwishyura ntibyakunze', // verified-rw
+    invoice_status_refunded: 'Amafaranga yasubijwe', // verified-rw
+    invoice_status_overdue: 'Yarengeje igihe', // verified-rw
+    invoice_payment_method: 'Uburyo bwo kwishyura', // verified-rw
+    invoice_paid_amount: 'Amafaranga yishyuwe', // verified-rw
+    invoice_balance: 'Asigaye', // verified-rw
+    invoice_days_overdue: 'Yarengejeho iminsi {count}', // verified-rw
+    invoice_not_tax_notice: 'Iyi ni inyemezabwishyu ya komande; ntigaragazwa nk’inyemezabwishyu y’imisoro yo mu Rwanda mu gihe izina ryemewe ry’umucuruzi na TIN bitarashyirwaho.', // verified-rw
+    tin_label: 'TIN', // verified-rw
+    tax: 'Umusoro', // verified-rw
+    retention_title: 'Kugumana abakiriya barangura', // verified-rw
+    retention_paid_only_note: 'Amafaranga n’imibare yo kugumana abakiriya bishingira gusa kuri komande zo kurangura zishyuwe kandi zitahagaritswe.', // verified-rw
+    retention_paid_customers: 'Abakiriya bafite komande zishyuwe', // verified-rw
+    retention_returning: 'Abakiriya bagarutse', // verified-rw
+    retention_reorders: 'Kongera gutumiza byarangiye / byageragejwe', // verified-rw
+    retention_reorder_conversion: 'Igipimo cyo kongera gutumiza', // verified-rw
+    retention_no_churn_policy: 'Nta gihe cyo kwita umukiriya uwahagaritse kugura cyashyizweho; nta mukiriya uhita yitwa ko yahagaritse kugura.', // verified-rw
     accept_terms: 'Emera amabwiriza', // verified-rw
     accept_terms_hint: 'Ugomba kwemera amabwiriza yo kurangura no kwemeza ko amakuru yawe ari ukuri.', // verified-rw
     account_manager: 'Ushinzwe konti yawe', // verified-rw
@@ -1127,8 +1191,8 @@ export const rw = {
     discount: 'Igabanyirizwa ryo kurangura', // verified-rw
     discount_desc: 'Zigama kuri buri gicuruzwa ugura byinshi. Uko ugura byinshi ni ko uzigama.', // verified-rw
     discount_title: 'Igabanyirizwa rigera kuri 30%', // verified-rw
-    document_upload: 'Gushyiraho inyandiko (si ngombwa)', // verified-rw
-    documents_hint: 'Icyemezo cy’ubucuruzi, TIN cyangwa izindi nyandiko bishobora kwihutisha kwemezwa. Ushobora kohereza ubusabe nta nyandiko; tuzakuvugisha niba zikenewe.', // verified-rw
+    document_upload: 'Inyandiko ntizoherezwa kuri iyi fishi', // verified-rw
+    documents_hint: 'Ohereza amakuru y’ubucuruzi gusa. Dushobora gusaba TIN, icyemezo cya RDB, icyemezo cy’ubucuruzi cyangwa icy’umwirondoro wa nyirabwo mu gihe cyo gusuzuma.', // verified-rw
     documents_submit: 'Inyandiko no kohereza', // verified-rw
     due: 'IGOMBA KWISHYURWA', // verified-rw
     due_date: 'Itariki ntarengwa', // verified-rw
@@ -1170,7 +1234,7 @@ export const rw = {
     item: 'Igicuruzwa', // verified-rw
     items_added: 'Ibicuruzwa byashyizwe mu gitebo', // verified-rw
     items_from_order: 'Ibicuruzwa {count} byo kuri komande {order}', // verified-rw
-    join_businesses: 'Jya mu bucuruzi burenga 100 bwo mu Rwanda busanzwe buzigama na FreedomCosmeticShop', // verified-rw
+    registered_business_cta: 'Saba konti yo kurangura ku bucuruzi bwawe bwanditswe mu Rwanda.', // verified-rw
     login_apply_hint: 'Injira cyangwa wiyandikishe kugira ngo usabe konti yo kurangura.', // verified-rw
     login_required: 'Ugomba kwinjira', // verified-rw
     login_status_hint: 'Injira kugira ngo urebe aho ubusabe bwawe bugeze.', // verified-rw

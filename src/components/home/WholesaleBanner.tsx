@@ -13,9 +13,9 @@ interface WholesaleBenefit {
 }
 
 interface WholesaleInfo {
-  minimumOrder: number
-  minimumOrderFormatted: string
-  maxDiscount: number
+  minimumOrder: number | null
+  minimumOrderFormatted: string | null
+  maxDiscount: number | null
   benefits: WholesaleBenefit[]
 }
 
@@ -57,7 +57,7 @@ export function WholesaleBanner() {
             <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#FFD700]"><Store className="h-3.5 w-3.5" />{t('home.freedom_wholesale')}</span>
             <h2 className="mt-5 text-3xl font-black leading-tight sm:text-4xl">{t('home.wholesale_title')}</h2>
             <p className="mt-3 max-w-xl text-sm leading-6 text-gray-300 sm:text-base">{t('home.wholesale_subtitle')}</p>
-            {loading ? <div className="mt-5 h-5 w-64 animate-pulse rounded bg-white/10" /> : info ? <p className="mt-5 text-sm font-semibold text-[#e6a6b0]">{t('home.wholesale_savings', { percent: info.maxDiscount, amount: info.minimumOrderFormatted })}</p> : null}
+            {loading ? <div className="mt-5 h-5 w-64 animate-pulse rounded bg-white/10" /> : info?.maxDiscount !== null && info?.minimumOrderFormatted ? <p className="mt-5 text-sm font-semibold text-[#e6a6b0]">{t('home.wholesale_savings', { percent: info.maxDiscount, amount: info.minimumOrderFormatted })}</p> : null}
             <div className="mt-7 flex flex-wrap gap-3">
               <button type="button" onClick={() => router.push('/wholesale')} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#B76E79] px-6 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#a55d68]">{t('home.apply_wholesale')} <ArrowRight className="h-4 w-4" /></button>
               <span className="inline-flex items-center gap-2 px-2 text-xs text-gray-400"><Users className="h-4 w-4 text-[#FFD700]" />{t('home.registered_businesses')}</span>
@@ -69,8 +69,12 @@ export function WholesaleBanner() {
           ) : error ? (
             <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-6 text-center"><p className="text-sm font-semibold">{t('home.wholesale_benefits_failed')}</p><button type="button" onClick={load} className="mt-3 inline-flex items-center gap-2 text-xs font-bold text-[#e6a6b0]"><RefreshCw className="h-3.5 w-3.5" />{t('home.retry_details')}</button></div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {info?.benefits.slice(0, 6).map((benefit) => <div key={benefit.title} className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur"><span className="text-2xl" aria-hidden="true">{benefit.icon}</span><h3 className="mt-2 text-xs font-bold sm:text-sm">{benefit.title}</h3><p className="mt-1 hidden text-[11px] leading-4 text-gray-400 sm:block">{benefit.desc}</p></div>)}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {[
+                { icon: '🏷️', title: t('wholesale.honest_pricing_title'), desc: t('wholesale.honest_pricing_desc') },
+                { icon: '📦', title: t('wholesale.honest_minimum_title'), desc: t('wholesale.honest_minimum_unconfigured') },
+                { icon: '💳', title: t('wholesale.honest_credit_title'), desc: t('wholesale.honest_credit_disabled') },
+              ].map((benefit) => <div key={benefit.title} className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur"><span className="text-2xl" aria-hidden="true">{benefit.icon}</span><h3 className="mt-2 text-xs font-bold sm:text-sm">{benefit.title}</h3><p className="mt-1 text-[11px] leading-4 text-gray-400">{benefit.desc}</p></div>)}
             </div>
           )}
         </div>

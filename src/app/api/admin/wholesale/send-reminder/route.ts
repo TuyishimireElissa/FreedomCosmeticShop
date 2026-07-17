@@ -17,6 +17,7 @@ import { requireRole } from "@/lib/auth"
 import { sendWholesaleSms } from "@/server/services/wholesale"
 import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
+import { WHOLESALE_CONFIG } from "@/lib/wholesale-config"
 
 const ReminderSchema = z.object({
   userId: z.string(),
@@ -27,6 +28,9 @@ const ReminderSchema = z.object({
 export async function POST(req: Request) {
   try {
     const adminUser = await requireRole("ADMIN")
+    if (!WHOLESALE_CONFIG.credit.enabled) {
+      return NextResponse.json({ error: "Wholesale credit reminders are disabled" }, { status: 409 })
+    }
     const body = await req.json()
     const parsed = ReminderSchema.safeParse(body)
     if (!parsed.success) {

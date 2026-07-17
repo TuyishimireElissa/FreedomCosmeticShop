@@ -7,6 +7,7 @@ import { DESTRUCTIVE_OPERATIONS, requireDestructiveOperation } from "@/lib/permi
 import { updateCreditBalance, sendWholesaleSms } from "@/server/services/wholesale"
 import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
+import { WHOLESALE_CONFIG } from "@/lib/wholesale-config"
 
 const PaymentSchema = z.object({
   userId: z.string(),
@@ -18,6 +19,9 @@ const PaymentSchema = z.object({
 export async function POST(req: Request) {
   try {
     const adminUser = await requireDestructiveOperation(DESTRUCTIVE_OPERATIONS.PAYMENT_STATUS_CHANGE)
+    if (!WHOLESALE_CONFIG.credit.enabled) {
+      return NextResponse.json({ error: "Wholesale credit payments are disabled" }, { status: 409 })
+    }
     const body = await req.json()
     const parsed = PaymentSchema.safeParse(body)
     if (!parsed.success) {

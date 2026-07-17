@@ -59,8 +59,8 @@ export function WholesalePricingPanel({ productId, onClose }: WholesalePricingPa
   const { toast } = useToast()
   const [product, setProduct] = useState<ProductInfo | null>(null)
   const [tiers, setTiers] = useState<Tier[]>([])
-  const [wholesaleActive, setWholesaleActive] = useState(true)
-  const [minWholesaleQty, setMinWholesaleQty] = useState(6)
+  const [wholesaleActive, setWholesaleActive] = useState(false)
+  const [minWholesaleQty, setMinWholesaleQty] = useState(1)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
 
@@ -125,15 +125,17 @@ export function WholesalePricingPanel({ productId, onClose }: WholesalePricingPa
 
   const addTier = () => {
     const lastTier = tiers[tiers.length - 1]
-    const newMin = lastTier?.maxQuantity ? lastTier.maxQuantity + 1 : (lastTier?.minQuantity || 1) + 1
+    const newMin = lastTier
+      ? (lastTier.maxQuantity ? lastTier.maxQuantity + 1 : lastTier.minQuantity + 1)
+      : minWholesaleQty
     setTiers((prev) => [
       ...prev,
       {
         tierName: `Buy ${newMin}+`,
         minQuantity: newMin,
         maxQuantity: null,
-        pricePerUnit: product ? Math.round(product.retailPrice * 0.7) : 0,
-        discountPercent: 30,
+        pricePerUnit: product?.retailPrice || 0,
+        discountPercent: 0,
       },
     ])
   }

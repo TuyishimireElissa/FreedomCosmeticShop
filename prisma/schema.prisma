@@ -1275,30 +1275,69 @@ model WholesaleApplication {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  businessName     String
-  businessType     String // BEAUTY_SALON | HAIR_SALON | SPA | SHOP | MARKET_VENDOR | BEAUTY_SCHOOL | HOTEL | RESELLER | OTHER
-  businessPhone    String
-  businessAddress  String
-  businessDistrict String
-  tinNumber        String?
-  yearsInBusiness  Int?
-  monthlyRevenue   String? // Estimated monthly order range
-  nationalId       String? // Rwanda National ID
-  heardFrom        String? // How they heard about us
-  documents        String  @default("[]") // JSON array of document URLs
-  notes            String?
+  // Existing identity fields are preserved for current application APIs.
+  businessName String
+  businessType String
+  tradingName  String?
 
-  status          String  @default("PENDING") // PENDING | APPROVED | REJECTED | SUSPENDED
+  // Rwanda business registration identifiers support evidence requested during
+  // review without forcing document uploads in the initial application.
+  tinNumber     String?
+  rdbNumber     String?
+  vatRegistered Boolean @default(false)
+
+  businessPhone    String
+  businessEmail    String?
+  businessDistrict String
+  businessSector   String?
+  businessAddress  String
+
+  // Optional for legacy compatibility; the improved application flow will
+  // require the owner fields selected by the final published policy.
+  ownerName       String?
+  nationalId      String?
+  ownerPhone      String?
+  ownerEmail      String?
+  yearsInBusiness Int?
+
+  monthlyRevenue        String?
+  estimatedMonthlyOrder String?
+  numberOfEmployees     Int?
+  heardFrom             String?
+
+  // Existing JSON document list remains intact. Structured slots make real
+  // RDB/TIN/owner proof auditable without destroying old applications.
+  documents               String @default("[]")
+  businessRegistrationDoc String?
+  tinCertificateDoc       String?
+  ownerIdDoc               String?
+  additionalDocs           String @default("[]")
+  notes                    String?
+
+  status          String @default("PENDING")
   reviewedBy      String?
   reviewNotes     String?
   rejectionReason String?
+  reviewedAt      DateTime?
+  approvedAt      DateTime?
+  approvedBy      String?
 
-  appliedAt  DateTime  @default(now())
-  reviewedAt DateTime?
+  // Integer RWF is retained across the project to avoid destructive Decimal
+  // conversion and floating-point money behavior.
+  approvedCreditLimit Int @default(0)
+  paymentTermsDays    Int @default(0)
+  discountTier        String?
+  assignedAgentId     String?
+
+  appliedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([status])
   @@index([businessDistrict])
+  @@index([tinNumber])
+  @@index([rdbNumber])
 }
 
 // =============================================================================
@@ -1347,15 +1386,37 @@ model WholesaleCredit {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique
 
-  creditLimit     Int @default(0) // Maximum credit in RWF
-  usedCredit      Int @default(0) // Currently used credit in RWF
-  availableCredit Int @default(0) // creditLimit - usedCredit
+  // Integer RWF fields remain compatible with orders, invoices, and services.
+  creditLimit     Int @default(0)
+  usedCredit      Int @default(0)
+  availableCredit Int @default(0)
+  paymentTermDays Int @default(30)
 
-  paymentTermDays Int @default(30) // Payment due in N days
+  // Credit must be explicitly activated by an operational approval workflow.
+  isActive   Boolean @default(false)
+  approvedAt DateTime?
+  approvedBy String?
+
+  totalPaid      Int @default(0)
+  totalOverdue   Int @default(0)
+  overdueDays    Int @default(0)
+  lastPaymentDate DateTime?
+
+  riskScore    Int    @default(50)
+  creditRating String @default("NEW")
+
+  isSuspended      Boolean @default(false)
+  suspendedAt      DateTime?
+  suspensionReason String?
 
   history CreditHistory[]
 
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([creditRating])
+  @@index([isSuspended])
 }
 
 // =============================================================================
@@ -1385,35 +1446,93 @@ model CreditHistory {
 
 model WholesaleInvoice {
   id            String @id @default(cuid())
-  invoiceNumber String @unique // Format: INV-WHL-YYYY-NNN
+  invoiceNumber String @unique
   order         Order  @relation(fields: [orderId], references: [id])
   orderId       String @unique
 
   userId String?
-  user   User?   @relation(fields: [userId], references: [id])
+  user   User? @relation(fields: [userId], references: [id])
 
   businessName    String
   businessAddress String
   tinNumber       String?
+  businessRdb     String?
 
+  // Existing integer RWF invoice fields are retained.
   subtotal    Int
   tax         Int @default(0)
   discount    Int @default(0)
   totalAmount Int
+  paidAmount  Int @default(0)
+  balanceDue  Int @default(0)
 
-  paymentTerms String? // e.g., "30 days"
-  dueDate      DateTime?
-  isPaid       Boolean   @default(false)
-  paidAt       DateTime?
+  paymentTerms  String?
+  dueDate       DateTime?
+  isPaid        Boolean @default(false)
+  paidAt        DateTime?
+  paymentMethod String?
 
-  notes String?
+  isOverdue           Boolean @default(false)
+  daysOverdue         Int @default(0)
+  overdueRemindersSent Int @default(0)
+  lastReminderDate    DateTime?
+
+  pdfUrl String?
+  notes  String?
 
   issuedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([invoiceNumber])
   @@index([userId])
+  @@index([businessName])
   @@index([isPaid])
+  @@index([isOverdue])
   @@index([dueDate])
+}
+
+model WholesaleReorder {
+  id              String   @id @default(cuid())
+  userId          String
+  originalOrderId String
+  newOrderId      String?
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([originalOrderId])
+  @@index([newOrderId])
+  @@index([createdAt])
+}
+
+model WholesaleRetentionMetric {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  firstOrderDate DateTime?
+  lastOrderDate  DateTime?
+  totalOrders    Int @default(0)
+  totalSpent     Int @default(0)
+  averageOrderValue Int @default(0)
+
+  daysSinceFirstOrder Int?
+  daysSinceLastOrder  Int?
+  // Basis points per month (10,000 = 1.0 order/month) avoid floating money/rates.
+  ordersPerMonthBps Int @default(0)
+
+  status      String @default("ACTIVE")
+  isChurned   Boolean @default(false)
+  churnedAt   DateTime?
+  churnReason String?
+
+  reorderCount   Int @default(0)
+  reorderRateBps Int @default(0)
+
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([isChurned])
+  @@index([userId])
 }
 
 // =============================================================================

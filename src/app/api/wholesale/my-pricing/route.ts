@@ -12,7 +12,7 @@ export async function GET() {
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
 
     // Verify approved wholesale
-    if (user.wholesaleStatus !== "APPROVED" && user.userType !== "WHOLESALE" && user.userType !== "BOTH") {
+    if (user.wholesaleStatus !== "APPROVED" || (user.userType !== "WHOLESALE" && user.userType !== "BOTH")) {
       return NextResponse.json({ error: "Wholesale account not approved" }, { status: 403 })
     }
 
@@ -25,15 +25,11 @@ export async function GET() {
       orderBy: { name: "asc" },
     })
 
-    const extraDiscount = user.wholesaleDiscount || 0
-
-    const priced = await Promise.all(
+    const pricedProducts = await Promise.all(
       products.map(async (p) => {
         const tiers = await getWholesaleTiers(p.id)
-        const bestTier = tiers[tiers.length - 1] // Last tier = best price
-        const bestPrice = bestTier
-          ? Math.round(bestTier.pricePerUnit * (1 - extraDiscount / 100))
-          : p.price
+        const bestTier = tiers[tiers.length - 1]
+        const bestPrice = bestTier?.pricePerUnit ?? p.price
         const images = JSON.parse(p.images) as string[]
         return {
           id: p.id,
@@ -52,7 +48,8 @@ export async function GET() {
       })
     )
 
-    return NextResponse.json({ products: priced, extraDiscount })
+    const productsWithConfiguredTiers = pricedProducts.filter((product) => product.tiers.length > 0)
+    return NextResponse.json({ products: productsWithConfiguredTiers, extraDiscount: 0 })
   } catch (error) {
     console.error("Wholesale pricing error:", error)
     return NextResponse.json({ error: "Failed to fetch pricing" }, { status: 500 })

@@ -36,6 +36,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/hooks/use-toast"
+import { useT } from '@/lib/i18n/LanguageContext'
 import {
   Store,
   Users,
@@ -136,10 +137,7 @@ function ApplicationsTab() {
   const [reviewTarget, setReviewTarget] = useState<Application | null>(null)
   const [actionLoading, setActionLoading] = useState(false)
 
-  // Approve form state
-  const [creditLimit, setCreditLimit] = useState("500000")
-  const [paymentTerms, setPaymentTerms] = useState("30")
-  const [specialDiscount, setSpecialDiscount] = useState("0")
+  // Approval grants wholesale access only; credit and account-level discounts are disabled.
   const [approveNotes, setApproveNotes] = useState("")
   const [rejectReason, setRejectReason] = useState("")
 
@@ -165,12 +163,7 @@ function ApplicationsTab() {
       const res = await fetch(`/api/admin/wholesale/applications/${reviewTarget.id}/approve`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          creditLimit: Number(creditLimit),
-          paymentTerms: Number(paymentTerms),
-          specialDiscount: Number(specialDiscount),
-          notes: approveNotes,
-        }),
+        body: JSON.stringify({ notes: approveNotes }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed")
@@ -262,7 +255,7 @@ function ApplicationsTab() {
                 </p>
               </div>
               {app.status === "PENDING" && (
-                <Button size="sm" onClick={() => { setReviewTarget(app); setCreditLimit("500000"); setPaymentTerms("30"); setSpecialDiscount("0"); }}>
+                <Button size="sm" onClick={() => setReviewTarget(app)}>
                   Review
                 </Button>
               )}
@@ -294,20 +287,6 @@ function ApplicationsTab() {
               {/* Approve fields */}
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
                 <p className="text-xs font-semibold text-emerald-900">If Approving:</p>
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  <div>
-                    <Label className="text-xs">Credit Limit (RWF)</Label>
-                    <Input type="number" value={creditLimit} onChange={(e) => setCreditLimit(e.target.value)} className="h-8 mt-1" />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Payment Terms (days)</Label>
-                    <Input type="number" value={paymentTerms} onChange={(e) => setPaymentTerms(e.target.value)} className="h-8 mt-1" />
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <Label className="text-xs">Special Discount (%)</Label>
-                  <Input type="number" value={specialDiscount} onChange={(e) => setSpecialDiscount(e.target.value)} className="h-8 mt-1" min="0" max="50" />
-                </div>
                 <Input placeholder="Notes (optional)" value={approveNotes} onChange={(e) => setApproveNotes(e.target.value)} className="h-8 mt-2" />
                 <Button className="mt-2 w-full" onClick={handleApprove} disabled={actionLoading}>
                   {actionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
@@ -715,10 +694,24 @@ interface AnalyticsData {
   topCustomers: Array<{ userId: string; businessName: string; revenue: number; orderCount: number }>
   topProducts: Array<{ productId: string; name: string; totalSold: number; orderCount: number }>
   credit: { totalLimit: number; totalUsed: number; totalAvailable: number }
+  retention: {
+    approvedWholesaleUsers: number
+    trackedUsers: number
+    customersWithPaidOrders: number
+    returningCustomers: number
+    paidOrders: number
+    paidRevenue: number
+    reorderAttempts: number
+    completedReorders: number
+    reorderConversionBps: number
+    churnPolicyConfigured: false
+    churnedCustomers: 0
+  }
   businessTypes: Array<{ type: string; count: number }>
 }
 
 function AnalyticsTab() {
+  const t = useT()
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -822,20 +815,17 @@ function AnalyticsTab() {
         )}
       </div>
 
-      {/* Credit overview */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl border bg-card p-3 text-center">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Credit Limit</p>
-          <p className="text-sm font-bold">{formatRWFCompact(data.credit.totalLimit)}</p>
+      {/* Database-derived retention */}
+      <div className="rounded-2xl border bg-card p-4">
+        <h3 className="text-sm font-semibold">{t('wholesale.retention_title')}</h3>
+        <p className="mt-1 text-xs text-muted-foreground">{t('wholesale.retention_paid_only_note')}</p>
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-xl bg-secondary/30 p-3 text-center"><p className="text-lg font-bold">{data.retention.customersWithPaidOrders}</p><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.retention_paid_customers')}</p></div>
+          <div className="rounded-xl bg-secondary/30 p-3 text-center"><p className="text-lg font-bold">{data.retention.returningCustomers}</p><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.retention_returning')}</p></div>
+          <div className="rounded-xl bg-secondary/30 p-3 text-center"><p className="text-lg font-bold">{data.retention.completedReorders}/{data.retention.reorderAttempts}</p><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.retention_reorders')}</p></div>
+          <div className="rounded-xl bg-secondary/30 p-3 text-center"><p className="text-lg font-bold">{(data.retention.reorderConversionBps / 100).toFixed(2)}%</p><p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t('wholesale.retention_reorder_conversion')}</p></div>
         </div>
-        <div className="rounded-xl border bg-card p-3 text-center">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Used</p>
-          <p className="text-sm font-bold text-amber-600">{formatRWFCompact(data.credit.totalUsed)}</p>
-        </div>
-        <div className="rounded-xl border bg-card p-3 text-center">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Available</p>
-          <p className="text-sm font-bold text-emerald-600">{formatRWFCompact(data.credit.totalAvailable)}</p>
-        </div>
+        <p className="mt-3 text-xs text-muted-foreground">{t('wholesale.retention_no_churn_policy')}</p>
       </div>
 
       {/* Business types */}

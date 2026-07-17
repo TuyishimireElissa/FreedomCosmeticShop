@@ -4,11 +4,15 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requireAuth } from "@/lib/auth"
+import { WHOLESALE_CONFIG } from "@/lib/wholesale-config"
 
 export async function GET() {
   try {
     const user = await requireAuth()
     if (!user) return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+    if (!WHOLESALE_CONFIG.credit.enabled) {
+      return NextResponse.json({ hasCredit: false, creditEnabled: false, message: "Wholesale credit is not enabled." })
+    }
 
     const credit = await db.wholesaleCredit.findUnique({
       where: { userId: user.id },

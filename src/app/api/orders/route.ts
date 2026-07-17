@@ -30,6 +30,7 @@ import { enqueueSms } from "@/server/services/sms-queue"
 import { sendOrderConfirmationEmail } from "@/server/services/email"
 import { features } from "@/lib/env"
 import { broadcastOrderEvent } from "@/lib/realtime"
+import { WHOLESALE_CONFIG } from "@/lib/wholesale-config"
 
 const OrderItemSchema = z.object({
   productId: z.string().min(1),
@@ -57,6 +58,7 @@ const CreateOrderSchema = z.object({
   useLoyaltyPoints: z.number().int().min(0).optional(),
   items: z.array(OrderItemSchema).min(1, "Cart cannot be empty"),
   isWholesale: z.boolean().optional().default(false),
+  wholesaleReorderId: z.string().min(1).optional(),
 })
 
 async function generateOrderNumber(): Promise<string> {
@@ -103,6 +105,9 @@ export async function POST(req: Request) {
     // ─── Section 2: Determine if this is a wholesale order ──────────
     let isWholesale = data.isWholesale || false
     const isCreditOrder = data.paymentMethod === "CREDIT"
+    if (isCreditOrder && !WHOLESALE_CONFIG.credit.enabled) {
+      return NextResponse.json({ error: "Wholesale credit is not enabled" }, { status: 400 })
+    }
     let userId: string | null = null
 
     if (isWholesale || isCreditOrder) {
@@ -154,10 +159,11 @@ export async function POST(req: Request) {
 
     const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
 
-    // ─── Section 2: Enforce wholesale minimum order ─────────────────
-    if (isWholesale && subtotal < 50_000) {
+    // Enforce a basket minimum only after the owner explicitly configures one.
+    const wholesaleMinimum = WHOLESALE_CONFIG.minimumOrderRwf
+    if (isWholesale && wholesaleMinimum !== null && subtotal < wholesaleMinimum) {
       return NextResponse.json(
-        { error: `Wholesale minimum order is 50,000 RWF. Current subtotal: ${subtotal.toLocaleString()} RWF. Add ${(50_000 - subtotal).toLocaleString()} RWF more.` },
+        { error: `Wholesale minimum order is ${wholesaleMinimum.toLocaleString()} RWF. Current subtotal: ${subtotal.toLocaleString()} RWF.` },
         { status: 400 }
       )
     }
@@ -252,7 +258,7 @@ export async function POST(req: Request) {
           orderType: isWholesale ? "WHOLESALE" : "RETAIL",
           priceType: isWholesale ? "WHOLESALE" : "RETAIL",
           isCredit: isCreditOrder,
-          creditDueDate: isCreditOrder ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) : null,
+          creditDueDate: null,
           items: { create: orderItems },
         },
         include: { items: true },
@@ -264,7 +270,7 @@ export async function POST(req: Request) {
           orderId: created.id,
           method: data.paymentMethod,
           amount: total,
-          status: isCreditOrder ? "PAID" : "PENDING", // Credit orders are marked as PAID (deferred)
+          status: "PENDING",
           phoneNumber:
             data.paymentMethod === "MTN_MOMO" || data.paymentMethod === "AIRTEL_MONEY"
               ? data.customerPhone
@@ -280,6 +286,13 @@ export async function POST(req: Request) {
           estimatedArrival: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000),
         },
       })
+
+      if (isWholesale && userId && data.wholesaleReorderId) {
+        await tx.wholesaleReorder.updateMany({
+          where: { id: data.wholesaleReorderId, userId, newOrderId: null },
+          data: { newOrderId: created.id },
+        })
+      }
 
       // Increment coupon usage
       if (couponId) {
@@ -326,7 +339,6 @@ export async function POST(req: Request) {
             orderNumber: order.orderNumber,
             amount: order.total,
             invoice: invoice.invoiceNumber,
-            dueDate: invoice.dueDate ? new Date(invoice.dueDate).toLocaleDateString("en-RW") : "N/A",
           })
         }
       } catch (e) {

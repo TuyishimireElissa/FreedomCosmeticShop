@@ -16,7 +16,6 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useStore } from "@/store/useStore"
-import { formatRWF } from "@/lib/format"
 import { RWANDA_DISTRICTS, RWANDA_PROVINCES } from "@/lib/rwanda-locations"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -36,21 +35,17 @@ import {
   CheckCircle2,
   Clock,
   Store,
-  TrendingDown,
-  Truck,
   FileText,
   CreditCard,
   Package,
-  Trophy,
-  Sparkles,
   Loader2,
   Phone,
-  Mail,
   XCircle,
 } from "lucide-react"
 import { WholesaleDashboard } from "./WholesaleDashboard"
 import { WholesaleInvoices } from "./WholesaleInvoices"
 import { useT } from '@/lib/i18n/LanguageContext'
+import { WHOLESALE_CONFIG } from '@/lib/wholesale-config'
 
 type InternalView = "landing" | "apply" | "status" | "success" | "dashboard" | "invoices"
 
@@ -133,28 +128,28 @@ export function WholesaleView() {
 function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: () => void; onCheckStatus: () => void; onDashboard: () => void }) {
   const t = useT()
   const { user } = useStore()
-
   const isApproved = user?.wholesaleStatus === "APPROVED"
+
+  const facts = [
+    { icon: Package, title: t('wholesale.honest_pricing_title'), desc: t('wholesale.honest_pricing_desc') },
+    { icon: FileText, title: t('wholesale.honest_minimum_title'), desc: t('wholesale.honest_minimum_unconfigured') },
+    { icon: CreditCard, title: t('wholesale.honest_credit_title'), desc: t('wholesale.honest_credit_disabled') },
+    { icon: Clock, title: t('wholesale.honest_review_title'), desc: t('wholesale.honest_review_no_promise') },
+  ]
 
   return (
     <div>
-      {/* Hero */}
       <section className="bg-gradient-to-br from-primary to-primary/80 px-4 py-16 text-primary-foreground sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-5xl">🏪</p>
-          <h1 className="mt-4 text-3xl font-bold sm:text-5xl">
-            {t('wholesale.program_title')}
-          </h1>
-          <p className="mt-3 text-lg text-primary-foreground/90">
-            {t('wholesale.premier_supplier')}
+          <p className="text-5xl" aria-hidden="true">🏪</p>
+          <h1 className="mt-4 text-3xl font-bold sm:text-5xl">{t('wholesale.honest_hero_title')}</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base text-primary-foreground/90 sm:text-lg">
+            {t('wholesale.honest_hero_subtitle')}
           </p>
-          <p className="mt-2 text-sm text-primary-foreground/80">
-            {t('wholesale.hero_subtitle')}
-          </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
             {isApproved ? (
               <Button size="lg" variant="secondary" onClick={onDashboard}>
-                🏪 {t('wholesale.go_dashboard')} →
+                {t('wholesale.go_dashboard')} →
               </Button>
             ) : (
               <Button size="lg" variant="secondary" onClick={onApply}>
@@ -170,138 +165,98 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
         </div>
       </section>
 
-      {/* Benefits */}
       <section className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
-          <h2 className="text-center text-2xl font-bold">{t('wholesale.why_join')}</h2>
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[
-              { icon: TrendingDown, title: t('wholesale.discount_title'), desc: t('wholesale.discount_desc') },
-              { icon: Truck, title: t('wholesale.priority_title'), desc: t('wholesale.priority_desc') },
-              { icon: FileText, title: t('wholesale.invoices_title'), desc: t('wholesale.invoices_desc') },
-              { icon: CreditCard, title: t('wholesale.credit_title'), desc: t('wholesale.credit_desc') },
-              { icon: Package, title: t('wholesale.bulk_title'), desc: t('wholesale.bulk_desc') },
-              { icon: Trophy, title: t('wholesale.loyalty_title'), desc: t('wholesale.loyalty_desc') },
-            ].map((b) => (
-              <div key={b.title} className="rounded-2xl border bg-card p-5">
+          <h2 className="text-center text-2xl font-bold">{t('wholesale.honest_current_terms')}</h2>
+          <p className="mx-auto mt-2 max-w-2xl text-center text-sm text-muted-foreground">
+            {t('wholesale.honest_terms_intro')}
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            {facts.map((fact) => (
+              <div key={fact.title} className="rounded-2xl border bg-card p-5">
                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10">
-                  <b.icon className="h-5 w-5 text-primary" />
+                  <fact.icon className="h-5 w-5 text-primary" />
                 </div>
-                <h3 className="mt-3 font-semibold">{b.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{b.desc}</p>
+                <h3 className="mt-3 font-semibold">{fact.title}</h3>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">{fact.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Who Can Apply */}
       <section className="bg-secondary/30 px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <h2 className="text-center text-2xl font-bold">{t('wholesale.who_apply')}</h2>
-          <p className="mt-1 text-center text-sm text-muted-foreground">
-            {t('wholesale.registered_rwanda')}
-          </p>
-          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {BUSINESS_TYPES.map((bt) => (
-              <div key={bt.value} className="rounded-xl border bg-card p-4 text-center">
-                <p className="text-2xl">{t(bt.label).split(" ")[0]}</p>
-                <p className="mt-1 text-xs font-medium">{t(bt.label).split(" ").slice(1).join(" ")}</p>
+          <p className="mt-2 text-center text-sm text-muted-foreground">{t('wholesale.registered_rwanda')}</p>
+          <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {BUSINESS_TYPES.map((businessType) => (
+              <div key={businessType.value} className="rounded-xl border bg-card p-4 text-center text-sm font-medium">
+                {t(businessType.label)}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Price Example Table */}
       <section className="px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl">
-          <h2 className="text-center text-2xl font-bold">{t('wholesale.pricing_example')}</h2>
-          <p className="mt-1 text-center text-sm text-muted-foreground">
-            {t('wholesale.pricing_sample_hint')}
-          </p>
-          <div className="mt-6 overflow-hidden rounded-2xl border">
-            <table className="w-full text-sm">
-              <thead className="bg-secondary/30">
-                <tr className="text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-3 text-left font-medium">{t('product.quantity_label')}</th>
-                  <th className="px-4 py-3 text-right font-medium">{t('product.unit_price')}</th>
-                  <th className="px-4 py-3 text-right font-medium">{t('wholesale.total_savings')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {[
-                  { qty: t('wholesale.qty_1_5'), price: 8500, savings: "—" },
-                  { qty: t('wholesale.qty_6_11'), price: 7500, savings: t('wholesale.save_10000') },
-                  { qty: t('wholesale.qty_12_23'), price: 7000, savings: t('wholesale.save_34000') },
-                  { qty: t('wholesale.qty_24_47'), price: 6500, savings: t('wholesale.save_96000') },
-                  { qty: t('wholesale.qty_48_plus'), price: 6000, savings: t('wholesale.over_240000') },
-                ].map((row) => (
-                  <tr key={row.qty} className="hover:bg-secondary/20">
-                    <td className="px-4 py-3 font-medium">{row.qty}</td>
-                    <td className="px-4 py-3 text-right font-bold">{formatRWF(row.price)}</td>
-                    <td className="px-4 py-3 text-right text-emerald-600">{row.savings}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
+          <div className="rounded-2xl border bg-card p-6">
+            <h2 className="text-xl font-bold">{t('wholesale.honest_documents_title')}</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{t('wholesale.honest_documents_initial')}</p>
+            <ul className="mt-4 space-y-2 text-sm">
+              {['tin', 'rdb', 'business', 'owner'].map((document) => (
+                <li key={document} className="flex gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>{t(`wholesale.honest_document_${document}`)}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-xs text-muted-foreground">{t('wholesale.honest_documents_upload_notice')}</p>
           </div>
-          <p className="mt-3 text-center text-xs text-muted-foreground">
-            {t('wholesale.minimum_pricing_note')}
-          </p>
+
+          <div className="rounded-2xl border bg-card p-6">
+            <h2 className="text-xl font-bold">{t('wholesale.honest_process_title')}</h2>
+            <ol className="mt-4 space-y-4">
+              {[1, 2, 3].map((step) => (
+                <li key={step} className="flex gap-3">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">{step}</span>
+                  <div>
+                    <p className="text-sm font-semibold">{t(`wholesale.honest_step_${step}_title`)}</p>
+                    <p className="mt-0.5 text-xs leading-5 text-muted-foreground">{t(`wholesale.honest_step_${step}_desc`)}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
 
-      {/* How It Works */}
       <section className="bg-secondary/30 px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <h2 className="text-center text-2xl font-bold">{t('wholesale.how_works')}</h2>
-          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-4">
-            {[
-              { step: 1, title: t('wholesale.apply_online'), desc: t('wholesale.apply_online_desc') },
-              { step: 2, title: t('wholesale.we_review'), desc: t('wholesale.we_review_desc') },
-              { step: 3, title: t('wholesale.get_approved'), desc: t('wholesale.get_approved_desc') },
-              { step: 4, title: t('wholesale.order_save'), desc: t('wholesale.order_save_desc') },
-            ].map((s) => (
-              <div key={s.step} className="text-center">
-                <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
-                  {s.step}
-                </div>
-                <h3 className="mt-3 font-semibold">{s.title}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">{s.desc}</p>
-              </div>
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-2xl font-bold">{t('wholesale.honest_questions_title')}</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{t('wholesale.honest_contact_intro')}</p>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            {WHOLESALE_CONFIG.contacts.map((contact) => (
+              <a
+                key={contact.whatsappE164}
+                href={`https://wa.me/${contact.whatsappE164}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full border bg-card px-5 text-sm font-semibold hover:bg-secondary"
+              >
+                <Phone className="h-4 w-4 text-primary" />
+                {t('wholesale.honest_whatsapp_contact', { phone: contact.displayPhone })}
+              </a>
             ))}
           </div>
+          <p className="mt-3 text-xs text-muted-foreground">{t('wholesale.honest_no_hours_promise')}</p>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl">
-          <h2 className="text-center text-2xl font-bold">{t('faq.title')}</h2>
-          <div className="mt-6 space-y-3">
-            {[
-              { q: t('wholesale.faq_min_q'), a: t('wholesale.faq_min_a') },
-              { q: t('wholesale.faq_approval_q'), a: t('wholesale.faq_approval_a') },
-              { q: t('wholesale.faq_docs_q'), a: t('wholesale.faq_docs_a') },
-              { q: t('wholesale.faq_credit_q'), a: t('wholesale.faq_credit_a') },
-              { q: t('wholesale.faq_provinces_q'), a: t('wholesale.faq_provinces_a') },
-            ].map((faq) => (
-              <details key={faq.q} className="rounded-xl border bg-card p-4">
-                <summary className="cursor-pointer text-sm font-medium">{faq.q}</summary>
-                <p className="mt-2 text-sm text-muted-foreground">{faq.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
       <section className="bg-primary px-4 py-12 text-center text-primary-foreground sm:px-6 lg:px-8">
-        <h2 className="text-2xl font-bold">{t('wholesale.ready_save')}</h2>
-        <p className="mt-2 text-sm text-primary-foreground/90">
-          {t('wholesale.join_businesses')}
-        </p>
+        <h2 className="text-2xl font-bold">{t('wholesale.honest_apply_title')}</h2>
+        <p className="mt-2 text-sm text-primary-foreground/90">{t('wholesale.registered_business_cta')}</p>
         <Button size="lg" variant="secondary" className="mt-6" onClick={onApply}>
           {t('home.apply_wholesale_account')} →
         </Button>
@@ -334,7 +289,6 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
   const [ownerName, setOwnerName] = useState(user?.name || "")
   const [ownerPhone, setOwnerPhone] = useState(user?.phone || "")
   const [ownerEmail, setOwnerEmail] = useState(user?.email || "")
-  const [nationalId, setNationalId] = useState("")
   const [monthlyRevenue, setMonthlyRevenue] = useState(REVENUE_RANGES[0])
   const [heardFrom, setHeardFrom] = useState(HEARD_FROM_OPTIONS[0])
 
@@ -369,7 +323,6 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
   const validateStep2 = () => {
     if (!ownerName.trim()) return t('wholesale.owner_name_required')
     if (!ownerPhone.trim()) return t('wholesale.owner_phone_required')
-    if (!nationalId.trim()) return t('wholesale.national_id_required')
     return null
   }
 
@@ -402,7 +355,9 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
           tinNumber: tinNumber || undefined,
           yearsInBusiness: Number(yearsInBusiness),
           monthlyRevenue,
-          nationalId,
+          ownerName,
+          ownerPhone,
+          ownerEmail: ownerEmail || undefined,
           heardFrom,
           notes: notes || undefined,
           documents: [],
@@ -523,10 +478,6 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
             <Input id="owner-email" type="email" value={ownerEmail} onChange={(e) => setOwnerEmail(e.target.value)} placeholder="amina@gmail.com" className="mt-1" />
           </div>
           <div>
-            <Label htmlFor="national-id">{t('wholesale.national_id')}</Label>
-            <Input id="national-id" value={nationalId} onChange={(e) => setNationalId(e.target.value)} placeholder="1 1990 8 0000001 0 00" className="mt-1" />
-          </div>
-          <div>
             <Label htmlFor="revenue">{t('wholesale.monthly_order')}</Label>
             <Select value={monthlyRevenue} onValueChange={setMonthlyRevenue}>
               <SelectTrigger id="revenue" className="mt-1"><SelectValue /></SelectTrigger>
@@ -629,31 +580,20 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch("/api/wholesale/application/status")
-      if (!res.ok) return
-      const data = await res.json()
-      setApplication(data)
-    } catch {
-      // ignore
+      const response = await fetch('/api/wholesale/application/status')
+      if (response.ok) setApplication(await response.json())
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    if (user) {
-      load()
-    } else {
-      setLoading(false)
-    }
+    if (user) load()
+    else setLoading(false)
   }, [user, load])
 
   if (loading) {
-    return (
-      <div className="mx-auto max-w-md px-4 py-20">
-        <Skeleton className="h-48 w-full rounded-2xl" />
-      </div>
-    )
+    return <div className="mx-auto max-w-md px-4 py-20"><Skeleton className="h-48 w-full rounded-2xl" /></div>
   }
 
   if (!user) {
@@ -666,154 +606,88 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
     )
   }
 
-  if (!application || !application.hasApplication) {
+  if (!application?.hasApplication) {
     return (
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <Store className="mx-auto h-12 w-12 text-muted-foreground/40" />
         <h1 className="mt-4 text-xl font-bold">{t('wholesale.no_application')}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t('wholesale.not_applied')}</p>
         <Button className="mt-6" onClick={onApply}>{t('home.apply_wholesale')} →</Button>
-        <button onClick={goHome} className="mt-4 block w-full text-xs text-muted-foreground hover:text-foreground">
-          ← {t('wholesale.back_store')}
-        </button>
+        <button onClick={goHome} className="mt-4 block w-full text-xs text-muted-foreground hover:text-foreground">← {t('wholesale.back_store')}</button>
       </div>
     )
   }
 
   const status = application.status
+  const startWholesaleShopping = () => {
+    if (typeof window !== 'undefined') sessionStorage.setItem('wholesaleShoppingMode', '1')
+    goCatalog()
+  }
+  const applicationId = application.application?.id?.slice(-8).toUpperCase()
 
-  // PENDING
-  if (status === "PENDING") {
+  if (status === 'PENDING') {
     return (
       <div className="mx-auto max-w-md px-4 py-12">
         <div className="rounded-2xl border bg-card p-8 text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-amber-100">
-            <Clock className="h-8 w-8 text-amber-600" />
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-amber-100"><Clock className="h-8 w-8 text-amber-600" /></div>
+          <h1 className="mt-4 text-xl font-bold">{t('wholesale.under_review')}</h1>
+          <p className="mt-1 font-mono text-sm text-muted-foreground">{t('wholesale.application_id')}: {applicationId}</p>
+          <p className="mt-6 text-sm leading-6 text-muted-foreground">{t('wholesale.honest_review_no_promise')}</p>
+          <p className="mt-3 text-xs text-muted-foreground">
+            {t('wholesale.submitted_label')}: {new Date(application.application?.appliedAt || '').toLocaleDateString('en-RW', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {WHOLESALE_CONFIG.contacts.map((contact) => (
+              <a key={contact.whatsappE164} href={`https://wa.me/${contact.whatsappE164}`} target="_blank" rel="noopener noreferrer" className="rounded-full border px-4 py-2 text-xs font-semibold hover:bg-secondary">
+                {t('wholesale.honest_whatsapp_contact', { phone: contact.displayPhone })}
+              </a>
+            ))}
           </div>
-          <h1 className="mt-4 text-xl font-bold text-amber-900">{t('wholesale.under_review')}</h1>
-          <p className="mt-1 font-mono text-sm text-muted-foreground">
-            {t('wholesale.application_id')}: {application.application?.id?.slice(-8).toUpperCase()}
-          </p>
-
-          {/* Timeline */}
-          <div className="mt-6 flex items-center justify-between">
-            <div className="text-center">
-              <div className="mx-auto grid h-8 w-8 place-items-center rounded-full bg-emerald-500 text-white">
-                <CheckCircle2 className="h-4 w-4" />
-              </div>
-              <p className="mt-1 text-[10px] font-medium">{t('wholesale.submitted')}</p>
-            </div>
-            <div className="flex-1 border-t-2 border-amber-300"></div>
-            <div className="text-center">
-              <div className="mx-auto grid h-8 w-8 place-items-center rounded-full bg-amber-400 text-white">
-                <Clock className="h-4 w-4 animate-pulse" />
-              </div>
-              <p className="mt-1 text-[10px] font-medium">{t('wholesale.in_review')}</p>
-            </div>
-            <div className="flex-1 border-t-2 border-secondary"></div>
-            <div className="text-center">
-              <div className="mx-auto grid h-8 w-8 place-items-center rounded-full bg-secondary text-muted-foreground">
-                <Sparkles className="h-4 w-4" />
-              </div>
-              <p className="mt-1 text-[10px] font-medium">{t('wholesale.decision')}</p>
-            </div>
-          </div>
-
-          <p className="mt-6 text-sm text-muted-foreground">
-            {t('wholesale.submitted_label')}: {new Date(application.application?.appliedAt || "").toLocaleDateString("en-RW", { day: "numeric", month: "long", year: "numeric" })}
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t('wholesale.expected_48')}
-          </p>
-          <p className="mt-4 text-xs text-muted-foreground">
-            {t('wholesale.sms_review_prefix')} <span className="font-medium text-foreground">{user.phone}</span> {t('wholesale.sms_review_suffix')}
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {t('wholesale.questions_whatsapp')}: <a href="https://wa.me/250780000000" className="text-primary hover:underline">+250 780 000 000</a>
-          </p>
         </div>
-        <button onClick={goHome} className="mt-6 w-full text-center text-xs text-muted-foreground hover:text-foreground">
-          ← {t('wholesale.continue_retail')}
-        </button>
+        <button onClick={goHome} className="mt-6 w-full text-center text-xs text-muted-foreground hover:text-foreground">← {t('wholesale.continue_retail')}</button>
       </div>
     )
   }
 
-  // APPROVED
-  if (status === "APPROVED") {
+  if (status === 'APPROVED') {
     return (
       <div className="mx-auto max-w-md px-4 py-12">
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500">
-            <CheckCircle2 className="h-8 w-8 text-white" />
-          </div>
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500"><CheckCircle2 className="h-8 w-8 text-white" /></div>
           <h1 className="mt-4 text-xl font-bold text-emerald-900">{t('wholesale.approved_title')}</h1>
-          <p className="mt-1 text-sm text-emerald-700">
-            {t('wholesale.approved_welcome')}
-          </p>
-
-          <div className="mt-6 space-y-2 text-left">
-            <div className="flex items-center gap-2 rounded-lg bg-white p-2 text-sm">
-              <TrendingDown className="h-4 w-4 text-emerald-600" />
-              <span>{t('wholesale.approved_discount')}</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-lg bg-white p-2 text-sm">
-              <CreditCard className="h-4 w-4 text-emerald-600" />
-              <span>{t('wholesale.approved_credit')}</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-lg bg-white p-2 text-sm">
-              <FileText className="h-4 w-4 text-emerald-600" />
-              <span>{t('wholesale.approved_invoices')}</span>
-            </div>
-            <div className="flex items-center gap-2 rounded-lg bg-white p-2 text-sm">
-              <Truck className="h-4 w-4 text-emerald-600" />
-              <span>{t('wholesale.approved_delivery')}</span>
-            </div>
+          <p className="mt-2 text-sm leading-6 text-emerald-800">{t('wholesale.honest_approved_pricing')}</p>
+          <div className="mt-5 rounded-xl border border-emerald-200 bg-white p-4 text-left text-sm">
+            <p className="font-semibold">{t('wholesale.honest_credit_title')}</p>
+            <p className="mt-1 text-muted-foreground">{t('wholesale.honest_credit_disabled')}</p>
           </div>
-
-          <Button className="mt-6 w-full" size="lg" onClick={() => goCatalog()}>
-            {t('wholesale.start_wholesale')} →
-          </Button>
+          <Button className="mt-6 w-full" size="lg" onClick={startWholesaleShopping}>{t('wholesale.start_wholesale')} →</Button>
         </div>
       </div>
     )
   }
 
-  // REJECTED
-  if (status === "REJECTED") {
+  if (status === 'REJECTED') {
     return (
       <div className="mx-auto max-w-md px-4 py-12">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-red-100">
-            <XCircle className="h-8 w-8 text-red-600" />
-          </div>
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-red-100"><XCircle className="h-8 w-8 text-red-600" /></div>
           <h1 className="mt-4 text-xl font-bold text-red-900">{t('wholesale.not_approved')}</h1>
-          <p className="mt-2 text-sm text-red-700">
-            {t('wholesale.not_approved_hint')}
-          </p>
+          <p className="mt-2 text-sm text-red-700">{t('wholesale.not_approved_hint')}</p>
           {application.application?.rejectionReason && (
             <div className="mt-4 rounded-lg border border-red-200 bg-white p-3 text-left">
               <p className="text-xs font-semibold text-red-800">{t('wholesale.reason')}:</p>
               <p className="mt-1 text-sm text-red-700">{application.application.rejectionReason}</p>
             </div>
           )}
-          <p className="mt-4 text-sm text-muted-foreground">
-            {t('wholesale.retail_call_prefix')} <a href="tel:+250780000000" className="text-primary hover:underline">+250 780 000 000</a>.
-          </p>
           <div className="mt-6 space-y-2">
-            <Button variant="outline" className="w-full" onClick={onApply}>
-              {t('wholesale.reapply_30')}
-            </Button>
-            <Button className="w-full" onClick={() => goCatalog()}>
-              {t('cart.continue_shopping')}
-            </Button>
+            <Button variant="outline" className="w-full" onClick={onApply}>{t('wholesale.honest_submit_updated_application')}</Button>
+            <Button className="w-full" onClick={() => goCatalog()}>{t('cart.continue_shopping')}</Button>
           </div>
         </div>
       </div>
     )
   }
 
-  // Unknown status
   return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <p className="text-sm text-muted-foreground">{t('orders.status_label')}: {status}</p>
@@ -828,7 +702,6 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
 
 function WholesaleSuccessPage({ onCheckStatus, onContinue }: { onCheckStatus: () => void; onContinue: () => void }) {
   const t = useT()
-  const { user } = useStore()
   return (
     <div className="mx-auto max-w-md px-4 py-12">
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center">
@@ -836,33 +709,11 @@ function WholesaleSuccessPage({ onCheckStatus, onContinue }: { onCheckStatus: ()
           <CheckCircle2 className="h-8 w-8 text-white" />
         </div>
         <h1 className="mt-4 text-2xl font-bold text-emerald-900">{t('wholesale.application_submitted')}</h1>
-        <p className="mt-2 text-sm text-emerald-700">
-          {t('wholesale.review_24_48')}
-        </p>
-
-        <div className="mt-6 rounded-lg bg-white p-4 text-left">
-          <p className="text-xs font-semibold text-muted-foreground">{t('wholesale.contact_on')}:</p>
-          <p className="mt-1 flex items-center gap-1.5 text-sm">
-            <Phone className="h-3.5 w-3.5 text-primary" /> {user?.phone}
-          </p>
-          {user?.email && (
-            <p className="mt-1 flex items-center gap-1.5 text-sm">
-              <Mail className="h-3.5 w-3.5 text-primary" /> {user.email}
-            </p>
-          )}
-        </div>
-
-        <p className="mt-4 text-xs text-muted-foreground">
-          {t('wholesale.sms_confirmation')}
-        </p>
-
+        <p className="mt-2 text-sm leading-6 text-emerald-800">{t('wholesale.honest_submission_received')}</p>
+        <p className="mt-4 text-xs leading-5 text-muted-foreground">{t('wholesale.honest_review_no_promise')}</p>
         <div className="mt-6 space-y-2">
-          <Button className="w-full" onClick={onCheckStatus}>
-            {t('wholesale.check_status')}
-          </Button>
-          <Button variant="outline" className="w-full" onClick={onContinue}>
-            {t('wholesale.continue_retail')}
-          </Button>
+          <Button className="w-full" onClick={onCheckStatus}>{t('wholesale.check_status')}</Button>
+          <Button variant="outline" className="w-full" onClick={onContinue}>{t('wholesale.continue_retail')}</Button>
         </div>
       </div>
     </div>

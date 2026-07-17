@@ -20,7 +20,6 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { requirePermission, PERMISSIONS } from "@/lib/permissions"
-import { getDefaultTiers } from "@/server/services/wholesale"
 import { broadcastProductEvent } from "@/lib/realtime"
 import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
@@ -66,19 +65,8 @@ export async function GET(
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
 
-    // If no pricing record exists, return default tiers
-    let tiers = product.pricing?.tiers || []
-    if (tiers.length === 0) {
-      const defaults = getDefaultTiers(product.price)
-      tiers = defaults.map((t) => ({
-        id: `default-${t.minQty}`,
-        tierName: t.label,
-        minQuantity: t.minQty,
-        maxQuantity: t.maxQty,
-        pricePerUnit: t.pricePerUnit,
-        discountPercent: t.discountPercent,
-      })) as typeof tiers
-    }
+    // Missing pricing stays unconfigured; the server never invents fallback tiers.
+    const tiers = product.pricing?.tiers || []
 
     return NextResponse.json({
       product: {
@@ -118,6 +106,26 @@ export async function PUT(
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
 
+    const configuredTiers = [...parsed.data.tiers]
+      .sort((a, b) => a.minQuantity - b.minQuantity)
+      .map((tier) => ({
+        ...tier,
+        discountPercent: product.price > 0
+          ? Math.max(0, Math.round(((product.price - tier.pricePerUnit) / product.price) * 100))
+          : 0,
+      }))
+
+    for (let index = 0; index < configuredTiers.length; index += 1) {
+      const tier = configuredTiers[index]
+      if (tier.maxQuantity !== null && tier.maxQuantity < tier.minQuantity) {
+        return NextResponse.json({ error: "A tier maximum cannot be below its minimum" }, { status: 400 })
+      }
+      const previous = configuredTiers[index - 1]
+      if (previous && (previous.maxQuantity === null || tier.minQuantity <= previous.maxQuantity)) {
+        return NextResponse.json({ error: "Wholesale pricing tiers cannot overlap" }, { status: 400 })
+      }
+    }
+
     // Update product wholesale fields
     await db.product.update({
       where: { id },
@@ -142,7 +150,7 @@ export async function PUT(
       })
       // Create new tiers
       await db.wholesaleTier.createMany({
-        data: parsed.data.tiers.map((t) => ({
+        data: configuredTiers.map((t) => ({
           pricingId: existingPricing.id,
           tierName: t.tierName,
           minQuantity: t.minQuantity,
@@ -159,7 +167,7 @@ export async function PUT(
           retailPrice: product.price,
           priceType: "WHOLESALE",
           tiers: {
-            create: parsed.data.tiers.map((t) => ({
+            create: configuredTiers.map((t) => ({
               tierName: t.tierName,
               minQuantity: t.minQuantity,
               maxQuantity: t.maxQuantity,
@@ -187,7 +195,7 @@ export async function PUT(
       action: "PRODUCT_UPDATE",
       entityType: "PRODUCT",
       entityId: product.id,
-      description: `Updated wholesale pricing for ${product.name}: ${parsed.data.tiers.length} tiers, wholesaleActive=${parsed.data.wholesaleActive}`,
+      description: `Updated wholesale pricing for ${product.name}: ${configuredTiers.length} tiers, wholesaleActive=${parsed.data.wholesaleActive}`,
       req,
     }).catch(() => {})
 

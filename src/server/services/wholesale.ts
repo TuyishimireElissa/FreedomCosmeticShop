@@ -9,26 +9,17 @@
  *   - checkCreditLimit(userId, orderAmount) → allowed/denied + available
  *   - updateCreditBalance(userId, amount, type, orderId) → DEBIT/CREDIT
  *   - generateWholesaleInvoice(orderId) → invoice data for PDF
- *   - getDefaultTiers(retailPrice) → standard 5-tier pricing structure
  *
- * All prices in RWF (integer). No Decimal type (SQLite).
+ * All prices are integer RWF values. Wholesale discounts come only from
+ * owner-configured ProductPricing and WholesaleTier records.
  */
 
 import { db } from "@/lib/db"
 import { enqueueSms } from "@/server/services/sms-queue"
 import { features } from "@/lib/env"
 import { BUSINESS } from "@/lib/business-config"
-
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-export const WHOLESALE_MIN_ORDER = 50_000 // RWF minimum wholesale order
-export const DEFAULT_TIERS = [
-  { minQty: 1, maxQty: 5, discount: 0 },    // Retail price (0% off)
-  { minQty: 6, maxQty: 11, discount: 12 },   // 12% off
-  { minQty: 12, maxQty: 23, discount: 18 },  // 18% off
-  { minQty: 24, maxQty: 47, discount: 24 },  // 24% off
-  { minQty: 48, maxQty: null, discount: 29 },// 29% off
-]
+import { WHOLESALE_CONFIG } from "@/lib/wholesale-config"
+import { getInvoicePaymentSummary } from "@/lib/wholesale-invoice"
 
 export interface PriceTier {
   minQty: number
@@ -48,31 +39,11 @@ export interface WholesalePriceResult {
   tiers: PriceTier[]
 }
 
-// ─── getDefaultTiers ─────────────────────────────────────────────────────────
-
-/**
- * Generate default price tiers from a retail price using the standard
- * discount structure (0%, 12%, 18%, 24%, 29%).
- */
-export function getDefaultTiers(retailPrice: number): PriceTier[] {
-  return DEFAULT_TIERS.map((t) => {
-    const discount = t.discount
-    const pricePerUnit = Math.round(retailPrice * (1 - discount / 100))
-    return {
-      minQty: t.minQty,
-      maxQty: t.maxQty,
-      pricePerUnit,
-      discountPercent: discount,
-      label: t.minQty === 1 ? "Retail" : `Buy ${t.minQty}+`,
-    }
-  })
-}
-
 // ─── getWholesaleTiers ───────────────────────────────────────────────────────
 
 /**
- * Get the price tiers for a product. Falls back to default tiers
- * if no ProductPricing record exists.
+ * Get owner-configured price tiers for a product.
+ * No fallback discount is generated when a product has no saved tiers.
  */
 export async function getWholesaleTiers(productId: string): Promise<PriceTier[]> {
   const pricing = await db.productPricing.findUnique({
@@ -90,14 +61,7 @@ export async function getWholesaleTiers(productId: string): Promise<PriceTier[]>
     }))
   }
 
-  // Fall back to default tiers based on product retail price
-  const product = await db.product.findUnique({
-    where: { id: productId },
-    select: { price: true },
-  })
-
-  if (!product) return []
-  return getDefaultTiers(product.price)
+  return []
 }
 
 // ─── calculateWholesalePrice ─────────────────────────────────────────────────
@@ -130,14 +94,12 @@ export async function calculateWholesalePrice(
 
   // Check if user is approved wholesale
   let isWholesale = false
-  let extraDiscount = 0
   if (userId) {
     const user = await db.user.findUnique({
       where: { id: userId },
       select: {
         userType: true,
         wholesaleStatus: true,
-        wholesaleDiscount: true,
       },
     })
     if (
@@ -146,7 +108,6 @@ export async function calculateWholesalePrice(
       user.wholesaleStatus === "APPROVED"
     ) {
       isWholesale = true
-      extraDiscount = user.wholesaleDiscount || 0
     }
   }
 
@@ -163,23 +124,23 @@ export async function calculateWholesalePrice(
     }
   }
 
-  // Find the correct tier for the requested quantity
-  let applicableTier = tiers[0] // Default to first tier (retail)
-  for (const tier of tiers) {
-    if (quantity >= tier.minQty) {
-      if (tier.maxQty === null || quantity <= tier.maxQty) {
-        applicableTier = tier
-        break
-      }
+  // No owner-configured tier means no wholesale discount.
+  const applicableTier = tiers.find(
+    (tier) => quantity >= tier.minQty && (tier.maxQty === null || quantity <= tier.maxQty)
+  )
+  if (!applicableTier) {
+    return {
+      retailPrice,
+      wholesalePrice: retailPrice,
+      currentPrice: retailPrice,
+      priceType: "RETAIL",
+      savings: 0,
+      savingsPercent: 0,
+      tiers,
     }
   }
 
-  // Apply user-specific extra discount on top of tier discount
-  let unitPrice = applicableTier.pricePerUnit
-  if (extraDiscount > 0) {
-    unitPrice = Math.round(unitPrice * (1 - extraDiscount / 100))
-  }
-
+  const unitPrice = applicableTier.pricePerUnit
   const total = unitPrice * quantity
   const retailTotal = retailPrice * quantity
   const savings = retailTotal - total
@@ -213,17 +174,27 @@ export async function checkCreditLimit(
   used: number
   message?: string
 }> {
-  const credit = await db.wholesaleCredit.findUnique({
-    where: { userId },
-  })
-
-  if (!credit) {
+  if (!WHOLESALE_CONFIG.credit.enabled) {
     return {
       allowed: false,
       available: 0,
       limit: 0,
       used: 0,
-      message: "No credit account found. Please contact admin.",
+      message: "Wholesale credit is not enabled.",
+    }
+  }
+
+  const credit = await db.wholesaleCredit.findUnique({
+    where: { userId },
+  })
+
+  if (!credit || !credit.isActive || credit.isSuspended) {
+    return {
+      allowed: false,
+      available: 0,
+      limit: 0,
+      used: 0,
+      message: "No active wholesale credit account is available.",
     }
   }
 
@@ -256,9 +227,13 @@ export async function updateCreditBalance(
   description: string,
   orderId?: string
 ): Promise<void> {
+  if (!WHOLESALE_CONFIG.credit.enabled) {
+    throw new Error("Wholesale credit is not enabled")
+  }
+
   const credit = await db.wholesaleCredit.findUnique({ where: { userId } })
-  if (!credit) {
-    throw new Error("No credit account found for user")
+  if (!credit || !credit.isActive || credit.isSuspended) {
+    throw new Error("No active wholesale credit account is available")
   }
 
   let newUsed: number
@@ -304,6 +279,7 @@ export async function generateWholesaleInvoice(orderId: string) {
     where: { id: orderId },
     include: {
       items: true,
+      payments: true,
       user: {
         select: {
           id: true,
@@ -337,16 +313,14 @@ export async function generateWholesaleInvoice(orderId: string) {
   const seq = String(countThisYear + 1).padStart(3, "0")
   const invoiceNumber = `INV-WHL-${year}-${seq}`
 
-  // Calculate due date (30 days from now by default)
-  const dueDate = new Date()
-  dueDate.setDate(dueDate.getDate() + 30)
-
   const businessName = order.user?.businessName || order.customerName
   const businessAddress =
     order.user?.businessAddress ||
     `${order.address}, ${order.district || order.city}, ${order.province}`
   const tinNumber = order.user?.tinNumber || null
 
+  const paidPayment = order.payments.find((payment) => payment.status === "PAID")
+  const paidAmount = paidPayment ? Math.min(order.total, paidPayment.amount) : 0
   const invoice = await db.wholesaleInvoice.create({
     data: {
       invoiceNumber,
@@ -356,13 +330,18 @@ export async function generateWholesaleInvoice(orderId: string) {
       businessAddress,
       tinNumber,
       subtotal: order.subtotal,
-      tax: 0, // VAT not included for now (can be added later)
+      tax: 0,
       discount: order.discountAmount,
       totalAmount: order.total,
-      paymentTerms: "30 days",
-      dueDate: order.isCredit ? order.creditDueDate : dueDate,
-      isPaid: !order.isCredit, // Non-credit orders are considered paid
-      paidAt: order.isCredit ? null : new Date(),
+      paidAmount,
+      balanceDue: Math.max(0, order.total - paidAmount),
+      paymentTerms: null,
+      dueDate: order.isCredit ? order.creditDueDate : null,
+      isPaid: paidAmount >= order.total,
+      paidAt: paidAmount >= order.total ? paidPayment?.completedAt || new Date() : null,
+      paymentMethod: paidPayment?.method || order.payments[0]?.method || null,
+      isOverdue: false,
+      daysOverdue: 0,
     },
   })
 
@@ -393,10 +372,10 @@ export async function sendWholesaleSms(
   if (!features.sms) return
 
   const messages: Record<string, string> = {
-    application_received: `${BUSINESS.tradingName}: Wholesale application #${variables.id} received! We review in 24-48 hours. Questions? ${BUSINESS.phone}`,
-    application_approved: `Congratulations ${variables.name}! Your wholesale account at ${BUSINESS.tradingName} is APPROVED! 🎉 Shop now and save up to 30% on all orders!`,
+    application_received: `${BUSINESS.tradingName}: Wholesale application #${variables.id} received. We will contact you after review.`,
+    application_approved: `${BUSINESS.tradingName}: The wholesale application for ${variables.name} is approved. Product-specific wholesale prices appear when configured.`,
     application_rejected: `${BUSINESS.tradingName}: Your wholesale application was not approved. Reason: ${variables.reason}. Questions: ${BUSINESS.phone}`,
-    order_confirmed: `Wholesale Order #${variables.orderNumber} confirmed! Amount: ${variables.amount} RWF. Invoice: ${variables.invoice}. Due: ${variables.dueDate}. ${BUSINESS.tradingName} 📦`,
+    order_confirmed: `${BUSINESS.tradingName}: Wholesale order #${variables.orderNumber} was received. Amount: ${variables.amount} RWF. Order invoice: ${variables.invoice}.`,
     payment_due: `Reminder: Invoice ${variables.invoice} of ${variables.amount} RWF due on ${variables.dueDate}. Pay MTN MoMo: ${variables.momoNumber}. Ref: ${variables.invoice}. ${BUSINESS.tradingName} 💳`,
     payment_overdue: `URGENT: Invoice ${variables.invoice} of ${variables.amount} RWF is OVERDUE. Pay now to avoid suspension. Call: ${BUSINESS.phone}. ${BUSINESS.tradingName} ⚠️`,
     payment_received: `Payment of ${variables.amount} RWF received for ${variables.invoice}. Balance: ${variables.remaining} RWF. Thank you! ${BUSINESS.tradingName} ✅`,
@@ -414,8 +393,7 @@ export async function sendWholesaleSms(
  * Get wholesale dashboard data for a customer.
  */
 export async function getWholesaleDashboard(userId: string) {
-  const [credit, recentOrders, invoices] = await Promise.all([
-    db.wholesaleCredit.findUnique({ where: { userId } }),
+  const [recentOrders, invoices, orderCount, invoiceCount, reorderCount] = await Promise.all([
     db.order.findMany({
       where: { userId, orderType: "WHOLESALE" },
       orderBy: { createdAt: "desc" },
@@ -437,39 +415,33 @@ export async function getWholesaleDashboard(userId: string) {
         id: true,
         invoiceNumber: true,
         totalAmount: true,
-        isPaid: true,
         dueDate: true,
         issuedAt: true,
+        order: {
+          select: {
+            payments: { select: { status: true, amount: true, method: true, completedAt: true } },
+          },
+        },
       },
     }),
+    db.order.count({ where: { userId, orderType: "WHOLESALE" } }),
+    db.wholesaleInvoice.count({ where: { userId } }),
+    db.wholesaleReorder.count({ where: { userId } }),
   ])
 
-  // Calculate total saved (retail vs wholesale)
-  const wholesaleOrders = await db.order.findMany({
-    where: { userId, orderType: "WHOLESALE", status: { not: "CANCELLED" } },
-    select: { subtotal: true, discountAmount: true, total: true, createdAt: true },
-  })
-
-  const totalSaved = wholesaleOrders.reduce((sum, o) => sum + o.discountAmount, 0)
-  const thisMonthOrders = wholesaleOrders.filter((o) => {
-    const d = new Date(o.createdAt)
-    const now = new Date()
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-  })
-  const thisMonthSaved = thisMonthOrders.reduce((sum, o) => sum + o.discountAmount, 0)
-
   return {
-    credit: credit
-      ? {
-          limit: credit.creditLimit,
-          used: credit.usedCredit,
-          available: credit.availableCredit,
-          paymentTermDays: credit.paymentTermDays,
-        }
-      : null,
-    totalSaved,
-    thisMonthSaved,
+    credit: null,
+    orderCount,
+    invoiceCount,
+    reorderCount,
     recentOrders,
-    recentInvoices: invoices,
+    recentInvoices: invoices.map((invoice) => ({
+      id: invoice.id,
+      invoiceNumber: invoice.invoiceNumber,
+      totalAmount: invoice.totalAmount,
+      dueDate: invoice.dueDate,
+      issuedAt: invoice.issuedAt,
+      ...getInvoicePaymentSummary(invoice.order.payments, invoice.totalAmount, invoice.dueDate),
+    })),
   }
 }
