@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useStore } from '@/store/useStore'
 import { useCartStore, type CartItem } from '@/store/cartStore'
+import { useOfflineDetection } from '@/hooks/useOfflineDetection'
 
 const RETRY_DELAYS = [0, 1000, 2500]
 
@@ -14,6 +15,7 @@ function mapServerItem(entry: ServerCartEntry): CartItem {
 }
 
 export function useCartSync() {
+  const { isConnectionKnown, isOffline } = useOfflineDetection()
   const user = useStore((state) => state.user)
   const authLoading = useStore((state) => state.authLoading)
   const items = useCartStore((state) => state.items)
@@ -26,7 +28,7 @@ export function useCartSync() {
   const loadingServer = useRef(false)
 
   const loadAndMerge = useCallback(async () => {
-    if (!user || loadedUser.current === user.id || loadingServer.current) return
+    if (!isConnectionKnown || isOffline || !user || loadedUser.current === user.id || loadingServer.current) return
     loadingServer.current = true
     try {
       const response = await fetch('/api/cart', { cache: 'no-store' })
@@ -41,10 +43,10 @@ export function useCartSync() {
     } finally {
       loadingServer.current = false
     }
-  }, [mergeServerItems, setSyncError, user])
+  }, [isConnectionKnown, isOffline, mergeServerItems, setSyncError, user])
 
   const syncToServer = useCallback(async () => {
-    if (!user || loadingServer.current) return
+    if (!isConnectionKnown || isOffline || !user || loadingServer.current) return
     const productItems = items.filter((item) => !item.isBundle).map((item) => ({ productId: item.productId, quantity: item.quantity }))
     setSyncing(true)
     setSyncError(null)
@@ -69,7 +71,7 @@ export function useCartSync() {
         }
       }
     }
-  }, [items, replaceServerProductItems, setLastSynced, setSyncError, setSyncing, user])
+  }, [isConnectionKnown, isOffline, items, replaceServerProductItems, setLastSynced, setSyncError, setSyncing, user])
 
   useEffect(() => {
     if (!authLoading && user) void loadAndMerge()

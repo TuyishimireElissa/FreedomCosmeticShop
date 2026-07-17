@@ -6,6 +6,9 @@ import Providers from '@/components/Providers'
 import SiteChrome from '@/components/layout/SiteChrome'
 import SkipToContent from '@/components/a11y/SkipToContent'
 import LiveAnnouncer from '@/components/a11y/LiveAnnouncer'
+import { LowDataProvider } from '@/contexts/LowDataContext'
+import OfflineBanner from '@/components/ui/OfflineBanner'
+import PerformanceMonitor from '@/components/dev/PerformanceMonitor'
 import { BUSINESS } from '@/lib/business-config'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
@@ -62,24 +65,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="rw">
       <body className={`${inter.className} bg-white text-[#1a1a1a] antialiased`}>
-        <Providers>
-          <SkipToContent />
-          <LiveAnnouncer />
-          <SiteChrome>{children}</SiteChrome>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: '#1a1a1a',
-                color: '#ffffff',
-                borderRadius: '12px',
-                padding: '12px 18px',
-                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.16)',
-              },
-            }}
-          />
-        </Providers>
+        <LowDataProvider>
+          <Providers>
+            <SkipToContent />
+            <LiveAnnouncer />
+            <OfflineBanner />
+            <SiteChrome>{children}</SiteChrome>
+            {process.env.NODE_ENV === 'development' && <PerformanceMonitor />}
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: '#1a1a1a',
+                  color: '#ffffff',
+                  borderRadius: '12px',
+                  padding: '12px 18px',
+                  boxShadow: '0 12px 30px rgba(0, 0, 0, 0.16)',
+                },
+              }}
+            />
+          </Providers>
+        </LowDataProvider>
       </body>
     </html>
   )

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Gift, Heart, Loader2, Mail, MapPin, Package, Phone, Save, User } from 'lucide-react'
+import { Gauge, Gift, Heart, Loader2, Mail, MapPin, Package, Phone, Save, User } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { useT } from '@/lib/i18n/LanguageContext'
 
@@ -39,7 +39,7 @@ export default function AccountPage() {
 
         <div className="mt-5 grid gap-5 lg:grid-cols-[1fr_280px]">
           <section className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm sm:p-7"><h2 className="flex items-center gap-2 text-lg font-black"><User className="h-5 w-5 text-[#B76E79]" />{t('auth.profile_details')}</h2><div className="mt-5 grid gap-4 sm:grid-cols-2"><label className="text-xs font-black uppercase tracking-wider text-gray-500">{t('auth.full_name')}<input value={name} onChange={(event) => setName(event.target.value)} className="input-field mt-1.5" /></label><label className="text-xs font-black uppercase tracking-wider text-gray-500">{t('auth.email_optional')}<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} className="input-field mt-1.5" /></label><label className="text-xs font-black uppercase tracking-wider text-gray-500">{t('auth.phone')}<input value={user.phone} disabled className="input-field mt-1.5 bg-gray-50 text-gray-400" /></label><label className="text-xs font-black uppercase tracking-wider text-gray-500">{t('auth.account_role')}<input value={user.role} disabled className="input-field mt-1.5 bg-gray-50 text-gray-400" /></label></div>{message && <p className="mt-4 rounded-xl bg-rose-50 p-3 text-sm font-semibold text-[#9e5964]">{message}</p>}<button type="button" onClick={save} disabled={saving || name.trim().length < 2} className="mt-5 flex min-h-11 items-center gap-2 rounded-xl bg-[#B76E79] px-5 text-sm font-black text-white disabled:opacity-50">{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}{t('auth.save_changes')}</button></section>
-          <aside className="space-y-3">{[{ label: t('auth.view_my_orders'), href: '/account/orders', icon: Package }, { label: t('auth.open_wishlist'), href: '/account/wishlist', icon: Heart }, { label: t('cart.browse_products'), href: '/products', icon: Gift }].map(({ label, href, icon: Icon }) => <Link key={href + label} href={href} className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 text-sm font-bold shadow-sm hover:border-rose-200"><span className="grid h-10 w-10 place-items-center rounded-xl bg-rose-50 text-[#B76E79]"><Icon className="h-5 w-5" /></span>{label}</Link>)}</aside>
+          <aside className="space-y-3">{[{ label: t('auth.view_my_orders'), href: '/account/orders', icon: Package }, { label: t('auth.open_wishlist'), href: '/account/wishlist', icon: Heart }, { label: t('low_data.settings_title'), href: '/account/settings', icon: Gauge }, { label: t('cart.browse_products'), href: '/products', icon: Gift }].map(({ label, href, icon: Icon }) => <Link key={href + label} href={href} className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 text-sm font-bold shadow-sm hover:border-rose-200"><span className="grid h-10 w-10 place-items-center rounded-xl bg-rose-50 text-[#B76E79]"><Icon className="h-5 w-5" /></span>{label}</Link>)}</aside>
         </div>
       </div>
     </main>

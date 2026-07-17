@@ -8,6 +8,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { MAX_REVIEW_PHOTOS, REVIEW_REWARD_POINTS } from '@/lib/review-constants'
 import FormField from '@/components/a11y/FormField'
 import FormTextarea from '@/components/a11y/FormTextarea'
+import { ResilientFetchError, useResilientFetch } from '@/hooks/useResilientFetch'
 
 interface Props { orderId: string; productId: string }
 interface Eligibility {
@@ -19,6 +20,7 @@ const hairTypes = ['NATURAL','RELAXED','WAVY','CURLY','COILY','ALL_HAIR'] as con
 
 export default function ReviewSubmissionForm({ orderId, productId }: Props) {
   const { t } = useLanguage()
+  const { resilientFetch } = useResilientFetch()
   const [eligibility, setEligibility] = useState<Eligibility | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -35,13 +37,17 @@ export default function ReviewSubmissionForm({ orderId, productId }: Props) {
 
   useEffect(() => {
     const controller = new AbortController()
-    fetch(`/api/reviews/eligibility?orderId=${encodeURIComponent(orderId)}&productId=${encodeURIComponent(productId)}`, { signal: controller.signal, cache: 'no-store' })
+    resilientFetch(`/api/reviews/eligibility?orderId=${encodeURIComponent(orderId)}&productId=${encodeURIComponent(productId)}`, { signal: controller.signal, cache: 'no-store' })
       .then(async (response) => { const result = await response.json(); if (!response.ok) throw new Error(result.error || 'ELIGIBILITY_UNAVAILABLE'); return result })
       .then((result) => setEligibility(result.data))
-      .catch((reason) => { if (!(reason instanceof DOMException && reason.name === 'AbortError')) setError(reason instanceof Error ? reason.message : 'ELIGIBILITY_UNAVAILABLE') })
+      .catch((reason) => {
+        if (reason instanceof DOMException && reason.name === 'AbortError') return
+        if (reason instanceof ResilientFetchError) setError(reason.code === 'OFFLINE' ? 'NETWORK_OFFLINE' : 'NETWORK_REQUEST_FAILED')
+        else setError(reason instanceof Error ? reason.message : 'ELIGIBILITY_UNAVAILABLE')
+      })
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [orderId, productId])
+  }, [orderId, productId, resilientFetch])
 
   const uploadPhotos = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = [...(event.target.files || [])].slice(0, MAX_REVIEW_PHOTOS - photos.length)
@@ -64,11 +70,14 @@ export default function ReviewSubmissionForm({ orderId, productId }: Props) {
     if (!rating || !eligibility) { setError('RATING_REQUIRED'); return }
     setSubmitting(true); setError('')
     try {
-      const response = await fetch('/api/reviews/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId, productId, rating, title: title.trim() || undefined, comment: comment.trim() || undefined, skinType: skinType || undefined, hairType: hairType || undefined, shadeMatched, photos }) })
+      const response = await resilientFetch('/api/reviews/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId, productId, rating, title: title.trim() || undefined, comment: comment.trim() || undefined, skinType: skinType || undefined, hairType: hairType || undefined, shadeMatched, photos }) })
       const result = await response.json()
       if (!response.ok) { setError(result.error || 'REVIEW_SUBMISSION_FAILED'); return }
       setSubmitted(true)
-    } catch { setError('REVIEW_SUBMISSION_FAILED') }
+    } catch (reason) {
+      if (reason instanceof ResilientFetchError) setError(reason.code === 'OFFLINE' ? 'NETWORK_OFFLINE' : 'NETWORK_REQUEST_FAILED')
+      else setError('REVIEW_SUBMISSION_FAILED')
+    }
     finally { setSubmitting(false) }
   }
 
@@ -98,4 +107,4 @@ export default function ReviewSubmissionForm({ orderId, productId }: Props) {
 
 function OptionGroup({ title, values, selected, setSelected, prefix, t }: { title: string; values: readonly string[]; selected: string; setSelected: (value: string) => void; prefix: string; t: (key: string, values?: Record<string,string|number>) => string }) { return <section className="mt-6"><h2 className="text-sm font-black text-gray-800">{title}</h2><div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">{values.map((value) => <button type="button" key={value} onClick={() => setSelected(selected === value ? '' : value)} className={`min-h-11 rounded-xl border-2 px-3 text-sm font-bold ${selected === value ? 'border-[#B76E79] bg-rose-50 text-[#B76E79]' : 'border-gray-200 text-gray-700'}`}>{t(`${prefix}.${value}`)}</button>)}</div></section> }
 function State({ message }: { message: string }) { const { t } = useLanguage(); return <main className="mx-auto grid min-h-[60vh] max-w-xl place-items-center px-4 text-center"><div><AlertCircle className="mx-auto h-12 w-12 text-amber-500" /><h1 className="mt-4 text-xl font-black">{message}</h1><Link href="/account/orders" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-[#1a1a1a] px-5 font-bold text-white">{t('reviews.back_to_orders')}</Link></div></main> }
-function reviewError(error: string, t: (key: string) => string) { const known = new Set(['AUTH_REQUIRED','DELIVERED_ORDER_REQUIRED','PRODUCT_NOT_IN_ORDER','REVIEW_WINDOW_EXPIRED','ALREADY_REVIEWED','INVALID_REVIEW_PHOTO','REVIEW_PHOTO_UPLOAD_FAILED','RATING_REQUIRED','REVIEW_SUBMISSION_FAILED','ELIGIBILITY_UNAVAILABLE']); return t(known.has(error) ? `reviews.error_${error.toLowerCase()}` : 'reviews.error_review_submission_failed') }
+function reviewError(error: string, t: (key: string) => string) { if (error === 'NETWORK_OFFLINE') return t('network.offline'); if (error === 'NETWORK_REQUEST_FAILED') return t('network.request_failed'); const known = new Set(['AUTH_REQUIRED','DELIVERED_ORDER_REQUIRED','PRODUCT_NOT_IN_ORDER','REVIEW_WINDOW_EXPIRED','ALREADY_REVIEWED','INVALID_REVIEW_PHOTO','REVIEW_PHOTO_UPLOAD_FAILED','RATING_REQUIRED','REVIEW_SUBMISSION_FAILED','ELIGIBILITY_UNAVAILABLE']); return t(known.has(error) ? `reviews.error_${error.toLowerCase()}` : 'reviews.error_review_submission_failed') }

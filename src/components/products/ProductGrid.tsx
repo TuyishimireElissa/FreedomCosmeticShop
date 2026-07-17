@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Heart, PackageOpen, RefreshCw, ShoppingBag, Star } from 'lucide-react'
@@ -10,7 +9,8 @@ import { formatRWF } from '@/lib/format'
 import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
-import { getCloudinaryUrl, getImageSizes, getProductPrimaryImage } from '@/lib/cloudinary-images'
+import { getCloudinaryUrl, getProductPrimaryImage } from '@/lib/cloudinary-images'
+import SmartImage from '@/components/ui/SmartImage'
 
 interface ProductGridProps {
   products: Product[]
@@ -78,7 +78,7 @@ export default function ProductGrid({ products, loading = false, error, onRetry 
           <article key={product.id} className="group flex min-w-0 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-[0_5px_20px_rgba(26,26,26,0.05)] transition-all hover:-translate-y-1 hover:border-rose-100 hover:shadow-[0_16px_34px_rgba(183,110,121,0.14)]">
             <div className="relative aspect-square overflow-hidden bg-[#f8f9fa]">
               <Link href={`/products/${product.slug}`} className="block h-full">
-                {image ? <Image src={image} alt={imageAlt} fill sizes={getImageSizes('card')} className={`object-cover transition-transform duration-300 group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`} loading="lazy" /> : <div className="grid h-full place-items-center text-xs text-gray-400">{t('product.no_image')}</div>}
+                {image ? <SmartImage publicId={primaryImage?.publicId || undefined} fallbackSrc={primaryImage?.url || undefined} context="card" alt={imageAlt} fill aspectRatio={1} className={`object-cover transition-transform duration-300 group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`} /> : <div className="grid h-full place-items-center text-xs text-gray-400">{t('product.no_image')}</div>}
               </Link>
               <div className="absolute left-2 top-2 flex flex-col items-start gap-1">{discount > 0 && <span className="rounded-full bg-red-500 px-2 py-1 text-[10px] font-bold text-white">-{discount}%</span>}{product.isNewArrival === true && <span className="rounded-full bg-emerald-600 px-2 py-1 text-[10px] font-bold text-white">{t('common.new')}</span>}{product.isBestSeller === true && <span className="rounded-full bg-[#B76E79] px-2 py-1 text-[10px] font-bold text-white">🔥 {t('categories.best_sellers')}</span>}{lowStock && <span className="rounded-full bg-amber-500 px-2 py-1 text-[10px] font-bold text-white">{t('common.low_stock', { count: product.stock })}</span>}{outOfStock && <span className="rounded-full bg-[#1a1a1a] px-2 py-1 text-[10px] font-bold text-white">{t('common.sold_out')}</span>}</div>
               <button type="button" onClick={() => toggleWishlist(product.id)} className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-500 shadow-sm hover:text-red-500" aria-label={`${t('product.add_to_wishlist')}: ${product.name}`} aria-pressed={wishlisted.has(product.id)}><Heart className={`h-4 w-4 ${wishlisted.has(product.id) ? 'fill-red-500 text-red-500' : ''}`} /></button>

@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { useT } from '@/lib/i18n/LanguageContext'
 import IconButton from '@/components/a11y/IconButton'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useLowData } from '@/contexts/LowDataContext'
+import { IMAGE_QUALITY, IMAGE_SIZES, optimizeCloudinaryUrl } from '@/lib/cloudinary-images'
 
 export interface HomeBanner {
   id: string
@@ -35,8 +37,9 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
   const [interactionPaused, setInteractionPaused] = useState(false)
   const [reducedMotionOverride, setReducedMotionOverride] = useState(false)
   const prefersReducedMotion = useReducedMotion()
+  const { isLowData } = useLowData()
   const reducedMotionPause = prefersReducedMotion && !reducedMotionOverride
-  const controlPaused = paused || reducedMotionPause
+  const controlPaused = isLowData || paused || reducedMotionPause
   const autoAdvancePaused = controlPaused || interactionPaused
 
   const next = useCallback(() => {
@@ -48,6 +51,7 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
   }
 
   const togglePlayback = () => {
+    if (isLowData) return
     if (reducedMotionPause) {
       setReducedMotionOverride(true)
       setPaused(false)
@@ -76,7 +80,7 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
   if (loading) {
     return (
       <section className="relative min-h-[300px] overflow-hidden bg-[#f4e8ea] sm:min-h-[320px] md:min-h-[480px] lg:min-h-[560px]" aria-label={t('home.loading_promotions')}>
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-[#f8edef] via-[#f4dfe3] to-[#ead0d5]" />
+        <div className={`absolute inset-0 bg-gradient-to-br from-[#f8edef] via-[#f4dfe3] to-[#ead0d5] ${isLowData ? '' : 'animate-pulse'}`} />
         <div className="relative mx-auto flex min-h-[300px] max-w-7xl items-center px-4 sm:min-h-[320px] sm:px-6 md:min-h-[480px] lg:min-h-[560px] lg:px-8">
           <div className="w-full max-w-xl space-y-4">
             <div className="h-7 w-40 animate-pulse rounded-full bg-white/70" />
@@ -116,9 +120,22 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
       aria-roledescription="carousel"
       aria-label={t('home.featured_campaigns')}
     >
+      {isLowData && (
+        <p id="hero-low-data-status" className="absolute right-3 top-3 z-30 rounded-full border border-white/25 bg-black/75 px-3 py-2 text-xs font-semibold text-white">
+          {t('low_data.carousel_paused')}
+        </p>
+      )}
       <div className="relative h-[300px] sm:h-[320px] md:h-[480px] lg:h-[560px]">
         {banners.map((banner, index) => {
           const active = index === current
+          const lowDataImage = optimizeCloudinaryUrl(banner.mobileImage || banner.image, {
+            width: IMAGE_SIZES.hero.lowData,
+            quality: IMAGE_QUALITY.lowData,
+          })
+          const mobileImage = banner.mobileImage
+            ? optimizeCloudinaryUrl(banner.mobileImage, { width: IMAGE_SIZES.hero.mobile })
+            : null
+          const desktopImage = optimizeCloudinaryUrl(banner.image, { width: IMAGE_SIZES.hero.desktop })
           return (
             <article
               key={banner.id}
@@ -130,10 +147,23 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
               inert={active ? undefined : true}
               className={`absolute inset-0 transition-all duration-700 ${active ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'}`}
             >
-              <picture className="absolute inset-0 block">
-                {banner.mobileImage && <source media="(max-width: 639px)" srcSet={banner.mobileImage} />}
-                <img src={banner.image} alt="" loading={index === 0 ? 'eager' : 'lazy'} fetchPriority={index === 0 ? 'high' : 'auto'} decoding="async" className={`h-full w-full object-cover transition-transform duration-500 ease-out md:duration-[7000ms] ${active ? 'md:scale-105' : 'scale-100'}`} />
-              </picture>
+              {(!isLowData || active) && (
+                <>
+                  {isLowData ? (
+                    <img
+                      src={lowDataImage}
+                      alt=""
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      fetchPriority={index === 0 ? 'high' : 'auto'}
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  ) : (
+                    <picture className="absolute inset-0 block">
+                      {mobileImage && <source media="(max-width: 639px)" srcSet={mobileImage} />}
+                      <img src={desktopImage} alt="" loading={index === 0 ? 'eager' : 'lazy'} fetchPriority={index === 0 ? 'high' : 'auto'} decoding="async" className={`h-full w-full object-cover transition-transform duration-500 ease-out md:duration-[7000ms] ${active ? 'md:scale-105' : 'scale-100'}`} />
+                    </picture>
+                  )}
               <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/50 to-black/10" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
 
@@ -153,6 +183,8 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
                   </div>
                 </div>
               </div>
+                </>
+              )}
             </article>
           )
         })}
@@ -165,7 +197,7 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
           <div className="absolute bottom-2 left-1/2 z-20 flex max-w-[calc(100%-7rem)] -translate-x-1/2 items-center gap-0.5 overflow-x-auto rounded-full bg-black/30 px-2 backdrop-blur md:bottom-5" role="tablist" aria-label={t('home.featured_campaigns')}>
             {banners.map((banner, index) => <button key={banner.id} type="button" role="tab" onClick={() => setCurrent(index)} className="grid h-11 w-11 place-items-center rounded-full" aria-label={t('home.show_banner', { number: index + 1 })} aria-selected={index === current} aria-controls={`hero-slide-${index}`}><span aria-hidden="true" className={`h-2 rounded-full transition-all ${index === current ? 'w-7 bg-[#B76E79]' : 'w-2 bg-white/60'}`} /></button>)}
           </div>
-          <IconButton label={controlPaused ? t('accessibility.play_carousel') : t('accessibility.pause_carousel')} icon={controlPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />} onClick={togglePlayback} className="absolute bottom-2 right-3 z-20 border border-white/20 bg-black/30 text-white backdrop-blur hover:bg-black/50 md:bottom-5 md:right-6" />
+          <IconButton label={controlPaused ? t('accessibility.play_carousel') : t('accessibility.pause_carousel')} icon={controlPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />} onClick={togglePlayback} disabled={isLowData} aria-describedby={isLowData ? 'hero-low-data-status' : undefined} className="absolute bottom-2 right-3 z-20 border border-white/20 bg-black/30 text-white backdrop-blur hover:bg-black/50 md:bottom-5 md:right-6" />
           <div className="sr-only" aria-live="polite" aria-atomic="true">{t('accessibility.slide_position', { current: current + 1, total: banners.length })}</div>
         </>
       )}

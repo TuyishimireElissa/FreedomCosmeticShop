@@ -7,6 +7,8 @@ import type { HomeBanner } from "@/components/home/HeroBanner"
 import Hero from "@/components/home/Hero"
 import HomeSearch from "@/components/home/HomeSearch"
 import MainCategories from "@/components/home/MainCategories"
+import LazySection from '@/components/ui/LazySection'
+import { useT } from '@/lib/i18n/LanguageContext'
 import {
   useBannerUpdates,
   useCategoryUpdates,
@@ -82,6 +84,7 @@ function useApiResource<T>(url: string): ApiResource<T> {
 }
 
 function Homepage() {
+  const t = useT()
   const banners = useApiResource<{ banners: HomeBanner[] }>("/api/banners?placement=HOME_HERO")
   const categories = useApiResource<{ categories: Category[] }>("/api/categories")
 
@@ -111,8 +114,10 @@ function Homepage() {
       {/* 7. Configured trust information only — lazy */}
       <TrustSection />
 
-      {/* 8. Hidden unless at least three real approved reviews exist — lazy */}
-      <ReviewsSection />
+      {/* 8. Hidden unless at least three real approved reviews exist — explicit in low-data mode */}
+      <LazySection label={t('home.section_reviews')}>
+        <ReviewsSection />
+      </LazySection>
 
       {/* 9. Optional recommendation entry point — no product claims */}
       <QuizBanner />

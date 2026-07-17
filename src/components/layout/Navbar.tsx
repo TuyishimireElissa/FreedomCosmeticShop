@@ -25,6 +25,7 @@ import { useSettings } from '@/hooks/use-settings'
 import { useToast } from '@/hooks/use-toast'
 import { useStore } from '@/store/useStore'
 import { BUSINESS } from '@/lib/business-config'
+import LowDataToggle from '@/components/settings/LowDataToggle'
 
 const categories = [
   { name: 'Skincare', slug: 'skincare', icon: '🧴', translationKey: 'categories.skincare' },
@@ -310,6 +311,10 @@ export default function Navbar() {
             <div className="mt-5 border-t border-gray-100 pt-4">
               <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">{t('nav.language')}</p>
               <LanguageSelector variant="mobile" />
+            </div>
+
+            <div className="mt-4 border-t border-gray-100 pt-4">
+              <LowDataToggle variant="compact" />
             </div>
 
             <div className="mt-5 space-y-2 border-t border-gray-100 pt-5">

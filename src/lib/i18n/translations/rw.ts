@@ -32,6 +32,43 @@ export const rw = {
     cart_saved_for_later: '{product} yimuriwe mu byo kubika.', // verified-rw
     cart_moved_from_saved: '{product} yimuriwe mu gitebo.', // verified-rw
   },
+  low_data: {
+    title: 'Uburyo bwo kuzigama interineti', // verified-rw
+    description: 'Gabanya interineti ikoreshwa kandi urubuga rufunguke vuba kuri murandasi icumbagira.', // verified-rw
+    turn_on: 'Fungura uburyo bwo kuzigama interineti', // verified-rw
+    turn_off: 'Funga uburyo bwo kuzigama interineti', // verified-rw
+    data_saver: 'Kuzigama interineti', // verified-rw
+    full_data: 'Interineti isanzwe', // verified-rw
+    preference: 'Hitamo uko interineti ikoreshwa', // verified-rw
+    auto: 'Byikoresha', // verified-rw
+    auto_description: 'Igenzura murandasi', // verified-rw
+    on: 'Birakora', // verified-rw
+    on_description: 'Ikoresha interineti nke', // verified-rw
+    off: 'Birafunze', // verified-rw
+    off_description: 'Ubwiza bwuzuye', // verified-rw
+    slow_detected: 'Twabonye murandasi icumbagira ({type})', // verified-rw
+    save_data_detected: 'Mucukumbuzi yawe yasabye kugabanya interineti ikoreshwa.', // verified-rw
+    current_status: 'Uko bimeze ubu: {status}', // verified-rw
+    status_saver: 'Kuzigama interineti birakora', // verified-rw
+    status_full: 'Interineti isanzwe', // verified-rw
+    settings_title: 'Interineti n’umuvuduko', // verified-rw
+    settings_description: 'Hitamo uko FreedomCosmeticShop ikoresha interineti kuri iki gikoresho.', // verified-rw
+    account_settings: 'Igenamiterere rya konti', // verified-rw
+    carousel_paused: 'Uburyo bwo kuzigama interineti: guhindura amashusho byikora byahagaritswe.', // verified-rw
+    hero_optimized: 'Uburyo bwo kuzigama interineti: hifashishijwe ishusho yoroheje.', // verified-rw
+    deferred_section: '{section} ntikirafungurwa kugira ngo interineti ya telefoni izigamwe.', // verified-rw
+    load_section: 'Fungura {section}', // verified-rw
+  },
+  offline: {
+    title: 'Nta murongo wa interineti uhari', // verified-rw
+    cart_saved: 'Impinduka zo mu gitebo zirabikwa kuri iki gikoresho. Serivisi zikenera interineti zizagaruka numara kongera kuyibona.', // verified-rw
+  },
+  network: {
+    retrying: 'Murandasi yagize ikibazo. Turongera kugerageza ({attempt}/{max})…', // verified-rw
+    offline: 'Nta murongo wa interineti uhari. Ongera uwubone maze ugerageze. Amakuru wanditse aracyahari.', // verified-rw
+    request_failed: 'Ubusabe ntibwashoboye kurangira. Genzura murandasi wongere ugerageze. Amakuru wanditse aracyahari.', // verified-rw
+    server_error: 'Seriveri ntiyashoboye kurangiza ubusabe. Ongera ugerageze utiriwe wongera kwandika amakuru yawe.', // verified-rw
+  },
   nav: {
     home: 'Ahabanza', products: 'Ibicuruzwa', categories: 'Ibyiciro', brands: 'Ibirango', bundles: 'Gahunda n’amatsinda', quiz: 'Shakisha gahunda yanjye', wholesale: 'Kurangura', wholesale_offer: 'Kurangura — ibiciro bya buri gicuruzwa', blog: 'Inkuru', about: 'Abo turi bo', contact: 'Twandikire', account: 'Konti yanjye', orders: 'Ibyo natumije', wishlist: 'Ibyo nifuza', cart: 'Igitebo', login: 'Injira', register: 'Iyandikishe', logout: 'Sohoka', admin: 'Ubuyobozi', help: 'Ubufasha', language: 'Ururimi', signed_out: 'Wasohotse neza', sign_in_wishlist: 'Injira kugira ngo ubike ibyo ukunda', payment_methods: 'Uburyo bwo kwishyura twemera', account_menu: 'Ibikubiye muri konti', product_categories: 'Ibyiciro by’ibicuruzwa', mobile_navigation: 'Ibikubiye kuri telefoni', language_selected: 'Ururimi: {language}', english_selected: 'Hahiswemo Icyongereza.', french_coming: 'Igifaransa kizongerwamo vuba.', kinyarwanda_selected: 'Hahiswemo Ikinyarwanda.', language_change: 'Ururimi: {language}. Kanda uhindure.', open_search: 'Fungura ahashakirwa', close_search: 'Funga ahashakirwa', open_menu: 'Fungura urutonde', close_menu: 'Funga urutonde', whatsapp_support: 'Ubufasha kuri WhatsApp', search_placeholder: 'Shakisha ibita ku ruhu, ibikoresho byo kwisiga, ibita ku musatsi...', // 🔍 REVIEW // verified-rw
   },
@@ -51,6 +88,7 @@ export const rw = {
     authentic_products: 'Ibicuruzwa by’umwimerere', // verified-rw
     authorized_genuine: 'Ibicuruzwa by’umwimerere 100% biva ku bacuruzi babyemerewe', // verified-rw
     beauty_expertise: 'Ubumenyi mu by’ubwiza', // verified-rw
+    beauty_guides: 'Inama n’amabwiriza by’ubwiza', // verified-rw
     best_sellers_subtitle: 'Ibicuruzwa abakiriya bakunda, twaguhitiyemo.', // verified-rw
     brand_subtitle: 'Ibicuruzwa by’umwimerere by’ibirango ukunda.', // verified-rw
     brands_coming: 'Ibirango bishya by’ubwiza biri hafi kwiyongera mu bubiko.', // verified-rw
@@ -275,6 +313,9 @@ export const rw = {
     grid_view: 'Erekana mu dusanduku', // verified-rw
     list_view: 'Erekana ku rutonde', // verified-rw
     loading_products: 'Ibicuruzwa birimo gufunguka...', // verified-rw
+    load_more_products: 'Fungura ibindi bicuruzwa', // verified-rw
+    loading_more_products: 'Ibindi bicuruzwa birimo gufunguka…', // verified-rw
+    showing_products: 'Hagaragara ibicuruzwa {shown} kuri {total}', // verified-rw
     minimum_rating: 'Amanota make', // verified-rw
     products_found: 'Habonetse ibicuruzwa {count}', // verified-rw
     recently_viewed: 'Ibyo uheruka kureba', // verified-rw

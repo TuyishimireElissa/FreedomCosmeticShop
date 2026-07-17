@@ -7,21 +7,22 @@ import {
 } from '@/lib/cloudinary-images'
 
 describe('Cloudinary product image helpers', () => {
-  it('uses a 300px transform for mobile cards', () => {
+  it('uses a 320px automatic-format transform for mobile cards', () => {
     const url = getCloudinaryUrl('freedomcosmeticshop/products/example', 'CARD_MOBILE')
-    expect(url).toContain('/w_300,h_300,')
-    expect(url).toContain('q_auto')
+    expect(url).toContain('/w_320,h_320,')
+    expect(url).toContain('q_auto:good')
     expect(url).toContain('f_auto')
+    expect(url).toContain('dpr_auto')
   })
 
   it('rejects full URLs passed as public IDs', () => {
     expect(getCloudinaryUrl('https://example.com/image.jpg')).toBe('')
   })
 
-  it('caps responsive source widths at 900px', () => {
-    const srcset = getResponsiveSrcSet('freedomcosmeticshop/products/example', [300, 600, 900, 1200])
-    expect(srcset).toContain('900w')
-    expect(srcset).not.toContain('1200w')
+  it('caps responsive source widths at 1024px', () => {
+    const srcset = getResponsiveSrcSet('freedomcosmeticshop/products/example', [320, 640, 1024, 1920])
+    expect(srcset).toContain('1024w')
+    expect(srcset).not.toContain('1920w')
   })
 
   it('prefers a structured primary image', () => {

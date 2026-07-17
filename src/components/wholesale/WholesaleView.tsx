@@ -40,6 +40,7 @@ import { WHOLESALE_CONFIG } from '@/lib/wholesale-config'
 import FormField from '@/components/a11y/FormField'
 import FormSelect from '@/components/a11y/FormSelect'
 import FormTextarea from '@/components/a11y/FormTextarea'
+import { ResilientFetchError, useResilientFetch } from '@/hooks/useResilientFetch'
 
 type InternalView = "landing" | "apply" | "status" | "success" | "dashboard" | "invoices"
 
@@ -267,6 +268,7 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
   const t = useT()
   const { user, goLogin } = useStore()
   const { toast } = useToast()
+  const { resilientFetch } = useResilientFetch()
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
@@ -348,7 +350,7 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
     setFormError('')
     setSubmitting(true)
     try {
-      const res = await fetch("/api/wholesale/apply", {
+      const res = await resilientFetch("/api/wholesale/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -373,7 +375,9 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
 
       onSuccess()
     } catch (e) {
-      const message = e instanceof Error ? e.message : t('common.error')
+      const message = e instanceof ResilientFetchError
+        ? t(e.code === 'OFFLINE' ? 'network.offline' : 'network.request_failed')
+        : e instanceof Error ? e.message : t('common.error')
       setFormError(message)
       toast({
         title: t('wholesale.submission_failed'),

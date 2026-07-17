@@ -15,7 +15,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import Image from "next/image"
 import { Product } from "@/lib/types"
 import { useStore } from "@/store/useStore"
 import { formatRWF } from "@/lib/format"
@@ -24,8 +23,9 @@ import { Badge } from "@/components/ui/badge"
 import { Star, Plus, Check, ShieldCheck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
-import { getCloudinaryUrl, getImageSizes, getProductPrimaryImage } from "@/lib/cloudinary-images"
+import { getCloudinaryUrl, getProductPrimaryImage } from "@/lib/cloudinary-images"
 import StockStatus from '@/components/a11y/StockStatus'
+import SmartImage from '@/components/ui/SmartImage'
 
 interface ProductCardProps {
   product: Product
@@ -93,13 +93,14 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       >
         <article className="h-full w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-transform duration-150 active:scale-[0.98]">
           <div className="relative aspect-square overflow-hidden bg-gray-50">
-            <Image
-              src={imageSource}
+            <SmartImage
+              publicId={primaryImage?.publicId || undefined}
+              fallbackSrc={primaryImage?.url || '/placeholder.svg'}
+              context="card"
               alt={imageAlt}
               fill
+              aspectRatio={1}
               className={`object-cover ${outOfStock ? 'opacity-60' : ''}`}
-              sizes={getImageSizes('card_compact')}
-              loading="lazy"
             />
             {compactBadge && (
               <span aria-hidden="true" className="absolute left-1.5 top-1.5 max-w-[calc(100%-12px)] truncate rounded-full bg-[#B76E79] px-1.5 py-0.5 text-xs font-bold text-white shadow-sm">
@@ -132,15 +133,16 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       {/* Image */}
       <div className="bg-secondary/30 relative aspect-square overflow-hidden">
         {primaryImage ? (
-          <Image
-            src={imageSource}
+          <SmartImage
+            publicId={primaryImage?.publicId || undefined}
+            fallbackSrc={primaryImage?.url}
+            context="card"
             alt={imageAlt}
             fill
+            aspectRatio={1}
             className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
               outOfStock ? "opacity-60" : ""
             }`}
-            sizes={getImageSizes('card')}
-            loading="lazy"
           />
         ) : (
           <div className="text-muted-foreground grid h-full w-full place-items-center">

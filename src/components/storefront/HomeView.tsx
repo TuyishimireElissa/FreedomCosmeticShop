@@ -18,7 +18,7 @@
  * /api/brands, and /api/blog on mount.
  */
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useStore } from "@/store/useStore"
 import { Product, Category } from "@/lib/types"
 import { HeroBanner } from "@/components/home/HeroBanner"
@@ -34,6 +34,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Truck, Smartphone, ShieldCheck, Sparkles } from "lucide-react"
 import { useT } from '@/lib/i18n/LanguageContext'
+import LazySection from '@/components/ui/LazySection'
 
 interface Banner {
   id: string
@@ -78,6 +79,9 @@ export function HomeView() {
   const [brands, setBrands] = useState<Brand[]>([])
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
+  const [brandsLoading, setBrandsLoading] = useState(false)
+  const [blogLoading, setBlogLoading] = useState(false)
+  const [blogRequested, setBlogRequested] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -88,23 +92,17 @@ export function HomeView() {
           bestSellersRes,
           newArrivalsRes,
           catsRes,
-          brandsRes,
-          blogRes,
         ] = await Promise.all([
           fetch("/api/banners?placement=HOME_HERO"),
           fetch("/api/products?sort=rating&limit=8"),
           fetch("/api/products?sort=newest&limit=4"),
           fetch("/api/categories"),
-          fetch("/api/brands"),
-          fetch("/api/blog?limit=3"),
         ])
 
         const bannersJson = await bannersRes.json()
         const bestJson = await bestSellersRes.json()
         const newJson = await newArrivalsRes.json()
         const catsJson = await catsRes.json()
-        const brandsJson = await brandsRes.json()
-        const blogJson = await blogRes.json()
 
         if (cancelled) return
 
@@ -112,8 +110,6 @@ export function HomeView() {
         setBestSellers(bestJson.products || [])
         setNewArrivals(newJson.products || [])
         setCategories(catsJson.categories || [])
-        setBrands(brandsJson.brands || [])
-        setBlogPosts(blogJson.posts || [])
       } catch (e) {
         console.error("HomeView load failed:", e)
       } finally {
@@ -123,6 +119,25 @@ export function HomeView() {
     return () => {
       cancelled = true
     }
+  }, [])
+
+  const loadBrands = useCallback(() => {
+    setBrandsLoading(true)
+    fetch('/api/brands')
+      .then((response) => response.json())
+      .then((data) => setBrands(data.brands || []))
+      .catch(() => setBrands([]))
+      .finally(() => setBrandsLoading(false))
+  }, [])
+
+  const loadBlog = useCallback(() => {
+    setBlogRequested(true)
+    setBlogLoading(true)
+    fetch('/api/blog?limit=3')
+      .then((response) => response.json())
+      .then((data) => setBlogPosts(data.posts || []))
+      .catch(() => setBlogPosts([]))
+      .finally(() => setBlogLoading(false))
   }, [])
 
   // ─── Section 2: Real-time product updates ─────────────────────────
@@ -185,10 +200,7 @@ export function HomeView() {
   // When admin publishes/unpublishes/updates a blog post, refetch the
   // blog posts so the BeautyTips section updates instantly.
   useBlogUpdates(() => {
-    fetch("/api/blog?limit=3")
-      .then((r) => r.json())
-      .then((d) => setBlogPosts(d.posts || []))
-      .catch(() => {})
+    if (blogRequested) loadBlog()
   })
 
   // When admin creates/updates/deactivates a category, refetch the
@@ -287,14 +299,20 @@ export function HomeView() {
         onViewAll={() => goCatalog(null)}
       />
 
-      {/* 7. Top Brands Carousel */}
-      {!loading && brands.length > 0 && <BrandCarousel brands={brands} />}
+      {/* 7. Top Brands Carousel — explicit in low-data mode */}
+      <LazySection label={t('home.top_brands')} onLoad={loadBrands}>
+        {brandsLoading ? <Skeleton className="mx-auto my-8 h-48 w-[calc(100%-2rem)] max-w-7xl rounded-2xl" /> : brands.length > 0 && <BrandCarousel brands={brands} />}
+      </LazySection>
 
-      {/* 8. Beauty Tips Preview (Blog) */}
-      {!loading && blogPosts.length > 0 && <BeautyTips posts={blogPosts} />}
+      {/* 8. Beauty Tips Preview (Blog) — explicit in low-data mode */}
+      <LazySection label={t('home.beauty_guides')} onLoad={loadBlog}>
+        {blogLoading ? <Skeleton className="mx-auto my-8 h-64 w-[calc(100%-2rem)] max-w-7xl rounded-2xl" /> : blogPosts.length > 0 && <BeautyTips posts={blogPosts} />}
+      </LazySection>
 
-      {/* 9. Customer Reviews Carousel */}
-      <ReviewsCarousel />
+      {/* 9. Customer Reviews Carousel — explicit in low-data mode */}
+      <LazySection label={t('home.section_reviews')}>
+        <ReviewsCarousel />
+      </LazySection>
 
       {/* 10. Section 4: Wholesale CTA Banner */}
       <WholesaleCtaBanner />

@@ -16,6 +16,7 @@ import { Star, Quote, ChevronLeft, ChevronRight, Pause, Play } from "lucide-reac
 import { useT } from '@/lib/i18n/LanguageContext'
 import IconButton from '@/components/a11y/IconButton'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useLowData } from '@/contexts/LowDataContext'
 
 interface Review {
   name: string
@@ -81,8 +82,9 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
   const [interactionPaused, setInteractionPaused] = useState(false)
   const [reducedMotionOverride, setReducedMotionOverride] = useState(false)
   const prefersReducedMotion = useReducedMotion()
+  const { isLowData } = useLowData()
   const reducedMotionPause = prefersReducedMotion && !reducedMotionOverride
-  const controlPaused = isPaused || reducedMotionPause
+  const controlPaused = isLowData || isPaused || reducedMotionPause
   const autoAdvancePaused = controlPaused || interactionPaused
 
   // Number of reviews to show at once (1 on mobile, 3 on desktop)
@@ -100,6 +102,7 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
   const prev = () => setCurrent((c) => (c - 1 + reviews.length) % reviews.length)
   const next = () => setCurrent((c) => (c + 1) % reviews.length)
   const togglePlayback = () => {
+    if (isLowData) return
     if (reducedMotionPause) {
       setReducedMotionOverride(true)
       setIsPaused(false)
@@ -132,6 +135,11 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
           <p className="mt-1 text-sm text-muted-foreground">
             {t('home.reviews_countrywide')}
           </p>
+          {isLowData && (
+            <p id="reviews-low-data-status" className="mx-auto mt-3 w-fit rounded-full border bg-background px-3 py-2 text-xs font-semibold text-foreground">
+              {t('low_data.carousel_paused')}
+            </p>
+          )}
           <div className="mt-3 flex items-center justify-center gap-2">
             <div className="flex">
               {[1, 2, 3, 4, 5].map((s) => (
@@ -219,7 +227,7 @@ export function ReviewsCarousel({ reviews = DEFAULT_REVIEWS }: ReviewsCarouselPr
               ))}
             </div>
             <IconButton label={t('home.next_reviews')} icon={<ChevronRight className="h-4 w-4" />} onClick={next} className="border bg-white" />
-            <IconButton label={controlPaused ? t('accessibility.play_carousel') : t('accessibility.pause_carousel')} icon={controlPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />} onClick={togglePlayback} className="border bg-white" />
+            <IconButton label={controlPaused ? t('accessibility.play_carousel') : t('accessibility.pause_carousel')} icon={controlPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />} onClick={togglePlayback} disabled={isLowData} aria-describedby={isLowData ? 'reviews-low-data-status' : undefined} className="border bg-white" />
           </div>
           <div className="sr-only" aria-live="polite" aria-atomic="true">{t('accessibility.slide_position', { current: current + 1, total: reviews.length })}</div>
         </div>

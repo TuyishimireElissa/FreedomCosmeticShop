@@ -25,9 +25,11 @@ describe('products search and filter integration', () => {
     expect(source).toContain('return () => controller.abort()')
   })
 
-  it('keeps pagination and sorting in URL state', () => {
+  it('keeps progressive pagination and sorting in URL state', () => {
     expect(source).toContain("setFilter('sort'")
     expect(source).toContain("setFilter('page'")
-    expect(source).toContain("params.set('pageSize', '18')")
+    expect(source).toContain("params.set('pageSize', String(pageSize))")
+    expect(source).toContain('LOW_DATA_PAGE_SIZE = 8')
+    expect(source).toContain('NORMAL_PAGE_SIZE = 20')
   })
 })

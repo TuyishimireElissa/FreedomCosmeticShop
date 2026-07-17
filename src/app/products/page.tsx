@@ -1,7 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import type { Brand, Category, Product } from '@/lib/types'
 import ProductGrid from '@/components/products/ProductGrid'
 import FilterSidebar from '@/components/products/FilterSidebar'
@@ -11,7 +10,7 @@ import SearchWithSuggestions from '@/components/storefront/SearchWithSuggestions
 import { useProductFilters } from '@/hooks/useProductFilters'
 import { useT } from '@/lib/i18n/LanguageContext'
 import { cn } from '@/lib/utils'
-import IconButton from '@/components/a11y/IconButton'
+import { useLowData } from '@/contexts/LowDataContext'
 
 interface Pagination {
   page: number
@@ -21,7 +20,10 @@ interface Pagination {
   hasMore: boolean
 }
 
-const EMPTY_PAGINATION: Pagination = { page: 1, pageSize: 18, total: 0, totalPages: 0, hasMore: false }
+const LOW_DATA_PAGE_SIZE = 8
+const NORMAL_PAGE_SIZE = 20
+
+const EMPTY_PAGINATION: Pagination = { page: 1, pageSize: NORMAL_PAGE_SIZE, total: 0, totalPages: 0, hasMore: false }
 
 export default function ProductsPage() {
   return <Suspense fallback={<ProductsPageSkeleton />}><ProductsContent /></Suspense>
@@ -29,6 +31,7 @@ export default function ProductsPage() {
 
 function ProductsContent() {
   const t = useT()
+  const { isLowData } = useLowData()
   const { filters, setFilter, buildApiQuery } = useProductFilters()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -38,6 +41,17 @@ function ProductsContent() {
   const [error, setError] = useState<string | null>(null)
   const [request, setRequest] = useState(0)
   const [pagination, setPagination] = useState<Pagination>(EMPTY_PAGINATION)
+  const lastProductRequest = useRef({ signature: '', page: 0 })
+  const page = Math.max(1, Number(filters.page) || 1)
+  const pageSize = isLowData ? LOW_DATA_PAGE_SIZE : NORMAL_PAGE_SIZE
+  const previousPageSize = useRef(pageSize)
+
+  useEffect(() => {
+    if (previousPageSize.current === pageSize) return
+    previousPageSize.current = pageSize
+    lastProductRequest.current = { signature: '', page: 0 }
+    setFilter('page', '1')
+  }, [pageSize, setFilter])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -55,11 +69,16 @@ function ProductsContent() {
     return () => controller.abort()
   }, [])
 
-  const apiQuery = useMemo(() => {
+  const { apiQuery, requestSignature } = useMemo(() => {
     const params = new URLSearchParams(buildApiQuery())
-    params.set('pageSize', '18')
-    return params.toString()
-  }, [buildApiQuery])
+    params.set('pageSize', String(pageSize))
+    const signatureParams = new URLSearchParams(params)
+    signatureParams.delete('page')
+    return {
+      apiQuery: params.toString(),
+      requestSignature: signatureParams.toString(),
+    }
+  }, [buildApiQuery, pageSize])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -68,13 +87,22 @@ function ProductsContent() {
     fetch(`/api/products?${apiQuery}`, { signal: controller.signal, cache: 'no-store' })
       .then((response) => { if (!response.ok) throw new Error(t('errors.products_load_failed')); return response.json() })
       .then((result) => {
-        setProducts(result.products || result.data?.products || [])
+        const rows: Product[] = result.products || result.data?.products || []
+        const canAppend = page > 1
+          && lastProductRequest.current.signature === requestSignature
+          && lastProductRequest.current.page === page - 1
+        setProducts((current) => {
+          if (!canAppend) return rows
+          const existingIds = new Set(current.map((product) => product.id))
+          return [...current, ...rows.filter((product) => !existingIds.has(product.id))]
+        })
+        lastProductRequest.current = { signature: requestSignature, page }
         setPagination(result.pagination || result.data?.pagination || EMPTY_PAGINATION)
       })
       .catch((reason) => { if (!(reason instanceof DOMException && reason.name === 'AbortError')) setError(reason instanceof Error ? reason.message : t('errors.products_load_failed')) })
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [apiQuery, request, t])
+  }, [apiQuery, page, request, requestSignature, t])
 
   const sortOptions = [
     { value: 'relevance', label: t('search.sort_relevance') },
@@ -84,7 +112,6 @@ function ProductsContent() {
     { value: 'price_desc', label: t('search.sort_price_high') },
     { value: 'rating', label: t('search.sort_top_rated') },
   ]
-  const page = Math.max(1, Number(filters.page) || 1)
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
@@ -113,15 +140,27 @@ function ProductsContent() {
         <div className="flex items-start gap-5 lg:gap-6">
           <FilterSidebar availableCategories={categories} availableBrands={brands} className={filtersLoading ? 'animate-pulse opacity-60' : ''} />
           <main className="min-w-0 flex-1">
-            <ProductGrid products={products} loading={loading} error={error} onRetry={() => setRequest((value) => value + 1)} />
-            {!loading && !error && pagination.totalPages > 1 && (
-              <nav className="mt-8 flex items-center justify-center gap-2" aria-label={t('ui.pagination')}>
-                <IconButton label={t('ui.go_previous_page')} icon={<ChevronLeft className="h-4 w-4" />} onClick={() => setFilter('page', String(Math.max(1, page - 1)))} disabled={page <= 1} className="rounded-xl border border-gray-200 bg-white" />
-                {Array.from({ length: pagination.totalPages }, (_, index) => index + 1)
-                  .filter((number) => number === 1 || number === pagination.totalPages || Math.abs(number - page) <= 1)
-                  .map((number, index, visible) => <span key={number} className="contents">{index > 0 && number - visible[index - 1] > 1 && <span className="px-1 text-gray-400">…</span>}<button type="button" onClick={() => setFilter('page', String(number))} className={cn('h-11 min-w-11 rounded-xl px-3 text-sm font-bold', number === page ? 'bg-[#B76E79] text-white' : 'border border-gray-200 bg-white text-gray-600')}>{number}</button></span>)}
-                <IconButton label={t('ui.go_next_page')} icon={<ChevronRight className="h-4 w-4" />} onClick={() => setFilter('page', String(Math.min(pagination.totalPages, page + 1)))} disabled={page >= pagination.totalPages} className="rounded-xl border border-gray-200 bg-white" />
-              </nav>
+            <div id="product-results">
+              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} />
+            </div>
+            {error && products.length > 0 && <p role="alert" className="mt-4 text-center text-sm text-red-700">{error}</p>}
+            {!error && products.length > 0 && (
+              <div className="mt-8 flex flex-col items-center gap-3">
+                <p className="text-sm text-gray-500" aria-live="polite">
+                  {t('search.showing_products', { shown: products.length, total: pagination.total })}
+                </p>
+                {pagination.hasMore && (
+                  <button
+                    type="button"
+                    onClick={() => setFilter('page', String(page + 1))}
+                    disabled={loading}
+                    aria-controls="product-results"
+                    className="min-h-12 rounded-xl bg-[#B76E79] px-6 text-sm font-bold text-white transition-colors hover:bg-[#a55d68] disabled:cursor-wait disabled:opacity-60"
+                  >
+                    {loading ? t('search.loading_more_products') : t('search.load_more_products')}
+                  </button>
+                )}
+              </div>
             )}
           </main>
         </div>

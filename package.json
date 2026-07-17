@@ -15,7 +15,8 @@
     "catalog:import": "tsx scripts/import-real-products.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:a11y": "tsx src/scripts/test-accessibility.ts"
+    "test:a11y": "tsx src/scripts/test-accessibility.ts",
+    "test:low-data": "vitest run src/lib/__tests__/low-data-infrastructure.test.ts src/lib/__tests__/low-data-toggle.test.ts src/lib/__tests__/low-data-images.test.ts src/lib/__tests__/low-data-hero-media.test.ts src/lib/__tests__/low-data-pagination-lazy.test.ts src/lib/__tests__/offline-cart.test.ts src/lib/__tests__/resilient-fetch.test.ts src/lib/__tests__/low-data-testing-tools.test.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

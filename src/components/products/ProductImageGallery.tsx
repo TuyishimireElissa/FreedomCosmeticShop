@@ -1,15 +1,10 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import Image from 'next/image'
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
-import {
-  getCloudinaryUrl,
-  getImageSizes,
-  getProductImageGallery,
-  type StructuredProductImage,
-} from '@/lib/cloudinary-images'
+import { getProductImageGallery, type StructuredProductImage } from '@/lib/cloudinary-images'
+import SmartImage from '@/components/ui/SmartImage'
 
 interface ProductImageGalleryProps {
   productImages?: StructuredProductImage[]
@@ -63,10 +58,6 @@ export default function ProductImageGallery({
   }
   const altText = (image: StructuredProductImage) => language === 'rw' && image.altTextRw ? image.altTextRw : image.altText || productName
   const typeLabel = (imageType: string) => IMAGE_TYPE_KEYS[imageType] ? t(IMAGE_TYPE_KEYS[imageType]) : ''
-  const source = (image: StructuredProductImage, thumbnail = false) => image.publicId
-    ? getCloudinaryUrl(image.publicId, thumbnail ? 'THUMBNAIL' : 'DETAIL_DESKTOP')
-    : image.url
-
   if (!activeImage) {
     return <div className="flex aspect-square items-center justify-center rounded-2xl bg-gray-100 text-sm text-gray-500">{t('product.no_image_available')}</div>
   }
@@ -94,13 +85,15 @@ export default function ProductImageGallery({
         tabIndex={0}
         aria-label={altText(activeImage)}
       >
-        <Image
-          src={source(activeImage)}
+        <SmartImage
+          publicId={activeImage.publicId || undefined}
+          fallbackSrc={activeImage.url}
+          context="detail"
           alt={altText(activeImage)}
           fill
           priority={activeIndex === 0}
+          aspectRatio={1}
           className={`object-contain p-4 transition-transform duration-200 ${isZoomed ? 'scale-150' : 'scale-100'} ${outOfStock ? 'opacity-60' : ''}`}
-          sizes={getImageSizes('detail')}
         />
 
         {activeImage.imageType !== 'PRODUCT' && typeLabel(activeImage.imageType) && (
@@ -132,7 +125,7 @@ export default function ProductImageGallery({
         <div className="scrollbar-hide scroll-smooth-ios flex gap-2 overflow-x-auto pb-1">
           {gallery.map((image, index) => (
             <button key={`${image.publicId || image.url}-thumb-${index}`} type="button" onClick={() => { setActiveIndex(index); setIsZoomed(false) }} className={`relative h-16 w-16 flex-none overflow-hidden rounded-xl border-2 bg-gray-50 transition-opacity sm:h-20 sm:w-20 ${index === activeIndex ? 'border-[#B76E79]' : 'border-gray-200 opacity-70 hover:opacity-100'}`} aria-label={altText(image)} aria-pressed={index === activeIndex}>
-              <Image src={source(image, true)} alt={altText(image)} fill className="object-contain p-1" sizes={getImageSizes('thumbnail')} loading="lazy" />
+              <SmartImage publicId={image.publicId || undefined} fallbackSrc={image.url} context="thumbnail" alt={altText(image)} fill aspectRatio={1} className="object-contain p-1" />
               {image.imageType !== 'PRODUCT' && typeLabel(image.imageType) && <span className="absolute inset-x-0 bottom-0 truncate bg-black/70 px-1 py-0.5 text-xs leading-none text-white">{typeLabel(image.imageType)}</span>}
             </button>
           ))}
