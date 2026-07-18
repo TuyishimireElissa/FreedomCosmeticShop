@@ -25,6 +25,7 @@ export const en = {
     cart_cleared: 'Cart cleared.',
     cart_saved_for_later: '{product} moved to saved items.',
     cart_moved_from_saved: '{product} moved to cart.',
+    breadcrumb: 'Breadcrumb',
   },
   low_data: {
     title: 'Low Data Mode',
@@ -1006,6 +1007,15 @@ export const en = {
     admin_analytics: 'WhatsApp Analytics',
     admin_guide: 'WhatsApp Guide',
   },
+  blog: {
+    label: 'Beauty guides',
+    section_title: 'Beauty tips and guides',
+    section_subtitle: 'Careful, practical information for skincare, makeup and hair routines.',
+    back_to_guides: 'Back to beauty guides',
+    read_more: 'Read more',
+    recent: 'Recent',
+    views: '{count} views',
+  },
   sms: {
     abandoned_cart: 'You left {{itemCount}} item(s) in your cart! Complete your order now: {{cartLink}} {business} 🛒',
     abandoned_cart_description: 'Sent 2 hours after cart abandonment',
@@ -1389,6 +1399,7 @@ export const en = {
     liability_law_text: 'Nothing in these terms limits rights that cannot legally be excluded. These terms are governed by the laws of Rwanda, and disputes should first be raised with our support team for good-faith resolution.',
     nationwide_delivery: 'Nationwide delivery',
     not_found_hint: 'The beauty page you\'re looking for may have moved, sold out, or never existed.',
+    or_try: 'Or try one of these categories',
     order_cancellation_terms: 'We may cancel an order affected by a pricing error, unavailable stock, suspected fraud, or an invalid delivery address.',
     order_confirmation_terms: 'An order is confirmed after payment approval, or acceptance for eligible cash-on-delivery orders.',
     orders_pricing: 'Orders and pricing',

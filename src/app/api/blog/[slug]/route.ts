@@ -45,9 +45,13 @@ export async function GET(
       select: {
         id: true,
         title: true,
+        titleRw: true,
         slug: true,
         excerpt: true,
+        excerptRw: true,
         coverImage: true,
+        imageAlt: true,
+        imageAltRw: true,
         publishedAt: true,
       },
     })

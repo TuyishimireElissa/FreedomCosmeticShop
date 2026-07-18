@@ -1076,23 +1076,32 @@ model LoyaltyPoints {
 // =============================================================================
 
 model BlogPost {
-  id      String  @id @default(cuid())
-  title   String
-  slug    String  @unique
-  excerpt String?
-  content String // Markdown or HTML
+  id        String  @id @default(cuid())
+  title     String
+  titleRw   String?
+  slug      String  @unique
+  excerpt   String?
+  excerptRw String? @db.Text
+  content   String // Markdown or HTML
+  contentRw String? @db.Text
 
   coverImage String?
+  imageAlt   String?
+  imageAltRw String?
+  category   String?
 
   // Author
-  authorId String?
-  author   User?   @relation(fields: [authorId], references: [id])
+  authorId   String?
+  author     User?   @relation(fields: [authorId], references: [id])
+  authorName String?
 
   // SEO
-  metaTitle       String?
-  metaDescription String?
+  metaTitle         String?
+  metaTitleRw       String?
+  metaDescription   String?
+  metaDescriptionRw String?
 
-  // Tags — JSON array: '["skincare", "rutine", "kigali"]'
+  // Tags — JSON array: '["skincare", "routine", "kigali"]'
   tags String?
 
   // Status: DRAFT | PUBLISHED | ARCHIVED
@@ -1610,6 +1619,20 @@ model SearchLog {
   @@index([hasResults])
   @@index([createdAt])
   @@index([sessionId])
+}
+
+// Privacy-minimized 404 analytics. Raw IP addresses, query strings, and full
+// browser user-agent strings are never stored.
+model NotFoundLog {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
 }
 
 // =============================================================================

@@ -10,6 +10,9 @@ import { LowDataProvider } from '@/contexts/LowDataContext'
 import OfflineBanner from '@/components/ui/OfflineBanner'
 import PerformanceMonitor from '@/components/dev/PerformanceMonitor'
 import { BUSINESS } from '@/lib/business-config'
+import { getPageMetadata, SEO_CONFIG } from '@/lib/seo-config'
+import StructuredData from '@/components/seo/StructuredData'
+import { getLocalBusinessSchema, getOrganizationSchema, getWebsiteSchema } from '@/lib/structured-data'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' })
 
@@ -20,51 +23,18 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: {
-    default: `${BUSINESS.name} | Rwanda Beauty Store 🇷🇼`,
-    template: `%s | ${BUSINESS.name}`,
-  },
-  description: BUSINESS.description,
-  keywords: [
-    'cosmetics Rwanda',
-    'beauty products Kigali',
-    'MTN MoMo shopping Rwanda',
-    'skincare Rwanda',
-    BUSINESS.name,
-    'authentic beauty products',
-    'online beauty store Rwanda',
-  ],
+  metadataBase: new URL(SEO_CONFIG.siteUrl),
+  ...getPageMetadata({ path: '/' }),
   authors: [{ name: BUSINESS.name }],
   creator: BUSINESS.name,
   publisher: BUSINESS.name,
-  metadataBase: new URL(BUSINESS.url),
-  openGraph: {
-    type: 'website',
-    locale: 'rw_RW',
-    siteName: BUSINESS.name,
-    title: `${BUSINESS.name} | Rwanda Beauty Store`,
-    description: BUSINESS.description,
-    url: BUSINESS.url,
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: BUSINESS.name,
-    description: BUSINESS.description,
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-    },
-  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="rw">
       <body className={`${inter.className} bg-white text-[#1a1a1a] antialiased`}>
+        <StructuredData data={[getOrganizationSchema(), getLocalBusinessSchema(), getWebsiteSchema()]} />
         <LowDataProvider>
           <Providers>
             <SkipToContent />

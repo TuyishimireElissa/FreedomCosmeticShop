@@ -31,6 +31,7 @@ export const rw = {
     cart_cleared: 'Igitebo cyasigaye kirimo ubusa.', // verified-rw
     cart_saved_for_later: '{product} yimuriwe mu byo kubika.', // verified-rw
     cart_moved_from_saved: '{product} yimuriwe mu gitebo.', // verified-rw
+    breadcrumb: 'Inzira y’urupapuro', // verified-rw
   },
   low_data: {
     title: 'Uburyo bwo kuzigama interineti', // verified-rw
@@ -1074,6 +1075,15 @@ export const rw = {
     admin_analytics: 'Isesengura rya WhatsApp', // verified-rw
     admin_guide: 'Amabwiriza ya WhatsApp', // verified-rw
   },
+  blog: {
+    label: 'Inama z’ubwiza', // verified-rw
+    section_title: 'Inama n’amabwiriza by’ubwiza', // verified-rw
+    section_subtitle: 'Amakuru yitonze kandi afatika ku kwita ku ruhu, kwisiga no kwita ku musatsi.', // verified-rw
+    back_to_guides: 'Subira ku nama z’ubwiza', // verified-rw
+    read_more: 'Soma ibindi', // verified-rw
+    recent: 'Vuba aha', // verified-rw
+    views: 'Byarebwe inshuro {count}', // verified-rw
+  },
   sms: {
     abandoned_cart: 'Wasize ibicuruzwa {{itemCount}} mu gitebo! Rangiza komande yawe hano: {{cartLink}} {business} 🛒', // verified-rw
     abandoned_cart_description: 'Bwoherezwa nyuma y’amasaha 2 igitebo gisizwe', // verified-rw
@@ -1457,6 +1467,7 @@ export const rw = {
     liability_law_text: 'Nta kiri muri aya mabwiriza kigabanya uburenganzira amategeko atemera gukuraho. Aya mabwiriza agengwa n’amategeko y’u Rwanda, kandi amakimbirane agomba kubanza kugezwa ku bagufasha kugira ngo ashakirwe igisubizo mu bwumvikane.', // verified-rw
     nationwide_delivery: 'Kubigeza mu Rwanda hose', // verified-rw
     not_found_hint: 'Urupapuro rw’ubwiza ushaka rushobora kuba rwarimuwe, ibicuruzwa byarashize cyangwa ntirwigeze rubaho.', // verified-rw
+    or_try: 'Cyangwa reba kimwe muri ibi byiciro', // verified-rw
     order_cancellation_terms: 'Dushobora guhagarika komande ifite ikosa ry’igiciro, ibicuruzwa bitakiboneka, uburiganya bukekwa cyangwa aderesi itemewe.', // verified-rw
     order_confirmation_terms: 'Komande yemezwa nyuma yo kwemeza kwishyura cyangwa kwemera ko wishyura ugejejweho igihe ubyemerewe.', // verified-rw
     orders_pricing: 'Komande n’ibiciro', // verified-rw

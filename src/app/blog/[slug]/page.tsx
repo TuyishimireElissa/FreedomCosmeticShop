@@ -1,20 +1,32 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, Calendar, Eye } from 'lucide-react'
 import { prisma } from '@/lib/prisma'
+import BlogPostContent from '@/components/blog/BlogPostContent'
+import StructuredData from '@/components/seo/StructuredData'
+import { getPageMetadata } from '@/lib/seo-config'
+import { getArticleSchema, getBreadcrumbSchema } from '@/lib/structured-data'
 
 export const revalidate = 300
 
 async function getPost(slug: string) {
   return prisma.blogPost.findFirst({
-    where: { slug, status: 'PUBLISHED', isDeleted: false },
+    where: { slug, status: 'PUBLISHED', isDeleted: false, publishedAt: { lte: new Date() } },
     select: {
       title: true,
+      titleRw: true,
       slug: true,
       excerpt: true,
+      excerptRw: true,
       content: true,
+      contentRw: true,
       coverImage: true,
+      imageAlt: true,
+      imageAltRw: true,
+      authorName: true,
+      metaTitle: true,
+      metaTitleRw: true,
+      metaDescription: true,
+      metaDescriptionRw: true,
       tags: true,
       publishedAt: true,
       updatedAt: true,
@@ -26,27 +38,68 @@ async function getPost(slug: string) {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const post = await getPost(slug).catch(() => null)
-  if (!post) return { title: 'Beauty guide not found' }
-  return {
-    title: post.title,
-    description: post.excerpt || undefined,
-    alternates: { canonical: `/blog/${post.slug}` },
-    openGraph: {
-      type: 'article',
-      title: post.title,
-      description: post.excerpt || undefined,
-      images: post.coverImage ? [{ url: post.coverImage }] : undefined,
-      publishedTime: post.publishedAt?.toISOString(),
-      modifiedTime: post.updatedAt.toISOString(),
-    },
+  if (!post) {
+    return getPageMetadata({
+      title: { en: 'Beauty guide not found', rw: 'Inama y’ubwiza ntiboneka' }, // verified-rw
+      description: { en: 'This beauty guide is not currently available.', rw: 'Iyi nama y’ubwiza ntiboneka ubu.' }, // verified-rw
+      path: `/blog/${encodeURIComponent(slug)}`,
+      noIndex: true,
+    })
   }
+
+  return getPageMetadata({
+    title: {
+      en: post.metaTitle || post.title,
+      rw: post.metaTitleRw || post.titleRw || post.title, // verified-rw
+    },
+    description: {
+      en: post.metaDescription || post.excerpt || post.title,
+      rw: post.metaDescriptionRw || post.excerptRw || post.excerpt || post.titleRw || post.title, // verified-rw
+    },
+    path: `/blog/${post.slug}`,
+    image: post.coverImage || undefined,
+  })
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const post = await getPost(slug).catch(() => null)
   if (!post) notFound()
-  const tags = post.tags ? safeTags(post.tags) : []
-  return <main className="min-h-screen bg-[#f8f9fa] px-4 py-8 sm:px-6 lg:px-8"><article className="mx-auto max-w-3xl overflow-hidden rounded-[2rem] border border-gray-100 bg-white shadow-sm">{post.coverImage&&<img src={post.coverImage} alt={post.title} className="aspect-[16/8] w-full object-cover" />}<div className="p-6 sm:p-10"><Link href="/" className="inline-flex items-center gap-1 text-xs font-bold text-[#B76E79]"><ArrowLeft className="h-3.5 w-3.5" />Back to beauty guides</Link><div className="mt-5 flex flex-wrap gap-2">{tags.map(tag=><span key={tag} className="rounded-full bg-rose-50 px-2.5 py-1 text-[10px] font-bold text-[#B76E79]">#{tag}</span>)}</div><h1 className="mt-4 text-3xl font-black leading-tight text-[#1a1a1a] sm:text-4xl">{post.title}</h1><div className="mt-4 flex flex-wrap gap-4 text-xs text-gray-400"><span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{(post.publishedAt||post.updatedAt).toLocaleDateString('en-RW',{dateStyle:'medium'})}</span><span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{post.viewCount} views</span></div>{post.excerpt&&<p className="mt-6 border-l-4 border-[#B76E79] pl-4 text-lg leading-8 text-gray-600">{post.excerpt}</p>}<div className="prose prose-sm mt-8 max-w-none whitespace-pre-line leading-7 text-gray-700">{post.content}</div></div></article></main>
+
+  const title = post.titleRw || post.title
+  const description = post.excerptRw || post.excerpt || title
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Ahabanza', url: '/' }, // verified-rw
+    { name: title, url: `/blog/${post.slug}` },
+  ])
+  const articleSchema = getArticleSchema({
+    title,
+    description,
+    slug: post.slug,
+    publishedAt: (post.publishedAt || post.updatedAt).toISOString(),
+    updatedAt: post.updatedAt.toISOString(),
+    image: post.coverImage,
+    author: post.authorName,
+  })
+
+  return (
+    <>
+      <StructuredData data={[articleSchema, breadcrumbSchema]} />
+      <BlogPostContent post={{
+        ...post,
+        tags: safeTags(post.tags),
+        publishedAt: post.publishedAt?.toISOString() || null,
+        updatedAt: post.updatedAt.toISOString(),
+      }} />
+    </>
+  )
 }
-function safeTags(value:string){try{const tags=JSON.parse(value);return Array.isArray(tags)?tags:[]}catch{return []}}
+
+function safeTags(value: string | null) {
+  try {
+    const parsed: unknown = JSON.parse(value || '[]')
+    return Array.isArray(parsed) ? parsed.filter((tag): tag is string => typeof tag === 'string') : []
+  } catch {
+    return []
+  }
+}

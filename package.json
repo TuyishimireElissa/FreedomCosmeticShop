@@ -13,6 +13,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx scripts/seed.ts",
     "catalog:import": "tsx scripts/import-real-products.ts",
+    "blog:seed": "tsx src/scripts/seed-blog-starters.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:a11y": "tsx src/scripts/test-accessibility.ts",

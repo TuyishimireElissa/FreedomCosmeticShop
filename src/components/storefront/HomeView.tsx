@@ -60,9 +60,13 @@ interface Brand {
 interface BlogPost {
   id: string
   title: string
+  titleRw?: string | null
   slug: string
   excerpt: string | null
+  excerptRw?: string | null
   coverImage: string | null
+  imageAlt?: string | null
+  imageAltRw?: string | null
   tags: string[]
   publishedAt: string | null
   viewCount: number

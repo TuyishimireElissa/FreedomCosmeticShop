@@ -1,174 +1,98 @@
-'use client'
+import type { Metadata } from 'next'
+import ProductsPageClient from '@/components/products/ProductsPageClient'
+import StructuredData from '@/components/seo/StructuredData'
+import { getPageMetadata, type LocalizedSEOText } from '@/lib/seo-config'
+import { getBreadcrumbSchema } from '@/lib/structured-data'
 
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import type { Brand, Category, Product } from '@/lib/types'
-import ProductGrid from '@/components/products/ProductGrid'
-import FilterSidebar from '@/components/products/FilterSidebar'
-import MobileFilters from '@/components/products/MobileFilters'
-import FilterChips from '@/components/products/FilterChips'
-import SearchWithSuggestions from '@/components/storefront/SearchWithSuggestions'
-import { useProductFilters } from '@/hooks/useProductFilters'
-import { useT } from '@/lib/i18n/LanguageContext'
-import { cn } from '@/lib/utils'
-import { useLowData } from '@/contexts/LowDataContext'
-
-interface Pagination {
-  page: number
-  pageSize: number
-  total: number
-  totalPages: number
-  hasMore: boolean
+const CATEGORY_SEO: Record<string, { title: LocalizedSEOText; label: string }> = {
+  skincare: {
+    title: { en: 'Skincare Products in Rwanda', rw: 'Ibicuruzwa byo Kwita ku Ruhu mu Rwanda' }, // verified-rw
+    label: 'Kwita ku ruhu', // verified-rw
+  },
+  haircare: {
+    title: { en: 'Haircare Products in Rwanda', rw: 'Ibicuruzwa byo Kwita ku Musatsi mu Rwanda' }, // verified-rw
+    label: 'Kwita ku musatsi', // verified-rw
+  },
+  makeup: {
+    title: { en: 'Makeup Products in Rwanda', rw: 'Ibikoresho byo Kwisiga mu Rwanda' }, // verified-rw
+    label: 'Ibikoresho byo kwisiga', // verified-rw
+  },
+  fragrance: {
+    title: { en: 'Fragrances in Rwanda', rw: 'Imibavu mu Rwanda' }, // verified-rw
+    label: 'Imibavu', // verified-rw
+  },
+  'body-care': {
+    title: { en: 'Body Care Products in Rwanda', rw: 'Ibicuruzwa byo Kwita ku Mubiri mu Rwanda' }, // verified-rw
+    label: 'Kwita ku mubiri', // verified-rw
+  },
 }
 
-const LOW_DATA_PAGE_SIZE = 8
-const NORMAL_PAGE_SIZE = 20
+type ProductsSearchParams = Promise<Record<string, string | string[] | undefined>>
 
-const EMPTY_PAGINATION: Pagination = { page: 1, pageSize: NORMAL_PAGE_SIZE, total: 0, totalPages: 0, hasMore: false }
-
-export default function ProductsPage() {
-  return <Suspense fallback={<ProductsPageSkeleton />}><ProductsContent /></Suspense>
+function firstValue(value: string | string[] | undefined) {
+  return (Array.isArray(value) ? value[0] : value || '').trim().slice(0, 100)
 }
 
-function ProductsContent() {
-  const t = useT()
-  const { isLowData } = useLowData()
-  const { filters, setFilter, buildApiQuery } = useProductFilters()
-  const [products, setProducts] = useState<Product[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
-  const [brands, setBrands] = useState<Brand[]>([])
-  const [filtersLoading, setFiltersLoading] = useState(true)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [request, setRequest] = useState(0)
-  const [pagination, setPagination] = useState<Pagination>(EMPTY_PAGINATION)
-  const lastProductRequest = useRef({ signature: '', page: 0 })
-  const page = Math.max(1, Number(filters.page) || 1)
-  const pageSize = isLowData ? LOW_DATA_PAGE_SIZE : NORMAL_PAGE_SIZE
-  const previousPageSize = useRef(pageSize)
+export async function generateMetadata({ searchParams }: { searchParams: ProductsSearchParams }): Promise<Metadata> {
+  const params = await searchParams
+  const search = firstValue(params.search || params.q)
+  const category = firstValue(params.category).toLowerCase()
 
-  useEffect(() => {
-    if (previousPageSize.current === pageSize) return
-    previousPageSize.current = pageSize
-    lastProductRequest.current = { signature: '', page: 0 }
-    setFilter('page', '1')
-  }, [pageSize, setFilter])
+  if (search) {
+    const encodedSearch = encodeURIComponent(search)
+    return getPageMetadata({
+      title: {
+        en: `Search results for “${search}”`,
+        rw: `Ibisubizo by’ishakisha rya “${search}”`, // verified-rw
+      },
+      description: {
+        en: `Browse current FreedomCosmeticShop catalogue results for “${search}” in Rwanda.`,
+        rw: `Reba ibicuruzwa biri ku rutonde rwa FreedomCosmeticShop bihuye na “${search}” mu Rwanda.`, // verified-rw
+      },
+      path: `/products?search=${encodedSearch}`,
+      noIndex: true,
+    })
+  }
 
-  useEffect(() => {
-    const controller = new AbortController()
-    setFiltersLoading(true)
-    Promise.all([
-      fetch('/api/categories', { signal: controller.signal }).then((response) => { if (!response.ok) throw new Error(); return response.json() }),
-      fetch('/api/brands', { signal: controller.signal }).then((response) => { if (!response.ok) throw new Error(); return response.json() }),
-    ])
-      .then(([categoryData, brandData]) => {
-        setCategories(categoryData.categories || categoryData.data || [])
-        setBrands(brandData.brands || brandData.data || [])
-      })
-      .catch((reason) => { if (!(reason instanceof DOMException && reason.name === 'AbortError')) { setCategories([]); setBrands([]) } })
-      .finally(() => { if (!controller.signal.aborted) setFiltersLoading(false) })
-    return () => controller.abort()
-  }, [])
+  const categorySEO = CATEGORY_SEO[category]
+  if (categorySEO) {
+    return getPageMetadata({
+      title: categorySEO.title,
+      description: {
+        en: `Browse current ${categorySEO.title.en.toLowerCase()} with prices in RWF and delivery information for Rwanda.`,
+        rw: `Reba ${categorySEO.title.rw.toLowerCase()} biriho, ibiciro mu RWF n’amakuru yo kubigeza mu Rwanda.`, // verified-rw
+      },
+      path: `/products?category=${encodeURIComponent(category)}`,
+    })
+  }
 
-  const { apiQuery, requestSignature } = useMemo(() => {
-    const params = new URLSearchParams(buildApiQuery())
-    params.set('pageSize', String(pageSize))
-    const signatureParams = new URLSearchParams(params)
-    signatureParams.delete('page')
-    return {
-      apiQuery: params.toString(),
-      requestSignature: signatureParams.toString(),
-    }
-  }, [buildApiQuery, pageSize])
+  return getPageMetadata({
+    title: {
+      en: 'Beauty Products in Rwanda | FreedomCosmeticShop',
+      rw: 'Ibicuruzwa by’Ubwiza mu Rwanda | FreedomCosmeticShop', // verified-rw
+    },
+    description: {
+      en: 'Browse the current FreedomCosmeticShop catalogue of skincare, makeup, haircare and other beauty products with prices in RWF.',
+      rw: 'Reba urutonde rwa FreedomCosmeticShop rw’ibita ku ruhu, ibikoresho byo kwisiga, ibita ku musatsi n’ibindi bicuruzwa by’ubwiza bifite ibiciro mu RWF.', // verified-rw
+    },
+    path: '/products',
+  })
+}
 
-  useEffect(() => {
-    const controller = new AbortController()
-    setLoading(true)
-    setError(null)
-    fetch(`/api/products?${apiQuery}`, { signal: controller.signal, cache: 'no-store' })
-      .then((response) => { if (!response.ok) throw new Error(t('errors.products_load_failed')); return response.json() })
-      .then((result) => {
-        const rows: Product[] = result.products || result.data?.products || []
-        const canAppend = page > 1
-          && lastProductRequest.current.signature === requestSignature
-          && lastProductRequest.current.page === page - 1
-        setProducts((current) => {
-          if (!canAppend) return rows
-          const existingIds = new Set(current.map((product) => product.id))
-          return [...current, ...rows.filter((product) => !existingIds.has(product.id))]
-        })
-        lastProductRequest.current = { signature: requestSignature, page }
-        setPagination(result.pagination || result.data?.pagination || EMPTY_PAGINATION)
-      })
-      .catch((reason) => { if (!(reason instanceof DOMException && reason.name === 'AbortError')) setError(reason instanceof Error ? reason.message : t('errors.products_load_failed')) })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false) })
-    return () => controller.abort()
-  }, [apiQuery, page, request, requestSignature, t])
-
-  const sortOptions = [
-    { value: 'relevance', label: t('search.sort_relevance') },
-    { value: 'best_selling', label: t('search.sort_best_selling') },
-    { value: 'newest', label: t('search.sort_newest') },
-    { value: 'price_asc', label: t('search.sort_price_low') },
-    { value: 'price_desc', label: t('search.sort_price_high') },
-    { value: 'rating', label: t('search.sort_top_rated') },
+export default async function ProductsPage({ searchParams }: { searchParams: ProductsSearchParams }) {
+  const params = await searchParams
+  const category = firstValue(params.category).toLowerCase()
+  const categorySEO = CATEGORY_SEO[category]
+  const breadcrumbs = [
+    { name: 'Ahabanza', url: '/' }, // verified-rw
+    { name: 'Ibicuruzwa', url: '/products' }, // verified-rw
+    ...(categorySEO ? [{ name: categorySEO.label, url: `/products?category=${encodeURIComponent(category)}` }] : []),
   ]
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
-      <header className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B76E79]">{t('search.catalog')}</span>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[#1a1a1a] sm:text-4xl">{t('categories.all')}</h1>
-          <p className="mt-2 text-sm text-gray-500">{loading ? t('search.loading_products') : t('search.products_found', { count: pagination.total })}</p>
-        </div>
-      </header>
-
-      <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
-        <div className="mb-4 md:hidden"><SearchWithSuggestions variant="page" /></div>
-        <FilterChips />
-
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <p className="min-w-0 text-sm text-gray-500">{filters.search ? t('search.results', { count: pagination.total, query: filters.search }) : t('search.products_found', { count: pagination.total })}</p>
-          <MobileFilters availableCategories={categories} availableBrands={brands} />
-        </div>
-
-        <div className="scrollbar-hide mb-5 flex items-center gap-2 overflow-x-auto pb-1">
-          <span className="shrink-0 text-xs font-semibold text-gray-500">{t('search.sort_by')}:</span>
-          {sortOptions.map((option) => <button key={option.value} type="button" onClick={() => setFilter('sort', option.value)} className={cn('min-h-9 shrink-0 rounded-full px-3 text-xs font-bold transition-colors', filters.sort === option.value ? 'bg-[#B76E79] text-white' : 'bg-white text-gray-700 hover:bg-gray-100')}>{option.label}</button>)}
-        </div>
-
-        <div className="flex items-start gap-5 lg:gap-6">
-          <FilterSidebar availableCategories={categories} availableBrands={brands} className={filtersLoading ? 'animate-pulse opacity-60' : ''} />
-          <main className="min-w-0 flex-1">
-            <div id="product-results">
-              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} />
-            </div>
-            {error && products.length > 0 && <p role="alert" className="mt-4 text-center text-sm text-red-700">{error}</p>}
-            {!error && products.length > 0 && (
-              <div className="mt-8 flex flex-col items-center gap-3">
-                <p className="text-sm text-gray-500" aria-live="polite">
-                  {t('search.showing_products', { shown: products.length, total: pagination.total })}
-                </p>
-                {pagination.hasMore && (
-                  <button
-                    type="button"
-                    onClick={() => setFilter('page', String(page + 1))}
-                    disabled={loading}
-                    aria-controls="product-results"
-                    className="min-h-12 rounded-xl bg-[#B76E79] px-6 text-sm font-bold text-white transition-colors hover:bg-[#a55d68] disabled:cursor-wait disabled:opacity-60"
-                  >
-                    {loading ? t('search.loading_more_products') : t('search.load_more_products')}
-                  </button>
-                )}
-              </div>
-            )}
-          </main>
-        </div>
-      </div>
-    </div>
+    <>
+      <StructuredData data={getBreadcrumbSchema(breadcrumbs)} />
+      <ProductsPageClient />
+    </>
   )
-}
-
-function ProductsPageSkeleton() {
-  return <div className="min-h-screen animate-pulse bg-[#f8f9fa] p-4"><div className="mx-auto mt-10 h-12 max-w-7xl rounded-2xl bg-gray-200" /></div>
 }

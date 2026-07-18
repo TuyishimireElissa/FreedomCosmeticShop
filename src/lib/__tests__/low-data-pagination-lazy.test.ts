@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8')
-const productsPage = read('src/app/products/page.tsx')
+const productsPage = read('src/components/products/ProductsPageClient.tsx')
 const lazySection = read('src/components/ui/LazySection.tsx')
 const homepage = read('src/app/page.tsx')
 const legacyHomepage = read('src/components/storefront/HomeView.tsx')

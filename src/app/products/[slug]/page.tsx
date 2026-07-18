@@ -1,26 +1,31 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import ProductDetailClient from '@/components/products/ProductDetailClient'
-import { BUSINESS } from '@/lib/business-config'
-
-const baseUrl = BUSINESS.url
+import StructuredData from '@/components/seo/StructuredData'
+import { getPageMetadata } from '@/lib/seo-config'
+import { getBreadcrumbSchema, getProductSchema } from '@/lib/structured-data'
+import Breadcrumbs from '@/components/ui/Breadcrumbs'
 
 async function getProduct(slug: string) {
   return prisma.product.findFirst({
     where: { slug, isActive: true, isDeleted: false },
     select: {
+      id: true,
       name: true,
       slug: true,
       shortDescription: true,
       description: true,
       price: true,
       stock: true,
+      sku: true,
+      barcode: true,
       images: true,
       productImages: {
         select: { url: true, isPrimary: true, sortOrder: true },
         orderBy: { sortOrder: 'asc' },
       },
       brand: { select: { name: true } },
+      category: { select: { name: true, slug: true } },
       reviews: {
         where: { isApproved: true, isVerified: true, isHidden: false, isDeleted: false },
         select: { rating: true },
@@ -32,51 +37,83 @@ async function getProduct(slug: string) {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const product = await getProduct(slug).catch(() => null)
-  if (!product) return { title: 'Product not found' }
-  const images = getMetadataImages(product)
-  const description = product.shortDescription || product.description.slice(0, 160)
-  return {
-    title: product.name,
-    description,
-    alternates: { canonical: `/products/${product.slug}` },
-    openGraph: {
-      type: 'website',
-      title: `${product.name} | ${BUSINESS.name}`,
-      description,
-      url: `${baseUrl}/products/${product.slug}`,
-      images: images[0] ? [{ url: images[0], alt: product.name }] : undefined,
-    },
+  if (!product) {
+    return getPageMetadata({
+      title: { en: 'Product not found', rw: 'Igicuruzwa nticyabonetse' }, // verified-rw
+      description: { en: 'This product is not available in the current catalogue.', rw: 'Iki gicuruzwa ntikiboneka ku rutonde rw’ibicuruzwa biriho.' }, // verified-rw
+      path: `/products/${encodeURIComponent(slug)}`,
+      noIndex: true,
+    })
   }
+  const images = getMetadataImages(product)
+  const englishDescription = (product.shortDescription || product.description).slice(0, 160)
+  return getPageMetadata({
+    title: {
+      en: `${product.name} | Buy Online in Rwanda`,
+      rw: `${product.name} | Gura mu Rwanda`, // verified-rw
+    },
+    description: {
+      en: englishDescription,
+      rw: `Gura ${product.name} mu Rwanda. Reba igiciro kiriho mu RWF, amakuru y’igicuruzwa n’uburyo bwo kukigezaho.`, // verified-rw
+    },
+    path: `/products/${product.slug}`,
+    image: images[0],
+  })
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const product = await getProduct(slug).catch(() => null)
-  const reviews = product?.reviews || []
-  const rating = reviews.length
+  if (!product) return <ProductDetailClient slug={slug} />
+
+  const reviews = product.reviews
+  const average = reviews.length
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
     : 0
-  const jsonLd = product ? {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
+  const productSchema = getProductSchema({
+    id: product.id,
     name: product.name,
+    slug: product.slug,
     description: product.shortDescription || product.description,
-    image: getMetadataImages(product),
-    brand: product.brand ? { '@type': 'Brand', name: product.brand.name } : undefined,
-    offers: {
-      '@type': 'Offer',
-      priceCurrency: 'RWF',
-      price: product.price,
-      availability: product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      url: `${baseUrl}/products/${product.slug}`,
-    },
-    aggregateRating: reviews.length ? {
-      '@type': 'AggregateRating',
-      ratingValue: Math.round(rating * 10) / 10,
-      reviewCount: reviews.length,
-    } : undefined,
-  } : null
-  return <>{jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />}<ProductDetailClient slug={slug} /></>
+    price: product.price,
+    images: getMetadataImages(product),
+    stockQuantity: product.stock,
+    sku: product.sku,
+    brand: product.brand,
+    aggregateRating: reviews.length > 0
+      ? { average, count: reviews.length, source: 'database' }
+      : undefined,
+    gtin: getKnownGTIN(product.barcode),
+  })
+  const breadcrumbSchema = getBreadcrumbSchema([
+    { name: 'Ahabanza', url: '/' }, // verified-rw
+    { name: 'Ibicuruzwa', url: '/products' }, // verified-rw
+    { name: product.category.name, url: `/products?category=${encodeURIComponent(product.category.slug)}` },
+    { name: product.name, url: `/products/${product.slug}` },
+  ])
+
+  return (
+    <>
+      <StructuredData data={[productSchema, breadcrumbSchema]} />
+      <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+        <Breadcrumbs items={[
+          { name: 'Ibicuruzwa', url: '/products' }, // verified-rw
+          { name: product.category.name, url: `/products?category=${encodeURIComponent(product.category.slug)}` },
+          { name: product.name, url: `/products/${product.slug}` },
+        ]} />
+      </div>
+      <ProductDetailClient slug={slug} />
+    </>
+  )
+}
+
+function getKnownGTIN(barcode: string | null) {
+  const value = barcode?.replace(/\D/g, '') || ''
+  if (value.length === 8) return { type: 'gtin8' as const, value }
+  if (value.length === 12) return { type: 'gtin12' as const, value }
+  if (value.length === 13) return { type: 'gtin13' as const, value }
+  if (value.length === 14) return { type: 'gtin14' as const, value }
+  return undefined
 }
 
 function parseImages(value: string): string[] {

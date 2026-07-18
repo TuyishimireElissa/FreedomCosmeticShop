@@ -1,13 +1,33 @@
 import type { MetadataRoute } from 'next'
-import { BUSINESS } from '@/lib/business-config'
+import { SEO_CONFIG } from '@/lib/seo-config'
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = BUSINESS.url
+  const privatePaths = [
+    '/admin',
+    '/admin/',
+    '/account',
+    '/account/',
+    '/api',
+    '/api/',
+    '/cart',
+    '/checkout',
+    '/checkout/',
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/change-password',
+    '/*?*search=*',
+    '/*?*q=*',
+    '/*?*utm_*',
+  ]
+
   return {
     rules: [
-      { userAgent: '*', allow: '/', disallow: ['/admin/', '/api/', '/account/', '/cart', '/checkout', '/login', '/register', '/forgot-password'] },
+      { userAgent: '*', allow: '/', disallow: privatePaths },
+      { userAgent: 'GPTBot', disallow: '/' },
+      { userAgent: 'CCBot', disallow: '/' },
     ],
-    sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
+    sitemap: `${SEO_CONFIG.siteUrl}/sitemap.xml`,
+    host: SEO_CONFIG.siteUrl,
   }
 }

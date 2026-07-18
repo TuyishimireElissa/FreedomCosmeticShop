@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-const source = readFileSync(resolve(process.cwd(), 'src/app/products/page.tsx'), 'utf8')
+const source = readFileSync(resolve(process.cwd(), 'src/components/products/ProductsPageClient.tsx'), 'utf8')
 
 describe('products search and filter integration', () => {
   it('assembles smart search, chips, mobile filters, and desktop sidebar', () => {
