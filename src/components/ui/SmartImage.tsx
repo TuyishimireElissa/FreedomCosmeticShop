@@ -9,6 +9,7 @@ import {
   getResponsiveSrcSet,
   IMAGE_QUALITY,
   IMAGE_SIZES,
+  optimizeCloudinaryUrl,
   type ResponsiveImageContext,
 } from '@/lib/cloudinary-images'
 import { cn } from '@/lib/utils'
@@ -47,20 +48,33 @@ export default function SmartImage({
     setFailed(false)
   }, [fallbackSrc, isLowData, publicId])
 
+  const optimizedFallback = useMemo(() => fallbackSrc
+    ? optimizeCloudinaryUrl(fallbackSrc, { width: maxWidth, quality })
+    : undefined, [fallbackSrc, maxWidth, quality])
+  const hasTransformableFallback = Boolean(fallbackSrc && optimizedFallback && optimizedFallback !== fallbackSrc)
+
   const loader = useMemo<ImageLoader | undefined>(() => {
-    if (!publicId) return undefined
-    return ({ width: requestedWidth }) => buildImageUrl({
-      publicId,
-      width: Math.min(requestedWidth, maxWidth),
-      height: aspectRatio && aspectRatio > 0 ? Math.round(Math.min(requestedWidth, maxWidth) / aspectRatio) : undefined,
-      quality,
-    })
-  }, [aspectRatio, maxWidth, publicId, quality])
+    if (publicId) {
+      return ({ width: requestedWidth }) => buildImageUrl({
+        publicId,
+        width: Math.min(requestedWidth, maxWidth),
+        height: aspectRatio && aspectRatio > 0 ? Math.round(Math.min(requestedWidth, maxWidth) / aspectRatio) : undefined,
+        quality,
+      })
+    }
+    if (fallbackSrc && hasTransformableFallback) {
+      return ({ width: requestedWidth }) => optimizeCloudinaryUrl(fallbackSrc, {
+        width: Math.min(requestedWidth, maxWidth),
+        quality,
+      })
+    }
+    return undefined
+  }, [aspectRatio, fallbackSrc, hasTransformableFallback, maxWidth, publicId, quality])
 
   const responsive = publicId
     ? getResponsiveSrcSet(publicId, { context, isLowData, aspectRatio })
     : null
-  const source = publicId || fallbackSrc
+  const source = publicId || optimizedFallback || fallbackSrc
 
   if (!source || failed) {
     if (!showPlaceholder) return null

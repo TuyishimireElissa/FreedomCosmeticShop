@@ -14,22 +14,19 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import { requireAuth } from "@/lib/auth"
 
+const PRIVATE_HEADERS = { 'Cache-Control': 'private, no-store, max-age=0' }
+const privateJson = (body: unknown, status = 200) => NextResponse.json(body, { status, headers: PRIVATE_HEADERS })
+
 export async function GET() {
   try {
     const user = await requireAuth()
     if (!user) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 }
-      )
+      return privateJson({ error: "Not authenticated" }, 401)
     }
 
-    return NextResponse.json({ user })
+    return privateJson({ user })
   } catch (error) {
     console.error("Get current user error:", error)
-    return NextResponse.json(
-      { error: "Failed to fetch user" },
-      { status: 500 }
-    )
+    return privateJson({ error: "Failed to fetch user" }, 500)
   }
 }

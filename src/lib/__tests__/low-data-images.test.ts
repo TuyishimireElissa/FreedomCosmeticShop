@@ -6,6 +6,7 @@ import {
   getResponsiveSrcSet,
   IMAGE_QUALITY,
   IMAGE_SIZES,
+  optimizeCloudinaryUrl,
 } from '@/lib/cloudinary-images'
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8')
@@ -51,8 +52,17 @@ describe('low-data responsive images', () => {
     expect(smartImage).toContain('const { isLowData } = useLowData()')
     expect(smartImage).toContain('Math.min(requestedWidth, maxWidth)')
     expect(smartImage).toContain("quality = isLowData ? IMAGE_QUALITY.lowData : IMAGE_QUALITY.normal")
+    expect(smartImage).toContain('hasTransformableFallback')
+    expect(smartImage).toContain('optimizeCloudinaryUrl(fallbackSrc')
     expect(smartImage).toContain("loading={priority ? undefined : 'lazy'}")
     expect(smartImage).toContain('onError={() => setFailed(true)}')
+
+    const legacy = optimizeCloudinaryUrl(
+      'https://res.cloudinary.com/dohoc0tmp/image/fetch/f_auto,q_auto,w_1200/https://example.com/product.jpg',
+      { width: 320, quality: IMAGE_QUALITY.lowData },
+    )
+    expect(legacy).toContain('w_320,c_fill,g_auto,q_auto:eco,f_auto,dpr_auto')
+    expect(legacy).not.toContain('w_1200')
   })
 
   it('uses SmartImage on listing cards and product detail galleries', () => {
