@@ -37,13 +37,23 @@ export function optimizeCloudinaryUrl(
   try {
     const url = new URL(source)
     const uploadPrefix = `/${CLOUDINARY_CLOUD_NAME}/image/upload/`
-    if (url.protocol !== 'https:' || url.hostname !== 'res.cloudinary.com' || !url.pathname.startsWith(uploadPrefix)) {
-      return source
-    }
+    const fetchPrefix = `/${CLOUDINARY_CLOUD_NAME}/image/fetch/`
+    const prefix = url.pathname.startsWith(uploadPrefix)
+      ? uploadPrefix
+      : url.pathname.startsWith(fetchPrefix)
+        ? fetchPrefix
+        : null
+    if (url.protocol !== 'https:' || url.hostname !== 'res.cloudinary.com' || !prefix) return source
+
     const safeWidth = Math.max(1, Math.min(1024, Math.round(width)))
     const safeQuality = quality === IMAGE_QUALITY.lowData ? IMAGE_QUALITY.lowData : IMAGE_QUALITY.normal
     const transformation = `w_${safeWidth},c_fill,g_auto,q_${safeQuality},f_auto,dpr_auto`
-    url.pathname = url.pathname.replace(uploadPrefix, `${uploadPrefix}${transformation}/`)
+    const remainder = url.pathname.slice(prefix.length)
+    const segments = remainder.split('/')
+    const firstSegment = segments[0] || ''
+    const hasExistingTransformation = /(?:^|,)(?:w|h|c|g|q|f|dpr)_/.test(firstSegment)
+    if (hasExistingTransformation) segments.shift()
+    url.pathname = `${prefix}${transformation}/${segments.join('/')}`
     return url.toString()
   } catch {
     return source

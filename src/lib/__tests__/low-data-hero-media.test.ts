@@ -52,6 +52,12 @@ describe('low-data hero and media behavior', () => {
       { width: 480, quality: IMAGE_QUALITY.lowData },
     )
     expect(optimized).toContain('/w_480,c_fill,g_auto,q_auto:eco,f_auto,dpr_auto/')
+    const optimizedFetch = optimizeCloudinaryUrl(
+      'https://res.cloudinary.com/dohoc0tmp/image/fetch/f_auto,q_auto,w_1200/https://example.com/hero.jpg',
+      { width: 480, quality: IMAGE_QUALITY.lowData },
+    )
+    expect(optimizedFetch).toContain('/image/fetch/w_480,c_fill,g_auto,q_auto:eco,f_auto,dpr_auto/https://example.com/hero.jpg')
+    expect(optimizedFetch).not.toContain('w_1200')
     expect(optimizeCloudinaryUrl('https://example.com/hero.jpg', { width: 480 })).toBe('https://example.com/hero.jpg')
     expect(staticHero).toContain('const { isLowData } = useLowData()')
     expect(staticHero).toContain('width: IMAGE_SIZES.hero.lowData')
