@@ -13,14 +13,15 @@ const querySchema = z.object({
 const LIMIT = 10
 const publicWhere = { isVerified: true, isApproved: true, isHidden: false, isDeleted: false } as const
 
-export async function GET(request: Request, { params }: { params: { productId: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ productId: string }> }) {
   try {
-    if (!params.productId || params.productId.length > 100) return NextResponse.json({ success: false, error: 'INVALID_PRODUCT' }, { status: 400 })
+    const { productId } = await params
+    if (!productId || productId.length > 100) return NextResponse.json({ success: false, error: 'INVALID_PRODUCT' }, { status: 400 })
     const url = new URL(request.url)
     const parsed = querySchema.safeParse({ sort: url.searchParams.get('sort') || undefined, filter: url.searchParams.get('filter') || undefined, page: url.searchParams.get('page') || undefined })
     if (!parsed.success) return NextResponse.json({ success: false, error: 'INVALID_QUERY' }, { status: 400 })
     const { sort, filter, page } = parsed.data
-    const where: Prisma.ReviewWhereInput = { productId: params.productId, ...publicWhere, ...(filter !== 'all' ? { rating: Number(filter) } : {}) }
+    const where: Prisma.ReviewWhereInput = { productId: productId, ...publicWhere, ...(filter !== 'all' ? { rating: Number(filter) } : {}) }
     const orderBy: Prisma.ReviewOrderByWithRelationInput[] = sort === 'recent' ? [{ createdAt: 'desc' }]
       : sort === 'rating_high' ? [{ rating: 'desc' }, { helpfulVotes: 'desc' }, { createdAt: 'desc' }]
       : sort === 'rating_low' ? [{ rating: 'asc' }, { helpfulVotes: 'desc' }, { createdAt: 'desc' }]
@@ -37,7 +38,7 @@ export async function GET(request: Request, { params }: { params: { productId: s
         },
       }),
       prisma.review.count({ where }),
-      prisma.review.findMany({ where: { productId: params.productId, ...publicWhere }, select: { rating: true } }),
+      prisma.review.findMany({ where: { productId: productId, ...publicWhere }, select: { rating: true } }),
     ])
     const counts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
     for (const review of allRatings) counts[review.rating] = (counts[review.rating] || 0) + 1

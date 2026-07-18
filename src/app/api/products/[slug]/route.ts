@@ -2,9 +2,10 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { PUBLIC_PRODUCT_SELECT, getRealUnitSales, serializePublicProduct } from '@/lib/public-product'
 
-export async function GET(_request: Request, { params }: { params: { slug: string } }) {
+export async function GET(_request: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
-    const slug = decodeURIComponent(params.slug || '').trim()
+    const { slug: rawSlug } = await params
+    const slug = decodeURIComponent(rawSlug || '').trim()
     if (!slug) {
       return NextResponse.json({ success: false, error: 'Product slug is required' }, { status: 400 })
     }

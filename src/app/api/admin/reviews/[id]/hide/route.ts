@@ -14,14 +14,15 @@ const schema = z.object({
   details: z.string().trim().max(500).optional(),
 }).strict().refine((value) => value.action !== 'HIDE' || Boolean(value.reason), { path: ['reason'], message: 'REASON_REQUIRED' })
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     const admin = await requirePermission(PERMISSIONS.REVIEWS_MODERATE)
     const parsed = schema.safeParse(await request.json())
     if (!parsed.success) return NextResponse.json({ success: false, error: 'INVALID_MODERATION' }, { status: 400 })
     const result = await prisma.$transaction(async (tx) => {
-      await tx.$queryRaw`SELECT id FROM "Review" WHERE id = ${params.id} FOR UPDATE`
-      const review = await tx.review.findUnique({ where: { id: params.id }, select: { id: true, productId: true, rating: true } })
+      await tx.$queryRaw`SELECT id FROM "Review" WHERE id = ${id} FOR UPDATE`
+      const review = await tx.review.findUnique({ where: { id: id }, select: { id: true, productId: true, rating: true } })
       if (!review) throw new ModerationError('REVIEW_NOT_FOUND', 404)
       const hidden = parsed.data.action === 'HIDE'
       await tx.review.update({ where: { id: review.id }, data: { isHidden: hidden, moderationReason: hidden ? [parsed.data.reason, parsed.data.details].filter(Boolean).join(': ') : null } })

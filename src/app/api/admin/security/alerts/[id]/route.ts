@@ -7,11 +7,12 @@ import { logActivity } from '@/server/services/activity'
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params
     const actor = await requireRole('ADMIN', 'SUPER_ADMIN')
-    const alert = await prisma.securityAlert.findUnique({ where: { id: params.id } })
+    const alert = await prisma.securityAlert.findUnique({ where: { id: id } })
     if (!alert) {
       return NextResponse.json({ success: false, error: 'Security alert not found' }, { status: 404 })
     }

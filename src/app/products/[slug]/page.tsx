@@ -29,8 +29,9 @@ async function getProduct(slug: string) {
   })
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const product = await getProduct(params.slug).catch(() => null)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const product = await getProduct(slug).catch(() => null)
   if (!product) return { title: 'Product not found' }
   const images = getMetadataImages(product)
   const description = product.shortDescription || product.description.slice(0, 160)
@@ -48,8 +49,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   }
 }
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const product = await getProduct(params.slug).catch(() => null)
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const product = await getProduct(slug).catch(() => null)
   const reviews = product?.reviews || []
   const rating = reviews.length
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
@@ -74,7 +76,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       reviewCount: reviews.length,
     } : undefined,
   } : null
-  return <>{jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />}<ProductDetailClient slug={params.slug} /></>
+  return <>{jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />}<ProductDetailClient slug={slug} /></>
 }
 
 function parseImages(value: string): string[] {

@@ -7,16 +7,17 @@ import { requireAuth } from '@/lib/auth'
 
 const schema = z.object({ isHelpful: z.boolean() }).strict()
 
-export async function POST(request: Request, { params }: { params: { reviewId: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ reviewId: string }> }) {
   try {
+    const { reviewId } = await params
     const user = await requireAuth()
     if (!user) return NextResponse.json({ success: false, error: 'AUTH_REQUIRED' }, { status: 401 })
-    if (!params.reviewId || params.reviewId.length > 100) return NextResponse.json({ success: false, error: 'INVALID_REVIEW' }, { status: 400 })
+    if (!reviewId || reviewId.length > 100) return NextResponse.json({ success: false, error: 'INVALID_REVIEW' }, { status: 400 })
     const parsed = schema.safeParse(await request.json())
     if (!parsed.success) return NextResponse.json({ success: false, error: 'INVALID_VOTE' }, { status: 400 })
     const counts = await prisma.$transaction(async (tx) => {
-      await tx.$queryRaw`SELECT id FROM "Review" WHERE id = ${params.reviewId} FOR UPDATE`
-      const review = await tx.review.findFirst({ where: { id: params.reviewId, isVerified: true, isApproved: true, isHidden: false, isDeleted: false }, select: { id: true, userId: true } })
+      await tx.$queryRaw`SELECT id FROM "Review" WHERE id = ${reviewId} FOR UPDATE`
+      const review = await tx.review.findFirst({ where: { id: reviewId, isVerified: true, isApproved: true, isHidden: false, isDeleted: false }, select: { id: true, userId: true } })
       if (!review) throw new ReviewVoteError('REVIEW_NOT_FOUND', 404)
       if (review.userId === user.id) throw new ReviewVoteError('SELF_VOTE_NOT_ALLOWED', 403)
       const existing = await tx.reviewVote.findUnique({ where: { reviewId_userId: { reviewId: review.id, userId: user.id } } })

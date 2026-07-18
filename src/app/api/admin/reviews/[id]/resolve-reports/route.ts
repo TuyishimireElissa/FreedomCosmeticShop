@@ -6,10 +6,11 @@ import { AuthError } from '@/lib/auth'
 import { PERMISSIONS, requirePermission } from '@/lib/permissions'
 import { logActivity } from '@/server/services/activity'
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     const admin = await requirePermission(PERMISSIONS.REVIEWS_MODERATE)
-    const review = await prisma.review.findUnique({ where: { id: params.id }, select: { id: true } })
+    const review = await prisma.review.findUnique({ where: { id: id }, select: { id: true } })
     if (!review) return NextResponse.json({ success: false, error: 'REVIEW_NOT_FOUND' }, { status: 404 })
     const result = await prisma.reviewReport.updateMany({ where: { reviewId: review.id, resolved: false }, data: { resolved: true, resolvedAt: new Date(), resolvedBy: admin.id } })
     void logActivity({ userId: admin.id, userName: admin.name, userRole: admin.role, action: 'REVIEW_REPORT_RESOLVE', entityType: 'REVIEW', entityId: review.id, description: 'Resolved review reports without hiding the review.', req: request }).catch(() => {})

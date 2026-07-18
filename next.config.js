@@ -64,7 +64,11 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
+  eslint: {
+    // Next 15's build-time ESLint runner conflicts with this repository's dual
+    // legacy/flat configuration. `npm run lint` remains a required separate check.
+    ignoreDuringBuilds: true,
+  },
 }
 
 module.exports = nextConfig

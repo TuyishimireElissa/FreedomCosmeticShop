@@ -3,6 +3,7 @@ import ReviewSubmissionForm from '@/components/reviews/ReviewSubmissionForm'
 
 export const metadata: Metadata = { title: 'Write an Honest Review' }
 
-export default function ReviewPage({ params }: { params: { orderId: string; productId: string } }) {
-  return <ReviewSubmissionForm orderId={params.orderId} productId={params.productId} />
+export default async function ReviewPage({ params }: { params: Promise<{ orderId: string; productId: string }> }) {
+  const { orderId, productId } = await params
+  return <ReviewSubmissionForm orderId={orderId} productId={productId} />
 }

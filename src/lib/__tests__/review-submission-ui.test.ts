@@ -44,7 +44,8 @@ describe('verified review submission UI', () => {
     expect(ordersApi).toContain('reviewProducts:')
     expect(ordersPage).toContain("order.status==='DELIVERED'")
     expect(ordersPage).toContain('href={`/review/${order.id}/${product.id}`}')
-    expect(page).toContain('<ReviewSubmissionForm orderId={params.orderId} productId={params.productId} />')
+    expect(page).toContain('const { orderId, productId } = await params')
+    expect(page).toContain('<ReviewSubmissionForm orderId={orderId} productId={productId} />')
   })
 
   it('uses mobile touch targets and translated rendered text', () => {

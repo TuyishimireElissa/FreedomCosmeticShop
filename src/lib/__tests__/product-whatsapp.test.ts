@@ -10,7 +10,8 @@ const rw = readFileSync(resolve(process.cwd(), 'src/lib/i18n/translations/rw.ts'
 
 describe('product WhatsApp assisted ordering', () => {
   it('is integrated into the active database-backed product detail route', () => {
-    expect(route).toContain('<ProductDetailClient slug={params.slug}')
+    expect(route).toContain('const { slug } = await params')
+    expect(route).toContain('<ProductDetailClient slug={slug}')
     expect(detail).toContain("import OrderViaWhatsApp from '@/components/products/OrderViaWhatsApp'")
     expect(detail).toContain('<OrderViaWhatsApp product={{ id: product.id, name: product.name, slug: product.slug, price: product.price, stock: product.stock }}')
   })

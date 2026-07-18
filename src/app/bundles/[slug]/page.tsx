@@ -1,5 +1,6 @@
 import BundleDetailView from '@/components/bundles/BundleDetailView'
 
-export default function BundlePage({ params }: { params: { slug: string } }) {
-  return <BundleDetailView slug={params.slug} />
+export default async function BundlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  return <BundleDetailView slug={slug} />
 }
