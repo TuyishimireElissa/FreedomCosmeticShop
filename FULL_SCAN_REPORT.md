@@ -138,7 +138,7 @@ REQUIRED:
 - ✅ SUPABASE_PROJECT_REF = hsdqahltrqjeaskhheis (PASS)
 - ✅ NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = dohoc0tmp (PASS)
 - ✅ CLOUDINARY_CLOUD_NAME = dohoc0tmp (PASS)
-- ✅ CLOUDINARY_API_KEY = 524578837153868 (PASS)
+- ✅ CLOUDINARY_API_KEY = [CONFIGURED_IN_ENV] (PASS)
 - ✅ CLOUDINARY_API_SECRET = [ROTATED_CLOUDINARY_API_SECRET] (PASS)
 - ✅ STORE_NAME = FreedomCosmeticShop (PASS)
 - ✅ STORE_CURRENCY = RWF (PASS)
@@ -467,7 +467,7 @@ CUSTOMERS, WHOLESALE ADMIN, SETTINGS:
 ### 🔍 SCAN 13: CLOUDINARY INTEGRATION
 
 - ❌ BEFORE: /lib/cloudinary.ts MISSING
-- ✅ AFTER ADDED: cloudName dohoc0tmp, apiKey 524578837153868, apiSecret [ROTATED_CLOUDINARY_API_SECRET], folders freedomcosmeticshop/products etc - FIXED
+- ✅ AFTER ADDED: cloudName dohoc0tmp, apiKey [CONFIGURED_IN_ENV], apiSecret [ROTATED_CLOUDINARY_API_SECRET], folders freedomcosmeticshop/products etc - FIXED
 - ✅ next.config.js allows res.cloudinary.com/dohoc0tmp (FIXED)
 - ✅ storage.ts uploadImage uses fetch to api.cloudinary.com/v1_1/dohoc0tmp/image/upload, unsigned preset freedom_uploads, folder param
 - ✅ Product images use Cloudinary URLs + Unsplash fallback, optimizeUrl with w_, h_, q_auto, f_auto
@@ -687,7 +687,7 @@ AFTER FIX (Commit 7508835 pushed, Commit cf126c9 pushed, Vercel redeploying):
 | 🌐 Website | ✅ CORRECT | HomeView 9 sections, fallback 18 products, RWF |
 | ⚙️ Admin | ✅ CORRECT | AdminView + Login with lockout, role check ADMIN/MANAGER/STAFF |
 | 🗄️ Database | ⚠️ FALLBACK ACTIVE | Supabase hsdqahltrqjeaskhheis - password auth FAILED, fallbackData working, needs reset |
-| 🖼️ Cloudinary | ✅ CONNECTED | dohoc0tmp, 524578837153868, folders freedomcosmeticshop/*, next.config allows res.cloudinary.com |
+| 🖼️ Cloudinary | ✅ CONNECTED | dohoc0tmp, [CONFIGURED_IN_ENV], folders freedomcosmeticshop/*, next.config allows res.cloudinary.com |
 | 💛 MTN MoMo | ⚠️ CONFIGURED | PayPack service exists, needs PAYPACK_CLIENT_ID/SECRET env for live |
 | 🚚 Delivery | ✅ WORKING | 30 districts, fees 1000/3000/3500/4000, free >50000, times Same day to 3-5 days |
 | 🏪 Wholesale | ✅ WORKING | Landing, apply, approve/reject, tiers 12%/18%/24%/29%, min 50000 |

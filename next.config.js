@@ -1,19 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'res.cloudinary.com',
         pathname: '/dohoc0tmp/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'via.placeholder.com',
       },
       {
         protocol: 'https',
@@ -26,13 +19,6 @@ const nextConfig = {
     ],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 60,
-  },
-  env: {
-    STORE_NAME: 'FreedomCosmeticShop',
-    STORE_CURRENCY: 'RWF',
-    STORE_COUNTRY: 'Rwanda',
-    STORE_WHATSAPP: '+250780000000',
-    CLOUDINARY_CLOUD: 'dohoc0tmp',
   },
   async headers() {
     const contentSecurityPolicy = [
@@ -64,9 +50,12 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: ['lucide-react'],
+  },
   eslint: {
-    // Next 15's build-time ESLint runner conflicts with this repository's dual
-    // legacy/flat configuration. `npm run lint` remains a required separate check.
+    // `npm run lint` is a separate required release gate because this repository
+    // intentionally retains its legacy ESLint configuration for Next.js 15.
     ignoreDuringBuilds: true,
   },
 }

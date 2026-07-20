@@ -43,7 +43,13 @@ export default function CheckoutPage() {
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [pendingOrder, setPendingOrder] = useState<{ id: string; orderNumber: string; total: number } | null>(null)
   const [completedOrder, setCompletedOrder] = useState<CompletedOrder | null>(null)
+  const [wholesaleShoppingMode, setWholesaleShoppingMode] = useState(false)
+  const [wholesaleReorderId, setWholesaleReorderId] = useState<string | null>(null)
 
+  useEffect(() => {
+    setWholesaleShoppingMode(sessionStorage.getItem('wholesaleShoppingMode') === '1')
+    setWholesaleReorderId(sessionStorage.getItem('wholesaleReorderId'))
+  }, [])
   useEffect(() => {
     if (user) setAddress((value) => ({ ...value, fullName: value.fullName || user.name, phone: value.phone === '+250 ' ? user.phone : value.phone, email: value.email || user.email || '' }))
   }, [user])
@@ -90,7 +96,14 @@ export default function CheckoutPage() {
       completedAnalyticsOrders.current.add(order.id)
       trackPurchaseCompleted(order.total, paymentMethod, address.district)
     }
-    setCompletedOrder({ ...order, items: [...items] }); clearCart(); setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' })
+    setCompletedOrder({ ...order, items: [...items] })
+    clearCart()
+    sessionStorage.removeItem('wholesaleShoppingMode')
+    sessionStorage.removeItem('wholesaleReorderId')
+    setWholesaleShoppingMode(false)
+    setWholesaleReorderId(null)
+    setStep(3)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   useEffect(() => {
@@ -126,7 +139,31 @@ export default function CheckoutPage() {
     setPlacing(true); setCheckoutError(null)
     try {
       if (pendingOrder) { await initiatePayment(pendingOrder); return }
-      const orderResponse = await fetch('/api/orders/create', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ customerName: address.fullName.trim(), customerPhone: normalizeRwandaPhone(address.phone), customerEmail: address.email.trim() || undefined, language, address: `${address.village}, ${address.cell}, ${address.sector}. ${address.address.trim()}${address.landmark ? ` (Landmark: ${address.landmark})` : ''}`, city: address.sector, province: address.province, district: address.district, sector: address.sector, landmark: address.landmark || undefined, paymentMethod, couponCode: appliedCoupon?.code, items: items.map((item) => item.isBundle && item.bundleId ? { bundleId: item.bundleId, quantity: item.quantity } : { productId: item.productId, quantity: item.quantity }) }) })
+      if (wholesaleShoppingMode && items.some((item) => item.isBundle)) throw new Error(t('checkout.wholesale_products_only'))
+      const orderItems = items.map((item) => item.isBundle && item.bundleId
+        ? { bundleId: item.bundleId, quantity: item.quantity }
+        : { productId: item.productId, quantity: item.quantity })
+      const payload = {
+        customerName: address.fullName.trim(),
+        customerPhone: normalizeRwandaPhone(address.phone),
+        customerEmail: address.email.trim() || undefined,
+        language,
+        address: `${address.village}, ${address.cell}, ${address.sector}. ${address.address.trim()}${address.landmark ? ` (Landmark: ${address.landmark})` : ''}`,
+        city: address.sector,
+        province: address.province,
+        district: address.district,
+        sector: address.sector,
+        landmark: address.landmark || undefined,
+        paymentMethod,
+        couponCode: appliedCoupon?.code,
+        items: wholesaleShoppingMode ? orderItems.filter((item) => 'productId' in item) : orderItems,
+        ...(wholesaleShoppingMode ? { isWholesale: true, wholesaleReorderId } : {}),
+      }
+      const orderResponse = await fetch(wholesaleShoppingMode ? '/api/orders' : '/api/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
       const orderData = await orderResponse.json()
       if (!orderResponse.ok) throw new Error(orderData.error || t('checkout.order_create_failed'))
       const order = { id: orderData.order.id, orderNumber: orderData.order.orderNumber, total: orderData.order.total, confirmationDelivery: orderData.confirmationDelivery }
@@ -141,7 +178,7 @@ export default function CheckoutPage() {
   return (
     <div className="safe-bottom min-h-screen bg-[#f8f9fa]">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-7 text-center"><span className="text-xs font-black uppercase tracking-[0.2em] text-[#B76E79]">{t('checkout.secure_rwanda_checkout')}</span><h1 className="mt-2 text-3xl font-black text-[#1a1a1a]">{t('checkout.title')}</h1></div>
+        <div className="mb-7 text-center"><span className="text-xs font-black uppercase tracking-[0.2em] text-[#B76E79]">{t('checkout.secure_rwanda_checkout')}</span><h1 className="mt-2 text-3xl font-black text-[#1a1a1a]">{t('checkout.title')}</h1>{wholesaleShoppingMode && <p className="mx-auto mt-3 max-w-xl rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">{t('checkout.wholesale_mode_active')}</p>}</div>
         <div className="mb-6 flex items-center gap-1 lg:hidden" aria-label={t('checkout.title')}>
           {[1, 2, 3].map((number) => <span key={number} className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${number <= step ? 'bg-[#B76E79]' : 'bg-gray-200'}`} />)}
         </div>

@@ -8,8 +8,6 @@ const formSelect = read('src/components/a11y/FormSelect.tsx')
 const formTextarea = read('src/components/a11y/FormTextarea.tsx')
 const loginPage = read('src/app/(auth)/login/page.tsx')
 const registerPage = read('src/app/(auth)/register/page.tsx')
-const legacyLogin = read('src/components/auth/LoginView.tsx')
-const legacyRegister = read('src/components/auth/RegisterView.tsx')
 const address = read('src/components/checkout/AddressForm.tsx')
 const wholesale = read('src/components/wholesale/WholesaleView.tsx')
 const review = read('src/components/reviews/ReviewSubmissionForm.tsx')
@@ -38,13 +36,11 @@ describe('accessible form controls', () => {
     expect(formTextarea).toContain('<textarea')
   })
 
-  it('upgrades current and preserved authentication forms', () => {
+  it('checks the active authentication forms', () => {
     expect(loginPage.match(/<FormField/g)?.length).toBeGreaterThanOrEqual(2)
     expect(registerPage.match(/<FormField/g)?.length).toBeGreaterThanOrEqual(3)
     expect(registerPage).toContain("id=\"register-terms-error\"")
     expect(registerPage).toContain('aria-describedby={fieldErrors.terms')
-    expect(legacyLogin.match(/<FormField/g)?.length).toBeGreaterThanOrEqual(2)
-    expect(legacyRegister.match(/<FormField/g)?.length).toBeGreaterThanOrEqual(4)
   })
 
   it('associates every checkout address error with its field', () => {

@@ -6,10 +6,9 @@ const source = readFileSync(resolve(process.cwd(), 'src/components/storefront/Ca
 const page = readFileSync(resolve(process.cwd(), 'src/app/cart/page.tsx'), 'utf8')
 
 describe('mobile-first cart view', () => {
-  it('uses the persistent cart hook while retaining the legacy component source', () => {
+  it('uses the persistent cart hook and the active cart page', () => {
     expect(source).toContain('useCart()')
     expect(page).toContain('<CartView />')
-    expect(() => readFileSync(resolve(process.cwd(), 'src/components/storefront/LegacyCartView.tsx'))).not.toThrow()
   })
   it('uses real delivery district and calculation APIs', () => {
     expect(source).toContain("fetch('/api/delivery/districts'")

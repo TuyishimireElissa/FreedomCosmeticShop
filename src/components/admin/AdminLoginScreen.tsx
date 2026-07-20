@@ -152,7 +152,7 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
         description: `Logged in as ${user.name}`,
       })
       // The AdminView will re-render and show the dashboard
-    } catch (err) {
+    } catch (_err) {
       const newAttempts = attempts + 1
       setAttempts(newAttempts)
 

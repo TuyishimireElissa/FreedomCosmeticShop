@@ -120,7 +120,7 @@ export async function DELETE() {
   try {
     const adminUser = await requireRole("ADMIN")
 
-    let settings = await db.storeSettings.findFirst()
+    const settings = await db.storeSettings.findFirst()
     if (!settings) {
       return NextResponse.json({ error: "No settings found" }, { status: 404 })
     }

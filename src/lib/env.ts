@@ -56,8 +56,8 @@ const envSchema = z.object({
 
   // Cloudinary - dohoc0tmp
   CLOUDINARY_CLOUD_NAME: z.string().default("dohoc0tmp"),
-  CLOUDINARY_API_KEY: z.string().default("524578837153868"),
-  CLOUDINARY_API_SECRET: z.string().min(1),
+  CLOUDINARY_API_KEY: z.string().min(1).optional(),
+  CLOUDINARY_API_SECRET: z.string().min(1).optional(),
   CLOUDINARY_UPLOAD_PRESET: z.string().default("freedom_uploads"),
   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().default("dohoc0tmp"),
 
@@ -109,7 +109,7 @@ function loadEnv(): Env {
           SUPABASE_PROJECT_REF: "hsdqahltrqjeaskhheis",
           CLOUDINARY_CLOUD_NAME: "dohoc0tmp",
           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "dohoc0tmp",
-          CLOUDINARY_API_KEY: "524578837153868",
+          CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
           CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
           CLOUDINARY_UPLOAD_PRESET: "freedom_uploads",
           STORE_NAME: "FreedomCosmeticShop",
@@ -126,7 +126,7 @@ function loadEnv(): Env {
           ENABLE_REAL_PAYMENTS: false,
           ENABLE_SEARCH_INDEXING: false,
           ENABLE_REDIS_CACHE: false,
-        } as any
+        } as unknown as Env
       } else {
         console.warn("⚠️  Env validation warnings:", parsed.error.flatten().fieldErrors)
         return envSchema.parse({ ...process.env })
@@ -141,7 +141,7 @@ function loadEnv(): Env {
       DATABASE_URL: process.env.DATABASE_URL || "file:./db/custom.db",
       CLOUDINARY_CLOUD_NAME: "dohoc0tmp",
       NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: "dohoc0tmp",
-      CLOUDINARY_API_KEY: "524578837153868",
+      CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
       CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
       CLOUDINARY_UPLOAD_PRESET: "freedom_uploads",
       ALGOLIA_INDEX_NAME: "freedom_products",
@@ -153,7 +153,7 @@ function loadEnv(): Env {
       ENABLE_REAL_PAYMENTS: false,
       ENABLE_SEARCH_INDEXING: false,
       ENABLE_REDIS_CACHE: false,
-    } as any
+    } as unknown as Env
   }
 }
 

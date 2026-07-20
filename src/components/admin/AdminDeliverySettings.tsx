@@ -18,7 +18,7 @@ import { Switch } from "@/components/ui/switch"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import { Truck, Save, Loader2, CheckCircle2, Clock } from "lucide-react"
+import { Truck, Save, Loader2, Clock } from "lucide-react"
 
 interface Zone {
   name: string

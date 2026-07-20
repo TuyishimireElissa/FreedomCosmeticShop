@@ -39,35 +39,15 @@ export function useSettings() {
     load()
   }, [load])
 
-  // Listen for real-time logo updates via SSE
+  // The shared realtime client emits a CustomEvent with the new logo URL.
   useEffect(() => {
-    const handler = (e: MessageEvent) => {
-      try {
-        const parsed = JSON.parse(e.data)
-        if (parsed.event === "logo:updated") {
-          const data = parsed.data as { logoUrl: string | null }
-          setSettings((prev) => prev ? { ...prev, logoUrl: data.logoUrl } : prev)
-        }
-      } catch {
-        // ignore
-      }
+    const onLogoUpdated: EventListener = (event) => {
+      const data = (event as CustomEvent<{ logoUrl: string | null }>).detail
+      if (!data) return
+      setSettings((previous) => previous ? { ...previous, logoUrl: data.logoUrl } : previous)
     }
-
-    // Use the existing SSE connection (EventSource is managed by use-realtime.ts)
-    // We add a custom listener for logo:updated
-    if (typeof window !== "undefined") {
-      // The SSE endpoint sends named events, so we listen for "logo:updated"
-      window.addEventListener("logo:updated", ((e: CustomEvent) => {
-        const data = e.detail as { logoUrl: string | null }
-        setSettings((prev) => prev ? { ...prev, logoUrl: data.logoUrl } : prev)
-      }) as EventListener)
-    }
-
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("logo:updated", ((e: CustomEvent) => {}) as EventListener)
-      }
-    }
+    window.addEventListener("logo:updated", onLogoUpdated)
+    return () => window.removeEventListener("logo:updated", onLogoUpdated)
   }, [])
 
   return { settings, loading, reload: load }

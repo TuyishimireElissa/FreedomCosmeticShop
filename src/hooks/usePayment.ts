@@ -87,7 +87,7 @@ export function usePayment(): UsePaymentResult {
 
   const initiate = useCallback(
     async (params: InitiateParams): Promise<boolean> => {
-      const { phone, amount, orderId, network } = params
+      const { phone, orderId, network } = params
 
       setStatus("initiating")
       setError(null)

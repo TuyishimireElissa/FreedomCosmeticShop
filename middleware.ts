@@ -22,12 +22,17 @@ function applySecurityHeaders(res: NextResponse) {
       "Content-Security-Policy",
       [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "img-src 'self' data: https: blob:",
-        "font-src 'self' https://fonts.gstatic.com",
-        "connect-src 'self' https:",
+        "script-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://*.supabase.co",
+        "font-src 'self' data:",
+        "connect-src 'self' https://*.supabase.co https://api.paypack.rw https://api.flutterwave.com",
+        "frame-src 'self' https://checkout.flutterwave.com",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
         "frame-ancestors 'none'",
+        "upgrade-insecure-requests",
       ].join("; ")
     )
   }

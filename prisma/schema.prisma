@@ -1622,6 +1622,7 @@ model WhatsAppClick {
 
 model SearchLog {
   id          String   @id @default(cuid())
+  // Deterministic HMAC identifier only; raw customer search text is never stored.
   query       String
   hasResults  Boolean  @default(true)
   resultCount Int      @default(0)

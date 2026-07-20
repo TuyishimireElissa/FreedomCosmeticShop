@@ -16,12 +16,14 @@ export async function GET() {
       orderBy: { _count: { query: 'desc' } },
       take: 50,
     })
-    const data = searches.map((search) => ({
-      query: search.query,
-      count: search._count._all,
-      lastSearched: search._max.createdAt?.toISOString() || null,
-    }))
-    const response = NextResponse.json({ success: true, data, periodDays: 30 })
+    const data = searches
+      .filter((search) => search.query.startsWith('sha256:'))
+      .map((search) => ({
+        queryHash: search.query,
+        count: search._count._all,
+        lastSearched: search._max.createdAt?.toISOString() || null,
+      }))
+    const response = NextResponse.json({ success: true, data, periodDays: 30, methodology: { rawQueriesStored: false } })
     response.headers.set('Cache-Control', 'private, no-store')
     return response
   } catch (error) {

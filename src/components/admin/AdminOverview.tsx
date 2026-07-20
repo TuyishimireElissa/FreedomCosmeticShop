@@ -49,7 +49,6 @@ import {
   Gift,
   Truck,
   Download,
-  UserPlus,
   CheckCircle2,
   XCircle,
   Clock,

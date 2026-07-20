@@ -406,7 +406,7 @@ export const rw = {
     price_over_15000: 'Hejuru ya 15,000 RWF', // verified-rw
     zero_results_title: 'Ibyashakishijwe ntibiboneke', // verified-rw
     zero_results_badge: 'Ibicuruzwa bibura · iminsi 30 ishize', // verified-rw
-    zero_results_description: 'Amagambo nyayo abakiriya bashakishije ntibabone ibicuruzwa. Banza uyagenzure mbere yo kwemeza ibicuruzwa bashobora kuba bakeneye.', // verified-rw
+    zero_results_description: 'Ibiranga by’ibanga byerekana inshuro gushakisha kutabonye ibicuruzwa byagarutse. Amagambo nyayo umukiriya yashakishije ntabikwa.', // verified-rw
     zero_results_empty: 'Nta byashakishijwe ntibiboneke byanditswe mu minsi 30 ishize.', // verified-rw
     zero_results_count: 'Byashakishijwe inshuro {count}', // verified-rw
     zero_results_terms: 'Amagambo {count} yashakishijwe', // verified-rw
@@ -661,6 +661,8 @@ export const rw = {
     save_address_future: 'Bika iyi aderesi uzayikoreshe ku zindi komande', // verified-rw
     sector_required: 'Umurenge', // verified-rw
     secure_rwanda_checkout: 'Kwishyura mu Rwanda mu buryo butekanye', // verified-rw
+    wholesale_mode_active: 'Kwishyura nk’umucuruzi birakora. Ibiciro byo kurangura byemewe kuri buri gicuruzwa birabarwa na seriveri.', // verified-rw
+    wholesale_products_only: 'Kwishyura nk’umucuruzi ubu kwemera ibicuruzwa byihariye gusa. Kuramo amatsinda y’ibicuruzwa wongere ugerageze.', // verified-rw
     select_district_first: 'Banza uhitemo akarere', // verified-rw
     select_district_for_fee: 'Hitamo akarere kawe urebe ikiguzi cyo kukugezaho', // verified-rw
     select_payment_method: 'Hitamo uburyo bwo kwishyura', // verified-rw
@@ -732,6 +734,17 @@ export const rw = {
     stock_changed_before_payment: 'Ububiko bwahindutse mbere yo kwishyura. Kwishyura ntikwatangiye. Subira mu gitebo ugenzure umubare w’ibicuruzwa bikiboneka.', // verified-rw
   },
   auth: {
+    change_password_title: 'Hindura ijambo ry’ibanga', // verified-rw
+    temporary_password_replace: 'Ugomba guhindura ijambo ry’ibanga ry’agateganyo mbere yo gukomeza.', // verified-rw
+    unique_password_advice: 'Hitamo ijambo ry’ibanga wihariye udakoresha ahandi.', // verified-rw
+    current_password: 'Ijambo ry’ibanga risanzwe', // verified-rw
+    confirm_new_password: 'Emeza ijambo ry’ibanga rishya', // verified-rw
+    show_passwords: 'Erekana amagambo y’ibanga', // verified-rw
+    hide_passwords: 'Hisha amagambo y’ibanga', // verified-rw
+    strong_password_requirement: 'Koresha nibura inyuguti 12 zirimo inyuguti nkuru, nto, umubare n’ikimenyetso.', // verified-rw
+    updating_password: 'Birimo guhindurwa…', // verified-rw
+    change_password_button: 'Hindura ijambo ry’ibanga', // verified-rw
+    password_change_failed: 'Guhindura ijambo ry’ibanga ntibyakunze. Genzura irisanzwe wongere ugerageze.', // verified-rw
     login_title: 'Murakaza neza', login_subtitle: 'Injira muri konti yawe ya FreedomCosmeticShop', phone_or_email: 'Nimero ya telefoni cyangwa imeyili', phone_placeholder: '+250 7XX XXX XXX', password: 'Ijambo ry’ibanga', show_password: 'Erekana', hide_password: 'Hisha', forgot_password: 'Wibagiwe ijambo ry’ibanga?', login_button: 'Injira', logging_in: 'Birimo kwinjira...', no_account: 'Nta konti ufite?', register_link: 'Iyandikishe hano', register_title: 'Fungura konti', register_subtitle: 'Injira muri FreedomCosmeticShop uyu munsi', full_name: 'Amazina yose', full_name_placeholder: 'Andika amazina yawe yose', email: 'Imeyili (si ngombwa)', email_placeholder: 'Andika imeyili yawe', phone: 'Nimero ya telefoni', phone_hint: 'Nimero yo mu Rwanda (+250 cyangwa 07X)', password_hint: 'Nibura inyuguti 8', confirm_password: 'Emeza ijambo ry’ibanga', skin_type: "Ubwoko bw’uruhu rwawe (si ngombwa)", skin_type_hint: 'Bidufasha kukugira inama y’ibicuruzwa bikubereye', terms_agree: 'Nemeye', terms_link: 'Amabwiriza n’amategeko', register_button: 'Fungura konti', registering: 'Konti irimo gufungurwa...', have_account: 'Usanzwe ufite konti?', login_link: 'Injira hano', otp_title: 'Emeza nimero yawe', otp_subtitle: 'Twohereje kode y’imibare 6 kuri {phone}', otp_placeholder: '000000', otp_verify: 'Emeza kode', otp_verifying: 'Birimo kwemezwa...', otp_resend: 'Ongera wohereze kode', otp_resend_in: 'Ongera wohereze mu masegonda {seconds}', otp_wrong_number: 'Nimero si yo?', otp_change: 'Hindura nimero', otp_hint: 'Reba ubutumwa bwa SMS', otp_expired: 'Kode yararengeje igihe. Saba indi kode.', otp_invalid: 'Kode ntiyemewe. Yigenzure wongere ugerageze.', otp_success: 'Nimero yemejwe neza!', forgot_title: 'Hindura ijambo ry’ibanga', forgot_subtitle: 'Andika nimero ya telefoni kugira ngo urihindure', forgot_send: 'Ohereza kode yo kurihindura', forgot_sending: 'Birimo koherezwa...', forgot_sent: 'Kode yoherejwe kuri {phone}', new_password: 'Ijambo ry’ibanga rishya', reset_password: 'Hindura ijambo ry’ibanga', reset_success: 'Ijambo ry’ibanga ryahinduwe neza!', invalid_credentials: 'Nimero ya telefoni, imeyili cyangwa ijambo ry’ibanga si byo', account_locked: 'Konti yafunzwe iminota {minutes} kubera kugerageza kenshi.', account_inactive: 'Konti yawe yahagaritswe.', phone_taken: 'Iyi nimero ya telefoni isanzwe ikoreshwa.', email_taken: 'Iyi imeyili isanzwe ikoreshwa.', passwords_no_match: 'Amagambo y’ibanga ntabwo ahura.', weak_password: 'Ijambo ry’ibanga rigomba kugira nibura inyuguti 8.', invalid_phone: 'Andika nimero ya telefoni yo mu Rwanda yemewe.', required_field: 'Aha harasabwa.', server_error: 'Habaye ikibazo. Ongera ugerageze.', // 🔍 REVIEW
 
     accept_terms_privacy: 'Emera amabwiriza na politiki y’amakuru bwite kugira ngo ukomeze', // verified-rw
@@ -758,7 +771,6 @@ export const rw = {
     code_sent: 'Kode yoherejwe', // verified-rw
     code_sent_to: 'Kode yoherejwe kuri', // verified-rw
     complete_six_digit_otp: 'Andika kode ya OTP y’imibare itandatu yose', // verified-rw
-    confirm_new_password: 'Emeza ijambo ry’ibanga rishya', // verified-rw
     delivery_all_districts: 'no kubigeza mu turere 30 twose', // verified-rw
     dev_mode_sms_disabled: 'Uburyo bw’igerageza (SMS ntikora)', // verified-rw
     development_otp: 'OTP y’igerageza', // verified-rw
@@ -1151,6 +1163,7 @@ export const rw = {
     read_more: 'Soma ibindi', // verified-rw
     recent: 'Vuba aha', // verified-rw
     views: 'Byarebwe inshuro {count}', // verified-rw
+    no_posts: 'Nta nama z’ubwiza zatangajwe ziraboneka ubu.', // verified-rw
   },
   sms: {
     abandoned_cart: 'Wasize ibicuruzwa {{itemCount}} mu gitebo! Rangiza komande yawe hano: {{cartLink}} {business} 🛒', // verified-rw
@@ -1471,6 +1484,9 @@ export const rw = {
     years_count: 'Imyaka {count}', // verified-rw
   },
   pages: {
+    last_updated: 'Byaherukaga kuvugururwa: {date}', // verified-rw
+    questions_contact: 'Ufite ikibazo? Vugana na {business} ukoresheje uburyo bwa WhatsApp bwashyizweho bwo gufasha abakiriya.', // verified-rw
+    back_to_store: 'Subira mu iduka', // verified-rw
     acceptable_use: 'Imikoreshereze yemewe', // verified-rw
     address_requirements: 'Amakuru akenewe kuri aderesi', // verified-rw
     address_requirements_text: 'Andika nimero yo mu Rwanda iboneka, intara, akarere, umurenge n’ikimenyetso gisobanutse cy’aho uri. Amakuru atari yo cyangwa atuzuye ashobora gutinza ibicuruzwa no gusaba ikindi kiguzi cyo kubigeza.', // verified-rw

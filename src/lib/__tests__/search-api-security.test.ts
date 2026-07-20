@@ -18,9 +18,10 @@ describe('search API data and analytics security', () => {
     expect(productsRoute).toContain('recordSearch({')
   })
 
-  it('derives authenticated user identity from the signed cookie, not query input', () => {
-    expect(analyticsService).toContain('getAccessTokenFromRequest(request)')
-    expect(analyticsService).toContain('verifyAccessToken(token)')
+  it('stores no raw query or direct user identity in search analytics', () => {
+    expect(analyticsService).toContain("query: hashSearchValue(normalizedQuery, 'query')")
+    expect(analyticsService).toContain('userId: null')
+    expect(analyticsService).toContain("session ? hashSearchValue(session, 'session') : null")
     expect(productsRoute).not.toContain("params.get('userId')")
     expect(trackingRoute).not.toContain('userId: parsed.data')
   })
@@ -39,10 +40,10 @@ describe('search API data and analytics security', () => {
     expect(suggestionsRoute).not.toContain('supplierId')
   })
 
-  it('derives popular searches from real successful logs and filters contact details', () => {
-    expect(popularRoute).toContain('prisma.searchLog.groupBy')
-    expect(popularRoute).toContain('hasResults: true')
-    expect(popularRoute).toContain('.slice(0, 6)')
-    expect(popularRoute).toContain('EMAIL_OR_PHONE')
+  it('does not expose hashed identifiers as readable popular searches', () => {
+    expect(popularRoute).toContain('rawQueriesStored: false')
+    expect(popularRoute).toContain('controlledVocabularyConfigured: false')
+    expect(popularRoute).toContain('data: []')
+    expect(popularRoute).not.toContain('prisma.searchLog.groupBy')
   })
 })

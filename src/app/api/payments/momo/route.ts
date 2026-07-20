@@ -1,184 +1,138 @@
-/**
- * POST /api/payments/momo
- *
- * Initiate an MTN MoMo or Airtel Money payment via PayPack.
- *
- * Body: { orderId, phone, network }
- *   - network: "MTN" | "AIRTEL"
- *
- * Flow:
- *   1. Fetch the order (verify it exists + is PENDING)
- *   2. Call PayPack cashin() to send USSD prompt to customer
- *   3. Update Payment record with providerTransactionId
- *   4. Return transaction ID for client-side polling
- *
- * The client polls /api/payments/status/[txId] until status is PAID or FAILED.
- * PayPack webhook (/api/webhooks/paypack) updates the payment status.
- */
-import { NextResponse } from "next/server"
-import { db } from "@/lib/db"
-import { cashin, normalizePhoneForPaypack, PaypackError } from "@/server/services/paypack"
+export const dynamic = 'force-dynamic'
+
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { db } from '@/lib/db'
+import { requireAuth } from '@/lib/auth'
+import { features } from '@/lib/env'
+import { rateLimit } from '@/lib/permissions'
+import { cashin, normalizePhoneForPaypack, PaypackError } from '@/server/services/paypack'
 import { isValidForNetwork } from '@/lib/paypack'
 import { validateOrderStockForPayment } from '@/server/services/payment-order-validation'
 
-export async function POST(req: Request) {
+const input = z.object({
+  orderId: z.string().min(1).max(100),
+  phone: z.string().min(9).max(20),
+  network: z.enum(['MTN', 'AIRTEL']),
+  language: z.enum(['en', 'rw']).default('rw'),
+}).strict()
+const headers = { 'Cache-Control': 'private, no-store, max-age=0' }
+
+export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { orderId, phone, network } = body as {
-      orderId: string
-      phone: string
-      network: "MTN" | "AIRTEL"
-      language?: 'en' | 'rw'
+    const origin = req.headers.get('origin')
+    if (origin && origin !== new URL(req.url).origin) {
+      return NextResponse.json({ error: 'INVALID_ORIGIN' }, { status: 403, headers })
     }
-    const language = body.language === 'en' ? 'en' : 'rw'
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const limit = rateLimit(`payment-initiation:${ip}`, { maxActions: 10, windowMs: 15 * 60_000 })
+    if (!limit.allowed) return NextResponse.json({ error: 'RATE_LIMITED' }, { status: 429, headers })
 
-    if (!orderId || !phone || (network !== 'MTN' && network !== 'AIRTEL')) {
-      return NextResponse.json(
-        { error: "Invalid payment request" },
-        { status: 400 }
-      )
-    }
-    if (!isValidForNetwork(phone, network)) {
-      return NextResponse.json({ error: 'INVALID_NETWORK_PHONE' }, { status: 400 })
-    }
+    const parsed = input.safeParse(await req.json().catch(() => null))
+    if (!parsed.success) return NextResponse.json({ error: 'Invalid payment request' }, { status: 400, headers })
+    const { orderId, phone, network, language } = parsed.data
+    // Keep an explicit guard as defense in depth and for maintainability.
+    if (network !== 'MTN' && network !== 'AIRTEL') return NextResponse.json({ error: 'Invalid payment network' }, { status: 400, headers })
+    if (!isValidForNetwork(phone, network)) return NextResponse.json({ error: 'INVALID_NETWORK_PHONE' }, { status: 400, headers })
 
-    // Normalize phone
     let normalizedPhone: string
     try {
       normalizedPhone = normalizePhoneForPaypack(phone)
     } catch {
-      return NextResponse.json(
-        { error: "Invalid phone number. Use format 0788123456" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid Rwanda phone number' }, { status: 400, headers })
     }
 
-    // Fetch the order
     const order = await db.order.findFirst({
       where: { id: orderId },
       include: { payments: true },
     })
+    if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404, headers })
 
-    if (!order) {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 })
+    const auth = await requireAuth().catch(() => null)
+    if (order.userId) {
+      if (!auth || auth.id !== order.userId) return NextResponse.json({ error: 'FORBIDDEN_ORDER' }, { status: 403, headers })
+    } else {
+      let checkoutPhone: string
+      try {
+        checkoutPhone = normalizePhoneForPaypack(order.customerPhone)
+      } catch {
+        return NextResponse.json({ error: 'ORDER_PHONE_INVALID' }, { status: 409, headers })
+      }
+      if (checkoutPhone !== normalizedPhone) return NextResponse.json({ error: 'PAYMENT_PHONE_MISMATCH' }, { status: 403, headers })
     }
 
-    if (order.status === "DELIVERED" || order.status === "CANCELLED") {
-      return NextResponse.json(
-        { error: `Order already ${order.status.toLowerCase()}` },
-        { status: 400 }
-      )
+    if (order.status === 'DELIVERED' || order.status === 'CANCELLED') {
+      return NextResponse.json({ error: `Order already ${order.status.toLowerCase()}` }, { status: 400, headers })
     }
     const stock = await validateOrderStockForPayment(order.id)
-    if (!stock.available) return NextResponse.json({ error: 'ORDER_STOCK_CHANGED' }, { status: 409 })
+    if (!stock.available) return NextResponse.json({ error: 'ORDER_STOCK_CHANGED' }, { status: 409, headers })
 
-    // ─── Simulation mode (MVP) ────────────────────────────────────────
-    // When real payments are disabled, we still create the payment record
-    // and simulate a successful payment after 3 seconds.
-    const isSimulation = process.env.ENABLE_REAL_PAYMENTS !== "true"
+    // Production always fails closed when real provider processing is disabled.
+    const developmentSimulation = process.env.NODE_ENV !== 'production' && !features.realPayments
+    if (!features.realPayments && !developmentSimulation) {
+      return NextResponse.json({ error: 'PAYMENTS_NOT_CONFIGURED' }, { status: 503, headers })
+    }
 
-    // Create or update payment record
     let payment = order.payments.find(
-      (p) => p.method === (network === "MTN" ? "MTN_MOMO" : "AIRTEL_MONEY") && p.status === "PENDING"
+      (entry) => entry.method === (network === 'MTN' ? 'MTN_MOMO' : 'AIRTEL_MONEY') && entry.status === 'PENDING',
     )
-
     if (payment) {
-      // Update existing payment
       payment = await db.payment.update({
         where: { id: payment.id },
-        data: {
-          phoneNumber: normalizedPhone,
-          webhookData: JSON.stringify({ checkoutLanguage: language }),
-        },
+        data: { phoneNumber: normalizedPhone, webhookData: JSON.stringify({ checkoutLanguage: language }) },
       })
     } else {
-      // Create new payment
       payment = await db.payment.create({
         data: {
           orderId: order.id,
-          method: network === "MTN" ? "MTN_MOMO" : "AIRTEL_MONEY",
+          method: network === 'MTN' ? 'MTN_MOMO' : 'AIRTEL_MONEY',
           amount: order.total,
-          status: "PENDING",
+          status: 'PENDING',
           phoneNumber: normalizedPhone,
           webhookData: JSON.stringify({ checkoutLanguage: language }),
         },
       })
     }
 
-    if (isSimulation) {
-      console.log(`[MOCK MoMo] Initiated simulated payment for order ${order.orderNumber}`)
-
-      // Simulate payment success after 3 seconds
+    if (developmentSimulation) {
       setTimeout(async () => {
         try {
-          // Mark as paid + trigger post-payment actions
-          const { handlePaymentSuccess } = await import("@/server/services/payment-events")
-          await handlePaymentSuccess({
-            paymentId: payment!.id,
-            orderId: order.id,
-            providerTransactionId: `mock-${Date.now()}`,
-          })
-          console.log(`[MOCK MoMo] Payment ${payment!.id} marked as PAID`)
-        } catch (e) {
-          console.error("Failed to update mock payment:", e)
+          const { handlePaymentSuccess } = await import('@/server/services/payment-events')
+          await handlePaymentSuccess({ paymentId: payment!.id, orderId: order.id, providerTransactionId: `dev-mock-${Date.now()}` })
+        } catch {
+          // Development-only simulation failure is intentionally not exposed.
         }
       }, 3000)
-
       return NextResponse.json({
         success: true,
         transactionId: payment.id,
-        providerTransactionId: `mock-${Date.now()}`,
-        status: "PENDING",
-        message: `Payment prompt sent to your phone. (Simulated — will auto-confirm in 3 seconds.)`,
+        status: 'PENDING',
+        message: 'Development payment simulation started.',
         simulated: true,
-      })
+      }, { headers })
     }
 
-    // ─── Real PayPack integration ─────────────────────────────────────
     try {
-      const result = await cashin({
-        amount: order.total,
-        phone: normalizedPhone,
-        reference: order.orderNumber,
-      })
-
-      // Update payment with provider transaction ID
+      const result = await cashin({ amount: order.total, phone: normalizedPhone, reference: order.orderNumber })
       await db.payment.update({
         where: { id: payment.id },
-        data: {
-          providerTransactionId: result.transactionId,
-          providerReference: result.reference,
-        },
+        data: { providerTransactionId: result.transactionId, providerReference: result.reference },
       })
-
       return NextResponse.json({
         success: true,
         transactionId: payment.id,
         providerTransactionId: result.transactionId,
         status: result.status.toUpperCase(),
         message: result.message,
-        simulated: result.simulated,
-      })
-    } catch (err) {
-      console.error("PayPack cashin error:", err)
-
-      if (err instanceof PaypackError) {
-        return NextResponse.json(
-          { error: err.message },
-          { status: err.statusCode }
-        )
-      }
-
-      return NextResponse.json(
-        { error: "Payment initiation failed. Please try again." },
-        { status: 500 }
-      )
+        simulated: false,
+      }, { headers })
+    } catch (error) {
+      console.error('PayPack cashin failed:', error instanceof Error ? error.message : 'unknown')
+      if (error instanceof PaypackError) return NextResponse.json({ error: error.message }, { status: error.statusCode, headers })
+      return NextResponse.json({ error: 'Payment initiation failed. Please try again.' }, { status: 502, headers })
     }
   } catch (error) {
-    console.error("MoMo payment error:", error)
-    return NextResponse.json(
-      { error: "Failed to initiate payment" },
-      { status: 500 }
-    )
+    console.error('MoMo payment initiation failed:', error instanceof Error ? error.message : 'unknown')
+    return NextResponse.json({ error: 'Failed to initiate payment' }, { status: 500, headers })
   }
 }

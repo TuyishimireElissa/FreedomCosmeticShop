@@ -24,7 +24,6 @@ import { DESTRUCTIVE_OPERATIONS, requireDestructiveOperation } from "@/lib/permi
 import { logActivity } from "@/server/services/activity"
 import { cashout, PaypackError } from "@/server/services/paypack"
 import { enqueueSms } from "@/server/services/sms-queue"
-import { getSmsMessage } from "@/server/services/sms-templates"
 import { features } from "@/lib/env"
 import { refreshWholesaleRetentionMetric } from '@/server/services/wholesale-retention'
 import { z } from "zod"

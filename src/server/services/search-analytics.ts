@@ -1,7 +1,9 @@
+import { createHmac } from 'node:crypto'
 import type { NextRequest } from 'next/server'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { getAccessTokenFromRequest, verifyAccessToken } from '@/lib/auth'
+import { resolveAuthSecret } from '@/lib/auth-secret'
 
 const SESSION_PATTERN = /^[a-zA-Z0-9_-]{8,128}$/
 
@@ -21,6 +23,17 @@ export async function authenticatedSearchUserId(request: NextRequest) {
   return payload?.userId || null
 }
 
+function analyticsSecret() {
+  return resolveAuthSecret(process.env.NEXTAUTH_SECRET, process.env.JWT_SECRET, process.env.NODE_ENV)
+}
+
+export function hashSearchValue(value: string, context: 'query' | 'session') {
+  return `sha256:${createHmac('sha256', analyticsSecret())
+    .update(`search-${context}-v1:${value}`)
+    .digest('hex')
+    .slice(0, 32)}`
+}
+
 export async function recordSearch(input: {
   request: NextRequest
   query: string
@@ -28,16 +41,18 @@ export async function recordSearch(input: {
   sessionId?: string | null
   filters?: Prisma.InputJsonValue
 }) {
-  const query = normalizeSearchQuery(input.query)
-  if (query.length < 2) return
-  const userId = await authenticatedSearchUserId(input.request)
+  const normalizedQuery = normalizeSearchQuery(input.query)
+  if (normalizedQuery.length < 2) return
+  const session = normalizeSearchSession(input.sessionId)
   await prisma.searchLog.create({
     data: {
-      query,
+      // Search terms may contain names, contact details, or addresses. Store only
+      // a deterministic HMAC identifier for recurrence counting.
+      query: hashSearchValue(normalizedQuery, 'query'),
       hasResults: input.resultCount > 0,
       resultCount: Math.max(0, Math.trunc(input.resultCount)),
-      userId,
-      sessionId: normalizeSearchSession(input.sessionId),
+      userId: null,
+      sessionId: session ? hashSearchValue(session, 'session') : null,
       filters: input.filters,
     },
   })

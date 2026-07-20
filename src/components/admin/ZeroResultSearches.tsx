@@ -5,7 +5,7 @@ import { AlertCircle, Loader2, RefreshCw, Search } from 'lucide-react'
 import { useT } from '@/lib/i18n/LanguageContext'
 
 interface ZeroResultEntry {
-  query: string
+  queryHash: string
   count: number
   lastSearched: string | null
 }
@@ -51,7 +51,7 @@ export default function ZeroResultSearches() {
       {loading ? <div className="mt-4 flex items-center gap-2 rounded-xl bg-gray-50 p-4 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin text-orange-500" />{t('common.loading')}</div>
         : error ? <div className="mt-4 rounded-xl bg-red-50 p-4 text-center"><p className="text-sm font-semibold text-red-700">{t('search.zero_results_load_failed')}</p><button type="button" onClick={() => setRequest((value) => value + 1)} className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-full bg-gray-900 px-4 text-xs font-bold text-white"><RefreshCw className="h-3.5 w-3.5" />{t('common.retry')}</button></div>
           : data.length === 0 ? <p className="mt-4 rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-500">{t('search.zero_results_empty')}</p>
-            : <div className="mt-4 max-h-80 space-y-2 overflow-y-auto pr-1">{data.map((entry) => <article key={entry.query} className="flex flex-wrap items-center gap-3 rounded-xl bg-orange-50/70 px-3 py-2.5"><Search className="h-4 w-4 shrink-0 text-orange-400" /><span className="min-w-0 flex-1 break-words text-sm font-semibold text-gray-900">{entry.query}</span><span className="rounded-full bg-white px-2 py-1 text-xs font-bold text-orange-700">{t('search.zero_results_count', { count: entry.count })}</span>{entry.lastSearched && <time dateTime={entry.lastSearched} className="text-xs text-gray-400">{new Date(entry.lastSearched).toLocaleDateString('en-RW')}</time>}</article>)}</div>}
+            : <div className="mt-4 max-h-80 space-y-2 overflow-y-auto pr-1">{data.map((entry) => <article key={entry.queryHash} className="flex flex-wrap items-center gap-3 rounded-xl bg-orange-50/70 px-3 py-2.5"><Search className="h-4 w-4 shrink-0 text-orange-400" /><span className="min-w-0 flex-1 break-all font-mono text-xs font-semibold text-gray-700">{entry.queryHash}</span><span className="rounded-full bg-white px-2 py-1 text-xs font-bold text-orange-700">{t('search.zero_results_count', { count: entry.count })}</span>{entry.lastSearched && <time dateTime={entry.lastSearched} className="text-xs text-gray-400">{new Date(entry.lastSearched).toLocaleDateString('en-RW')}</time>}</article>)}</div>}
     </section>
   )
 }

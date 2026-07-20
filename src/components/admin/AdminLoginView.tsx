@@ -43,7 +43,7 @@ const STORAGE_LOCK = "freedom-admin-locked"
 const STORAGE_REMEMBER = "freedom-admin-remember"
 
 export function AdminLoginView() {
-  const { login, user, goHome } = useStore()
+  const { login, goHome } = useStore()
   const { toast } = useToast()
 
   const [phone, setPhone] = useState("")

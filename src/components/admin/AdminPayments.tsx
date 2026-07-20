@@ -16,7 +16,6 @@ import { useEffect, useState, useCallback } from "react"
 import { formatRWF, PAYMENT_METHODS, type PaymentMethodKey } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Select,

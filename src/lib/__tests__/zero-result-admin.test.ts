@@ -14,9 +14,11 @@ describe('admin zero-result search dashboard', () => {
     expect(api).not.toContain('getServerSession')
   })
 
-  it('aggregates only real zero-result logs from the last 30 days', () => {
+  it('aggregates only privacy-hashed zero-result logs from the last 30 days', () => {
     expect(api).toContain('prisma.searchLog.groupBy')
     expect(api).toContain('hasResults: false')
+    expect(api).toContain("search.query.startsWith('sha256:')")
+    expect(api).toContain('queryHash: search.query')
     expect(api).toContain('30 * 24 * 60 * 60 * 1000')
     expect(api).toContain('take: 50')
   })
@@ -26,6 +28,7 @@ describe('admin zero-result search dashboard', () => {
     expect(component).toContain("t('common.retry')")
     expect(component).toContain("t('search.zero_results_empty')")
     expect(component).toContain('data.map((entry)')
+    expect(component).toContain('entry.queryHash')
   })
 
   it('is visible only to Admin and Super Admin roles on the overview', () => {

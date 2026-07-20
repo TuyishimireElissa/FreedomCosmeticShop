@@ -18,7 +18,7 @@ export default function DeliveryEstimator({ orderTotal }: { orderTotal: number }
 
   useEffect(() => {
     fetch('/api/delivery/districts').then((response) => { if (!response.ok) throw new Error(); return response.json() }).then((data) => setProvinces(data.provinces || [])).catch(() => setError(t('delivery.districts_load_failed')))
-  }, [])
+  }, [t])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -29,7 +29,7 @@ export default function DeliveryEstimator({ orderTotal }: { orderTotal: number }
       .catch((reason) => { if (reason.name !== 'AbortError') setError(reason.message || t('delivery.estimate_unavailable')) })
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [district, orderTotal, request])
+  }, [district, orderTotal, request, t])
 
   return (
     <section className="rounded-2xl border border-rose-100 bg-gradient-to-br from-rose-50/70 to-white p-4 sm:p-5">

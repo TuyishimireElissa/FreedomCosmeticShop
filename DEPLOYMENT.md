@@ -44,7 +44,7 @@ Use the Vercel Dashboard (easiest):
 | DATABASE_URL | [ROTATED_DATABASE_URL] | Production |
 | DIRECT_URL | [ROTATED_DATABASE_URL] | Production |
 | CLOUDINARY_CLOUD_NAME | dohoc0tmp | All |
-| CLOUDINARY_API_KEY | 524578837153868 | Production |
+| CLOUDINARY_API_KEY | [CONFIGURED_IN_ENV] | Production |
 | CLOUDINARY_API_SECRET | [ROTATED_CLOUDINARY_API_SECRET] | Production |
 | NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME | dohoc0tmp | All |
 | NEXT_PUBLIC_APP_URL | https://freedomcosmeticshop.vercel.app | All |

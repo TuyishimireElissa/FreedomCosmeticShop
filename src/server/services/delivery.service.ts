@@ -14,8 +14,8 @@
  * and can optionally read from DeliveryZoneSettings table for admin-managed fees.
  */
 
-import { DELIVERY_FEES, DELIVERY_TIMES, formatRWF } from "@/lib/format"
-import { DISTRICT_TO_PROVINCE_MAP, RWANDA_DISTRICTS, RWANDA_SECTORS, RWANDA_PROVINCES } from "@/lib/rwanda-locations"
+import { formatRWF } from "@/lib/format"
+import { DISTRICT_TO_PROVINCE_MAP, RWANDA_DISTRICTS, RWANDA_SECTORS } from "@/lib/rwanda-locations"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

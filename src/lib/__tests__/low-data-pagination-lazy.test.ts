@@ -6,7 +6,6 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8'
 const productsPage = read('src/components/products/ProductsPageClient.tsx')
 const lazySection = read('src/components/ui/LazySection.tsx')
 const homepage = read('src/app/page.tsx')
-const legacyHomepage = read('src/components/storefront/HomeView.tsx')
 const smartImage = read('src/components/ui/SmartImage.tsx')
 const english = read('src/lib/i18n/translations/en.ts')
 const kinyarwanda = read('src/lib/i18n/translations/rw.ts')
@@ -37,12 +36,9 @@ describe('low-data pagination and deferred sections', () => {
     expect(lazySection).toContain('min-h-12')
   })
 
-  it('gates heavy homepage review, brand, and blog content', () => {
+  it('gates heavy homepage reviews and personalized recommendations', () => {
     expect(homepage).toContain("<LazySection label={t('home.section_reviews')}")
-    expect(legacyHomepage).toContain("<LazySection label={t('home.top_brands')} onLoad={loadBrands}>")
-    expect(legacyHomepage).toContain("<LazySection label={t('home.beauty_guides')} onLoad={loadBlog}>")
-    expect(legacyHomepage).toContain("<LazySection label={t('home.section_reviews')}>")
-    expect(legacyHomepage).not.toContain('fetch("/api/brands"),')
+    expect(homepage).toContain("<LazySection label={t('personalized_recommendations.section_label')}")
   })
 
   it('continues to lazy-load non-priority responsive images', () => {

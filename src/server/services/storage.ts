@@ -71,10 +71,11 @@ export async function uploadImage(
  * Delete an image from Cloudinary by public ID.
  * (Stub — implement when admin image management is added.)
  */
-export async function deleteImage(publicId: string): Promise<UploadResult> {
-  // TODO: Implement using signed deletion with API secret
-  console.log(`[STUB] Would delete Cloudinary image: ${publicId}`)
-  return { success: true, message: "Image deletion (stub)." }
+export async function deleteImage(_publicId: string): Promise<UploadResult> {
+  return {
+    success: false,
+    message: "Image deletion is unavailable through this legacy service.",
+  }
 }
 
 /**

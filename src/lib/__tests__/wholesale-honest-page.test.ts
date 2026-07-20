@@ -10,9 +10,9 @@ const publicWholesaleSurfaces = [
   page,
   banner,
   read('src/components/layout/Navbar.tsx'),
-  read('src/components/storefront/HomeView.tsx'),
-  read('src/components/storefront/ProductDetailView.tsx'),
-  read('src/components/auth/AccountView.tsx'),
+  read('src/app/page.tsx'),
+  read('src/components/products/ProductDetailClient.tsx'),
+  read('src/app/account/page.tsx'),
 ].join('\n')
 const applyApi = read('src/app/api/wholesale/apply/route.ts')
 const english = read('src/lib/i18n/translations/en.ts')

@@ -20,9 +20,9 @@ export const BUSINESS = {
   tinNumber: OWNER_TODO,
   tagline: "Rwanda's Beauty Freedom",
   description:
-    "Rwanda's #1 online cosmetics store. " +
-    'Shop 100% authentic skincare, makeup, haircare & more. ' +
-    'Pay with MTN MoMo. Fast delivery to all 30 districts.',
+    'Online cosmetics catalogue for customers in Rwanda. ' +
+    'Browse current skincare, makeup and haircare listings, view prices in RWF, ' +
+    'and check available payment and district delivery information.',
 
   // ═══════════════════════════════════
   // CONTACT INFORMATION
@@ -44,7 +44,7 @@ export const BUSINESS = {
     weekdays: OWNER_TODO,
     saturday: OWNER_TODO,
     sunday: OWNER_TODO,
-    timezone: 'Africa/Kigali (EAT - UTC+3)',
+    timezone: 'Africa/Kigali (CAT - UTC+2)',
     emergency: 'WhatsApp only outside business hours',
   },
 
@@ -130,7 +130,7 @@ export const BUSINESS = {
     returnCondition: 'Unopened and in original packaging',
     freeDeliveryThreshold: 50000,
     sameDayCutoff: '14:00',
-    warrantyInfo: '100% Authentic Products Guaranteed',
+    warrantyInfo: 'Authenticity information is displayed only when supported by verified product records.',
   },
 
   // ═══════════════════════════════════

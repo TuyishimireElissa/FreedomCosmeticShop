@@ -37,7 +37,8 @@ describe('real and honest order confirmations', () => {
   it('supports optional customer email without collecting payment credentials', () => {
     expect(form).toContain("type=\"email\"")
     expect(checkout).toContain('customerEmail: address.email.trim() || undefined')
-    expect(checkout).toContain('language, address:')
+    expect(checkout).toContain('language,')
+    expect(checkout).toContain('address: `${address.village}')
     expect(form).not.toContain('type="password"')
   })
 

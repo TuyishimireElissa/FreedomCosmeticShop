@@ -36,14 +36,13 @@ export async function initiateMomoPayment(
   phone: string,
   orderId: string
 ): Promise<PaymentResult> {
-  // ─── Simulation mode (MVP) ────────────────────────────────────────
+  // Never mark money as paid when the real provider is disabled. Test payment
+  // behavior belongs in isolated tests, not in a service callable by runtime code.
   if (!features.realPayments) {
-    console.log(`[MOCK PAYMENT] ${amount} RWF from ${phone} for order ${orderId}`)
     return {
-      success: true,
-      transactionId: `mock-${Date.now()}`,
-      status: "PAID",
-      message: "Payment simulated successfully (ENABLE_REAL_PAYMENTS=false).",
+      success: false,
+      status: "FAILED",
+      message: "Mobile Money payments are not currently enabled.",
     }
   }
 
@@ -116,21 +115,12 @@ export async function initiateCardPayment(
   _orderId: string,
   _customerEmail: string
 ): Promise<PaymentResult> {
-  if (!features.realPayments) {
-    return {
-      success: true,
-      transactionId: `mock-card-${Date.now()}`,
-      status: "PAID",
-      message: "Card payment simulated.",
-    }
-  }
-
-  // TODO: Implement Flutterwave card payment
-  // See: https://developer.flutterwave.com/reference/endpoints/standard-payment
   return {
     success: false,
     status: "FAILED",
-    message: "Card payments not yet implemented.",
+    message: features.realPayments
+      ? "Card payments are not available through this legacy service."
+      : "Card payments are not currently enabled.",
   }
 }
 
@@ -138,11 +128,10 @@ export async function initiateCardPayment(
  * Verify a payment by transaction ID (used in webhook handler).
  */
 export async function verifyPayment(transactionId: string): Promise<PaymentResult> {
-  // TODO: Call PayPack /transactions/:id endpoint
   return {
-    success: true,
+    success: false,
     transactionId,
-    status: "PAID",
-    message: "Verified (stub).",
+    status: "FAILED",
+    message: "This legacy verification service is disabled. Use the provider-specific verified webhook flow.",
   }
 }
