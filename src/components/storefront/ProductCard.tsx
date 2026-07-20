@@ -92,7 +92,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         className="block h-full touch-manipulation rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]"
       >
         <article className="h-full w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-transform duration-150 active:scale-[0.98]">
-          <div className="relative aspect-square overflow-hidden bg-gray-50">
+          <div className="relative aspect-[4/5] overflow-hidden bg-white">
             <SmartImage
               publicId={primaryImage?.publicId || undefined}
               fallbackSrc={primaryImage?.url || '/placeholder.svg'}
@@ -100,7 +100,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
               alt={imageAlt}
               fill
               aspectRatio={1}
-              className={`object-cover ${outOfStock ? 'opacity-60' : ''}`}
+              className={`object-contain p-2 ${outOfStock ? 'opacity-60' : ''}`}
             />
             {compactBadge && (
               <span aria-hidden="true" className="absolute left-1.5 top-1.5 max-w-[calc(100%-12px)] truncate rounded-full bg-[#B76E79] px-1.5 py-0.5 text-xs font-bold text-white shadow-sm">
@@ -131,7 +131,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       className="group bg-card relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
     >
       {/* Image */}
-      <div className="bg-secondary/30 relative aspect-square overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden bg-white">
         {primaryImage ? (
           <SmartImage
             publicId={primaryImage?.publicId || undefined}
@@ -140,7 +140,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             alt={imageAlt}
             fill
             aspectRatio={1}
-            className={`object-cover transition-transform duration-300 group-hover:scale-105 ${
+            className={`object-contain p-3 transition-transform duration-300 group-hover:scale-[1.02] ${
               outOfStock ? "opacity-60" : ""
             }`}
           />
