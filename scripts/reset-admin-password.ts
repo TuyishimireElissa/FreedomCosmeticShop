@@ -1,63 +1,48 @@
-/**
- * Reset the admin user's password to a known value.
- *
- * Usage: npx tsx scripts/reset-admin-password.ts
- *
- * This script finds the existing admin user (Test User, +250788123456)
- * and sets a password supplied through the ADMIN_NEW_PASSWORD environment variable.
- *
- * After first login, change the password via the admin profile.
- */
+import bcrypt from 'bcryptjs'
+import { db } from '@/lib/db'
+import { normalizeRwandaPhone } from '@/lib/phone'
 
-import { db } from "@/lib/db"
-import { hashPassword } from "@/lib/auth"
-
-const NEW_PASSWORD = process.env.ADMIN_NEW_PASSWORD
-if (!NEW_PASSWORD || NEW_PASSWORD.length < 12) {
-  throw new Error("Set ADMIN_NEW_PASSWORD to a unique password of at least 12 characters")
-}
-const ADMIN_PHONE = "+250788123456"
+const BCRYPT_COST = 12
 
 async function main() {
-  const admin = await db.user.findFirst({
-    where: { phone: ADMIN_PHONE, role: { in: ["ADMIN", "STAFF", "MANAGER"] } },
-    select: { id: true, name: true, phone: true, email: true, role: true, passwordHash: true },
-  })
-
-  if (!admin) {
-    console.error(`❌ No admin user found with phone ${ADMIN_PHONE}`)
-    console.log("\nExisting users:")
-    const users = await db.user.findMany({ select: { name: true, phone: true, role: true } })
-    console.log(JSON.stringify(users, null, 2))
-    process.exit(1)
+  const rawPhone = process.env.ADMIN_PHONE
+  const password = process.env.ADMIN_NEW_PASSWORD
+  if (!rawPhone) throw new Error('Set ADMIN_PHONE to the existing owner admin phone')
+  if (!password || password.length < 12) throw new Error('Set ADMIN_NEW_PASSWORD to a private password of at least 12 characters')
+  if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+    throw new Error('ADMIN_NEW_PASSWORD must contain uppercase, lowercase, number, and symbol')
   }
 
-  console.log("=== FOUND ADMIN USER ===")
-  console.log(`  ID:    ${admin.id}`)
-  console.log(`  Name:  ${admin.name}`)
-  console.log(`  Phone: ${admin.phone}`)
-  console.log(`  Email: ${admin.email || "(none)"}`)
-  console.log(`  Role:  ${admin.role}`)
-  console.log(`  Has password hash: ${!!admin.passwordHash}`)
+  const phone = normalizeRwandaPhone(rawPhone)
+  const admin = await db.user.findFirst({
+    where: { phone, role: { in: ['ADMIN', 'SUPER_ADMIN'] }, isDeleted: false },
+    select: { id: true, phone: true, role: true },
+  })
+  if (!admin) throw new Error('Active ADMIN or SUPER_ADMIN account not found')
 
-  // Reset password
-  const newHash = await hashPassword(NEW_PASSWORD)
+  const passwordHash = await bcrypt.hash(password, BCRYPT_COST)
   await db.user.update({
     where: { id: admin.id },
-    data: { passwordHash: newHash },
+    data: {
+      passwordHash,
+      passwordChangedAt: new Date(),
+      mustChangePassword: true,
+      failedLoginCount: 0,
+      lockedUntil: null,
+    },
   })
 
-  console.log("\n✅ Password reset successfully!")
-  console.log("\n=== LOGIN CREDENTIALS ===")
-  console.log(`  Phone:    ${admin.phone}`)
-  console.log(`  Password: ${NEW_PASSWORD}`)
-  console.log(`  Role:     ${admin.role}`)
-  console.log("\n⚠️  Change this password after first login via the admin profile menu.")
+  const updated = await db.user.findUnique({ where: { id: admin.id }, select: { passwordHash: true, role: true } })
+  if (!updated?.passwordHash || !(await bcrypt.compare(password, updated.passwordHash))) {
+    throw new Error('Password verification failed after update')
+  }
 
-  await db.$disconnect()
+  console.log(`Password reset verified for ${admin.phone} (${updated.role}). A password change is required after login.`)
 }
 
-main().catch((e) => {
-  console.error(e)
-  process.exit(1)
-})
+main()
+  .catch((error) => {
+    console.error(error instanceof Error ? error.message : 'Admin password reset failed')
+    process.exitCode = 1
+  })
+  .finally(() => db.$disconnect())
