@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth'
+import { syncAbandonedCartReminder } from '@/server/services/retention-messaging'
 
 const schema = z.object({ productId: z.string().min(1), quantity: z.number().int().min(1).max(99).default(1) })
 
@@ -16,7 +17,8 @@ export async function POST(request: Request) {
     const existing = await prisma.cartItem.findUnique({ where: { cartId_productId: { cartId: cart.id, productId: product.id } } })
     const quantity = Math.min((existing?.quantity || 0) + parsed.data.quantity, product.stock)
     const item = existing ? await prisma.cartItem.update({ where: { id: existing.id }, data: { quantity, price: product.price } }) : await prisma.cartItem.create({ data: { cartId: cart.id, productId: product.id, quantity, price: product.price } })
-    const items = await prisma.cartItem.findMany({ where: { cartId: cart.id } }); const totalItems = items.reduce((sum, value) => sum + value.quantity, 0); const subtotal = items.reduce((sum, value) => sum + value.price * value.quantity, 0); await prisma.cart.update({ where: { id: cart.id }, data: { totalItems, subtotal } })
+    const items = await prisma.cartItem.findMany({ where: { cartId: cart.id } }); const totalItems = items.reduce((sum, value) => sum + value.quantity, 0); const subtotal = items.reduce((sum, value) => sum + value.price * value.quantity, 0); const updated = await prisma.cart.update({ where: { id: cart.id }, data: { totalItems, subtotal } })
+    await syncAbandonedCartReminder(user.id, updated).catch(() => null)
     return NextResponse.json({ success: true, data: { item, totalItems, subtotal }, item, totalItems, subtotal }, { status: 201 })
   } catch (error) { console.error('Cart add error:', error); return NextResponse.json({ success: false, error: 'Failed to add item to cart' }, { status: 500 }) }
 }

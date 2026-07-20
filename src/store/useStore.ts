@@ -12,6 +12,7 @@
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 import { announceTranslated } from '@/components/a11y/LiveAnnouncer'
+import { EVENTS, trackEvent } from '@/lib/analytics'
 
 /* ---------- Types ---------- */
 
@@ -269,11 +270,13 @@ export const useStore = create<StoreState>()(
         }
         const current = get().items.find((value) => value.productId === item.productId)
         if (current) announceTranslated('accessibility.cart_added', { product: current.name, quantity: current.quantity })
+        void trackEvent({ event: EVENTS.ADD_TO_CART, productId: item.productId, metadata: { source: 'button' } })
       },
       removeFromCart: (productId) => {
         const item = get().items.find((value) => value.productId === productId)
         set({ items: get().items.filter((i) => i.productId !== productId) })
         if (item) announceTranslated('accessibility.cart_removed', { product: item.name })
+        void trackEvent({ event: EVENTS.REMOVE_FROM_CART, productId, metadata: { source: 'button' } })
       },
       updateQuantity: (productId, qty) => {
         if (qty <= 0) {

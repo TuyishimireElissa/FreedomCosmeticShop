@@ -1,11 +1,17 @@
 {
   "buildCommand": "npx prisma generate && next build",
   "framework": "nextjs",
-  "regions": ["cdg1"],
+  "regions": [
+    "cdg1"
+  ],
   "crons": [
     {
       "path": "/api/cron/review-requests",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/retention-reminders",
+      "schedule": "15 7 * * *"
     }
   ]
 }

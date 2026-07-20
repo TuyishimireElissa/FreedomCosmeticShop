@@ -31,6 +31,7 @@ import { sendOrderConfirmationEmail } from "@/server/services/email"
 import { features } from "@/lib/env"
 import { broadcastOrderEvent } from "@/lib/realtime"
 import { WHOLESALE_CONFIG } from "@/lib/wholesale-config"
+import { cancelAbandonedCartReminder } from "@/server/services/retention-messaging"
 
 const OrderItemSchema = z.object({
   productId: z.string().min(1),
@@ -312,6 +313,8 @@ export async function POST(req: Request) {
 
       return created
     })
+
+    if (userId) await cancelAbandonedCartReminder(userId).catch(() => null)
 
     // ─── Send confirmations (non-blocking) ─────────────────────────
     if (features.sms) {

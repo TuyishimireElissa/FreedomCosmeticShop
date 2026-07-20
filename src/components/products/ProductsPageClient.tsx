@@ -15,6 +15,7 @@ import StructuredData from '@/components/seo/StructuredData'
 import { getItemListSchema } from '@/lib/structured-data'
 import { getProductPrimaryImage } from '@/lib/cloudinary-images'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
+import { EVENTS, trackEvent } from '@/lib/analytics'
 
 interface Pagination {
   page: number
@@ -111,12 +112,16 @@ function ProductsContent() {
           return [...current, ...rows.filter((product) => !existingIds.has(product.id))]
         })
         lastProductRequest.current = { signature: requestSignature, page }
-        setPagination(result.pagination || result.data?.pagination || EMPTY_PAGINATION)
+        const nextPagination = result.pagination || result.data?.pagination || EMPTY_PAGINATION
+        setPagination(nextPagination)
+        if (filters.search && page === 1 && nextPagination.total === 0) {
+          void trackEvent({ event: EVENTS.ZERO_RESULT_SEARCH, path: '/products', metadata: { resultCount: 0, source: 'automatic' } })
+        }
       })
       .catch((reason) => { if (!(reason instanceof DOMException && reason.name === 'AbortError')) setError(reason instanceof Error ? reason.message : t('errors.products_load_failed')) })
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [apiQuery, page, request, requestSignature, t])
+  }, [apiQuery, filters.search, page, request, requestSignature, t])
 
   const sortOptions = [
     { value: 'relevance', label: t('search.sort_relevance') },

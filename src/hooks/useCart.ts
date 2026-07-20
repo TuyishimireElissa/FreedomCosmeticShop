@@ -6,6 +6,7 @@ import { useStore } from '@/store/useStore'
 import { useCartSync } from '@/hooks/useCartSync'
 import { announce } from '@/components/a11y/LiveAnnouncer'
 import { useT } from '@/lib/i18n/LanguageContext'
+import { EVENTS, trackEvent } from '@/lib/analytics'
 
 export function useCart() {
   useCartSync()
@@ -36,12 +37,14 @@ export function useCart() {
     store.addItem(item)
     const current = useCartStore.getState().items.find((value) => value.productId === item.productId)
     if (current) announce(t('accessibility.cart_added', { product: current.name, quantity: current.quantity }))
+    void trackEvent({ event: EVENTS.ADD_TO_CART, productId: item.productId, metadata: { source: 'button' } })
   }, [store, t])
 
   const removeWithUndo = useCallback((productId: string) => {
     const item = useCartStore.getState().items.find((value) => value.productId === productId)
     store.removeItem(productId)
     if (item) announce(t('accessibility.cart_removed', { product: item.name }))
+    void trackEvent({ event: EVENTS.REMOVE_FROM_CART, productId, metadata: { source: 'button' } })
   }, [store, t])
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {

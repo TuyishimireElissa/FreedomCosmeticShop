@@ -9,6 +9,7 @@ import { MAX_REVIEW_PHOTOS, REVIEW_REWARD_POINTS } from '@/lib/review-constants'
 import FormField from '@/components/a11y/FormField'
 import FormTextarea from '@/components/a11y/FormTextarea'
 import { ResilientFetchError, useResilientFetch } from '@/hooks/useResilientFetch'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 interface Props { orderId: string; productId: string }
 interface Eligibility {
@@ -21,6 +22,7 @@ const hairTypes = ['NATURAL','RELAXED','WAVY','CURLY','COILY','ALL_HAIR'] as con
 export default function ReviewSubmissionForm({ orderId, productId }: Props) {
   const { t } = useLanguage()
   const { resilientFetch } = useResilientFetch()
+  const { trackReviewSubmitted } = useAnalytics()
   const [eligibility, setEligibility] = useState<Eligibility | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -73,6 +75,7 @@ export default function ReviewSubmissionForm({ orderId, productId }: Props) {
       const response = await resilientFetch('/api/reviews/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId, productId, rating, title: title.trim() || undefined, comment: comment.trim() || undefined, skinType: skinType || undefined, hairType: hairType || undefined, shadeMatched, photos }) })
       const result = await response.json()
       if (!response.ok) { setError(result.error || 'REVIEW_SUBMISSION_FAILED'); return }
+      trackReviewSubmitted(productId)
       setSubmitted(true)
     } catch (reason) {
       if (reason instanceof ResilientFetchError) setError(reason.code === 'OFFLINE' ? 'NETWORK_OFFLINE' : 'NETWORK_REQUEST_FAILED')

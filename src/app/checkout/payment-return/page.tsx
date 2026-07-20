@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Loader2, XCircle } from 'lucide-react'
@@ -9,6 +9,7 @@ import type { CheckoutAddress } from '@/components/checkout/AddressForm'
 import type { CheckoutPaymentMethod } from '@/components/checkout/PaymentSelector'
 import { useStore } from '@/store/useStore'
 import { useT } from '@/lib/i18n/LanguageContext'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 interface Result {
   status: string
@@ -24,6 +25,8 @@ function PaymentResult() {
   const params = useSearchParams()
   const paymentId = params.get('paymentId')
   const clearCart = useStore((state) => state.clearCart)
+  const { trackPaymentFailed, trackPurchaseCompleted } = useAnalytics()
+  const trackedResult = useRef<string | null>(null)
   const [result, setResult] = useState<Result | null>(null)
   const [error, setError] = useState(false)
 
@@ -38,8 +41,21 @@ function PaymentResult() {
         if (!response.ok) throw new Error()
         if (stopped) return
         setResult(data)
-        if (data.status === 'PAID') { clearCart(); return }
-        if (data.status === 'FAILED') return
+        if (data.status === 'PAID') {
+          if (data.order && trackedResult.current !== `paid:${data.order.id}`) {
+            trackedResult.current = `paid:${data.order.id}`
+            trackPurchaseCompleted(data.order.total, 'CARD', '')
+          }
+          clearCart()
+          return
+        }
+        if (data.status === 'FAILED') {
+          if (trackedResult.current !== 'failed') {
+            trackedResult.current = 'failed'
+            trackPaymentFailed('CARD', 'CARD_PROVIDER_FAILED')
+          }
+          return
+        }
         attempts += 1
         if (attempts < 60) window.setTimeout(check, 3000)
         else setError(true)
@@ -47,7 +63,7 @@ function PaymentResult() {
     }
     void check()
     return () => { stopped = true }
-  }, [clearCart, paymentId])
+  }, [clearCart, paymentId, trackPaymentFailed, trackPurchaseCompleted])
 
   if (error) return <StateCard title={t('confirmation.verification_attention')} message={t('confirmation.verification_attention_hint')} />
   if (!result || result.status === 'PENDING') return <Loading />

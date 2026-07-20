@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth'
 import { PUBLIC_PRODUCT_SELECT, getRealUnitSales, serializePublicProduct } from '@/lib/public-product'
+import { syncAbandonedCartReminder } from '@/server/services/retention-messaging'
 
 const itemSchema = z.object({ productId: z.string().min(1), quantity: z.number().int().min(1).max(99) })
 function fail(error: string, status: number) { return NextResponse.json({ success: false, error }, { status }) }
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
     const quantity = Math.min((existing?.quantity || 0) + parsed.data.quantity, product.stock)
     const item = existing ? await prisma.cartItem.update({ where: { id: existing.id }, data: { quantity, price: product.price } }) : await prisma.cartItem.create({ data: { cartId: cart.id, productId: product.id, quantity, price: product.price } })
     const updated = await recalculate(cart.id)
+    await syncAbandonedCartReminder(user.id, updated).catch(() => null)
     return NextResponse.json({ success: true, data: { item, cart: updated }, item, cart: updated }, { status: 201 })
   } catch (error) { console.error('Cart POST error:', error); return fail('Failed to add item to cart', 500) }
 }
@@ -53,6 +55,7 @@ export async function PATCH(request: Request) {
     const product = await prisma.product.findUnique({ where: { id: parsed.data.productId } }); if (!product || product.stock < parsed.data.quantity) return fail('Insufficient stock', 400)
     const item = await prisma.cartItem.update({ where: { cartId_productId: { cartId: cart.id, productId: product.id } }, data: { quantity: parsed.data.quantity, price: product.price } })
     const updated = await recalculate(cart.id)
+    await syncAbandonedCartReminder(user.id, updated).catch(() => null)
     return NextResponse.json({ success: true, data: { item, cart: updated }, item, cart: updated })
   } catch (error) { console.error('Cart PATCH error:', error); return fail('Failed to update cart', 500) }
 }
@@ -64,6 +67,7 @@ export async function DELETE(request: Request) {
     const body = await request.json().catch(() => ({})) as { productId?: string }
     if (body.productId) await prisma.cartItem.deleteMany({ where: { cartId: cart.id, productId: body.productId } }); else await prisma.cartItem.deleteMany({ where: { cartId: cart.id } })
     const updated = await recalculate(cart.id)
+    await syncAbandonedCartReminder(user.id, updated).catch(() => null)
     return NextResponse.json({ success: true, data: { cart: updated }, cart: updated })
   } catch (error) { console.error('Cart DELETE error:', error); return fail('Failed to remove cart item', 500) }
 }

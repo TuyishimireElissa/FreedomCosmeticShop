@@ -33,6 +33,74 @@ export const rw = {
     cart_moved_from_saved: '{product} yimuriwe mu gitebo.', // verified-rw
     breadcrumb: 'Inzira y’urupapuro', // verified-rw
   },
+  retention_messages: {
+    back_in_stock: '{product} yongeye kuboneka. Yirebe hano: {url}', // verified-rw
+    price_drop: '{product} ubu igura {price} RWF. Yirebe hano: {url}', // verified-rw
+    reorder: 'Igihe cy’urwibutso rwa {product} kirageze. Reba igicuruzwa: {url}', // verified-rw
+  },
+  personalized_recommendations: {
+    title: 'Byahiswemo hashingiwe ku bikorwa byawe', // verified-rw
+    description: 'Ibicuruzwa bihari ubu bihuzwa igihe ubisabye n’ibyiciro rusange, ibirango, ibyo wabitse n’ibicuruzwa byahuye n’ibisubizo by’ikizamini cyawe giheruka.', // verified-rw
+    privacy_note: 'Iki gice ntigikora umwirondoro mushya w’umukiriya kandi ntikigaragaza amakuru bwite ya konti.', // verified-rw
+    loading: 'Turimo gutegura ibicuruzwa byaguhitiyemo', // verified-rw
+    section_label: 'Ibicuruzwa byaguhitiyemo', // verified-rw
+    reason_quiz: 'Bihuye n’ikizamini cyawe giheruka', // verified-rw
+    reason_purchase_category: 'Icyiciro gisa n’icy’igicuruzwa waguze cyemewe', // verified-rw
+    reason_saved_category: 'Bisa n’ibicuruzwa wabitse', // verified-rw
+    reason_brand: 'Ikirango gifitanye isano n’ibikorwa byawe', // verified-rw
+    reason_activity: 'Bihuye n’ibikorwa byawe mu iduka', // verified-rw
+  },
+  communication_preferences: {
+    title: 'Ubutumwa n’inzibutso', // verified-rw
+    description: 'Hitamo ukwako uburyo bwo kwakira ubutumwa n’ubwoko bw’ubutumwa butari ngombwa. Byose bibanza bifunze kugeza ubyifunguriye.', // verified-rw
+    loading: 'Turimo gufungura amahitamo y’ubutumwa…', // verified-rw
+    channels: 'Uburyo bwo kwakira ubutumwa', // verified-rw
+    channels_help: 'Ubutumwa bwemerwa gusa iyo uburyo bwo kubwakira n’ubwoko bwabwo byombi bifunguye.', // verified-rw
+    sms: 'SMS', // verified-rw
+    sms_description: 'Akira ubutumwa butari ngombwa kuri nimero ya telefoni iri kuri konti yawe.', // verified-rw
+    whatsapp: 'WhatsApp', // verified-rw
+    whatsapp_description: 'Kohereza ubutumwa kuri WhatsApp ntibirahuzwa.', // verified-rw
+    email: 'Imeyili', // verified-rw
+    email_description: 'Kohereza imeyili zitari ngombwa ntibirahuzwa.', // verified-rw
+    unavailable: 'Ntibiraboneka ubu — nta butumwa buzoherezwa', // verified-rw
+    purposes: 'Ubwoko bw’ubutumwa', // verified-rw
+    purposes_help: 'Gufunga ubwoko bw’ubutumwa bihita bihagarika inzibutso zabwo zitaroherezwa.', // verified-rw
+    reorder: 'Inzibutso zo kongera gutumiza', // verified-rw
+    reorder_description: 'Unyibutse ku itariki nihitiyemo nyuma yo kwakira ibyo natumije byemewe.', // verified-rw
+    price_drop: 'Amatangazo y’igiciro cyagabanutse', // verified-rw
+    price_drop_description: 'Mbwira igihe igicuruzwa nahisemo kigeze ku giciro nihitiyemo.', // verified-rw
+    back_in_stock: 'Amatangazo y’ibyongeye kuboneka', // verified-rw
+    back_in_stock_description: 'Mbwira igihe igicuruzwa nahisemo kitari gihari cyongeye kuboneka.', // verified-rw
+    birthday: 'Ibihembo by’isabukuru y’amavuko', // verified-rw
+    birthday_description: 'Emera amatangazo no gusaba ibihembo by’isabukuru byashyizweho.', // verified-rw
+    post_delivery: 'Inama nyuma yo kwakira ibyo watumije', // verified-rw
+    post_delivery_description: 'Inama zitari ngombwa zo gukoresha igicuruzwa nyuma yo kukibona.', // verified-rw
+    abandoned_cart: 'Inzibutso z’igitebo wasize', // verified-rw
+    abandoned_cart_description: 'Unyibutse igitebo nasize nkiri muri konti yanjye.', // verified-rw
+    wishlist: 'Inzibutso z’ibyo nifuza', // verified-rw
+    wishlist_description: 'Amakuru atari ngombwa ku bicuruzwa nibikiye ubwanjye.', // verified-rw
+    language: 'Ururimi rw’ubutumwa', // verified-rw
+    language_help: 'Ubutumwa butari ngombwa bukoresha uru rurimi.', // verified-rw
+    kinyarwanda: 'Ikinyarwanda', // verified-rw
+    english: 'Icyongereza', // verified-rw
+    site_language_note: 'Ibi bibika ururimi rw’ubutumwa hanyuma bigahindura ururimi rw’urubuga.', // verified-rw
+    saving: 'Birimo kubikwa…', // verified-rw
+    saved: 'Ihitamo ryabitswe.', // verified-rw
+    save_error: 'Ihitamo ntiryabitswe. Genzura interineti wongere ugerageze.', // verified-rw
+    opt_out_note: 'Ushobora gufunga ihitamo iryo ari ryo ryose igihe icyo ari cyo cyose. Gufunga bihita bikurikizwa kuri seriveri kandi inzibutso bijyanye zitaroherezwa zigahagarikwa.', // verified-rw
+  },
+  analytics_consent: {
+    title: 'Isesengura ritari ngombwa kandi ririnda amakuru bwite', // verified-rw
+    description: 'Emera ibikorwa bitarimo umwirondoro bidufasha kunoza iduka. Amazina, uburyo bwo kuvugana nawe, aderesi, nimero z’ubwishyu, amakuru y’ikarita, amagambo y’ibanga, kode z’ibanga n’indangamuntu ntibyoherezwa.', // verified-rw
+    accept: 'Emera isesengura', // verified-rw
+    decline: 'Oya, urakoze', // verified-rw
+    settings_title: 'Ihitamo ry’isesengura', // verified-rw
+    settings_description: 'Ushobora guhindura iri hitamo igihe icyo ari cyo cyose. Kurifunga bihita bitangira gukurikizwa kuri iki gikoresho.', // verified-rw
+    on: 'Isesengura rirakora', // verified-rw
+    off: 'Isesengura rirafunze', // verified-rw
+    status_on: 'Isesengura ritari ngombwa rirakora kuri iki gikoresho.', // verified-rw
+    status_off: 'Isesengura ritari ngombwa rirafunze kuri iki gikoresho.', // verified-rw
+  },
   low_data: {
     title: 'Uburyo bwo kuzigama interineti', // verified-rw
     description: 'Gabanya interineti ikoreshwa kandi urubuga rufunguke vuba kuri murandasi icumbagira.', // verified-rw

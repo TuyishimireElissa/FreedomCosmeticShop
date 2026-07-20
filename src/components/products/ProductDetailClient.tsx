@@ -16,6 +16,7 @@ import { useT } from '@/lib/i18n/LanguageContext'
 import IconButton from '@/components/a11y/IconButton'
 import StockStatus from '@/components/a11y/StockStatus'
 import { getProductPrimaryImage } from '@/lib/cloudinary-images'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 interface ProductResponse { product: Product; related: Product[] }
 
@@ -24,6 +25,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const router = useRouter()
   const addToCart = useStore((state) => state.addToCart)
   const { toast } = useToast()
+  const { trackProductView } = useAnalytics()
   const [data, setData] = useState<ProductResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -40,7 +42,16 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
       .catch((reason) => { if (reason.name !== 'AbortError') setError(reason.message || t('product.unavailable_hint')) })
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
-  }, [slug, request])
+  }, [slug, request, t])
+
+  useEffect(() => {
+    if (!data?.product) return
+    trackProductView({
+      id: data.product.id,
+      slug: data.product.slug,
+      category: data.product.category?.slug,
+    })
+  }, [data?.product, trackProductView])
 
   if (loading) return <DetailSkeleton />
   if (error || !data) return <div className="mx-auto grid min-h-[60vh] max-w-3xl place-items-center px-4 py-16 text-center"><div><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-rose-50 text-[#B76E79]"><ShoppingBag className="h-7 w-7" /></div><h1 className="mt-5 text-2xl font-black text-[#1a1a1a]">{error || t('product.product_not_found')}</h1><p className="mt-2 text-sm text-gray-500">{t('product.unavailable_hint')}</p><div className="mt-6 flex justify-center gap-3"><button type="button" onClick={() => router.push('/products')} className="rounded-full bg-[#1a1a1a] px-5 py-2.5 text-sm font-bold text-white">{t('product.browse_products')}</button><button type="button" onClick={() => setRequest((value) => value + 1)} className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-5 py-2.5 text-sm font-bold"><RefreshCw className="h-4 w-4" />{t('common.retry')}</button></div></div></div>

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertCircle, Check, ChevronRight, Loader2, ShieldCheck, ShoppingBag, Truck } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { formatRWF } from '@/lib/format'
@@ -12,6 +12,7 @@ import PaymentSelector, { type CheckoutPaymentMethod } from '@/components/checko
 import OrderSummary from '@/components/checkout/OrderSummary'
 import ConfirmationView, { type ConfirmedCheckoutOrder } from '@/components/checkout/ConfirmationView'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 const initialAddress: CheckoutAddress = { fullName: '', phone: '+250 ', email: '', province: '', district: '', sector: '', cell: '', village: '', landmark: '', address: '' }
 type Step = 1 | 2 | 3
@@ -22,6 +23,16 @@ export default function CheckoutPage() {
   const { t, language } = useLanguage()
   const { items, cartSubtotal, appliedCoupon, clearCart, user } = useStore()
   const polling = usePaymentPolling()
+  const {
+    trackBeginCheckout,
+    trackAddressCompleted,
+    trackPaymentSelected,
+    trackPaymentStarted,
+    trackPaymentFailed,
+    trackPurchaseCompleted,
+  } = useAnalytics()
+  const checkoutStarted = useRef(false)
+  const completedAnalyticsOrders = useRef(new Set<string>())
   const [step, setStep] = useState<Step>(1)
   const [address, setAddress] = useState<CheckoutAddress>(() => ({ ...initialAddress, fullName: user?.name || '', phone: user?.phone || '+250 ' }))
   const [paymentMethod, setPaymentMethod] = useState<CheckoutPaymentMethod>('MTN_MOMO')
@@ -38,6 +49,11 @@ export default function CheckoutPage() {
   }, [user])
   useEffect(() => setPaymentPhone(address.phone), [address.phone])
   useEffect(() => { if (paymentMethod === 'COD' && address.province !== 'Kigali City') setPaymentMethod('MTN_MOMO') }, [address.province, paymentMethod])
+  useEffect(() => {
+    if (items.length === 0 || checkoutStarted.current) return
+    checkoutStarted.current = true
+    trackBeginCheckout()
+  }, [items.length, trackBeginCheckout])
 
   useEffect(() => {
     if (!address.district) { setDeliveryFee(0); setDeliveryLoading(false); return }
@@ -70,15 +86,25 @@ export default function CheckoutPage() {
   const momoValid = paymentMethod === 'MTN_MOMO' ? /^(?:250|0)?7[89]\d{7}$/.test(paymentPhone.replace(/\D/g, '')) : paymentMethod === 'AIRTEL_MONEY' ? /^(?:250|0)?7[23]\d{7}$/.test(paymentPhone.replace(/\D/g, '')) : true
 
   const finishOrder = (order: { id: string; orderNumber: string; total: number }) => {
+    if (!completedAnalyticsOrders.current.has(order.id)) {
+      completedAnalyticsOrders.current.add(order.id)
+      trackPurchaseCompleted(order.total, paymentMethod, address.district)
+    }
     setCompletedOrder({ ...order, items: [...items] }); clearCart(); setStep(3); window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   useEffect(() => {
     if (polling.status === 'paid' && pendingOrder) finishOrder(pendingOrder)
   }, [polling.status, pendingOrder]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (polling.status === 'failed') trackPaymentFailed(paymentMethod, 'PROVIDER_FAILED')
+    if (polling.status === 'timeout') trackPaymentFailed(paymentMethod, 'PROVIDER_TIMEOUT')
+  }, [paymentMethod, polling.status, trackPaymentFailed])
 
   const initiatePayment = async (order: { id: string; orderNumber: string; total: number }) => {
-    if (paymentMethod === 'COD') { finishOrder(order); return }
+    trackPaymentStarted(paymentMethod, order.total)
+    try {
+      if (paymentMethod === 'COD') { finishOrder(order); return }
     if (paymentMethod === 'CARD') {
       const response = await fetch('/api/payments/card', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: order.id, language }) })
       const data = await response.json(); if (!response.ok) throw new Error(data.error === 'ORDER_STOCK_CHANGED' ? t('checkout.stock_changed_before_payment') : t('checkout.card_start_failed'))
@@ -88,7 +114,11 @@ export default function CheckoutPage() {
     const network = paymentMethod === 'MTN_MOMO' ? 'MTN' : 'AIRTEL'
     const response = await fetch('/api/payments/momo', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: order.id, phone: paymentPhone, network, language }) })
     const data = await response.json(); if (!response.ok) throw new Error(data.error === 'ORDER_STOCK_CHANGED' ? t('checkout.stock_changed_before_payment') : data.error === 'INVALID_NETWORK_PHONE' ? t('checkout.invalid_network_phone', { network }) : t('checkout.mobile_money_start_failed'))
-    polling.start(data.transactionId)
+      polling.start(data.transactionId)
+    } catch (error) {
+      trackPaymentFailed(paymentMethod, 'PAYMENT_START_FAILED')
+      throw error
+    }
   }
 
   const placeOrder = async () => {
@@ -119,7 +149,7 @@ export default function CheckoutPage() {
 
         {step === 3 && completedOrder ? <ConfirmationView order={completedOrder} address={address} paymentMethod={paymentMethod} /> : <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
           <main className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm sm:p-7">
-            {step === 1 ? <><div className="mb-6"><h2 className="flex items-center gap-2 text-xl font-black"><Truck className="h-5 w-5 text-[#B76E79]" />{t('checkout.step_address')}</h2><p className="mt-1 text-sm text-gray-500">{t('checkout.delivery_intro')}</p></div><AddressForm value={address} onChange={setAddress} errors={addressErrors} /><div className="mt-5 flex items-center justify-between rounded-2xl bg-rose-50 p-4"><span><strong className="block text-sm text-gray-800">{t('checkout.delivery_to', { place: address.district })}</strong><span className="text-xs text-gray-500">{deliveryLoading ? t('checkout.calculating') : address.province}</span></span><strong className="text-[#B76E79]">{deliveryLoading ? '—' : formatRWF(finalDelivery)}</strong></div><button type="button" onClick={() => { if (addressValid) { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) } }} disabled={!addressValid} className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#B76E79] text-base font-black text-white disabled:opacity-40">{t('checkout.step_payment')} <ChevronRight className="h-4 w-4" /></button></> : <><div className="mb-6"><h2 className="text-xl font-black">{t('checkout.choose_payment')}</h2><p className="mt-1 text-sm text-gray-500">{t('checkout.mtn_fastest')}</p></div><PaymentSelector method={paymentMethod} onMethodChange={(nextMethod) => { if (nextMethod !== paymentMethod) { setPendingOrder(null); polling.reset(); setCheckoutError(null) } setPaymentMethod(nextMethod) }} phone={paymentPhone} onPhoneChange={setPaymentPhone} isKigali={address.province === 'Kigali City'} paymentStatus={placing ? 'initiating' : polling.status} total={formatRWF(total)} remaining={polling.remaining} onRetry={() => { polling.reset(); setCheckoutError(null) }} onCancel={() => { polling.reset(); setCheckoutError(null) }} />{!momoValid && <p className="mt-3 flex items-center gap-1.5 text-xs font-bold text-red-700" role="alert"><AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />{t('checkout.valid_network_number', { network: paymentMethod === 'MTN_MOMO' ? 'MTN (078/079)' : 'Airtel (072/073)' })}</p>}{checkoutError && <p className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700" role="alert" aria-live="assertive"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />{checkoutError}</p>}<div className="mt-6 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={() => setStep(1)} disabled={placing || polling.status === 'polling'} className="min-h-12 flex-1 rounded-xl border border-gray-200 text-base font-bold">{t('common.back')}</button><button type="button" onClick={placeOrder} disabled={placing || polling.status === 'polling' || !momoValid} className={`min-h-12 flex-[2] rounded-xl px-4 text-base font-black shadow-lg disabled:opacity-50 ${paymentMethod === 'MTN_MOMO' ? 'bg-[#FFD200] text-[#1a1a1a] shadow-yellow-200' : 'bg-[#B76E79] text-white shadow-rose-100'}`}>{placing || polling.status === 'polling' ? <span className="flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />{polling.status === 'polling' ? t('checkout.approve_on_phone') : t('checkout.creating_order')}</span> : paymentMethod === 'COD' ? t('checkout.place_order_amount', { amount: formatRWF(total) }) : t('checkout.pay_amount', { amount: formatRWF(total) })}</button></div><p className="mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-500"><ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />{t('checkout.rwanda_payment_security')}</p></>}
+            {step === 1 ? <><div className="mb-6"><h2 className="flex items-center gap-2 text-xl font-black"><Truck className="h-5 w-5 text-[#B76E79]" />{t('checkout.step_address')}</h2><p className="mt-1 text-sm text-gray-500">{t('checkout.delivery_intro')}</p></div><AddressForm value={address} onChange={setAddress} errors={addressErrors} /><div className="mt-5 flex items-center justify-between rounded-2xl bg-rose-50 p-4"><span><strong className="block text-sm text-gray-800">{t('checkout.delivery_to', { place: address.district })}</strong><span className="text-xs text-gray-500">{deliveryLoading ? t('checkout.calculating') : address.province}</span></span><strong className="text-[#B76E79]">{deliveryLoading ? '—' : formatRWF(finalDelivery)}</strong></div><button type="button" onClick={() => { if (addressValid) { trackAddressCompleted(address.district); setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) } }} disabled={!addressValid} className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#B76E79] text-base font-black text-white disabled:opacity-40">{t('checkout.step_payment')} <ChevronRight className="h-4 w-4" /></button></> : <><div className="mb-6"><h2 className="text-xl font-black">{t('checkout.choose_payment')}</h2><p className="mt-1 text-sm text-gray-500">{t('checkout.mtn_fastest')}</p></div><PaymentSelector method={paymentMethod} onMethodChange={(nextMethod) => { if (nextMethod !== paymentMethod) { trackPaymentSelected(nextMethod); setPendingOrder(null); polling.reset(); setCheckoutError(null) } setPaymentMethod(nextMethod) }} phone={paymentPhone} onPhoneChange={setPaymentPhone} isKigali={address.province === 'Kigali City'} paymentStatus={placing ? 'initiating' : polling.status} total={formatRWF(total)} remaining={polling.remaining} onRetry={() => { polling.reset(); setCheckoutError(null) }} onCancel={() => { polling.reset(); setCheckoutError(null) }} />{!momoValid && <p className="mt-3 flex items-center gap-1.5 text-xs font-bold text-red-700" role="alert"><AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />{t('checkout.valid_network_number', { network: paymentMethod === 'MTN_MOMO' ? 'MTN (078/079)' : 'Airtel (072/073)' })}</p>}{checkoutError && <p className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700" role="alert" aria-live="assertive"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />{checkoutError}</p>}<div className="mt-6 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={() => setStep(1)} disabled={placing || polling.status === 'polling'} className="min-h-12 flex-1 rounded-xl border border-gray-200 text-base font-bold">{t('common.back')}</button><button type="button" onClick={placeOrder} disabled={placing || polling.status === 'polling' || !momoValid} className={`min-h-12 flex-[2] rounded-xl px-4 text-base font-black shadow-lg disabled:opacity-50 ${paymentMethod === 'MTN_MOMO' ? 'bg-[#FFD200] text-[#1a1a1a] shadow-yellow-200' : 'bg-[#B76E79] text-white shadow-rose-100'}`}>{placing || polling.status === 'polling' ? <span className="flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />{polling.status === 'polling' ? t('checkout.approve_on_phone') : t('checkout.creating_order')}</span> : paymentMethod === 'COD' ? t('checkout.place_order_amount', { amount: formatRWF(total) }) : t('checkout.pay_amount', { amount: formatRWF(total) })}</button></div><p className="mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-500"><ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />{t('checkout.rwanda_payment_security')}</p></>}
           </main>
           <details className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm lg:hidden">
             <summary className="flex min-h-[52px] cursor-pointer list-none items-center justify-between gap-3 p-4 text-sm font-semibold text-gray-800">

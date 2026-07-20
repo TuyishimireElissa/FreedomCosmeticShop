@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth'
+import { syncAbandonedCartReminder } from '@/server/services/retention-messaging'
 
 function parseImages(value: string) { try { const images = JSON.parse(value); return Array.isArray(images) ? images.filter((image): image is string => typeof image === 'string') : [] } catch { return [] } }
 
@@ -44,6 +45,8 @@ export async function POST(request: Request) {
       }
       return tx.cart.update({ where: { id: current.id }, data: { totalItems, subtotal } })
     })
+
+    await syncAbandonedCartReminder(user.id, cart).catch(() => null)
 
     const items = accepted.map(({ product, quantity }) => {
       const image = product.productImages.find((entry) => entry.isPrimary) || product.productImages[0]

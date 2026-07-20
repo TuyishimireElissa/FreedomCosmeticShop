@@ -41,7 +41,7 @@ describe('delivered-order review requests', () => {
     expect(cron).toContain("process.env.CRON_SECRET")
     expect(cron).toContain('timingSafeEqual')
     expect(cron).toContain("authorization?.startsWith('Bearer ')")
-    expect(vercel.crons).toEqual([{ path: '/api/cron/review-requests', schedule: '0 8 * * *' }])
+    expect(vercel.crons).toContainEqual({ path: '/api/cron/review-requests', schedule: '0 8 * * *' })
   })
 
   it('triggers request creation only when an order becomes delivered', () => {

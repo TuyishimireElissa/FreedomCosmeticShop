@@ -8,6 +8,7 @@ import SkipToContent from '@/components/a11y/SkipToContent'
 import LiveAnnouncer from '@/components/a11y/LiveAnnouncer'
 import { LowDataProvider } from '@/contexts/LowDataContext'
 import OfflineBanner from '@/components/ui/OfflineBanner'
+import { AnalyticsConsentBanner } from '@/components/analytics/AnalyticsConsent'
 import PerformanceMonitor from '@/components/dev/PerformanceMonitor'
 import { BUSINESS } from '@/lib/business-config'
 import { getPageMetadata, SEO_CONFIG } from '@/lib/seo-config'
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <SkipToContent />
             <LiveAnnouncer />
             <OfflineBanner />
+            <AnalyticsConsentBanner />
             <SiteChrome>{children}</SiteChrome>
             {process.env.NODE_ENV === 'development' && <PerformanceMonitor />}
             <Toaster

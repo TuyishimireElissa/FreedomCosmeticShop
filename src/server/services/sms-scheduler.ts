@@ -13,8 +13,11 @@
 
 import { enqueueSms } from "./sms-queue"
 import { getSmsMessage, type SmsLanguage, type SmsTemplateKey } from "./sms-templates"
-import { hasOptedOut } from "./sms"
+import { hasOptedOut, sendSmsViaProvider } from "./sms"
 import { db } from "@/lib/db"
+import { features } from "@/lib/env"
+import { hasCurrentRetentionConsent } from "./retention-messaging"
+import { SEO_CONFIG } from "@/lib/seo-config"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -35,7 +38,6 @@ export interface ScheduledSms {
 
 interface AbandonedCart {
   userId: string
-  phone: string
   itemCount: number
   cartValue: number
   abandonedAt: Date
@@ -141,10 +143,9 @@ const ABANDONED_CART_THRESHOLD_MS = 2 * 60 * 60 * 1000 // 2 hours
  * For MVP, this is called from the frontend via an API route.
  * In production, this would be triggered by cart activity events.
  */
-export function trackCartActivity(userId: string, phone: string, itemCount: number, cartValue: number): void {
+export function trackCartActivity(userId: string, itemCount: number, cartValue: number): void {
   abandonedCarts.set(userId, {
     userId,
-    phone,
     itemCount,
     cartValue,
     abandonedAt: new Date(),
@@ -172,22 +173,25 @@ async function processAbandonedCarts(): Promise<void> {
     const elapsed = now - cart.abandonedAt.getTime()
     if (elapsed < ABANDONED_CART_THRESHOLD_MS) continue
 
-    // Cart is abandoned — send SMS
-    if (!hasOptedOut(cart.phone)) {
-      const message = getSmsMessage("ABANDONED_CART", "en", {
-        itemCount: cart.itemCount,
-        cartLink: "freedomcosmeticshop.rw/cart",
-      })
-
-      enqueueSms(cart.phone, message, {
-        priority: 3, // low priority
-        template: "ABANDONED_CART",
-      })
-
-      console.log(`[SMS Scheduler] Abandoned cart SMS sent to ${cart.phone} (${cart.itemCount} items, ${cart.cartValue} RWF)`)
+    // Resolve contact information only at send time and require current channel
+    // plus abandoned-cart purpose consent. Disabled providers never simulate or
+    // log recipient details for retention messages.
+    const preference = await db.communicationPreference.findUnique({
+      where: { userId: cart.userId },
+      include: { user: { select: { phone: true, isDeleted: true } } },
+    })
+    if (!preference || preference.user.isDeleted || !hasCurrentRetentionConsent(preference, 'SMS', 'ABANDONED_CART')) {
+      abandonedCarts.delete(cart.userId)
+      continue
     }
+    if (!features.sms) continue
 
-    cart.notified = true
+    const message = getSmsMessage("ABANDONED_CART", preference.language === 'en' ? 'en' : 'rw', {
+      itemCount: cart.itemCount,
+      cartLink: `${SEO_CONFIG.siteUrl}/cart`,
+    })
+    const result = await sendSmsViaProvider(preference.user.phone, message).catch(() => null)
+    if (result?.success && result.provider !== 'SIMULATED') cart.notified = true
   }
 }
 

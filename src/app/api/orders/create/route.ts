@@ -7,6 +7,7 @@ import { requireAuth } from '@/lib/auth'
 import { calculateDelivery, getAllDistricts, getProvinceByDistrict } from '@/server/services/delivery.service'
 import { calculateBundleFacts } from '@/lib/bundle-pricing'
 import { sendOrderConfirmation } from '@/server/services/order-confirmation'
+import { cancelAbandonedCartReminder } from '@/server/services/retention-messaging'
 
 const lineSchema = z.object({
   productId: z.string().min(1).optional(),
@@ -105,6 +106,7 @@ export async function POST(request: Request) {
       if (couponId) await tx.coupon.update({ where: { id: couponId }, data: { usedCount: { increment: 1 } } })
       return created
     })
+    if (user) await cancelAbandonedCartReminder(user.id).catch(() => null)
     const confirmationDelivery = input.paymentMethod === 'COD'
       ? await sendOrderConfirmation({ orderId: order.id, orderNumber: order.orderNumber, customerName: order.customerName, customerPhone: order.customerPhone, customerEmail: order.customerEmail, totalAmount: order.total, deliveryDistrict: order.district || order.city, estimatedDelivery: estimatedArrival, paymentMethod: input.paymentMethod, language: input.language, paymentConfirmed: false }).catch(() => ({ sms: 'failed' as const, email: 'failed' as const }))
       : { sms: 'not_requested' as const, email: 'not_requested' as const }

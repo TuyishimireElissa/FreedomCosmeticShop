@@ -14,7 +14,7 @@
  * Uses /api/wholesale/* endpoints from Section 2.
  */
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useStore } from "@/store/useStore"
 import { RWANDA_DISTRICTS, RWANDA_PROVINCES } from "@/lib/rwanda-locations"
 import { Button } from "@/components/ui/button"
@@ -41,6 +41,7 @@ import FormField from '@/components/a11y/FormField'
 import FormSelect from '@/components/a11y/FormSelect'
 import FormTextarea from '@/components/a11y/FormTextarea'
 import { ResilientFetchError, useResilientFetch } from '@/hooks/useResilientFetch'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 type InternalView = "landing" | "apply" | "status" | "success" | "dashboard" | "invoices"
 
@@ -269,6 +270,8 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
   const { user, goLogin } = useStore()
   const { toast } = useToast()
   const { resilientFetch } = useResilientFetch()
+  const { trackWholesaleApplicationCompleted, trackWholesaleApplicationStarted } = useAnalytics()
+  const analyticsStarted = useRef(false)
   const [step, setStep] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
@@ -294,6 +297,12 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
   const [notes, setNotes] = useState("")
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [confirmAccurate, setConfirmAccurate] = useState(false)
+
+  useEffect(() => {
+    if (!user || analyticsStarted.current) return
+    analyticsStarted.current = true
+    trackWholesaleApplicationStarted()
+  }, [trackWholesaleApplicationStarted, user])
 
   // Redirect to login if not authenticated
   if (!user) {
@@ -373,6 +382,7 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || t('wholesale.submission_failed'))
 
+      trackWholesaleApplicationCompleted()
       onSuccess()
     } catch (e) {
       const message = e instanceof ResilientFetchError

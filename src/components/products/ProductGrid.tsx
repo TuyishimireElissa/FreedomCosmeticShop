@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { getCloudinaryUrl, getProductPrimaryImage } from '@/lib/cloudinary-images'
 import SmartImage from '@/components/ui/SmartImage'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 interface ProductGridProps {
   products: Product[]
@@ -25,6 +26,7 @@ export default function ProductGrid({ products, loading = false, error, onRetry 
   const user = useStore((state) => state.user)
   const router = useRouter()
   const { toast } = useToast()
+  const { trackAddToWishlist, trackRemoveFromWishlist } = useAnalytics()
   const [wishlisted, setWishlisted] = useState<Set<string>>(new Set())
 
   const toggleWishlist = async (productId: string) => {
@@ -42,6 +44,8 @@ export default function ProductGrid({ products, loading = false, error, onRetry 
       toast({ title: t('search.wishlist_failed'), variant: 'destructive' })
       return
     }
+    if (active) trackRemoveFromWishlist(productId)
+    else trackAddToWishlist(productId)
     setWishlisted((current) => {
       const next = new Set(current)
       if (active) next.delete(productId)

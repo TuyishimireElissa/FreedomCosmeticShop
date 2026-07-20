@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { ArrowLeft, Gauge } from 'lucide-react'
 import LowDataToggle from '@/components/settings/LowDataToggle'
 import { useT } from '@/lib/i18n/LanguageContext'
+import { AnalyticsConsentSettings } from '@/components/analytics/AnalyticsConsent'
+import CommunicationPreferences from '@/components/settings/CommunicationPreferences'
 
 export default function AccountSettingsPage() {
   const t = useT()
@@ -23,8 +25,10 @@ export default function AccountSettingsPage() {
           <h1 className="mt-2 text-3xl font-black text-gray-950">{t('low_data.settings_title')}</h1>
           <p className="mt-2 text-sm leading-6 text-gray-600">{t('low_data.settings_description')}</p>
         </header>
-        <div className="mt-6">
+        <div className="mt-6 space-y-6">
+          <CommunicationPreferences />
           <LowDataToggle />
+          <AnalyticsConsentSettings />
         </div>
       </div>
     </main>

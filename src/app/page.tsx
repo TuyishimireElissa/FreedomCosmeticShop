@@ -19,6 +19,10 @@ const FeaturedProducts = dynamic(
   () => import('@/components/home/FeaturedProducts'),
   { ssr: false, loading: () => <ProductSectionSkeleton /> },
 )
+const PersonalizedRecommendations = dynamic(
+  () => import('@/components/home/PersonalizedRecommendations'),
+  { ssr: false, loading: () => null },
+)
 const DeliveryPromo = dynamic(
   () => import('@/components/home/DeliveryPromo'),
   { loading: () => <div className="mx-4 h-64 animate-pulse rounded-2xl bg-gray-100 motion-reduce:animate-none" /> },
@@ -105,27 +109,32 @@ function Homepage() {
       {/* 4. Four real featured products — lazy */}
       <FeaturedProducts type="featured" limit={4} />
 
-      {/* 5. Real delivery settings and active coupon only — lazy */}
+      {/* 5. On-demand account recommendations; hidden without eligible signals */}
+      <LazySection label={t('personalized_recommendations.section_label')}>
+        <PersonalizedRecommendations />
+      </LazySection>
+
+      {/* 6. Real delivery settings and active coupon only — lazy */}
       <DeliveryPromo />
 
-      {/* 6. Four real new arrivals — lazy */}
+      {/* 7. Four real new arrivals — lazy */}
       <FeaturedProducts type="new-arrivals" limit={4} />
 
-      {/* 7. Configured trust information only — lazy */}
+      {/* 8. Configured trust information only — lazy */}
       <TrustSection />
 
-      {/* 8. Hidden unless at least three real approved reviews exist — explicit in low-data mode */}
+      {/* 9. Hidden unless at least three real approved reviews exist — explicit in low-data mode */}
       <LazySection label={t('home.section_reviews')}>
         <ReviewsSection />
       </LazySection>
 
-      {/* 9. Optional recommendation entry point — no product claims */}
+      {/* 10. Optional recommendation entry point — no product claims */}
       <QuizBanner />
 
-      {/* 10. Hidden until a real WhatsApp number is configured — lazy */}
+      {/* 11. Hidden until a real WhatsApp number is configured — lazy */}
       <WhatsAppCTA />
 
-      {/* 11. Footer is connected through SiteChrome */}
+      {/* 12. Footer is connected through SiteChrome */}
     </div>
   )
 }

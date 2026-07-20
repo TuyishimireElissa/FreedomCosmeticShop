@@ -61,7 +61,6 @@ export function hasOptedOut(phone: string): boolean {
 export function optOut(phone: string): void {
   const normalized = normalizeRwandaPhoneSafe(phone)
   optedOutPhones.add(normalized)
-  console.log(`[SMS Opt-out] ${normalized} opted out`)
 }
 
 /**
@@ -70,7 +69,6 @@ export function optOut(phone: string): void {
 export function optIn(phone: string): void {
   const normalized = normalizeRwandaPhoneSafe(phone)
   optedOutPhones.delete(normalized)
-  console.log(`[SMS Opt-in] ${normalized} opted back in`)
 }
 
 /**

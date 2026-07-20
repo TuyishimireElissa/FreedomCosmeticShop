@@ -9,6 +9,7 @@ import { formatRWF } from '@/lib/format'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { getQuizStep, type QuizAnswers } from '@/lib/quiz-logic'
 import IconButton from '@/components/a11y/IconButton'
+import { useAnalytics } from '@/hooks/useAnalytics'
 
 interface RecommendedBundle {
   id: string
@@ -46,6 +47,8 @@ function getSessionId() {
 
 export default function RoutineQuiz() {
   const { t, language } = useLanguage()
+  const { trackQuizCompleted, trackQuizStarted } = useAnalytics()
+  const analyticsStarted = useRef(false)
   const [stepNumber, setStepNumber] = useState(1)
   const [answers, setAnswers] = useState<Partial<QuizAnswers>>({})
   const [phase, setPhase] = useState<'questions' | 'loading' | 'results'>('questions')
@@ -68,6 +71,7 @@ export default function RoutineQuiz() {
         if (Date.now() - cached.timestamp < CACHE_TTL_MS) {
           setRecommendations(cached.data)
           setPhase('results')
+          trackQuizCompleted()
           return
         }
         sessionStorage.removeItem(cacheKey)
@@ -87,13 +91,18 @@ export default function RoutineQuiz() {
       setRecommendations(data)
       sessionStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data }))
       setPhase('results')
+      trackQuizCompleted()
     } catch {
       setError(true)
       setPhase('results')
     }
-  }, [language])
+  }, [language, trackQuizCompleted])
 
   const choose = (value: string) => {
+    if (!analyticsStarted.current) {
+      analyticsStarted.current = true
+      trackQuizStarted()
+    }
     const next = { ...answers, [step.id]: value }
     setAnswers(next)
     if (stepNumber < 6) {
@@ -109,6 +118,7 @@ export default function RoutineQuiz() {
   }
 
   const restart = () => {
+    analyticsStarted.current = false
     setAnswers({})
     setStepNumber(1)
     setRecommendations(null)

@@ -13,6 +13,7 @@ import { formatRWF } from '@/lib/format'
 import type { CartItem } from '@/store/cartStore'
 import { buildWhatsAppShareUrl, trackWhatsAppClick } from '@/lib/whatsapp-service'
 import IconButton from '@/components/a11y/IconButton'
+import { EVENTS, trackEvent } from '@/lib/analytics'
 
 interface DeliveryResult { fee: number; deliveryTime: string; isFreeDelivery: boolean; freeDeliveryThreshold: number; amountNeededForFree: number }
 interface CouponPreview {
@@ -37,6 +38,10 @@ export default function CartView() {
   const [crossSells, setCrossSells] = useState<CrossSell[]>([])
   const [couponError, setCouponError] = useState('')
   const [couponLoading, setCouponLoading] = useState(false)
+
+  useEffect(() => {
+    void trackEvent({ event: EVENTS.VIEW_CART, path: '/cart', metadata: { context: 'cart', source: 'automatic' } })
+  }, [])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -91,6 +96,8 @@ export default function CartView() {
   const applyCoupon = () => {
     if (!couponPreview || !couponPreview.canApply) return
     setAppliedCoupon({ code: couponPreview.coupon.code, type: couponPreview.coupon.type, value: couponPreview.coupon.value, discountAmount: couponPreview.discountAmount, freeShipping: couponPreview.freeShipping })
+    const couponType = couponPreview.freeShipping ? 'FREE_SHIPPING' : couponPreview.coupon.type === 'PERCENTAGE' ? 'PERCENTAGE' : 'FIXED'
+    void trackEvent({ event: EVENTS.COUPON_APPLIED, metadata: { couponType, source: 'button' } })
     setCouponPreview(null)
   }
   const discount = appliedCoupon?.discountAmount || 0

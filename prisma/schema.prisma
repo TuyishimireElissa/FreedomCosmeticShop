@@ -131,6 +131,17 @@ model User {
   wholesaleInvoices    WholesaleInvoice[]
   quizResults           QuizResult[]
 
+  // Privacy-first retention relations. Contact details remain on User and are
+  // resolved only at send time after current consent is checked.
+  referralCode            ReferralCode?
+  referralRedemptions     ReferralRedemption[] @relation("ReferredCustomer")
+  birthdayRewards         BirthdayReward[]
+  reorderReminders        ReorderReminder[]
+  stockAlerts             StockAlert[]
+  communicationPreference CommunicationPreference?
+  customerSegment         CustomerSegment?
+  abandonedCartReminders  AbandonedCartReminder[]
+
   @@index([phone])
   @@index([email])
   @@index([role])
@@ -354,6 +365,8 @@ model Product {
   productImages ProductImage[]
   batches       ProductBatch[]
   bundles       BundleProduct[]
+  reorderReminders ReorderReminder[]
+  stockAlerts      StockAlert[]
 
   @@index([slug])
   @@index([categoryId])
@@ -559,7 +572,8 @@ model Cart {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  items CartItem[]
+  items               CartItem[]
+  abandonedReminder AbandonedCartReminder?
 
   @@index([userId])
 }
@@ -648,6 +662,7 @@ model Order {
   reviews          Review[]
   reviewRequests   ReviewRequest[]
   wholesaleInvoice WholesaleInvoice?
+  reorderReminders ReorderReminder[]
 
   @@index([orderNumber])
   @@index([status])
@@ -1633,6 +1648,283 @@ model NotFoundLog {
 
   @@index([path])
   @@index([createdAt])
+}
+
+// Consent-gated, privacy-minimized first-party analytics. No direct customer
+// identifiers, contact details, addresses, payment references, or credentials.
+model AnalyticsEvent {
+  id              String   @id @default(cuid())
+  event           String
+  category        String?
+  path            String?
+  productId       String?
+  productSlug     String?
+  productCategory String?
+  searchQueryHash String?
+  device          String?
+  district        String?
+  language        String?
+  paymentMethod   String?
+  isNewUser       Boolean  @default(false)
+  isKigali        Boolean  @default(false)
+  sessionHash     String?
+  userHash        String?
+  value           Decimal?
+  currency        String   @default("RWF")
+  metadata        Json?
+  createdAt       DateTime @default(now())
+
+  @@index([event])
+  @@index([createdAt])
+  @@index([productId])
+  @@index([sessionHash])
+  @@index([district])
+  @@index([device])
+}
+
+// =============================================================================
+// RETENTION FOUNDATION — consent-first, policy-neutral records
+// =============================================================================
+// These models do not activate rewards or communications by themselves. Reward
+// values and timing remain nullable until an authorized business policy is
+// configured. Reminder delivery code must re-check CommunicationPreference at
+// send time so an opt-out blocks queued, unsent messages immediately.
+
+model ReferralCode {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Codes are generated from cryptographic randomness in the service layer;
+  // customer names and contact details must never be embedded in them.
+  code     String  @unique
+  isActive Boolean @default(false)
+
+  // No reward or discount is assumed. Section 4 may use these values only
+  // after an authorized policy explicitly configures and activates the code.
+  pointsPerUse       Int?
+  discountType       String?
+  discountValue      Int?
+  maxUses            Int?
+  usedCount          Int       @default(0)
+  startsAt           DateTime?
+  endsAt             DateTime?
+  policyConfiguredAt DateTime?
+
+  redemptions ReferralRedemption[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+}
+
+model ReferralRedemption {
+  id             String       @id @default(cuid())
+  referralCodeId String
+  referralCode   ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Restrict)
+
+  // One authenticated customer can redeem a referral only once. No customer
+  // name, phone, email, or address snapshot is retained here.
+  referredUserId String @unique
+  referredUser   User   @relation("ReferredCustomer", fields: [referredUserId], references: [id], onDelete: Restrict)
+
+  referrerPointsAwarded Int    @default(0)
+  discountType          String?
+  discountValue         Int?
+  discountRedeemedAt    DateTime?
+  status                String @default("RECORDED")
+  createdAt             DateTime @default(now())
+
+  @@index([referralCodeId, createdAt])
+  @@index([status])
+}
+
+model BirthdayReward {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Month/day supports the feature while minimizing retained date information.
+  birthMonth Int
+  birthDay   Int
+  rewardYear Int
+
+  // A record is non-claimable until a policy sets a value and explicitly
+  // grants it. There is intentionally no default reward or expiry period.
+  rewardPoints     Int?
+  status           String    @default("BLOCKED")
+  consentGranted   Boolean   @default(false)
+  consentCheckedAt DateTime?
+  grantedAt        DateTime?
+  redeemedAt       DateTime?
+  expiresAt        DateTime?
+  revokedAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, rewardYear])
+  @@index([status])
+  @@index([rewardYear, birthMonth, birthDay])
+}
+
+model ReorderReminder {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sourceOrderId String?
+  sourceOrder   Order?  @relation(fields: [sourceOrderId], references: [id], onDelete: SetNull)
+
+  // Usage periods are product/policy configuration, never guessed defaults.
+  estimatedDays Int?
+  dueAt         DateTime?
+  channel       String?
+
+  // BLOCKED + false is the safe queue state. A sender must re-check current
+  // channel and reorder consent instead of relying only on this snapshot.
+  status           String    @default("BLOCKED")
+  consentGranted   Boolean   @default(false)
+  consentCheckedAt DateTime?
+  sentAt           DateTime?
+  cancelledAt      DateTime?
+  lastErrorCode    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([productId])
+  @@index([sourceOrderId])
+  @@index([dueAt, status])
+}
+
+model AbandonedCartReminder {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartId String @unique
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  channel String @default("SMS")
+  dueAt   DateTime
+
+  status           String   @default("BLOCKED")
+  consentGranted   Boolean  @default(false)
+  consentCheckedAt DateTime?
+  sentAt           DateTime?
+  cancelledAt      DateTime?
+  lastErrorCode    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([dueAt, status])
+}
+
+model StockAlert {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  alertType   String
+  targetPrice Int?
+  channel     String?
+
+  // No phone/name/address snapshot is stored. Contact information is resolved
+  // from the authenticated user only after current purpose + channel consent.
+  status           String    @default("BLOCKED")
+  consentGranted   Boolean   @default(false)
+  consentCheckedAt DateTime?
+  sentAt           DateTime?
+  cancelledAt      DateTime?
+  lastErrorCode    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId, alertType])
+  @@index([productId, alertType, status])
+  @@index([userId, status])
+}
+
+model CommunicationPreference {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  language String @default("rw")
+
+  // Channel consent is explicit and disabled by default.
+  smsEnabled          Boolean   @default(false)
+  whatsappEnabled     Boolean   @default(false)
+  emailEnabled        Boolean   @default(false)
+  smsConsentedAt      DateTime?
+  whatsappConsentedAt DateTime?
+  emailConsentedAt    DateTime?
+  smsRevokedAt        DateTime?
+  whatsappRevokedAt   DateTime?
+  emailRevokedAt      DateTime?
+
+  // Purpose consent is independent from channel consent. A message may be sent
+  // only when both its purpose and selected channel are currently enabled.
+  reorderReminders       Boolean @default(false)
+  priceDropAlerts        Boolean @default(false)
+  backInStockAlerts      Boolean @default(false)
+  birthdayRewards        Boolean @default(false)
+  postDeliveryTips       Boolean @default(false)
+  abandonedCartReminders Boolean @default(false)
+  wishlistReminders      Boolean @default(false)
+
+  reorderConsentedAt       DateTime?
+  priceDropConsentedAt     DateTime?
+  backInStockConsentedAt   DateTime?
+  birthdayConsentedAt      DateTime?
+  postDeliveryConsentedAt  DateTime?
+  abandonedCartConsentedAt DateTime?
+  wishlistConsentedAt      DateTime?
+
+  reorderRevokedAt       DateTime?
+  priceDropRevokedAt     DateTime?
+  backInStockRevokedAt   DateTime?
+  birthdayRevokedAt      DateTime?
+  postDeliveryRevokedAt  DateTime?
+  abandonedCartRevokedAt DateTime?
+  wishlistRevokedAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([updatedAt])
+}
+
+model CustomerSegment {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // No business thresholds are assumed. Segmentation remains inactive and
+  // unclassified until a versioned definition is explicitly configured.
+  segment           String    @default("UNCLASSIFIED")
+  isActive          Boolean   @default(false)
+  definitionVersion String?
+  assignedAt        DateTime?
+  calculatedAt      DateTime?
+  expiresAt         DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([segment, isActive])
+  @@index([calculatedAt])
 }
 
 // =============================================================================
