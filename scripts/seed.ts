@@ -13,7 +13,7 @@ const categories = [
 ] as const
 
 const deliveryZones = [
-  { zoneName: 'Kigali City', zoneCode: 'KIGALI', baseFee: 1000, freeThreshold: 50000, estimatedDays: 1, isSameDay: true, sameDayCutoff: '14:00' },
+  { zoneName: 'Kigali Same Day', zoneCode: 'KIGALI_SAME_DAY', baseFee: 1000, freeThreshold: 50000, estimatedDays: 1, isSameDay: true, sameDayCutoff: '14:00' },
   { zoneName: 'Northern Province', zoneCode: 'NORTHERN', baseFee: 3000, freeThreshold: 50000, estimatedDays: 3, isSameDay: false, sameDayCutoff: null },
   { zoneName: 'Southern Province', zoneCode: 'SOUTHERN', baseFee: 3000, freeThreshold: 50000, estimatedDays: 3, isSameDay: false, sameDayCutoff: null },
   { zoneName: 'Eastern Province', zoneCode: 'EASTERN', baseFee: 3500, freeThreshold: 50000, estimatedDays: 3, isSameDay: false, sameDayCutoff: null },
