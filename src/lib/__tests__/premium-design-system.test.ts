@@ -12,6 +12,7 @@ function tsxFiles(directory: string): string[] {
 const css = read('src/app/globals.css')
 const navbar = read('src/components/layout/Navbar.tsx')
 const productGrid = read('src/components/products/ProductGrid.tsx')
+const productCard = read('src/components/storefront/ProductCard.tsx')
 const footer = read('src/components/layout/Footer.tsx')
 const emoji = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u{2BFF}]/u
 
@@ -28,10 +29,14 @@ describe('premium cosmetics design system', () => {
     expect(navbar).toContain('<Store className="h-4 w-4"')
   })
 
-  it('uses complete product images and a maximum of one conditional status badge', () => {
-    expect(productGrid).toContain('object-contain p-3')
-    expect(productGrid).toContain('outOfStock ? <span')
-    expect(productGrid).not.toContain('flex flex-col items-start gap-1')
+  it('uses one shared image-led card with a clean responsive grid', () => {
+    expect(productGrid).toContain("import { ProductCard } from '@/components/storefront/ProductCard'")
+    expect(productGrid).toContain('grid-cols-2')
+    expect(productGrid).toContain('md:grid-cols-3')
+    expect(productGrid).toContain('lg:grid-cols-4')
+    expect(productCard).toContain('aspect-square')
+    expect(productCard).toContain('<Package className="h-12 w-12 text-gray-300"')
+    expect(productCard).not.toContain("t('product.no_reviews')")
   })
 
   it('moves payment information to the footer as plain text', () => {

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { ProductCard } from '@/components/storefront/ProductCard'
 import { useProductUpdates } from '@/hooks/use-realtime'
@@ -60,7 +59,7 @@ export default function FeaturedProducts({ type = 'featured', limit = 4 }: Featu
       <section className="px-4 py-6 md:py-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-4 flex items-center justify-between"><div className="h-6 w-40 animate-pulse rounded bg-gray-200" /><div className="h-4 w-16 animate-pulse rounded bg-gray-200" /></div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
             {[1, 2, 3, 4].map((item) => <div key={item} className="aspect-[3/4] animate-pulse rounded-xl bg-gray-100" />)}
           </div>
         </div>
@@ -75,25 +74,17 @@ export default function FeaturedProducts({ type = 'featured', limit = 4 }: Featu
       <div className="mx-auto max-w-7xl">
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="text-lg font-bold text-gray-900 md:text-xl">{sectionTitle}</h2>
-          <Link href={viewAllHref} className="flex min-h-11 shrink-0 items-center gap-1 px-2 text-sm font-medium text-[#B76E79] transition-colors hover:text-[#a55d68]">
-            {t('home.view_all')} <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          <Link href={viewAllHref} className="flex min-h-11 shrink-0 items-center px-2 text-sm font-medium text-[#B76E79] transition-colors hover:text-[#9B5A64]">
+            {t('home.view_all')}
           </Link>
         </div>
 
-        <div className="scrollbar-hide scroll-smooth-ios -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 touch-pan-x md:hidden">
-          {products.map((product) => (
-            <div key={product.id} className="w-[calc(50vw-20px)] min-w-[140px] max-w-[180px] flex-none snap-start">
-              <ProductCard product={product} compact />
-            </div>
-          ))}
-        </div>
-
-        <div className="hidden grid-cols-4 gap-4 md:grid">
+        <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
           {products.map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
 
-        <Link href={viewAllHref} className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-700 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
-          {t('home.view_all')} <ChevronRight className="h-4 w-4" aria-hidden="true" />
+        <Link href={viewAllHref} className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-700 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
+          {t('home.view_all')}
         </Link>
       </div>
     </section>

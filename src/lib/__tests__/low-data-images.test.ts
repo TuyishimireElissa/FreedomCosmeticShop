@@ -12,7 +12,6 @@ import {
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8')
 const helper = read('src/lib/cloudinary-images.ts')
 const smartImage = read('src/components/ui/SmartImage.tsx')
-const productGrid = read('src/components/products/ProductGrid.tsx')
 const productCard = read('src/components/storefront/ProductCard.tsx')
 const gallery = read('src/components/products/ProductImageGallery.tsx')
 
@@ -65,10 +64,11 @@ describe('low-data responsive images', () => {
     expect(legacy).not.toContain('w_1200')
   })
 
-  it('uses SmartImage on listing cards and product detail galleries', () => {
-    expect(productGrid).toContain('<SmartImage')
-    expect(productGrid).toContain('context="card"')
-    expect(productCard.match(/<SmartImage/g)?.length).toBeGreaterThanOrEqual(2)
+  it('uses low-data Cloudinary card URLs and responsive detail galleries', () => {
+    expect(productCard).toContain('const { isLowData } = useLowData()')
+    expect(productCard).toContain("compact || isLowData ? 'CARD_MOBILE' : 'CARD_DESKTOP'")
+    expect(productCard).toContain('quality: isLowData ? IMAGE_QUALITY.lowData : IMAGE_QUALITY.normal')
+    expect(productCard).toContain('width: compact || isLowData ? 320 : 640')
     expect(gallery).toContain('context="detail"')
     expect(gallery).toContain('context="thumbnail"')
   })

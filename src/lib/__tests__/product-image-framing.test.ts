@@ -5,11 +5,11 @@ const card = readFileSync('src/components/storefront/ProductCard.tsx', 'utf8')
 const gallery = readFileSync('src/components/products/ProductImageGallery.tsx', 'utf8')
 
 describe('product image framing', () => {
-  it('shows complete product photos on compact and desktop cards', () => {
-    expect(card.match(/aspect-square/g)?.length).toBeGreaterThanOrEqual(2)
-    expect(card).toContain('object-contain p-2')
-    expect(card).toContain('object-contain p-3')
-    expect(card).not.toContain('object-cover')
+  it('renders a square image-led card with a visible fallback', () => {
+    expect(card).toContain('aspect-square')
+    expect(card).toContain('object-cover')
+    expect(card).toContain('onError={() => setImageFailed(true)}')
+    expect(card).toContain('<Package className="h-12 w-12 text-gray-300"')
   })
 
   it('keeps the detail gallery uncropped with a restrained zoom', () => {

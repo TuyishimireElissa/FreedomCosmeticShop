@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ChevronRight, Sparkles } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { ProductCard } from '@/components/storefront/ProductCard'
 import { useT } from '@/lib/i18n/LanguageContext'
@@ -49,14 +49,11 @@ export default function PersonalizedRecommendations() {
             <h2 id="personalized-recommendations-title" className="flex items-center gap-2 text-lg font-bold text-gray-900 md:text-xl"><Sparkles className="h-5 w-5 text-[#B76E79]" aria-hidden="true" />{t('personalized_recommendations.title')}</h2>
             <p className="mt-1 max-w-2xl text-xs leading-5 text-gray-500">{t('personalized_recommendations.description')}</p>
           </div>
-          <Link href="/products" className="flex min-h-11 shrink-0 items-center gap-1 px-2 text-sm font-medium text-[#8a4b55]">{t('home.view_all')}<ChevronRight className="h-4 w-4" aria-hidden="true" /></Link>
+          <Link href="/products" className="flex min-h-11 shrink-0 items-center px-2 text-sm font-medium text-[#8a4b55] hover:text-[#9B5A64]">{t('home.view_all')}</Link>
         </div>
 
-        <div className="scrollbar-hide -mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-3 md:hidden">
-          {result.products.map((product) => <div key={product.id} className="w-[calc(50vw-20px)] min-w-[140px] max-w-[180px] flex-none snap-start"><p className="mb-1 min-h-5 text-xs font-semibold text-[#8a4b55]">{t(reasonKeys[result.reasons[product.id]] || 'personalized_recommendations.reason_activity')}</p><ProductCard product={product} compact /></div>)}
-        </div>
-        <div className="hidden grid-cols-4 gap-4 md:grid">
-          {result.products.map((product) => <div key={product.id}><p className="mb-1 min-h-5 text-xs font-semibold text-[#8a4b55]">{t(reasonKeys[result.reasons[product.id]] || 'personalized_recommendations.reason_activity')}</p><ProductCard product={product} /></div>)}
+        <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+          {result.products.map((product) => <div key={product.id} className="flex min-w-0 flex-col"><p className="mb-1 min-h-5 text-xs font-semibold text-[#8a4b55]">{t(reasonKeys[result.reasons[product.id]] || 'personalized_recommendations.reason_activity')}</p><ProductCard product={product} /></div>)}
         </div>
         <p className="mt-4 text-xs leading-5 text-gray-500">{t('personalized_recommendations.privacy_note')}</p>
       </div>
