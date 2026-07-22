@@ -189,9 +189,6 @@ export async function initializePayment(
 
   // ─── Simulation mode ──────────────────────────────────────────────
   if (!features.realPayments || !env.FLW_SECRET_KEY) {
-    console.log(
-      `[Flutterwave SIMULATE] Init ${params.amount} RWF — txRef: ${params.txRef}`
-    )
     return {
       success: true,
       status: "success",
@@ -283,7 +280,6 @@ export async function verifyPayment(
 
   // ─── Simulation mode ──────────────────────────────────────────────
   if (!features.realPayments || !env.FLW_SECRET_KEY) {
-    console.log(`[Flutterwave SIMULATE] Verify txRef: ${txRef}`)
     return {
       success: true,
       status: "success",
@@ -395,7 +391,6 @@ export async function refundPayment(
 
   // Simulation mode
   if (!features.realPayments || !env.FLW_SECRET_KEY) {
-    console.log(`[Flutterwave SIMULATE] Refund ${amount} RWF for flwRef: ${flwRef}`)
     return {
       success: true,
       refundId: `sim-refund-${Date.now()}`,

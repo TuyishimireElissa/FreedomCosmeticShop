@@ -30,6 +30,10 @@ export function isAirtelPhone(phone: string): boolean {
   return /^(72|73)\d{7}$/.test(normalized)
 }
 
+// Canonical aliases retained for callers that use the network-number naming.
+export const isMTNNumber = isMTNPhone
+export const isAirtelNumber = isAirtelPhone
+
 export function getDeliveryFee(district: string): number {
   const fees: Record<string, number> = {
     Gasabo: 1000,

@@ -70,7 +70,7 @@ export interface AuthUser {
 
 // ─── Password hashing ────────────────────────────────────────────────────────
 
-const BCRYPT_ROUNDS = 10
+const BCRYPT_ROUNDS = 12
 
 export async function hashPassword(plain: string): Promise<string> {
   return bcrypt.hash(plain, BCRYPT_ROUNDS)

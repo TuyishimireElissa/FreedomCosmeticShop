@@ -112,7 +112,8 @@ async function sendViaAfricasTalking(
     throw new Error(resolveTranslation('en', 'sms.at_not_configured'))
   }
 
-  const normalized = normalizeRwandaPhoneSafe(to).replace("+", "") // 250XXXXXXXXX
+  // Africa's Talking requires E.164 international format, including the +.
+  const normalized = normalizeRwandaPhone(to)
 
   const res = await fetch("https://api.africastalking.com/version1/messaging", {
     method: "POST",
@@ -159,7 +160,8 @@ async function sendViaPindo(
     throw new Error(resolveTranslation('en', 'sms.pindo_not_configured'))
   }
 
-  const normalized = normalizeRwandaPhoneSafe(to).replace("+", "")
+  // Pindo also documents E.164 recipients such as +250781234567.
+  const normalized = normalizeRwandaPhone(to)
 
   const res = await fetch("https://api.pindo.io/v1/sms/", {
     method: "POST",
@@ -195,7 +197,7 @@ async function sendViaPindo(
  * Send SMS via provider with automatic fallback.
  *
  * Tries Africa's Talking first, falls back to Pindo on failure.
- * In simulation mode, logs the message and returns success.
+ * In simulation mode, returns a synthetic success without logging customer data.
  *
  * This is the low-level send function used by the SMS queue.
  * For most use cases, use sendSms() which checks opt-out + queues.
@@ -206,8 +208,6 @@ export async function sendSmsViaProvider(
 ): Promise<SmsProviderResult> {
   // ─── Simulation mode ──────────────────────────────────────────────
   if (!features.sms) {
-    const normalized = normalizeRwandaPhoneSafe(to)
-    console.log(`[MOCK SMS] To: ${normalized} | Body: ${message}`)
     return {
       success: true,
       messageId: `mock-${Date.now()}`,

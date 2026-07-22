@@ -25,7 +25,7 @@ const sources = {
   orderStatus: read('src/components/a11y/OrderStatusBadge.tsx'),
   paymentStatus: read('src/components/a11y/PaymentStatusBadge.tsx'),
   hero: read('src/components/home/HeroBanner.tsx'),
-  reviews: read('src/components/home/ReviewsCarousel.tsx'),
+  reviews: read('src/components/home/ReviewsSection.tsx'),
   rw: read('src/lib/i18n/translations/rw.ts'),
 }
 
@@ -42,7 +42,7 @@ const checks: Array<[string, boolean]> = [
   ['IconButton requires accessible names', sources.iconButton.includes('label: string') && sources.iconButton.includes('aria-label={label}')],
   ['Status components combine roles, icons, and text', [sources.stock, sources.orderStatus, sources.paymentStatus].every((source) => source.includes('role="status"') && source.includes('aria-hidden="true"'))],
   ['Hero has pause/play and carousel semantics', sources.hero.includes("t('accessibility.pause_carousel')") && sources.hero.includes('aria-roledescription="carousel"')],
-  ['Reviews have pause/play and carousel semantics', sources.reviews.includes("t('accessibility.pause_carousel')") && sources.reviews.includes('aria-roledescription="carousel"')],
+  ['Reviews use static section, article, and rating semantics', sources.reviews.includes('<section') && sources.reviews.includes('<article') && sources.reviews.includes("t('home.rating_stars'")],
   ['Accessibility Kinyarwanda strings are marked verified-rw', sources.rw.includes("pause_carousel: 'Hagarika uruhererekane rw’amashusho', // verified-rw")],
 ]
 
@@ -89,7 +89,7 @@ CONTRAST — REQUIRED
 
 REDUCED MOTION — REQUIRED
 1. Enable the operating-system reduced-motion preference.
-2. Verify hero and review carousels do not auto-advance.
+2. Verify the hero carousel does not auto-advance.
 3. Verify an explicit Play action is required before motion resumes.
 
 ORIENTATION AND TOUCH — REQUIRED

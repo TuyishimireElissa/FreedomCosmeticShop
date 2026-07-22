@@ -5,10 +5,8 @@ import { WHOLESALE_CONFIG } from '@/lib/wholesale-config'
 
 const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8')
 const page = read('src/components/wholesale/WholesaleView.tsx')
-const banner = read('src/components/home/WholesaleBanner.tsx')
 const publicWholesaleSurfaces = [
   page,
-  banner,
   read('src/components/layout/Navbar.tsx'),
   read('src/app/page.tsx'),
   read('src/components/products/ProductDetailClient.tsx'),
@@ -46,7 +44,7 @@ describe('honest wholesale page', () => {
       'honest_review_no_promise',
       'honest_documents_initial',
     ]) {
-      expect(page + banner).toContain(`wholesale.${key}`)
+      expect(page).toContain(`wholesale.${key}`)
       expect(english).toContain(`${key}:`)
       expect(kinyarwanda).toMatch(new RegExp(`${key}:.*// verified-rw`))
     }

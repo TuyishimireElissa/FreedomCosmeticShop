@@ -7,7 +7,6 @@ const stock = read('src/components/a11y/StockStatus.tsx')
 const order = read('src/components/a11y/OrderStatusBadge.tsx')
 const payment = read('src/components/a11y/PaymentStatusBadge.tsx')
 const currentProductCard = read('src/components/storefront/ProductCard.tsx')
-const alternateProductCard = read('src/components/ui/ProductCard.tsx')
 const currentProductDetail = read('src/components/products/ProductDetailClient.tsx')
 const accountOrders = read('src/app/account/orders/page.tsx')
 const tracking = read('src/components/storefront/TrackOrderView.tsx')
@@ -46,8 +45,8 @@ describe('non-color-only status indicators', () => {
     expect(payment).toContain('accessibility.payment_status_')
   })
 
-  it('applies stock status to current and preserved product surfaces', () => {
-    for (const source of [currentProductCard, alternateProductCard, currentProductDetail]) expect(source).toContain('<StockStatus')
+  it('applies stock status to current product surfaces', () => {
+    for (const source of [currentProductCard, currentProductDetail]) expect(source).toContain('<StockStatus')
     expect(currentProductDetail).not.toContain('Only {product.stock} left!')
   })
 

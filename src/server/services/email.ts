@@ -35,8 +35,6 @@ interface EmailOptions {
 export async function sendEmail(opts: EmailOptions): Promise<EmailResult> {
   // ─── Simulation mode ──────────────────────────────────────────────
   if (!features.email) {
-    console.log(`[MOCK EMAIL] To: ${opts.to} | Subject: ${opts.subject}`)
-    console.log(opts.text || opts.html.substring(0, 200) + "...")
     return {
       success: true,
       messageId: `mock-${Date.now()}`,

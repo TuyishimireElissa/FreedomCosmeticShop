@@ -72,7 +72,16 @@ export async function POST(request: Request) {
       const validWindow = coupon.startsAt <= now && (!coupon.endsAt || coupon.endsAt >= now)
       const usageAvailable = coupon.usageLimit === null || coupon.usedCount < coupon.usageLimit
       const minimumMet = coupon.minOrderAmount === null || subtotal >= coupon.minOrderAmount
-      const customerUses = await prisma.order.count({ where: { couponId: coupon.id, customerPhone: input.customerPhone, status: { not: 'CANCELLED' } } })
+      // Only completed/accepted orders consume a customer's coupon allowance.
+      // Unpaid PENDING orders must not let an attacker lock a phone number out
+      // of a legitimate coupon redemption.
+      const customerUses = await prisma.order.count({
+        where: {
+          couponId: coupon.id,
+          customerPhone: input.customerPhone,
+          status: { in: ['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'RETURNED'] },
+        },
+      })
       const selectedProductIds = parseIds(coupon.productIds)
       const selectedCategoryIds = parseIds(coupon.categoryIds)
       const eligibleSubtotal = productLines.reduce((sum, line) => {
@@ -103,7 +112,11 @@ export async function POST(request: Request) {
         }
         for (const line of bundleLines) await tx.bundle.update({ where: { id: line.bundleId }, data: { totalSales: { increment: line.quantity } } })
       }
-      if (couponId) await tx.coupon.update({ where: { id: couponId }, data: { usedCount: { increment: 1 } } })
+      // COD is confirmed immediately. Online-payment coupons are consumed only
+      // after the provider confirms payment in handlePaymentSuccess().
+      if (couponId && input.paymentMethod === 'COD') {
+        await tx.coupon.update({ where: { id: couponId }, data: { usedCount: { increment: 1 } } })
+      }
       return created
     })
     if (user) await cancelAbandonedCartReminder(user.id).catch(() => null)

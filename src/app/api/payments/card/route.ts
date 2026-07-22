@@ -81,7 +81,6 @@ export async function POST(req: Request) {
     const isSimulation = process.env.ENABLE_REAL_PAYMENTS !== "true"
 
     if (isSimulation) {
-      console.log(`[MOCK CARD] ${order.total} RWF for ${order.orderNumber} — txRef: ${txRef}`)
 
       // Simulate payment success after 3 seconds
       setTimeout(async () => {
@@ -94,7 +93,6 @@ export async function POST(req: Request) {
             cardLast4: "4242",
             cardBrand: "visa",
           })
-          console.log(`[MOCK CARD] Payment ${payment!.id} marked as PAID`)
         } catch (e) {
           console.error("Failed to update mock payment:", e)
         }

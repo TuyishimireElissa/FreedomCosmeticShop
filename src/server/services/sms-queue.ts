@@ -124,7 +124,6 @@ export function enqueueSms(
   }
 
   queue.set(id, item)
-  console.log(`[SMS Queue] Enqueued ${id} → ${to} (priority: ${priority}, status: ${item.status})`)
 
   return id
 }
@@ -159,7 +158,6 @@ async function processQueue(): Promise<void> {
   for (const item of batch) {
     // Skip if rate limited
     if (isRateLimited(item.to)) {
-      console.log(`[SMS Queue] Rate limited: ${item.to}`)
       continue
     }
 
@@ -175,7 +173,6 @@ async function processQueue(): Promise<void> {
         item.sentAt = new Date()
         item.provider = result.provider
         item.messageId = result.messageId
-        console.log(`[SMS Queue] Sent ${item.id} → ${item.to} via ${result.provider}`)
       } else {
         throw new Error(result.message)
       }

@@ -43,8 +43,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
     }
 
-    console.log(`[PayPack Webhook] Received event: ${event.id} — status: ${event.status}`)
-
     // Find the payment by provider transaction ID or reference
     const payment = await db.payment.findFirst({
       where: {
@@ -76,16 +74,12 @@ export async function POST(req: Request) {
         orderId: payment.orderId,
         providerTransactionId: event.id,
       })
-
-      console.log(`[PayPack Webhook] Payment ${payment.id} marked as PAID`)
     } else if (event.status === "failed") {
       await handlePaymentFailure({
         paymentId: payment.id,
         orderId: payment.orderId,
         reason: "Payment declined or timed out",
       })
-
-      console.log(`[PayPack Webhook] Payment ${payment.id} marked as FAILED`)
     }
 
     // Always return 200 to acknowledge receipt

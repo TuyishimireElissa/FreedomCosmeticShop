@@ -6,7 +6,6 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8'
 
 const publicWholesaleCopy = [
   'src/components/wholesale/WholesaleView.tsx',
-  'src/components/home/WholesaleBanner.tsx',
   'src/lib/i18n/translations/en.ts',
   'src/lib/i18n/translations/rw.ts',
 ].map(read).join('\n')

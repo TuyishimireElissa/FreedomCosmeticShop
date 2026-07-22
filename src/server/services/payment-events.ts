@@ -55,8 +55,6 @@ export interface PaymentFailurePayload {
 export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Promise<void> {
   const { paymentId, orderId, providerTransactionId, cardLast4, cardBrand } = payload
 
-  console.log(`[Payment] Success handler: payment=${paymentId}, order=${orderId}`)
-
   // Fetch the payment
   const payment = await db.payment.findUnique({
     where: { id: paymentId },
@@ -70,7 +68,6 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
 
   // Idempotency: already processed
   if (payment.status === "PAID") {
-    console.log(`[Payment] Payment ${paymentId} already marked as PAID — skipping`)
     return
   }
 
@@ -106,6 +103,12 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
     if (otherPaid) {
       await tx.securityAlert.create({ data: { type: 'DUPLICATE_PAYMENT', severity: 'CRITICAL', title: 'Duplicate payment received', message: `Order ${order.orderNumber} has more than one paid transaction and requires review.`, metadata: { orderId, orderNumber: order.orderNumber, paymentId, previousPaymentId: otherPaid.id } } })
       return { processed: true, stockIssue: false, duplicatePayment: true }
+    }
+
+    // Online-payment coupons are consumed only after this durable payment gate.
+    // Duplicate webhooks and duplicate payments cannot increment usage twice.
+    if (order.couponId) {
+      await tx.coupon.update({ where: { id: order.couponId }, data: { usedCount: { increment: 1 } } })
     }
 
     const required = new Map<string, { name: string; quantity: number }>()
@@ -191,8 +194,6 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
       },
     }).catch((e) => console.error("[Payment] Notification create failed:", e))
   }
-
-  console.log(`[Payment] Success handler complete: order ${order.orderNumber} confirmed`)
 }
 
 // ─── Failure handler ─────────────────────────────────────────────────────────
@@ -204,8 +205,6 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
  */
 export async function handlePaymentFailure(payload: PaymentFailurePayload): Promise<void> {
   const { paymentId, orderId, reason } = payload
-
-  console.log(`[Payment] Failure handler: payment=${paymentId}, order=${orderId}, reason=${reason}`)
 
   const payment = await db.payment.findUnique({
     where: { id: paymentId },
@@ -254,8 +253,6 @@ export async function handlePaymentFailure(payload: PaymentFailurePayload): Prom
       },
     }).catch((e) => console.error("[Payment] Notification create failed:", e))
   }
-
-  console.log(`[Payment] Failure handler complete: order ${order.orderNumber}`)
 }
 
 function checkoutLanguage(value: string | null): 'en' | 'rw' {
@@ -302,6 +299,4 @@ async function awardLoyaltyPoints(
       data: { loyaltyPoints: newBalance },
     }),
   ])
-
-  console.log(`[Payment] Awarded ${points} loyalty points to user ${userId}`)
 }

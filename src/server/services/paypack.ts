@@ -255,9 +255,6 @@ export async function cashin(params: PaypackCashinParams): Promise<PaypackPaymen
 
   // ─── Simulation mode (MVP) ────────────────────────────────────────
   if (!features.realPayments || !env.PAYPACK_CLIENT_ID) {
-    console.log(
-      `[PayPack SIMULATE] Cashin ${params.amount} RWF from ${phone} — ref: ${params.reference}`
-    )
     return {
       success: true,
       transactionId: `sim-${Date.now()}`,
@@ -322,9 +319,6 @@ export async function cashout(params: PaypackCashoutParams): Promise<PaypackPaym
 
   // ─── Simulation mode ──────────────────────────────────────────────
   if (!features.realPayments || !env.PAYPACK_CLIENT_ID) {
-    console.log(
-      `[PayPack SIMULATE] Cashout ${params.amount} RWF to ${phone} — ref: ${params.reference}`
-    )
     return {
       success: true,
       transactionId: `sim-out-${Date.now()}`,

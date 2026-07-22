@@ -74,7 +74,6 @@ export function scheduleSms(
     createdAt: new Date(),
   }
   scheduledSmsList.set(id, item)
-  console.log(`[SMS Scheduler] Scheduled "${name}" for ${scheduledAt.toISOString()}`)
   return id
 }
 
@@ -128,7 +127,6 @@ async function processScheduledSms(): Promise<void> {
     item.status = "sent"
     item.sentAt = new Date()
     item.sentCount = sentCount
-    console.log(`[SMS Scheduler] Sent "${item.name}" to ${sentCount} recipients`)
   }
 }
 
@@ -220,7 +218,6 @@ export async function scheduleBroadcast(
   })
 
   const recipients = customers.map((c) => c.phone)
-  console.log(`[SMS Scheduler] Broadcast "${name}" scheduled for ${recipients.length} customers`)
 
   return scheduleSms(name, message, recipients, scheduledAt, { language })
 }

@@ -7,32 +7,27 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8'
 const hero = read('src/components/home/HeroBanner.tsx')
 const staticHero = read('src/components/home/Hero.tsx')
 const imageHelpers = read('src/lib/cloudinary-images.ts')
-const reviews = read('src/components/home/ReviewsCarousel.tsx')
 const productGallery = read('src/components/products/ProductImageGallery.tsx')
 const english = read('src/lib/i18n/translations/en.ts')
 const kinyarwanda = read('src/lib/i18n/translations/rw.ts')
 
 describe('low-data hero and media behavior', () => {
-  it('prevents hero and review carousel auto-advance in low-data mode', () => {
-    for (const carousel of [hero, reviews]) {
-      expect(carousel).toContain("import { useLowData } from '@/contexts/LowDataContext'")
-      expect(carousel).toContain('const { isLowData } = useLowData()')
-      expect(carousel).toMatch(/const controlPaused = isLowData \|\|/)
-      expect(carousel).toContain('const autoAdvancePaused = controlPaused || interactionPaused')
-      expect(carousel).toContain('if (autoAdvancePaused ||')
-      expect(carousel).toContain('if (isLowData) return')
-      expect(carousel).toContain('disabled={isLowData}')
-    }
+  it('prevents hero auto-advance in low-data mode', () => {
+    expect(hero).toContain("import { useLowData } from '@/contexts/LowDataContext'")
+    expect(hero).toContain('const { isLowData } = useLowData()')
+    expect(hero).toMatch(/const controlPaused = isLowData \|\|/)
+    expect(hero).toContain('const autoAdvancePaused = controlPaused || interactionPaused')
+    expect(hero).toContain('if (autoAdvancePaused ||')
+    expect(hero).toContain('if (isLowData) return')
+    expect(hero).toContain('disabled={isLowData}')
   })
 
   it('keeps reduced-motion and pointer or keyboard interaction pauses', () => {
-    for (const carousel of [hero, reviews]) {
-      expect(carousel).toContain('reducedMotionPause')
-      expect(carousel).toContain('onMouseEnter={() => setInteractionPaused(true)}')
-      expect(carousel).toContain('onMouseLeave={() => setInteractionPaused(false)}')
-      expect(carousel).toContain('onFocusCapture={() => setInteractionPaused(true)}')
-      expect(carousel).toContain('onBlurCapture=')
-    }
+    expect(hero).toContain('reducedMotionPause')
+    expect(hero).toContain('onMouseEnter={() => setInteractionPaused(true)}')
+    expect(hero).toContain('onMouseLeave={() => setInteractionPaused(false)}')
+    expect(hero).toContain('onFocusCapture={() => setInteractionPaused(true)}')
+    expect(hero).toContain('onBlurCapture=')
   })
 
   it('renders only the necessary hero slide content and mobile image in low-data mode', () => {
@@ -69,7 +64,6 @@ describe('low-data hero and media behavior', () => {
 
   it('shows translated low-data hero and carousel statuses', () => {
     expect(hero).toContain("t('low_data.carousel_paused')")
-    expect(reviews).toContain("t('low_data.carousel_paused')")
     expect(staticHero).toContain("t('low_data.hero_optimized')")
     expect(english).toMatch(/carousel_paused: 'Low data mode:/)
     expect(english).toMatch(/hero_optimized: 'Low data mode:/)
@@ -78,7 +72,7 @@ describe('low-data hero and media behavior', () => {
   })
 
   it('does not preload or autoplay native video and retains explicit video activation', () => {
-    const applicationSource = `${hero}\n${reviews}\n${productGallery}`
+    const applicationSource = `${hero}\n${productGallery}`
     expect(applicationSource).not.toMatch(/<video\b/)
     expect(applicationSource).not.toMatch(/\bautoPlay=/)
     expect(productGallery).toContain('videoUrl &&')

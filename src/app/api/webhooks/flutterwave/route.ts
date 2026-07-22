@@ -43,13 +43,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
     }
 
-    console.log(
-      `[Flutterwave Webhook] Received: ${event.event} — tx_ref: ${event.data.tx_ref}`
-    )
-
     // Only process charge.completed events
     if (event.event !== "charge.completed") {
-      console.log(`[Flutterwave Webhook] Ignoring event: ${event.event}`)
       return NextResponse.json({ received: true, ignored: true })
     }
 
@@ -94,11 +89,8 @@ export async function POST(req: Request) {
         cardLast4: verification.card?.last4 || undefined,
         cardBrand: verification.card?.brand || undefined,
       })
-
-      console.log(`[Flutterwave Webhook] Payment ${payment.id} verified + marked as PAID`)
     } else if (verification.status === 'failed' || verification.status === 'cancelled') {
       await handlePaymentFailure({ paymentId: payment.id, orderId: payment.orderId, reason: verification.message || 'Payment verification failed' })
-      console.log(`[Flutterwave Webhook] Payment ${payment.id} marked as FAILED`)
     } else {
       return NextResponse.json({ received: true, processed: false, status: 'pending' })
     }
