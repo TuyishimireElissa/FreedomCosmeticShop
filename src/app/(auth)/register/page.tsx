@@ -46,6 +46,13 @@ export default function RegisterPage() {
       const phone = normalizeRwandaPhone(form.phone)
       const response = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: form.name.trim(), phone, email: form.email.trim() || undefined, password: form.password, skinType: form.skinType }) })
       const data = await response.json(); if (!response.ok) throw new Error(data.error || t('auth.registration_failed'))
+      if (data.verificationRequired === false && data.user) {
+        localStorage.setItem('freedom-skin-type', form.skinType)
+        setUser(data.user)
+        router.push('/')
+        router.refresh()
+        return
+      }
       setForm((current) => ({ ...current, phone })); setDevCode(data.code || null); setStep('otp')
     } catch (reason) { setError(reason instanceof Error ? reason.message : t('auth.registration_failed')) }
     finally { setLoading(false) }

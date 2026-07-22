@@ -1,44 +1,31 @@
-/**
- * POST /api/auth/register
- *
- * Step 1 of registration: validates input, checks phone availability,
- * hashes password, creates OTP, sends SMS.
- *
- * Body: { name, phone, email?, password }
- *
- * Returns:
- *   - 200: { success: true, message: "OTP sent", code?: "123456" }
- *     (code only returned in dev mode when SMS is disabled)
- *   - 400: { error: "..." }
- *   - 429: { error: "Too many requests", retryAfter: 600 }
- */
-import { NextResponse } from "next/server"
-import { startRegistration } from "@/server/services/auth"
+/** POST /api/auth/register — OTP registration, with password fallback while SMS is disabled. */
+import { NextResponse } from 'next/server'
+import { registerWithoutOtp, startRegistration } from '@/server/services/auth'
+import { setAuthCookies } from '@/lib/auth'
+import { features } from '@/lib/env'
+import { rateLimit } from '@/lib/permissions'
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const limit = rateLimit(`registration:${ip}`, { maxActions: 5, windowMs: 60 * 60_000 })
+    if (!limit.allowed) return NextResponse.json({ error: 'Too many registration attempts. Please try again later.' }, { status: 429 })
     const body = await req.json()
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown"
 
-    const result = await startRegistration(body, ip)
-
-    if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 400 }
-      )
+    if (!features.sms) {
+      const result = await registerWithoutOtp(body)
+      const response = NextResponse.json({ success: true, verificationRequired: false, user: result.user, message: 'Registration successful.' }, { status: 201 })
+      return setAuthCookies(response, result.accessToken, result.refreshToken)
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Verification code sent to your phone.",
-      code: result.code, // only present in dev mode
-    })
+    const result = await startRegistration(body, ip)
+    if (!result.success) return NextResponse.json({ error: result.error }, { status: 400 })
+    return NextResponse.json({ success: true, verificationRequired: true, message: 'Verification code sent to your phone.' })
   } catch (error) {
-    console.error("Registration error:", error)
-    return NextResponse.json(
-      { error: "Registration failed. Please try again." },
-      { status: 500 }
-    )
+    console.error('Registration error:', error)
+    const message = error instanceof Error && (error.message.startsWith('Invalid') || error.message.includes('already registered') || error.message.includes('at least'))
+      ? error.message
+      : 'Registration failed. Please try again.'
+    return NextResponse.json({ error: message }, { status: 400 })
   }
 }

@@ -7,6 +7,7 @@ const otp = read('src/lib/otp.ts')
 const schema = read('prisma/schema.prisma')
 const authService = read('src/server/services/auth.ts')
 const registerPage = read('src/app/(auth)/register/page.tsx')
+const registerRoute = read('src/app/api/auth/register/route.ts')
 
 describe('production registration recovery', () => {
   it('stores OTP state durably instead of using server memory', () => {
@@ -30,6 +31,15 @@ describe('production registration recovery', () => {
 
   it('awaits database-backed verification for registration, login, and reset', () => {
     expect(authService.match(/await verifyOtp/g)?.length).toBe(3)
+  })
+
+  it('supports rate-limited password registration while production SMS is disabled', () => {
+    expect(authService).toContain('export async function registerWithoutOtp')
+    expect(authService).toContain("passwordHash: await hashPassword(input.password)")
+    expect(registerRoute).toContain("if (!features.sms)")
+    expect(registerRoute).toContain('setAuthCookies(response, result.accessToken, result.refreshToken)')
+    expect(registerRoute).toContain("rateLimit(`registration:${ip}`")
+    expect(registerPage).toContain('data.verificationRequired === false')
   })
 
   it('makes skin type optional and improves native form validation', () => {

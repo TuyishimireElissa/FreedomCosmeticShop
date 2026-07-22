@@ -33,6 +33,7 @@ import {
 import { normalizeRwandaPhone, PhoneValidationError } from "@/lib/phone"
 import { createOtp, verifyOtp } from "@/lib/otp"
 import { logLogin } from "@/server/services/activity"
+import { features } from '@/lib/env'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -132,6 +133,42 @@ export async function completeMfaLogin(userId: string): Promise<AuthResult> {
 }
 
 // ─── Registration ────────────────────────────────────────────────────────────
+
+/** Password registration fallback used only while production SMS is disabled. */
+export async function registerWithoutOtp(input: RegisterInput): Promise<AuthResult> {
+  if (features.sms) throw new Error('Direct registration is disabled while SMS verification is available')
+  if (!input.name || input.name.trim().length < 2) throw new Error('Name must be at least 2 characters')
+  if (!input.password || input.password.length < 8) throw new Error('Password must be at least 8 characters')
+  if (input.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email)) throw new Error('Invalid email format')
+
+  let phone: string
+  try { phone = normalizeRwandaPhone(input.phone) }
+  catch { throw new Error('Invalid Rwanda phone number') }
+
+  const existing = await db.user.findFirst({
+    where: { OR: [{ phone }, ...(input.email ? [{ email: input.email.trim().toLowerCase() }] : [])], isDeleted: false },
+    select: { phone: true, email: true },
+  })
+  if (existing?.phone === phone) throw new Error('This phone number is already registered. Try logging in.')
+  if (existing?.email && input.email) throw new Error('This email address is already registered. Try logging in.')
+
+  const user = await db.user.create({
+    data: {
+      name: input.name.trim(),
+      phone,
+      email: input.email?.trim().toLowerCase() || null,
+      emailVerifiedAt: input.email ? new Date() : null,
+      passwordHash: await hashPassword(input.password),
+      role: 'CUSTOMER',
+      failedLoginCount: 0,
+      lockedUntil: null,
+      isDeleted: false,
+      isTestAccount: false,
+    },
+  })
+  const tokens = await issueTokens(user)
+  return { user: toAuthUser(user), ...tokens }
+}
 
 /**
  * Step 1: Start registration.
