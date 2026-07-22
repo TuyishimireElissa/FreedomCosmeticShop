@@ -64,11 +64,12 @@ describe('low-data responsive images', () => {
     expect(legacy).not.toContain('w_1200')
   })
 
-  it('uses low-data Cloudinary card URLs and responsive detail galleries', () => {
-    expect(productCard).toContain('const { isLowData } = useLowData()')
-    expect(productCard).toContain("compact || isLowData ? 'CARD_MOBILE' : 'CARD_DESKTOP'")
-    expect(productCard).toContain('quality: isLowData ? IMAGE_QUALITY.lowData : IMAGE_QUALITY.normal')
-    expect(productCard).toContain('width: compact || isLowData ? 320 : 640')
+  it('uses the API image URL directly on cards and responsive detail galleries', () => {
+    expect(productCard).toContain('export function getImageUrl')
+    expect(productCard).toContain('product.images')
+    expect(productCard).toContain('product.productImages')
+    expect(productCard).toContain('loading="lazy"')
+    expect(productCard).toContain('decoding="async"')
     expect(gallery).toContain('context="detail"')
     expect(gallery).toContain('context="thumbnail"')
   })

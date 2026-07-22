@@ -1,48 +1,72 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Check, Heart, Package, ShoppingCart, Star } from 'lucide-react'
-import type { Product } from '@/lib/types'
+import type { Product, ProductImage } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
-import { getCloudinaryUrl, getProductPrimaryImage, IMAGE_QUALITY, optimizeCloudinaryUrl } from '@/lib/cloudinary-images'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
-import { useLowData } from '@/contexts/LowDataContext'
 import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
 
+type ProductWithImageFallbacks = Product & {
+  image?: string | null
+  imageUrl?: string | null
+  thumbnailUrl?: string | null
+}
+
 interface ProductCardProps {
-  product: Product
-  compact?: boolean
+  product: ProductWithImageFallbacks
   wishlisted?: boolean
   onToggleWishlist?: () => void
 }
 
-export function ProductCard({ product, compact = false, wishlisted = false, onToggleWishlist }: ProductCardProps) {
-  const { t, language } = useLanguage()
-  const { isLowData } = useLowData()
+/** Resolve the public API's `images`/`productImages` fields and legacy aliases. */
+export function getImageUrl(product: ProductWithImageFallbacks): string | null {
+  const legacyImages: unknown = product.images
+  if (Array.isArray(legacyImages)) {
+    const first = legacyImages.find((value): value is string => typeof value === 'string' && value.trim().length > 0)
+    if (first) return first
+  } else if (typeof legacyImages === 'string' && legacyImages.trim()) {
+    try {
+      const parsed: unknown = JSON.parse(legacyImages)
+      if (Array.isArray(parsed)) {
+        const first = parsed.find((value): value is string => typeof value === 'string' && value.trim().length > 0)
+        if (first) return first
+      }
+    } catch {
+      if (/^https?:\/\//i.test(legacyImages)) return legacyImages
+    }
+  }
+
+  for (const value of [product.image, product.imageUrl]) {
+    if (typeof value === 'string' && value.trim()) return value
+  }
+
+  const structuredImages: unknown = product.productImages
+  if (Array.isArray(structuredImages)) {
+    const primary = structuredImages.find((value): value is ProductImage => typeof value === 'object' && value !== null && 'isPrimary' in value && value.isPrimary === true)
+    const candidate: unknown = primary || structuredImages[0]
+    if (typeof candidate === 'string' && candidate.trim()) return candidate
+    if (typeof candidate === 'object' && candidate !== null && 'url' in candidate && typeof candidate.url === 'string' && candidate.url.trim()) return candidate.url
+  }
+
+  if (typeof product.thumbnailUrl === 'string' && product.thumbnailUrl.trim()) return product.thumbnailUrl
+  return null
+}
+
+export function ProductCard({ product, wishlisted = false, onToggleWishlist }: ProductCardProps) {
+  const { t } = useLanguage()
   const addToCart = useStore((state) => state.addToCart)
   const { toast } = useToast()
   const [added, setAdded] = useState(false)
   const [imageFailed, setImageFailed] = useState(false)
 
-  const primaryImage = getProductPrimaryImage(product)
-  const imageUrl = useMemo(() => {
-    if (!primaryImage) return null
-    if (primaryImage.publicId) return getCloudinaryUrl(primaryImage.publicId, compact || isLowData ? 'CARD_MOBILE' : 'CARD_DESKTOP')
-    if (!primaryImage.url) return null
-    return optimizeCloudinaryUrl(primaryImage.url, {
-      width: compact || isLowData ? 320 : 640,
-      quality: isLowData ? IMAGE_QUALITY.lowData : IMAGE_QUALITY.normal,
-    })
-  }, [compact, isLowData, primaryImage])
+  const imageUrl = getImageUrl(product)
 
   useEffect(() => setImageFailed(false), [imageUrl])
 
-  const imageAlt = language === 'rw' && primaryImage?.altTextRw
-    ? primaryImage.altTextRw
-    : primaryImage?.altText || product.name
+  const imageAlt = product.name
   const outOfStock = product.isOutOfStock ?? product.stock < 1
   const hasDiscount = product.compareAt !== null && product.compareAt > product.price
   const discount = hasDiscount ? Math.round((1 - product.price / product.compareAt!) * 100) : 0
@@ -77,13 +101,12 @@ export function ProductCard({ product, compact = false, wishlisted = false, onTo
       <div className="relative aspect-square w-full overflow-hidden rounded-t-xl bg-[#f5f5f5]">
         <Link href={`/products/${product.slug}`} className="block h-full w-full" aria-label={t('product.view_product', { product: product.name })}>
           {imageUrl && !imageFailed ? (
-            <Image
+            <img
               src={imageUrl}
               alt={imageAlt}
-              fill
-              unoptimized
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className={`object-contain p-4 transition-transform duration-300 ease-out group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`}
+              className={`h-full w-full object-contain p-4 transition-transform duration-300 ease-out group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`}
+              loading="lazy"
+              decoding="async"
               onError={() => setImageFailed(true)}
             />
           ) : (
