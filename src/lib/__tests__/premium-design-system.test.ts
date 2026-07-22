@@ -26,7 +26,9 @@ describe('premium cosmetics design system', () => {
     expect(navbar).not.toContain("t('checkout.mtn_momo')")
     expect(navbar).not.toContain("t('checkout.airtel_money')")
     expect(navbar).not.toContain('category.icon')
-    expect(navbar).toContain('<Store className="h-4 w-4"')
+    expect(navbar).not.toContain('<Sparkles')
+    expect(navbar).not.toContain('<Gift')
+    expect(navbar).not.toContain('<Store')
   })
 
   it('uses one shared image-led card with a clean responsive grid', () => {
@@ -35,7 +37,7 @@ describe('premium cosmetics design system', () => {
     expect(productGrid).toContain('md:grid-cols-3')
     expect(productGrid).toContain('lg:grid-cols-4')
     expect(productCard).toContain('aspect-square')
-    expect(productCard).toContain('<Package className="h-12 w-12 text-gray-300"')
+    expect(productCard).toContain('<Package className="mb-2 h-16 w-16"')
     expect(productCard).not.toContain("t('product.no_reviews')")
   })
 

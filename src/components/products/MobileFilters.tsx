@@ -63,14 +63,14 @@ export default function MobileFilters({ availableCategories, availableBrands }: 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button type="button" className="relative flex min-h-11 items-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 text-sm font-bold text-gray-700 md:hidden" aria-label={t('search.filters')}>
+        <button type="button" className="relative flex min-h-11 items-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 text-sm font-bold text-gray-700 lg:hidden" aria-label={t('search.filters')}>
           <Filter className="h-4 w-4" />{t('search.filters')}
           {activeFilterCount > 0 && <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-[#B76E79] px-1 text-xs text-white">{activeFilterCount}</span>}
         </button>
       </SheetTrigger>
       <SheetContent
         side="bottom"
-        className="max-h-[90vh] gap-0 rounded-t-3xl bg-white p-0 md:hidden"
+        className="max-h-[90vh] gap-0 rounded-t-3xl bg-white p-0 lg:hidden"
         onTouchStart={(event) => { touchStartY.current = event.touches[0]?.clientY || 0 }}
         onTouchEnd={(event) => { if ((event.changedTouches[0]?.clientY || 0) - touchStartY.current > 80) setOpen(false) }}
       >
@@ -90,7 +90,7 @@ export default function MobileFilters({ availableCategories, availableBrands }: 
           </FilterSection>
 
           {availableCategories.length > 0 && <FilterSection title={t('nav.categories')}>
-            {availableCategories.map((category) => <ChoiceRow key={category.id} selected={localFilters.category === category.slug} onClick={() => update('category', localFilters.category === category.slug ? '' : category.slug)} label={category.name} count={category._count?.products} />)}
+            {availableCategories.map((category) => <ChoiceRow key={category.id} selected={localFilters.category === category.slug} onClick={() => update('category', localFilters.category === category.slug ? '' : category.slug)} label={category.name} />)}
           </FilterSection>}
 
           {availableBrands.length > 0 && <FilterSection title={t('search.brand')}>
@@ -129,8 +129,8 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
   return <section><h3 className="mb-2 text-xs font-black uppercase tracking-wider text-gray-500">{title}</h3><div className="space-y-1">{children}</div></section>
 }
 
-function ChoiceRow({ selected, onClick, label, count }: { selected: boolean; onClick: () => void; label: string; count?: number }) {
-  return <button type="button" onClick={onClick} className={cn('flex min-h-11 w-full items-center justify-between rounded-xl px-3 text-left text-sm', selected ? 'bg-rose-50 font-bold text-[#B76E79]' : 'text-gray-700 hover:bg-gray-50')}><span>{label}</span><span className="flex items-center gap-2">{count !== undefined && <span className="text-xs text-gray-400">{count}</span>}{selected && <Check className="h-4 w-4" />}</span></button>
+function ChoiceRow({ selected, onClick, label }: { selected: boolean; onClick: () => void; label: string }) {
+  return <button type="button" onClick={onClick} className={cn('flex min-h-11 w-full items-center justify-between rounded-xl px-3 text-left text-sm', selected ? 'bg-rose-50 font-bold text-[#B76E79]' : 'text-gray-700 hover:bg-gray-50')}><span>{label}</span>{selected && <Check className="h-4 w-4" />}</button>
 }
 
 function Pill({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {

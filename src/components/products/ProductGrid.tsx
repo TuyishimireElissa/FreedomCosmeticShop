@@ -53,7 +53,7 @@ export default function ProductGrid({ products, loading = false, error, onRetry 
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 8 }).map((_, index) => (
           <div key={index} className="overflow-hidden rounded-xl border border-[#EEEEEE] bg-white">
             <div className="aspect-square animate-pulse bg-[#f5f5f5] motion-reduce:animate-none" />
@@ -78,7 +78,7 @@ export default function ProductGrid({ products, loading = false, error, onRetry 
   }
 
   return (
-    <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+    <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 lg:grid-cols-4">
       {products.map((product) => (
         <ProductCard
           key={product.id}

@@ -7,9 +7,9 @@ const gallery = readFileSync('src/components/products/ProductImageGallery.tsx', 
 describe('product image framing', () => {
   it('renders a square image-led card with a visible fallback', () => {
     expect(card).toContain('aspect-square')
-    expect(card).toContain('object-cover')
+    expect(card).toContain('object-contain p-4')
     expect(card).toContain('onError={() => setImageFailed(true)}')
-    expect(card).toContain('<Package className="h-12 w-12 text-gray-300"')
+    expect(card).toContain('<Package className="mb-2 h-16 w-16"')
   })
 
   it('keeps the detail gallery uncropped with a restrained zoom', () => {

@@ -73,7 +73,7 @@ export function ProductCard({ product, compact = false, wishlisted = false, onTo
   }
 
   return (
-    <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-[#EEEEEE] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md">
+    <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
       <div className="relative aspect-square w-full overflow-hidden rounded-t-xl bg-[#f5f5f5]">
         <Link href={`/products/${product.slug}`} className="block h-full w-full" aria-label={t('product.view_product', { product: product.name })}>
           {imageUrl && !imageFailed ? (
@@ -83,22 +83,23 @@ export function ProductCard({ product, compact = false, wishlisted = false, onTo
               fill
               unoptimized
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              className={`object-cover transition-transform duration-200 ease-out group-hover:scale-[1.025] ${outOfStock ? 'opacity-60' : ''}`}
+              className={`object-contain p-4 transition-transform duration-300 ease-out group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`}
               onError={() => setImageFailed(true)}
             />
           ) : (
-            <span role="img" aria-label={imageAlt} className="flex h-full w-full items-center justify-center">
-              <Package className="h-12 w-12 text-gray-300" strokeWidth={1.5} aria-hidden="true" />
+            <span role="img" aria-label={imageAlt} className="flex h-full w-full flex-col items-center justify-center px-3 text-center text-gray-300">
+              <Package className="mb-2 h-16 w-16" strokeWidth={1} aria-hidden="true" />
+              <span className="line-clamp-2 text-xs">{product.name}</span>
             </span>
           )}
         </Link>
 
-        {badge && <span className={`absolute left-2 top-2 rounded-full px-2.5 py-1 text-[10px] font-semibold ${badge.classes}`}>{badge.text}</span>}
+        {badge && <span className={`absolute right-2 top-2 rounded-md px-2 py-1 text-xs font-bold ${badge.classes}`}>{badge.text}</span>}
         {onToggleWishlist && (
           <button
             type="button"
             onClick={onToggleWishlist}
-            className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-500 shadow-sm transition-colors hover:text-[#B76E79] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]"
+            className="absolute left-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-500 shadow-sm transition-colors hover:text-[#B76E79] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]"
             aria-label={`${t('product.add_to_wishlist')}: ${product.name}`}
             aria-pressed={wishlisted}
           >
@@ -107,7 +108,7 @@ export function ProductCard({ product, compact = false, wishlisted = false, onTo
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
+      <div className="flex flex-1 flex-col p-3">
         <p className="mb-1 min-h-[1rem] truncate text-[11px] font-medium uppercase tracking-[0.5px] text-gray-400">
           {product.brand?.name || product.category?.name || ''}
         </p>

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import {
   ChevronDown,
   Globe,
-  Gift,
   Heart,
   LogOut,
   Menu,
@@ -15,8 +14,6 @@ import {
   Shield,
   ShoppingBag,
   ShoppingCart,
-  Sparkles,
-  Store,
   User,
   X,
 } from 'lucide-react'
@@ -141,7 +138,7 @@ export default function Navbar() {
           <LanguageSelector variant="navbar" className="hidden md:block" />
 
           <button type="button" onClick={() => router.push('/quiz')} className="hidden min-h-10 items-center gap-1.5 rounded-xl bg-rose-50 px-3 text-xs font-bold text-[#B76E79] transition-colors hover:bg-[#B76E79] hover:text-white lg:flex">
-            <Sparkles className="h-4 w-4" /> {t('nav.quiz')}
+            {t('nav.quiz')}
           </button>
 
           <button
@@ -247,10 +244,10 @@ export default function Navbar() {
             </button>
           ))}
           <button type="button" onClick={() => router.push('/bundles')} className="ml-auto flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-[#B76E79] transition-colors hover:border-[#B76E79] hover:text-[#9e5964]">
-            <Gift className="h-4 w-4" /> {t('nav.bundles')}
+            {t('nav.bundles')}
           </button>
           <button type="button" onClick={() => router.push('/wholesale')} className="shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-[#B76E79] transition-colors hover:border-[#B76E79] hover:text-[#9e5964]">
-            <Store className="h-4 w-4" aria-hidden="true" /> {t('nav.wholesale')}
+            {t('nav.wholesale')}
           </button>
         </nav>
       </div>
@@ -282,11 +279,11 @@ export default function Navbar() {
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => navigate(() => router.push('/quiz'))} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-rose-50 px-3 text-sm font-bold text-[#B76E79]"><Sparkles className="h-4 w-4" />{t('nav.quiz')}</button>
-              <button type="button" onClick={() => navigate(() => router.push('/bundles'))} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-rose-50 px-3 text-sm font-bold text-[#B76E79]"><Gift className="h-4 w-4" />{t('nav.bundles')}</button>
+              <button type="button" onClick={() => navigate(() => router.push('/quiz'))} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-rose-50 px-3 text-sm font-bold text-[#B76E79]">{t('nav.quiz')}</button>
+              <button type="button" onClick={() => navigate(() => router.push('/bundles'))} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-rose-50 px-3 text-sm font-bold text-[#B76E79]">{t('nav.bundles')}</button>
             </div>
             <button type="button" onClick={() => navigate(() => router.push('/wholesale'))} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#fff8e7] px-4 py-3 font-bold text-[#9e5964] ring-1 ring-[#FFD700]/30">
-              <Store className="h-4 w-4" aria-hidden="true" /> {t('nav.wholesale_offer')}
+              {t('nav.wholesale_offer')}
             </button>
 
             <div className="mt-5 border-t border-gray-100 pt-4">

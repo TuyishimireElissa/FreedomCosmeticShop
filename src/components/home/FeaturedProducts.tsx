@@ -59,7 +59,7 @@ export default function FeaturedProducts({ type = 'featured', limit = 4 }: Featu
       <section className="px-4 py-6 md:py-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-4 flex items-center justify-between"><div className="h-6 w-40 animate-pulse rounded bg-gray-200" /><div className="h-4 w-16 animate-pulse rounded bg-gray-200" /></div>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {[1, 2, 3, 4].map((item) => <div key={item} className="aspect-[3/4] animate-pulse rounded-xl bg-gray-100" />)}
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function FeaturedProducts({ type = 'featured', limit = 4 }: Featu
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+        <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 lg:grid-cols-4">
           {products.map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
 
