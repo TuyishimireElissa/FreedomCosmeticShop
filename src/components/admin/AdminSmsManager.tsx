@@ -270,11 +270,11 @@ function TemplatesTab() {
           </div>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <div className="rounded-lg bg-secondary/30 p-2">
-              <p className="text-xs font-medium uppercase text-muted-foreground">🇬🇧 English</p>
+              <p className="text-xs font-medium uppercase text-muted-foreground"> English</p>
               <p className="mt-1 text-sm">{t.en}</p>
             </div>
             <div className="rounded-lg bg-secondary/30 p-2">
-              <p className="text-xs font-medium uppercase text-muted-foreground">🇷🇼 Kinyarwanda</p>
+              <p className="text-xs font-medium uppercase text-muted-foreground"> Kinyarwanda</p>
               <p className="mt-1 text-sm">{t.rw}</p>
             </div>
           </div>
@@ -555,7 +555,7 @@ function ScheduledTab() {
                   </span>
                 </div>
                 {s.sentCount !== undefined && (
-                  <p className="mt-1 text-xs text-emerald-600">✓ Sent to {s.sentCount} recipients</p>
+                  <p className="mt-1 text-xs text-emerald-600"> Sent to {s.sentCount} recipients</p>
                 )}
               </div>
             ))}

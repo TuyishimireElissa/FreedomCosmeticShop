@@ -71,9 +71,9 @@ export function WholesaleBanner() {
           ) : (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {[
-                { icon: '🏷️', title: t('wholesale.honest_pricing_title'), desc: t('wholesale.honest_pricing_desc') },
-                { icon: '📦', title: t('wholesale.honest_minimum_title'), desc: t('wholesale.honest_minimum_unconfigured') },
-                { icon: '💳', title: t('wholesale.honest_credit_title'), desc: t('wholesale.honest_credit_disabled') },
+                { icon: '', title: t('wholesale.honest_pricing_title'), desc: t('wholesale.honest_pricing_desc') },
+                { icon: '', title: t('wholesale.honest_minimum_title'), desc: t('wholesale.honest_minimum_unconfigured') },
+                { icon: '', title: t('wholesale.honest_credit_title'), desc: t('wholesale.honest_credit_disabled') },
               ].map((benefit) => <div key={benefit.title} className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur"><span className="text-2xl" aria-hidden="true">{benefit.icon}</span><h3 className="mt-2 text-xs font-bold sm:text-sm">{benefit.title}</h3><p className="mt-1 text-[11px] leading-4 text-gray-400">{benefit.desc}</p></div>)}
             </div>
           )}

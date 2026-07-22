@@ -62,7 +62,7 @@ export function LogoUploader() {
   const handleFileSelect = (file: File) => {
     const error = validateFile(file)
     if (error) {
-      toast({ title: "❌ Invalid file", description: error, variant: "destructive" })
+      toast({ title: " Invalid file", description: error, variant: "destructive" })
       return
     }
     setSelectedFile(file)
@@ -96,7 +96,7 @@ export function LogoUploader() {
       if (!res.ok) throw new Error(data.error || "Upload failed")
 
       toast({
-        title: "✅ Logo uploaded successfully!",
+        title: " Logo uploaded successfully!",
         description: "Your logo is now live on the website and admin panel.",
       })
       setCurrentLogo(data.data?.logoUrl ?? data.logoUrl)
@@ -104,7 +104,7 @@ export function LogoUploader() {
       setPreviewUrl(null)
     } catch (e) {
       toast({
-        title: "❌ Upload failed",
+        title: " Upload failed",
         description: e instanceof Error ? e.message : "Unknown error",
         variant: "destructive",
       })
@@ -148,7 +148,7 @@ export function LogoUploader() {
     <div className="rounded-2xl border bg-card p-5">
       <h3 className="flex items-center gap-2 text-sm font-bold">
         <ImageIcon className="h-4 w-4 text-primary" />
-        🖼️ Shop Logo Settings
+         Shop Logo Settings
       </h3>
 
       {/* Current logo */}
@@ -252,10 +252,10 @@ export function LogoUploader() {
       <div className="mt-3 rounded-lg bg-secondary/20 p-3 text-[10px] text-muted-foreground">
         <p className="font-medium text-foreground">Requirements:</p>
         <ul className="mt-1 space-y-0.5">
-          <li>✅ JPG, PNG, or WebP format</li>
-          <li>✅ Maximum size: 5MB</li>
-          <li>✅ Recommended: 500×500px square</li>
-          <li>✅ White or transparent background works best</li>
+          <li> JPG, PNG, or WebP format</li>
+          <li> Maximum size: 5MB</li>
+          <li> Recommended: 500×500px square</li>
+          <li> White or transparent background works best</li>
         </ul>
       </div>
 

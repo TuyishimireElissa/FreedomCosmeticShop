@@ -313,7 +313,7 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
 
       // Show toast notification
       toast({
-        title: "🔔 New order received!",
+        title: " New order received!",
         description: `${o.orderNumber} — ${o.customerName || "Customer"} — ${formatRWF(o.total)}`,
       })
 
@@ -1336,7 +1336,7 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
                 onClick={() => setShortcutsOpen(false)}
                 className="rounded-md p-1 text-muted-foreground hover:bg-secondary"
               >
-                ✕
+
               </button>
             </div>
             <div className="space-y-3 text-sm">

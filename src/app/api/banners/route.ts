@@ -9,7 +9,7 @@ import { db } from "@/lib/db"
 const fallbackBanners = [
   {
     id: "banner_hero",
-    title: "Rwanda's #1 Beauty Store 🇷🇼",
+    title: "Rwanda's #1 Beauty Store ",
     subtitle: "100% Authentic Products. Shop skincare, makeup & haircare. Pay with MTN MoMo.",
     image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1200&auto=format&fit=crop",
     mobileImage: null,
@@ -21,7 +21,7 @@ const fallbackBanners = [
   },
   {
     id: "banner_promo",
-    title: "Beauty that unites us ✨",
+    title: "Beauty that unites us ",
     subtitle: "Made for Rwandan beauty - Shades for melanin-rich skin",
     image: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=1200&auto=format&fit=crop",
     mobileImage: null,

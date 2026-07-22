@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     let result = calculation
     if (override?.isActive) {
       const free = orderTotal >= override.freeThreshold
-      result = { ...calculation, fee: free ? 0 : override.baseFee, feeFormatted: free ? 'FREE' : `${override.baseFee.toLocaleString()} RWF`, isFreeDelivery: free, freeDeliveryThreshold: override.freeThreshold, amountNeededForFree: Math.max(0, override.freeThreshold - orderTotal), deliveryTime: `${override.estimatedDays} business days`, isSameDay: override.isSameDay, message: free ? '🎉 FREE delivery!' : `Delivery fee: ${override.baseFee.toLocaleString()} RWF` }
+      result = { ...calculation, fee: free ? 0 : override.baseFee, feeFormatted: free ? 'FREE' : `${override.baseFee.toLocaleString()} RWF`, isFreeDelivery: free, freeDeliveryThreshold: override.freeThreshold, amountNeededForFree: Math.max(0, override.freeThreshold - orderTotal), deliveryTime: `${override.estimatedDays} business days`, isSameDay: override.isSameDay, message: free ? ' FREE delivery!' : `Delivery fee: ${override.baseFee.toLocaleString()} RWF` }
     }
     return NextResponse.json({ success: true, data: result, ...result })
   } catch (error) {

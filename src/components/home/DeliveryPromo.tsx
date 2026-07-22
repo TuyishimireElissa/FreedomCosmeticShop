@@ -141,7 +141,7 @@ export default function DeliveryPromo() {
 
             {freeThreshold !== null && (
               <div className="mt-4 flex items-start gap-2 rounded-xl border border-green-200 bg-green-50 p-3">
-                <span className="text-lg text-green-700" aria-hidden="true">✓</span>
+                <span className="text-lg text-green-700" aria-hidden="true"></span>
                 <p className="text-sm font-medium text-green-800">
                   {t('delivery.free_above', { amount: freeThreshold.toLocaleString('en-RW') })}
                 </p>
@@ -187,10 +187,10 @@ export default function DeliveryPromo() {
               </div>
               <div className="space-y-3">
                 {[
-                  { icon: '💛', name: t('checkout.mtn_momo'), detail: t('product.pay_mobile_short') },
-                  { icon: '🔴', name: t('checkout.airtel_money'), detail: t('checkout.airtel_pay_prefixes') },
-                  { icon: '💳', name: t('checkout.card_payment'), detail: t('checkout.flutterwave_secure') },
-                  { icon: '💵', name: t('checkout.cod'), detail: t('checkout.cod_kigali_only') },
+                  { icon: '', name: t('checkout.mtn_momo'), detail: t('product.pay_mobile_short') },
+                  { icon: '', name: t('checkout.airtel_money'), detail: t('checkout.airtel_pay_prefixes') },
+                  { icon: '', name: t('checkout.card_payment'), detail: t('checkout.flutterwave_secure') },
+                  { icon: '', name: t('checkout.cod'), detail: t('checkout.cod_kigali_only') },
                 ].map((method) => (
                   <div key={method.name} className="flex items-center gap-3 rounded-xl bg-gray-50 p-3">
                     <span className="text-2xl" aria-hidden="true">{method.icon}</span>

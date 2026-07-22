@@ -103,7 +103,7 @@ export async function POST(req: Request) {
         data: {
           userId: admin.id,
           type: "PROMOTION",
-          title: "🏪 New wholesale application",
+          title: " New wholesale application",
           body: `${parsed.data.businessName} (${parsed.data.businessType}) applied for wholesale`,
           data: JSON.stringify({ applicationId: application.id }),
           linkType: "URL",
@@ -114,7 +114,7 @@ export async function POST(req: Request) {
         id: application.id,
         userId: admin.id,
         type: "wholesale_application",
-        title: "🏪 New wholesale application",
+        title: " New wholesale application",
       }, { source: user.name }).catch(() => {})
     }
 

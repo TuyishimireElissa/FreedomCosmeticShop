@@ -1,6 +1,6 @@
 'use client'
 
-import { Award, Building2, CreditCard, MapPin, Phone, RotateCcw, ShieldCheck, Truck } from 'lucide-react'
+import { Award, Building2, CreditCard, Phone, RotateCcw, ShieldCheck, Truck } from 'lucide-react'
 import { BUSINESS, OWNER_TODO } from '@/lib/business-config'
 import { useT } from '@/lib/i18n/LanguageContext'
 
@@ -24,12 +24,6 @@ export default function TrustSection() {
       color: 'bg-blue-50 text-blue-700',
       title: t('delivery.kigali_same_day'),
       detail: t('home.trust_kigali_delivery'),
-    },
-    {
-      icon: MapPin,
-      color: 'bg-indigo-50 text-indigo-700',
-      title: t('product.delivery_across_rwanda'),
-      detail: t('home.trust_district_delivery'),
     },
     {
       icon: RotateCcw,
@@ -79,10 +73,10 @@ export default function TrustSection() {
   }
 
   return (
-    <section className="bg-white px-4 py-8 md:py-12">
+    <section className="bg-[#FAFAFA] px-4 py-10 md:py-16">
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 text-center md:mb-8">
-          <h2 className="mb-2 text-xl font-bold text-gray-900 md:text-2xl">{t('home.trust_title')}</h2>
+          <h2 className="mb-2 text-2xl font-bold text-[#1a1a1a] md:text-3xl">{t('home.trust_title')}</h2>
           <p className="mx-auto max-w-md text-sm text-gray-500">{t('home.trust_subtitle')}</p>
         </div>
 
@@ -90,7 +84,7 @@ export default function TrustSection() {
           {trustItems.map((item) => {
             const Icon = item.icon
             return (
-              <div key={item.title} className="rounded-2xl border border-gray-100 bg-white p-4 transition-shadow hover:shadow-sm">
+              <div key={item.title} className="rounded-xl border border-[#EEEEEE] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
                 <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${item.color}`}>
                   <Icon className="h-5 w-5" aria-hidden="true" />
                 </div>

@@ -13,8 +13,10 @@ import {
   Package,
   Search,
   Shield,
+  ShoppingBag,
   ShoppingCart,
   Sparkles,
+  Store,
   User,
   X,
 } from 'lucide-react'
@@ -28,12 +30,12 @@ import { BUSINESS } from '@/lib/business-config'
 import LowDataToggle from '@/components/settings/LowDataToggle'
 
 const categories = [
-  { name: 'Skincare', slug: 'skincare', icon: '🧴', translationKey: 'categories.skincare' },
-  { name: 'Makeup', slug: 'makeup', icon: '💄', translationKey: 'categories.makeup' },
-  { name: 'Hair Care', slug: 'haircare', icon: '💇', translationKey: 'categories.haircare' },
-  { name: 'Fragrance', slug: 'fragrance', icon: '🌸', translationKey: 'categories.fragrance' },
-  { name: 'Body Care', slug: 'body-care', icon: '🧼', translationKey: 'categories.body_care' },
-  { name: "Men's", slug: 'mens-grooming', icon: '🧔', translationKey: 'categories.mens' },
+  { slug: 'skincare', translationKey: 'categories.skincare' },
+  { slug: 'makeup', translationKey: 'categories.makeup' },
+  { slug: 'haircare', translationKey: 'categories.haircare' },
+  { slug: 'fragrance', translationKey: 'categories.fragrance' },
+  { slug: 'body-care', translationKey: 'categories.body_care' },
+  { slug: 'mens-grooming', translationKey: 'categories.mens' },
 ]
 
 export default function Navbar() {
@@ -99,20 +101,8 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-rose-100/70 bg-white/95 shadow-[0_4px_20px_rgba(26,26,26,0.05)] backdrop-blur-xl">
-      <div className="hidden border-b border-[#FFD700]/20 bg-[#fff8e7] px-3 py-1.5 md:block">
-        <div className="scrollbar-hide mx-auto flex max-w-7xl items-center justify-start gap-3 overflow-x-auto text-xs font-medium text-gray-600 sm:justify-center sm:gap-5 sm:text-xs">
-          <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">💛</span> {t('checkout.mtn_momo')}</span>
-          <span className="text-gray-300" aria-hidden="true">|</span>
-          <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">🔴</span> {t('checkout.airtel_money')}</span>
-          <span className="text-gray-300" aria-hidden="true">|</span>
-          <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">💳</span> {t('checkout.card_payment')}</span>
-          <span className="text-gray-300" aria-hidden="true">|</span>
-          <span className="flex shrink-0 items-center gap-1"><span aria-hidden="true">💵</span> {t('checkout.cod')}</span>
-        </div>
-      </div>
-
-      <div className="mx-auto flex h-[52px] max-w-7xl items-center gap-2 px-3 md:h-[72px] md:gap-4 md:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 border-b border-[#EEEEEE] bg-white/95 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-4 md:h-16 md:gap-6 md:px-6 lg:px-8">
         <button
           type="button"
           onClick={() => navigate(() => router.push('/'))}
@@ -126,19 +116,10 @@ export default function Navbar() {
               className="h-10 w-auto max-w-[150px] object-contain sm:max-w-[190px]"
             />
           ) : (
-            <>
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-[#c98892] to-[#9e5964] text-base font-black text-white shadow-md shadow-[#B76E79]/20">
-                F
-              </span>
-              <span className="hidden text-left md:block">
-                <span className="block text-[15px] font-extrabold leading-none tracking-tight text-[#1a1a1a] lg:text-base">
-                  {BUSINESS.tradingName}
-                </span>
-                <span className="mt-1 block text-xs font-medium leading-none text-[#B76E79] lg:text-xs">
-                  {BUSINESS.tagline} 🇷🇼
-                </span>
-              </span>
-            </>
+            <span className="text-left">
+              <span className="block text-sm font-bold leading-none tracking-[-0.02em] text-[#1a1a1a] sm:text-base lg:text-lg">{BUSINESS.tradingName}</span>
+              <span className="mt-1 hidden text-[11px] font-medium leading-none text-[#777777] sm:block">{BUSINESS.tagline}</span>
+            </span>
           )}
         </button>
 
@@ -255,21 +236,21 @@ export default function Navbar() {
         </div>
       </div>
 
-      <div className="hidden border-t border-gray-100 md:block">
-        <nav className="scrollbar-hide mx-auto flex max-w-7xl items-center gap-1 overflow-x-auto px-6 lg:px-8" aria-label={t('nav.product_categories')}>
-          <button type="button" onClick={() => router.push('/products')} className="shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-semibold text-gray-600 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
+      <div className="hidden border-t border-[#EEEEEE] md:block">
+        <nav className="scrollbar-hide mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-6 lg:px-8" aria-label={t('nav.product_categories')}>
+          <button type="button" onClick={() => router.push('/products')} className="shrink-0 border-b-2 border-transparent py-3 text-[13px] font-medium text-[#777777] transition-colors hover:border-[#B76E79] hover:text-[#1a1a1a]">
             {t('categories.all')}
           </button>
           {categories.map((category) => (
-            <button key={category.slug} type="button" onClick={() => router.push(`/products?category=${category.slug}`)} className="flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-3 py-3 text-sm font-medium text-gray-600 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
-              <span aria-hidden="true">{category.icon}</span>{t(category.translationKey)}
+            <button key={category.slug} type="button" onClick={() => router.push(`/products?category=${category.slug}`)} className="shrink-0 border-b-2 border-transparent py-3 text-[13px] font-medium text-[#777777] transition-colors hover:border-[#B76E79] hover:text-[#1a1a1a]">
+              {t(category.translationKey)}
             </button>
           ))}
           <button type="button" onClick={() => router.push('/bundles')} className="ml-auto flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-[#B76E79] transition-colors hover:border-[#B76E79] hover:text-[#9e5964]">
             <Gift className="h-4 w-4" /> {t('nav.bundles')}
           </button>
           <button type="button" onClick={() => router.push('/wholesale')} className="shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-[#B76E79] transition-colors hover:border-[#B76E79] hover:text-[#9e5964]">
-            🏪 {t('nav.wholesale')}
+            <Store className="h-4 w-4" aria-hidden="true" /> {t('nav.wholesale')}
           </button>
         </nav>
       </div>
@@ -291,11 +272,11 @@ export default function Navbar() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <button type="button" onClick={() => navigate(() => router.push('/products'))} className="col-span-2 flex items-center gap-3 rounded-2xl border border-gray-100 bg-[#f8f9fa] px-4 py-3 text-left font-semibold">
-                <span className="text-xl">🛍️</span> {t('categories.all')}
+                <ShoppingBag className="h-5 w-5" aria-hidden="true" /> {t('categories.all')}
               </button>
               {categories.map((category) => (
                 <button key={category.slug} type="button" onClick={() => navigate(() => router.push(`/products?category=${category.slug}`))} className="flex min-h-16 items-center gap-2 rounded-2xl border border-gray-100 px-3 py-3 text-left text-sm font-medium transition-colors hover:border-rose-200 hover:bg-rose-50">
-                  <span className="text-xl" aria-hidden="true">{category.icon}</span>{t(category.translationKey)}
+                  {t(category.translationKey)}
                 </button>
               ))}
             </div>
@@ -305,7 +286,7 @@ export default function Navbar() {
               <button type="button" onClick={() => navigate(() => router.push('/bundles'))} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-rose-50 px-3 text-sm font-bold text-[#B76E79]"><Gift className="h-4 w-4" />{t('nav.bundles')}</button>
             </div>
             <button type="button" onClick={() => navigate(() => router.push('/wholesale'))} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#fff8e7] px-4 py-3 font-bold text-[#9e5964] ring-1 ring-[#FFD700]/30">
-              🏪 {t('nav.wholesale_offer')}
+              <Store className="h-4 w-4" aria-hidden="true" /> {t('nav.wholesale_offer')}
             </button>
 
             <div className="mt-5 border-t border-gray-100 pt-4">

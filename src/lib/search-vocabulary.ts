@@ -1,12 +1,12 @@
 /**
  * Rwanda cosmetics local-search vocabulary.
  *
- * 🔍 REVIEW: Kinyarwanda vocabulary must be reviewed by a fluent speaker and
+ *  REVIEW: Kinyarwanda vocabulary must be reviewed by a fluent speaker and
  * local cosmetics retailer before production search analytics are finalized.
  */
 
 export const LOCAL_SEARCH_VOCABULARY: Readonly<Record<string, readonly string[]>> = {
-  // Broad categories — 🔍 REVIEW
+  // Broad categories —  REVIEW
   uruhu: ['skincare', 'skin care', 'skin', 'face cream'],
   'kwita ku ruhu': ['skincare', 'skin care', 'face care'],
   umusatsi: ['haircare', 'hair care', 'hair'],
@@ -17,7 +17,7 @@ export const LOCAL_SEARCH_VOCABULARY: Readonly<Record<string, readonly string[]>
   umubiri: ['body care', 'body lotion', 'body'],
   'kwita ku mubiri': ['body care', 'body lotion'],
 
-  // Common product language — 🔍 REVIEW
+  // Common product language —  REVIEW
   amavuta: ['oil', 'lotion', 'cream', 'body butter'],
   "amavuta y'uruhu": ['face oil', 'skin oil', 'serum'],
   'amavuta y’uruhu': ['face oil', 'skin oil', 'serum'],
@@ -33,7 +33,7 @@ export const LOCAL_SEARCH_VOCABULARY: Readonly<Record<string, readonly string[]>
   lipisitiki: ['lipstick', 'lip color'],
   masikara: ['mascara'],
 
-  // Customer needs — 🔍 REVIEW
+  // Customer needs —  REVIEW
   'uruhu rwumye': ['dry skin', 'moisturizer', 'hydrating'],
   'uruhu rugira amavuta': ['oily skin', 'oil control', 'mattifying'],
   'uruhu rworoshye': ['sensitive skin', 'soothing', 'gentle'],
@@ -239,13 +239,13 @@ const PRICE_PATTERNS: ReadonlyArray<{
 }> = [
   { pattern: /^(\d+)k\s*(?:rwf|frw)?$/i, parse: (match) => ({ maxPrice: Number.parseInt(match[1], 10) * 1000 }) },
   { pattern: /around\s+(\d+[,.]?\d*)\s*(?:rwf|frw)?/i, parse: (match) => aroundPrice(parseAmount(match[1])) },
-  { pattern: /hafi ya\s+(\d+[,.]?\d*)\s*(?:rwf|frw)?/i, parse: (match) => aroundPrice(parseAmount(match[1])) }, // 🔍 REVIEW
-  { pattern: /amafaranga make/i, parse: () => ({ maxPrice: 10000 }) }, // 🔍 REVIEW
-  { pattern: /amafaranga menshi/i, parse: () => ({ minPrice: 30000 }) }, // 🔍 REVIEW
+  { pattern: /hafi ya\s+(\d+[,.]?\d*)\s*(?:rwf|frw)?/i, parse: (match) => aroundPrice(parseAmount(match[1])) }, //  REVIEW
+  { pattern: /amafaranga make/i, parse: () => ({ maxPrice: 10000 }) }, //  REVIEW
+  { pattern: /amafaranga menshi/i, parse: () => ({ minPrice: 30000 }) }, //  REVIEW
   { pattern: new RegExp(`(?:under|below|less than)\\s+${amount}\\s*(?:rwf|frw|rw)?`, 'i'), parse: (match) => ({ maxPrice: parseAmount(match[1]) }) },
-  { pattern: new RegExp(`(?:munsi ya|kutarenza)\\s+${amount}\\s*(?:rwf|frw|rw)?`, 'i'), parse: (match) => ({ maxPrice: parseAmount(match[1]) }) }, // 🔍 REVIEW
+  { pattern: new RegExp(`(?:munsi ya|kutarenza)\\s+${amount}\\s*(?:rwf|frw|rw)?`, 'i'), parse: (match) => ({ maxPrice: parseAmount(match[1]) }) }, //  REVIEW
   { pattern: new RegExp(`(?:between|from)\\s+${amount}\\s*(?:and|to|-)\\s*${amount}\\s*(?:rwf|frw|rw)?`, 'i'), parse: (match) => ({ minPrice: parseAmount(match[1]), maxPrice: parseAmount(match[2]) }) },
-  { pattern: new RegExp(`hagati ya\\s+${amount}\\s+na\\s+${amount}\\s*(?:rwf|frw|rw)?`, 'i'), parse: (match) => ({ minPrice: parseAmount(match[1]), maxPrice: parseAmount(match[2]) }) }, // 🔍 REVIEW
+  { pattern: new RegExp(`hagati ya\\s+${amount}\\s+na\\s+${amount}\\s*(?:rwf|frw|rw)?`, 'i'), parse: (match) => ({ minPrice: parseAmount(match[1]), maxPrice: parseAmount(match[2]) }) }, //  REVIEW
   { pattern: new RegExp(`${amount}\\s*[-–]\\s*${amount}\\s*(?:rwf|frw|rw)?`, 'i'), parse: (match) => ({ minPrice: parseAmount(match[1]), maxPrice: parseAmount(match[2]) }) },
 ]
 

@@ -653,7 +653,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                           <p className="line-clamp-1 font-medium">{p.name}</p>
                           <p className="text-xs text-muted-foreground">
                             {p.brand?.name || "No brand"}
-                            {p.featured && " · ★ Featured"}
+                            {p.featured && " ·  Featured"}
                           </p>
                           <p className="line-clamp-1 text-xs text-muted-foreground">
                             {p.realSku || p.sku || "No SKU"}{p.supplier?.name ? ` · ${p.supplier.name}` : ""}

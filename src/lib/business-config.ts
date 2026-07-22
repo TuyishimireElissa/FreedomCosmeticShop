@@ -1,7 +1,7 @@
 /**
  * FreedomCosmeticShop Business Configuration
  *
- * ⚠️ OWNER: Update all [TODO] fields before launch.
+ *  OWNER: Update all [TODO] fields before launch.
  * Search for: TODO: OWNER_MUST_ADD_THIS_BEFORE_LAUNCH
  * Replace each marker with verified, real business information.
  */

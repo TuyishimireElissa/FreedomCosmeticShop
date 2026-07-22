@@ -168,7 +168,7 @@ function ApplicationsTab() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed")
-      toast({ title: "✅ Application approved", description: `${reviewTarget.businessName} is now a wholesale customer` })
+      toast({ title: " Application approved", description: `${reviewTarget.businessName} is now a wholesale customer` })
       setReviewTarget(null)
       setApproveNotes("")
       load()
@@ -353,10 +353,10 @@ function CustomersTab() {
   useEffect(() => { load() }, [load])
 
   const getTier = (revenue: number) => {
-    if (revenue > 1_000_000) return { label: "Diamond 💎", class: "bg-indigo-100 text-indigo-700" }
-    if (revenue > 500_000) return { label: "Gold 🥇", class: "bg-amber-100 text-amber-700" }
-    if (revenue > 100_000) return { label: "Silver 🥈", class: "bg-slate-100 text-slate-700" }
-    return { label: "Bronze 🥉", class: "bg-orange-100 text-orange-700" }
+    if (revenue > 1_000_000) return { label: "Diamond ", class: "bg-indigo-100 text-indigo-700" }
+    if (revenue > 500_000) return { label: "Gold ", class: "bg-amber-100 text-amber-700" }
+    if (revenue > 100_000) return { label: "Silver ", class: "bg-slate-100 text-slate-700" }
+    return { label: "Bronze ", class: "bg-orange-100 text-orange-700" }
   }
 
   return (
@@ -487,7 +487,7 @@ function OrdersTab() {
                     <tr key={order.id || i} className="hover:bg-secondary/20">
                       <td className="px-3 py-3">
                         <p className="font-mono text-xs font-bold">{order.orderNumber}</p>
-                        {order.isCredit && <Badge variant="secondary" className="text-[10px]">💳 Credit</Badge>}
+                        {order.isCredit && <Badge variant="secondary" className="text-[10px]"> Credit</Badge>}
                       </td>
                       <td className="px-3 py-3">
                         <p className="text-xs font-medium">{order.customerName}</p>
@@ -557,7 +557,7 @@ function CreditTab() {
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed")
-      toast({ title: "✅ Payment recorded", description: `${formatRWF(Number(paymentAmount))} from ${paymentTarget.businessName || paymentTarget.name}` })
+      toast({ title: " Payment recorded", description: `${formatRWF(Number(paymentAmount))} from ${paymentTarget.businessName || paymentTarget.name}` })
       setPaymentTarget(null)
       setPaymentAmount("")
       load()
@@ -594,7 +594,7 @@ function CreditTab() {
         <div className="space-y-2">
           {customers.filter((c) => c.credit && c.credit.used > 0).length === 0 ? (
             <p className="rounded-xl border border-dashed p-4 text-center text-sm text-muted-foreground">
-              No outstanding credit balances. All wholesale customers are paid up. ✅
+              No outstanding credit balances. All wholesale customers are paid up.
             </p>
           ) : (
             customers.filter((c) => c.credit && c.credit.used > 0).map((c) => {
@@ -628,13 +628,13 @@ function CreditTab() {
                           })
                           const data = await res.json()
                           if (!res.ok) throw new Error(data.error)
-                          toast({ title: "📩 Due reminder sent", description: c.businessName || c.name })
+                          toast({ title: " Due reminder sent", description: c.businessName || c.name })
                         } catch {
                           toast({ title: "Failed to send reminder", variant: "destructive" })
                         }
                       }}
                     >
-                      📩 Send Reminder
+                       Send Reminder
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => { setPaymentTarget(c); setPaymentAmount(String(c.credit!.used)) }}>
                       <CreditCard className="mr-1.5 h-3 w-3" /> Record Payment

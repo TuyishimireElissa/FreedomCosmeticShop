@@ -8,11 +8,11 @@
  * Features:
  *   - Polls /api/admin/analytics every 30 seconds for new orders (fallback)
  *   - listens to real-time SSE events for INSTANT notifications:
- *     - order:new → 🔔 New order alert + sound
- *     - payment:confirmed → 💳 Payment confirmed
- *     - payment:failed → ❌ Payment failed
- *     - product:stockLow → ⚠️ Low stock warning
- *     - product:outOfStock → 🚨 Out of stock
+ *     - order:new →  New order alert + sound
+ *     - payment:confirmed →  Payment confirmed
+ *     - payment:failed →  Payment failed
+ *     - product:stockLow →  Low stock warning
+ *     - product:outOfStock →  Out of stock
  *   - Plays a sound when a new order arrives
  *   - Shows a toast notification
  *   - Returns the list of recent notifications
@@ -107,11 +107,11 @@ export function useAdminNotifications() {
     playSound()
     addNotification({
       type: "new_order",
-      title: "🛒 New order!",
+      title: " New order!",
       message: `${o.orderNumber} — ${o.customerName || "Customer"} — ${formatRWF(o.total)}`,
     })
     toast({
-      title: "🛒 New order received!",
+      title: " New order received!",
       description: `${o.orderNumber} — ${formatRWF(o.total)}`,
     })
   })
@@ -123,11 +123,11 @@ export function useAdminNotifications() {
 
     const o = data as { orderNumber: string; status: string }
     const statusLabels: Record<string, string> = {
-      confirmed: "✅ Confirmed",
-      processing: "📦 Processing",
-      shipped: "🚚 Shipped",
-      delivered: "🎉 Delivered",
-      cancelled: "❌ Cancelled",
+      confirmed: " Confirmed",
+      processing: " Processing",
+      shipped: " Shipped",
+      delivered: " Delivered",
+      cancelled: " Cancelled",
     }
     const action = event.replace("order:", "")
     const label = statusLabels[action]
@@ -148,13 +148,13 @@ export function useAdminNotifications() {
     if (event === "payment:confirmed") {
       addNotification({
         type: "payment_confirmed",
-        title: "💳 Payment confirmed",
+        title: " Payment confirmed",
         message: `${p.orderNumber} — ${formatRWF(p.amount)} via ${p.method}`,
       })
     } else if (event === "payment:failed") {
       addNotification({
         type: "payment_failed",
-        title: "❌ Payment failed",
+        title: " Payment failed",
         message: `${p.orderNumber} — ${formatRWF(p.amount)} via ${p.method}`,
       })
     }
@@ -168,13 +168,13 @@ export function useAdminNotifications() {
     if (event === "product:stockLow") {
       addNotification({
         type: "low_stock",
-        title: "⚠️ Low stock",
+        title: " Low stock",
         message: `${p.name} — only ${p.stock} left (threshold: ${p.threshold || 5})`,
       })
     } else if (event === "product:outOfStock") {
       addNotification({
         type: "out_of_stock",
-        title: "🚨 Out of stock",
+        title: " Out of stock",
         message: `${p.name} is now out of stock`,
       })
     }

@@ -37,7 +37,7 @@ export default function BundlesView() {
 
     {loading ? <div className="mt-8 flex items-center justify-center gap-2 py-16 text-sm text-gray-500"><Loader2 className="h-5 w-5 animate-spin text-[#B76E79]" />{t('common.loading')}</div>
       : error ? <div className="mt-8 rounded-2xl bg-red-50 p-8 text-center"><p className="font-bold text-red-700">{t('bundles.load_failed')}</p><button type="button" onClick={() => setRequest((value) => value + 1)} className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-xl bg-gray-900 px-5 text-sm font-bold text-white"><RefreshCw className="h-4 w-4" />{t('common.retry')}</button></div>
-        : bundles.length === 0 ? <div className="mt-8 rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center"><p className="text-4xl">📦</p><h2 className="mt-3 font-black text-gray-800">{t('bundles.empty')}</h2><p className="mt-2 text-sm text-gray-500">{t('bundles.empty_hint')}</p></div>
+        : bundles.length === 0 ? <div className="mt-8 rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center"><p className="text-4xl"></p><h2 className="mt-3 font-black text-gray-800">{t('bundles.empty')}</h2><p className="mt-2 text-sm text-gray-500">{t('bundles.empty_hint')}</p></div>
           : <><div className="scrollbar-hide mt-8 flex snap-x gap-4 overflow-x-auto pb-3 md:hidden">{bundles.map((bundle) => <BundleCard key={bundle.id} bundle={bundle} />)}</div><div className="mt-8 hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">{bundles.map((bundle) => <BundleCard key={bundle.id} bundle={bundle} />)}</div></>}
   </main>
 }

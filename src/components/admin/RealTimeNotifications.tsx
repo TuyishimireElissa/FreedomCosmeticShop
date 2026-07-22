@@ -113,7 +113,7 @@ export function RealTimeNotifications() {
         // Show toast for each new order (max 3 to avoid spam)
         data.newOrders.slice(0, 3).forEach((order) => {
           toast({
-            title: "🔔 New order!",
+            title: " New order!",
             description: `${order.orderNumber} — ${order.customerName} (${order.itemCount} items)`,
           })
         })
@@ -129,7 +129,7 @@ export function RealTimeNotifications() {
           playBeep(440, 200) // Lower pitch for low stock
         }
         toast({
-          title: "⚠️ Low stock alert",
+          title: " Low stock alert",
           description: `${data.lowStockCount} products need restocking.`,
           variant: "destructive",
         })

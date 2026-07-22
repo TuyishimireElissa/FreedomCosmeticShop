@@ -376,9 +376,9 @@ export async function sendWholesaleSms(
     application_approved: `${BUSINESS.tradingName}: The wholesale application for ${variables.name} is approved. Product-specific wholesale prices appear when configured.`,
     application_rejected: `${BUSINESS.tradingName}: Your wholesale application was not approved. Reason: ${variables.reason}. Questions: ${BUSINESS.phone}`,
     order_confirmed: `${BUSINESS.tradingName}: Wholesale order #${variables.orderNumber} was received. Amount: ${variables.amount} RWF. Order invoice: ${variables.invoice}.`,
-    payment_due: `Reminder: Invoice ${variables.invoice} of ${variables.amount} RWF due on ${variables.dueDate}. Pay MTN MoMo: ${variables.momoNumber}. Ref: ${variables.invoice}. ${BUSINESS.tradingName} 💳`,
-    payment_overdue: `URGENT: Invoice ${variables.invoice} of ${variables.amount} RWF is OVERDUE. Pay now to avoid suspension. Call: ${BUSINESS.phone}. ${BUSINESS.tradingName} ⚠️`,
-    payment_received: `Payment of ${variables.amount} RWF received for ${variables.invoice}. Balance: ${variables.remaining} RWF. Thank you! ${BUSINESS.tradingName} ✅`,
+    payment_due: `Reminder: Invoice ${variables.invoice} of ${variables.amount} RWF due on ${variables.dueDate}. Pay MTN MoMo: ${variables.momoNumber}. Ref: ${variables.invoice}. ${BUSINESS.tradingName} `,
+    payment_overdue: `URGENT: Invoice ${variables.invoice} of ${variables.amount} RWF is OVERDUE. Pay now to avoid suspension. Call: ${BUSINESS.phone}. ${BUSINESS.tradingName} `,
+    payment_received: `Payment of ${variables.amount} RWF received for ${variables.invoice}. Balance: ${variables.remaining} RWF. Thank you! ${BUSINESS.tradingName} `,
   }
 
   const message = messages[template]

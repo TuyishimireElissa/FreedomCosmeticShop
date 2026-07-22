@@ -78,11 +78,11 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="absolute left-2 top-2 flex max-w-[70%] flex-col items-start gap-1 sm:left-3 sm:top-3">
           {discount > 0 && <span className="badge bg-red-500 text-white shadow-sm">-{discount}%</span>}
           {product.isNewArrival && <span className="badge bg-emerald-600 text-white shadow-sm">{t('common.new')}</span>}
-          {product.isBestSeller && <span className="badge bg-[#B76E79] text-white shadow-sm">🔥 {t('categories.best_sellers')}</span>}
+          {product.isBestSeller && <span className="badge bg-[#B76E79] text-white shadow-sm"> {t('categories.best_sellers')}</span>}
           {product.stockQuantity > 0 && product.stockQuantity <= (product.lowStockThreshold ?? 5) && <span aria-hidden="true" className="badge bg-amber-500 text-white shadow-sm">{t('common.low_stock', { count: product.stockQuantity })}</span>}
         </div>
 
-        {product.isAuthentic === true && <span className="absolute right-2 top-2 hidden items-center rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-emerald-700 shadow-sm backdrop-blur sm:inline-flex">✓ {t('common.authentic')}</span>}
+        {product.isAuthentic === true && <span className="absolute right-2 top-2 hidden items-center rounded-full bg-white/95 px-2 py-1 text-xs font-bold text-emerald-700 shadow-sm backdrop-blur sm:inline-flex"> {t('common.authentic')}</span>}
 
         {outOfStock && (
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 grid place-items-center bg-white/25">

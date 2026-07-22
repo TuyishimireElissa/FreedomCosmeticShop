@@ -13,7 +13,7 @@
 export const siteConfig = {
   name: "FreedomCosmeticShop",
   shortName: "Freedom Cosmetic",
-  tagline: "Rwanda's Beauty Freedom 🇷🇼",
+  tagline: "Rwanda's Beauty Freedom ",
   description:
     "Shop authentic skincare, makeup & haircare products in Rwanda. Pay with MTN MoMo or cash on delivery. Fast delivery in Kigali and across all provinces.",
   url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",

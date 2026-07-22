@@ -8,12 +8,23 @@
     --foreground: 0 0% 10%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 10%;
-    --muted: 210 17% 98%;
-    --muted-foreground: 215 14% 42%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --muted: 0 0% 98%;
+    --muted-foreground: 0 0% 47%;
+    --border: 0 0% 93%;
+    --input: 0 0% 93%;
     --ring: 351 32% 57%;
     --radius: 0.75rem;
+    --fcs-primary: #B76E79;
+    --fcs-primary-hover: #9B5A64;
+    --fcs-secondary: #1a1a1a;
+    --fcs-accent: #C4956A;
+    --fcs-surface: #FAFAFA;
+    --fcs-border: #EEEEEE;
+    --fcs-muted: #777777;
+    --fcs-light: #AAAAAA;
+    --fcs-success: #2D8A4E;
+    --fcs-error: #D64045;
+    --fcs-warning: #E8A838;
   }
 
   * {
@@ -97,11 +108,14 @@
   }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     background-color: #ffffff;
     color: #1a1a1a;
+    font-size: 15px;
+    line-height: 1.6;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -127,6 +141,21 @@
     cursor: pointer;
     border: none;
     background: none;
+  }
+
+  button,
+  a,
+  input,
+  select,
+  textarea,
+  [role='button'] {
+    transition-duration: 150ms;
+    transition-timing-function: ease;
+  }
+
+  ::selection {
+    background: rgba(183, 110, 121, 0.2);
+    color: #1a1a1a;
   }
 
   :focus:not(:focus-visible) {
@@ -190,15 +219,15 @@
 
 @layer components {
   .btn-primary {
-    @apply min-h-12 w-full touch-manipulation select-none rounded-xl bg-primary px-6 py-3 text-base font-semibold text-white transition-all duration-150 hover:bg-primary-600 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 md:w-auto;
+    @apply min-h-12 w-full touch-manipulation select-none rounded-[10px] bg-[#B76E79] px-6 py-3 text-sm font-semibold text-white transition-all duration-150 hover:bg-[#9B5A64] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 md:w-auto;
   }
 
   .btn-secondary {
-    @apply min-h-12 w-full touch-manipulation select-none rounded-xl bg-gray-900 px-6 py-3 text-base font-semibold text-white transition-all duration-150 hover:bg-gray-800 active:scale-[0.98] md:w-auto;
+    @apply min-h-12 w-full touch-manipulation select-none rounded-[10px] bg-[#1a1a1a] px-6 py-3 text-sm font-semibold text-white transition-all duration-150 hover:bg-black active:scale-[0.98] md:w-auto;
   }
 
   .btn-outline {
-    @apply min-h-12 w-full touch-manipulation select-none rounded-xl border-2 border-primary-500 px-6 py-3 text-base font-semibold text-primary-500 transition-all duration-150 hover:bg-primary-500 hover:text-white active:scale-[0.98] md:w-auto;
+    @apply min-h-12 w-full touch-manipulation select-none rounded-[10px] border-2 border-[#B76E79] px-6 py-3 text-sm font-semibold text-[#B76E79] transition-all duration-150 hover:bg-[#B76E79] hover:text-white active:scale-[0.98] md:w-auto;
   }
 
   .btn-ghost {
@@ -210,11 +239,11 @@
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-200;
+    @apply overflow-hidden rounded-xl border border-[#EEEEEE] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)];
   }
 
   .input-field {
-    @apply min-h-12 w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-base text-gray-900 transition-colors duration-150 placeholder:text-base placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-0;
+    @apply min-h-12 w-full rounded-[10px] border border-[#E5E5E5] bg-white px-4 py-3 text-base text-[#1a1a1a] transition-colors duration-150 placeholder:text-base placeholder:text-[#AAAAAA] focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/10;
   }
 
   .input-label {

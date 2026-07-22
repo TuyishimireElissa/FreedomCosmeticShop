@@ -257,7 +257,7 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
   </div>
 
   <div class="footer">
-    <p>Thank you for shopping with ${BUSINESS.tradingName}! 🌸</p>
+    <p>Thank you for shopping with ${BUSINESS.tradingName}! </p>
     <p>${BUSINESS.address.full} · ${BUSINESS.phoneDisplay} · ${BUSINESS.emailInvoices}</p>
     ${BUSINESS.tinNumber.includes('TODO') ? '' : `<p>TIN: ${BUSINESS.tinNumber}</p>`}
     <p>For support, call ${BUSINESS.phoneDisplay} or send a WhatsApp message to ${BUSINESS.whatsapp}.</p>
@@ -265,7 +265,7 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
 
   <div class="no-print" style="text-align: center; margin-top: 24px;">
     <button onclick="window.print()" style="background: #b76e79; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-size: 14px; cursor: pointer;">
-      🖨️ Print Invoice
+       Print Invoice
     </button>
   </div>
 

@@ -388,7 +388,7 @@ export function AdminDeliveries() {
     }
     setUpdating(true)
     try {
-      const message = `Your order ${selected.order.orderNumber} is on the way! Rider: ${selected.driverName} - ${selected.driverPhone}. ETA: ${etaLabel(selected)}. FreedomCosmeticShop 🏍️`
+      const message = `Your order ${selected.order.orderNumber} is on the way! Rider: ${selected.driverName} - ${selected.driverPhone}. ETA: ${etaLabel(selected)}. FreedomCosmeticShop `
       const res = await fetch("/api/sms/send", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -205,7 +205,7 @@ export function calculateDelivery(district: string, orderTotal: number): Deliver
       freeDeliveryThreshold: 50000,
       amountNeededForFree: Math.max(0, 50000 - orderTotal),
       message: orderTotal >= 50000
-        ? "🎉 FREE delivery!"
+        ? " FREE delivery!"
         : `Order ${formatRWF(50000 - orderTotal)} more for FREE delivery!`,
       isSameDay: false,
     }
@@ -216,7 +216,7 @@ export function calculateDelivery(district: string, orderTotal: number): Deliver
 
   let message: string
   if (freeDelivery) {
-    message = "🎉 FREE delivery!"
+    message = " FREE delivery!"
   } else if (amountNeeded > 0) {
     message = `Order ${formatRWF(amountNeeded)} more for FREE delivery!`
   } else {

@@ -148,7 +148,7 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
       }
       setAttempts(0)
       toast({
-        title: "Welcome, Admin! 🔐",
+        title: "Welcome, Admin! ",
         description: `Logged in as ${user.name}`,
       })
       // The AdminView will re-render and show the dashboard
@@ -215,7 +215,7 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
                 return
               }
               setMfaChallenge(null)
-              toast({ title: 'Welcome, Admin! 🔐', description: `Logged in as ${authenticated.name}` })
+              toast({ title: 'Welcome, Admin! ', description: `Logged in as ${authenticated.name}` })
             }}
           />
         </div>

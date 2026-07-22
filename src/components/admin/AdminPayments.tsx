@@ -325,10 +325,10 @@ export function AdminPayments() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="PAID">✅ Paid</SelectItem>
-            <SelectItem value="PENDING">⏳ Pending</SelectItem>
-            <SelectItem value="FAILED">❌ Failed</SelectItem>
-            <SelectItem value="REFUNDED">🔄 Refunded</SelectItem>
+            <SelectItem value="PAID"> Paid</SelectItem>
+            <SelectItem value="PENDING"> Pending</SelectItem>
+            <SelectItem value="FAILED"> Failed</SelectItem>
+            <SelectItem value="REFUNDED"> Refunded</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="outline" size="icon" onClick={load}>
@@ -395,7 +395,7 @@ export function AdminPayments() {
                       </td>
                       <td className="px-3 py-3">
                         <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_COLORS[t.status] || ""}`}>
-                          {t.status === "PAID" ? "✅ " : t.status === "FAILED" ? "❌ " : t.status === "REFUNDED" ? "🔄 " : "⏳ "}
+                          {t.status === "PAID" ? " " : t.status === "FAILED" ? " " : t.status === "REFUNDED" ? " " : " "}
                           {t.status}
                         </span>
                         {t.failureReason && (

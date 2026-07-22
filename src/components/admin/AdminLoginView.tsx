@@ -148,7 +148,7 @@ export function AdminLoginView() {
         useStore.getState().setAdminAuthenticated(true)
 
         toast({
-          title: "Welcome back, Admin! 🔐",
+          title: "Welcome back, Admin! ",
           description: "Logged in to admin panel successfully.",
         })
       } else {
@@ -256,7 +256,7 @@ export function AdminLoginView() {
           {failedAttempts > 0 && failedAttempts < MAX_ATTEMPTS && !error && (
             <div className="mb-4 rounded-lg bg-amber-50 p-3">
               <p className="text-center text-xs text-amber-700">
-                ⚠️ {MAX_ATTEMPTS - failedAttempts} attempt{MAX_ATTEMPTS - failedAttempts !== 1 ? "s" : ""} remaining before lockout
+                 {MAX_ATTEMPTS - failedAttempts} attempt{MAX_ATTEMPTS - failedAttempts !== 1 ? "s" : ""} remaining before lockout
               </p>
             </div>
           )}

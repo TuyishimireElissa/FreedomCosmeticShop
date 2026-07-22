@@ -111,28 +111,28 @@ export interface QuizStep {
 }
 
 export const CATEGORY_OPTIONS: QuizOption[] = [
-  { value: 'skin', labelKey: 'quiz.category_skin', icon: '🧴' },
-  { value: 'hair', labelKey: 'quiz.category_hair', icon: '💇' },
-  { value: 'makeup', labelKey: 'quiz.category_makeup', icon: '💄' },
+  { value: 'skin', labelKey: 'quiz.category_skin', icon: '' },
+  { value: 'hair', labelKey: 'quiz.category_hair', icon: '' },
+  { value: 'makeup', labelKey: 'quiz.category_makeup', icon: '' },
 ]
 
 export const CONCERN_OPTIONS: Record<QuizCategory, QuizOption[]> = {
-  skin: ['acne', 'dark_spots', 'dryness', 'oiliness', 'aging', 'uneven_tone', 'pores', 'glow', 'sensitivity'].map((value) => ({ value, labelKey: `quiz.concern_skin_${value}`, icon: '🌸' })),
-  hair: ['hair_loss', 'dryness', 'dandruff', 'growth', 'breakage', 'frizz', 'relaxer', 'natural', 'color'].map((value) => ({ value, labelKey: `quiz.concern_hair_${value}`, icon: '🌿' })),
-  makeup: ['coverage', 'natural_look', 'long_lasting', 'eyes', 'lips', 'glow', 'everyday'].map((value) => ({ value, labelKey: `quiz.concern_makeup_${value}`, icon: '✨' })),
+  skin: ['acne', 'dark_spots', 'dryness', 'oiliness', 'aging', 'uneven_tone', 'pores', 'glow', 'sensitivity'].map((value) => ({ value, labelKey: `quiz.concern_skin_${value}`, icon: '' })),
+  hair: ['hair_loss', 'dryness', 'dandruff', 'growth', 'breakage', 'frizz', 'relaxer', 'natural', 'color'].map((value) => ({ value, labelKey: `quiz.concern_hair_${value}`, icon: '' })),
+  makeup: ['coverage', 'natural_look', 'long_lasting', 'eyes', 'lips', 'glow', 'everyday'].map((value) => ({ value, labelKey: `quiz.concern_makeup_${value}`, icon: '' })),
 }
 
-export const SKIN_TYPE_OPTIONS: QuizOption[] = ['OILY', 'DRY', 'COMBINATION', 'NORMAL', 'SENSITIVE'].map((value) => ({ value, labelKey: `skin_types.${value}`, icon: '🧴' }))
-export const HAIR_TYPE_OPTIONS: QuizOption[] = ['NATURAL', 'RELAXED', 'WAVY', 'CURLY', 'COILY', 'ALL_HAIR'].map((value) => ({ value, labelKey: `hair_types.${value}`, icon: '💇' }))
+export const SKIN_TYPE_OPTIONS: QuizOption[] = ['OILY', 'DRY', 'COMBINATION', 'NORMAL', 'SENSITIVE'].map((value) => ({ value, labelKey: `skin_types.${value}`, icon: '' }))
+export const HAIR_TYPE_OPTIONS: QuizOption[] = ['NATURAL', 'RELAXED', 'WAVY', 'CURLY', 'COILY', 'ALL_HAIR'].map((value) => ({ value, labelKey: `hair_types.${value}`, icon: '' }))
 
 export const RESULT_OPTIONS: Record<QuizCategory, QuizOption[]> = {
-  skin: ['clear_skin', 'bright_skin', 'moisturized', 'even_tone', 'youthful', 'smooth'].map((value) => ({ value, labelKey: `quiz.result_skin_${value}`, icon: '✨' })),
-  hair: ['long_strong', 'moisturized_soft', 'smooth_shiny', 'defined_curls', 'clean_scalp'].map((value) => ({ value, labelKey: `quiz.result_hair_${value}`, icon: '🌿' })),
-  makeup: ['everyday_look', 'full_glam', 'office_look', 'glowing_skin'].map((value) => ({ value, labelKey: `quiz.result_makeup_${value}`, icon: '💄' })),
+  skin: ['clear_skin', 'bright_skin', 'moisturized', 'even_tone', 'youthful', 'smooth'].map((value) => ({ value, labelKey: `quiz.result_skin_${value}`, icon: '' })),
+  hair: ['long_strong', 'moisturized_soft', 'smooth_shiny', 'defined_curls', 'clean_scalp'].map((value) => ({ value, labelKey: `quiz.result_hair_${value}`, icon: '' })),
+  makeup: ['everyday_look', 'full_glam', 'office_look', 'glowing_skin'].map((value) => ({ value, labelKey: `quiz.result_makeup_${value}`, icon: '' })),
 }
 
-export const BUDGET_OPTIONS: QuizOption[] = (Object.keys(BUDGET_RANGES) as BudgetRange[]).map((value) => ({ value, labelKey: BUDGET_RANGES[value].translationKey, icon: '💰' }))
-export const SENSITIVITY_OPTIONS: QuizOption[] = ['none', 'some', 'high'].map((value) => ({ value, labelKey: `quiz.sensitivity_${value}`, icon: value === 'none' ? '✅' : '🌸' }))
+export const BUDGET_OPTIONS: QuizOption[] = (Object.keys(BUDGET_RANGES) as BudgetRange[]).map((value) => ({ value, labelKey: BUDGET_RANGES[value].translationKey, icon: '' }))
+export const SENSITIVITY_OPTIONS: QuizOption[] = ['none', 'some', 'high'].map((value) => ({ value, labelKey: `quiz.sensitivity_${value}`, icon: value === 'none' ? '' : '' }))
 
 export function getQuizStep(step: number, answers: Partial<QuizAnswers>): QuizStep {
   const category = answers.category || 'skin'

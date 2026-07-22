@@ -125,7 +125,7 @@ export function AdminMobilePanel() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || "Failed")
-      toast({ title: "✅ Order confirmed", description: json.message })
+      toast({ title: " Order confirmed", description: json.message })
       load()
     } catch (e) {
       toast({
@@ -154,7 +154,7 @@ export function AdminMobilePanel() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || "Failed")
-      toast({ title: "🚚 Order shipped", description: json.message })
+      toast({ title: " Order shipped", description: json.message })
       setShipOrderId(null)
       setRiderName("")
       setRiderPhone("")
@@ -265,7 +265,7 @@ export function AdminMobilePanel() {
         </h2>
         {data.pendingOrders.length === 0 ? (
           <p className="rounded-xl border border-dashed p-4 text-center text-xs text-muted-foreground">
-            ✅ No pending orders. All caught up!
+             No pending orders. All caught up!
           </p>
         ) : (
           <div className="space-y-2">

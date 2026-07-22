@@ -59,13 +59,13 @@ export default function ProductImageGallery({
   const altText = (image: StructuredProductImage) => language === 'rw' && image.altTextRw ? image.altTextRw : image.altText || productName
   const typeLabel = (imageType: string) => IMAGE_TYPE_KEYS[imageType] ? t(IMAGE_TYPE_KEYS[imageType]) : ''
   if (!activeImage) {
-    return <div className="flex aspect-square items-center justify-center rounded-2xl bg-gray-100 text-sm text-gray-500">{t('product.no_image_available')}</div>
+    return <div className="flex aspect-square items-center justify-center rounded-xl bg-gray-100 text-sm text-gray-500">{t('product.no_image_available')}</div>
   }
 
   return (
     <div className="space-y-3">
       <div
-        className={`group relative aspect-square overflow-hidden rounded-2xl bg-gray-50 ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+        className={`group relative aspect-square overflow-hidden rounded-xl bg-[#FAFAFA] ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
         onTouchStart={(event) => { touchStartX.current = event.touches[0].clientX }}
         onTouchEnd={(event) => {
           const difference = touchStartX.current - event.changedTouches[0].clientX
@@ -124,7 +124,7 @@ export default function ProductImageGallery({
       {gallery.length > 1 && (
         <div className="scrollbar-hide scroll-smooth-ios flex gap-2 overflow-x-auto pb-1">
           {gallery.map((image, index) => (
-            <button key={`${image.publicId || image.url}-thumb-${index}`} type="button" onClick={() => { setActiveIndex(index); setIsZoomed(false) }} className={`relative h-16 w-16 flex-none overflow-hidden rounded-xl border-2 bg-gray-50 transition-opacity sm:h-20 sm:w-20 ${index === activeIndex ? 'border-[#B76E79]' : 'border-gray-200 opacity-70 hover:opacity-100'}`} aria-label={altText(image)} aria-pressed={index === activeIndex}>
+            <button key={`${image.publicId || image.url}-thumb-${index}`} type="button" onClick={() => { setActiveIndex(index); setIsZoomed(false) }} className={`relative h-16 w-16 flex-none overflow-hidden rounded-xl border-2 bg-[#FAFAFA] transition-opacity sm:h-20 sm:w-20 ${index === activeIndex ? 'border-[#B76E79]' : 'border-gray-200 opacity-70 hover:opacity-100'}`} aria-label={altText(image)} aria-pressed={index === activeIndex}>
               <SmartImage publicId={image.publicId || undefined} fallbackSrc={image.url} context="thumbnail" alt={altText(image)} fill aspectRatio={1} className="object-contain p-1" />
               {image.imageType !== 'PRODUCT' && typeLabel(image.imageType) && <span className="absolute inset-x-0 bottom-0 truncate bg-black/70 px-1 py-0.5 text-xs leading-none text-white">{typeLabel(image.imageType)}</span>}
             </button>

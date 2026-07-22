@@ -218,9 +218,9 @@ const ROLE_DEFAULTS: Record<string, string[]> = {
 const DEPARTMENTS = ["SALES", "MARKETING", "LOGISTICS", "SUPPORT", "FINANCE", "MANAGEMENT"] as const
 
 const ROLE_BADGES: Record<string, { label: string; class: string; icon: string }> = {
-  ADMIN: { label: "Admin", class: "bg-rose-100 text-rose-700 border-rose-200", icon: "👑" },
-  MANAGER: { label: "Manager", class: "bg-violet-100 text-violet-700 border-violet-200", icon: "🛡️" },
-  STAFF: { label: "Staff", class: "bg-sky-100 text-sky-700 border-sky-200", icon: "👤" },
+  ADMIN: { label: "Admin", class: "bg-rose-100 text-rose-700 border-rose-200", icon: "" },
+  MANAGER: { label: "Manager", class: "bg-violet-100 text-violet-700 border-violet-200", icon: "" },
+  STAFF: { label: "Staff", class: "bg-sky-100 text-sky-700 border-sky-200", icon: "" },
 }
 
 const SEVERITY_BADGES: Record<string, { label: string; class: string }> = {
@@ -655,9 +655,9 @@ function StaffTab() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="STAFF">👤 Staff</SelectItem>
-                    <SelectItem value="MANAGER">🛡️ Manager</SelectItem>
-                    <SelectItem value="ADMIN">👑 Admin</SelectItem>
+                    <SelectItem value="STAFF"> Staff</SelectItem>
+                    <SelectItem value="MANAGER"> Manager</SelectItem>
+                    <SelectItem value="ADMIN"> Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -731,9 +731,9 @@ function StaffTab() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="STAFF">👤 Staff</SelectItem>
-                      <SelectItem value="MANAGER">🛡️ Manager</SelectItem>
-                      <SelectItem value="ADMIN">👑 Admin</SelectItem>
+                      <SelectItem value="STAFF"> Staff</SelectItem>
+                      <SelectItem value="MANAGER"> Manager</SelectItem>
+                      <SelectItem value="ADMIN"> Admin</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -837,7 +837,7 @@ function StaffTab() {
                       placeholder="12+ chars, upper/lower, number, symbol"
                     />
                     <p className="mt-1 text-[10px] text-amber-600">
-                      ⚠️ This will force a password reset for {editing.name}.
+                       This will force a password reset for {editing.name}.
                     </p>
                   </div>
                 )}
@@ -937,9 +937,9 @@ function ActivityTab() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All severities</SelectItem>
-            <SelectItem value="info">ℹ️ Info</SelectItem>
-            <SelectItem value="warn">⚠️ Warning</SelectItem>
-            <SelectItem value="critical">🚨 Critical</SelectItem>
+            <SelectItem value="info">ℹ Info</SelectItem>
+            <SelectItem value="warn"> Warning</SelectItem>
+            <SelectItem value="critical"> Critical</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="outline" size="icon" onClick={load}>
@@ -1227,7 +1227,7 @@ function SecurityTab() {
         </h3>
         {recentCritical.length === 0 ? (
           <p className="rounded-lg border border-dashed p-4 text-center text-xs text-muted-foreground">
-            ✅ No critical events recorded. All clear.
+             No critical events recorded. All clear.
           </p>
         ) : (
           <div className="space-y-2">
@@ -1296,9 +1296,9 @@ function SecurityTab() {
             <thead>
               <tr className="border-b bg-secondary/30 text-[10px] uppercase tracking-wider text-muted-foreground">
                 <th className="px-2 py-2 text-left font-medium">Capability</th>
-                <th className="px-2 py-2 text-center font-medium">👑 Admin</th>
-                <th className="px-2 py-2 text-center font-medium">🛡️ Manager</th>
-                <th className="px-2 py-2 text-center font-medium">👤 Staff</th>
+                <th className="px-2 py-2 text-center font-medium"> Admin</th>
+                <th className="px-2 py-2 text-center font-medium"> Manager</th>
+                <th className="px-2 py-2 text-center font-medium"> Staff</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -1323,9 +1323,9 @@ function SecurityTab() {
               ].map((row) => (
                 <tr key={row.cap} className="hover:bg-secondary/20">
                   <td className="px-2 py-1.5 font-medium">{row.cap}</td>
-                  <td className="px-2 py-1.5 text-center">{row.admin ? "✅" : "—"}</td>
-                  <td className="px-2 py-1.5 text-center">{row.mgr ? "✅" : "❌"}</td>
-                  <td className="px-2 py-1.5 text-center">{row.staff ? "✅" : "❌"}</td>
+                  <td className="px-2 py-1.5 text-center">{row.admin ? "" : "—"}</td>
+                  <td className="px-2 py-1.5 text-center">{row.mgr ? "" : ""}</td>
+                  <td className="px-2 py-1.5 text-center">{row.staff ? "" : ""}</td>
                 </tr>
               ))}
             </tbody>

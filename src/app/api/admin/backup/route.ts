@@ -24,7 +24,7 @@ export const dynamic = 'force-dynamic'
  * POST — Restore from a previously-downloaded backup JSON.
  *        Body: { backup: <backup-json-object> } or raw backup object in body.
  *        Mode: "preview" (dry-run, returns counts) or "apply" (writes to DB).
- *        ⚠️ Restore is destructive — it will UPSERT records based on ID.
+ *         Restore is destructive — it will UPSERT records based on ID.
  *        Only ADMIN role can perform backup/restore.
  */
 import { NextResponse } from "next/server"
@@ -201,7 +201,7 @@ export async function POST(req: Request) {
     }
 
     // Apply mode — UPSERT records
-    // ⚠️ This is destructive. We use upsert to handle both create + update.
+    //  This is destructive. We use upsert to handle both create + update.
     const results = {
       users: 0,
       products: 0,

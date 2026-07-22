@@ -7,7 +7,7 @@ type EmptyStateType = 'cart' | 'wishlist' | 'orders' | 'products' | 'reviews' | 
 
 export default function EmptyState({ type, query }: { type: EmptyStateType; query?: string }) {
   const t = useT()
-  const icons: Record<EmptyStateType, string> = { cart: '🛒', wishlist: '❤️', orders: '📦', products: '🔍', reviews: '⭐', search: '🔍' }
+  const icons: Record<EmptyStateType, string> = { cart: '', wishlist: '', orders: '', products: '', reviews: '', search: '' }
   const title = type === 'search' && query ? t('empty.search', { query }) : t(`empty.${type}`)
   const hint = type === 'search' ? t('empty.search_hint') : t(`empty.${type}_hint`)
   const canBrowse = ['cart', 'wishlist', 'orders', 'products', 'search'].includes(type)

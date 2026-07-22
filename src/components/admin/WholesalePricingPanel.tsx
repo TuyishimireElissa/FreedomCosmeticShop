@@ -164,7 +164,7 @@ export function WholesalePricingPanel({ productId, onClose }: WholesalePricingPa
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Save failed")
-      toast({ title: "✅ Wholesale pricing saved", description: `${tiers.length} tiers configured` })
+      toast({ title: " Wholesale pricing saved", description: `${tiers.length} tiers configured` })
       onClose?.()
     } catch (e) {
       toast({
@@ -341,7 +341,7 @@ export function WholesalePricingPanel({ productId, onClose }: WholesalePricingPa
         </div>
         {wholesaleProfit < 0 && (
           <p className="mt-2 rounded bg-red-50 p-2 text-[10px] text-red-700">
-            ⚠️ Warning: Lowest wholesale price is below cost price. You are losing {formatRWF(Math.abs(wholesaleProfit))} per unit.
+             Warning: Lowest wholesale price is below cost price. You are losing {formatRWF(Math.abs(wholesaleProfit))} per unit.
           </p>
         )}
       </div>

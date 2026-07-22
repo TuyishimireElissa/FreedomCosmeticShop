@@ -97,7 +97,7 @@ function loadEnv(): Env {
     const parsed = envSchema.safeParse(process.env)
     if (!parsed.success) {
       if (process.env.NODE_ENV === "production") {
-        console.warn("⚠️  Env validation warnings (non-blocking):", parsed.error.flatten().fieldErrors)
+        console.warn("  Env validation warnings (non-blocking):", parsed.error.flatten().fieldErrors)
         // Don't throw in production to allow fallback data to work
         return {
           NODE_ENV: "production" as const,
@@ -128,7 +128,7 @@ function loadEnv(): Env {
           ENABLE_REDIS_CACHE: false,
         } as unknown as Env
       } else {
-        console.warn("⚠️  Env validation warnings:", parsed.error.flatten().fieldErrors)
+        console.warn("  Env validation warnings:", parsed.error.flatten().fieldErrors)
         return envSchema.parse({ ...process.env })
       }
     }

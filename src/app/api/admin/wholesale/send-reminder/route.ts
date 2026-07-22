@@ -87,7 +87,7 @@ export async function POST(req: Request) {
       data: {
         userId,
         type: "SYSTEM",
-        title: type === "due" ? "Payment Due Reminder" : "⚠️ Overdue Payment",
+        title: type === "due" ? "Payment Due Reminder" : " Overdue Payment",
         body:
           type === "due"
             ? `Your invoice ${invoice?.invoiceNumber || ""} of ${invoice?.totalAmount || outstanding} RWF is due. Please pay to MTN MoMo: 078 XXX XXXX`

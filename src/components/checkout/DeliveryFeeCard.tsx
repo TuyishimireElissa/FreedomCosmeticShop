@@ -7,7 +7,7 @@
  *   - When no district: "Select your district"
  *   - When Kigali: "Same Day Delivery" + fee + time + free delivery progress
  *   - When province: "Standard Delivery" + fee + time
- *   - When free delivery: "🎉 FREE DELIVERY!" with strikethrough fee
+ *   - When free delivery: " FREE DELIVERY!" with strikethrough fee
  *
  * Usage:
  *   <DeliveryFeeCard district="Gasabo" orderTotal={25000} />
@@ -117,7 +117,7 @@ export function DeliveryFeeCard({ district, orderTotal, className = "" }: Delive
       {/* Same-day cutoff note */}
       {isSameDay && !isFree && (
         <p className="mt-2 text-xs text-muted-foreground">
-          ⏰ {t('delivery.cutoff')}
+           {t('delivery.cutoff')}
         </p>
       )}
     </div>

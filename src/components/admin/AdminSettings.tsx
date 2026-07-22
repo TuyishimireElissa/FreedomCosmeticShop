@@ -862,7 +862,7 @@ function DeliverySettings() {
         ))}
       </div>
       <p className="mt-4 rounded-lg bg-amber-50 p-3 text-xs text-amber-700">
-        💡 To change delivery fees, update the{" "}
+         To change delivery fees, update the{" "}
         <code className="rounded bg-amber-100 px-1">DELIVERY_FEES</code> constant in{" "}
         <code className="rounded bg-amber-100 px-1">src/lib/format.ts</code>
       </p>
@@ -990,12 +990,12 @@ function BackupManager() {
         <div className="mt-3 rounded-lg bg-secondary/30 p-3 text-xs text-muted-foreground">
           <p className="font-medium text-foreground">What&apos;s included:</p>
           <ul className="mt-1 space-y-0.5">
-            <li>✅ Users (without password hashes for security)</li>
-            <li>✅ Products + categories + brands</li>
-            <li>✅ Orders + order items + payments</li>
-            <li>✅ Deliveries, coupons, banners, delivery zone settings</li>
-            <li>✅ Staff profiles + recent activity logs (last 1000)</li>
-            <li>❌ Passwords, OTPs, refresh tokens (excluded for security)</li>
+            <li> Users (without password hashes for security)</li>
+            <li> Products + categories + brands</li>
+            <li> Orders + order items + payments</li>
+            <li> Deliveries, coupons, banners, delivery zone settings</li>
+            <li> Staff profiles + recent activity logs (last 1000)</li>
+            <li> Passwords, OTPs, refresh tokens (excluded for security)</li>
           </ul>
         </div>
         <Button
@@ -1040,7 +1040,7 @@ function BackupManager() {
           >
             <FileJson className="h-10 w-10 text-muted-foreground/60" />
             <p className="mt-2 text-sm font-medium">
-              {pendingBackup ? "Backup file loaded ✓" : "Click to select a .json backup file"}
+              {pendingBackup ? "Backup file loaded " : "Click to select a .json backup file"}
             </p>
             <p className="text-xs text-muted-foreground">
               {pendingBackup ? "Review the preview below, then click Restore" : "Max size: 50MB"}

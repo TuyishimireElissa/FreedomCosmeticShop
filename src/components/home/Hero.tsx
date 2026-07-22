@@ -37,7 +37,7 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
 
   return (
     <section
-      className="relative h-[280px] overflow-hidden bg-[#1a1a1a] sm:h-[340px] md:h-[440px] lg:h-[520px]"
+      className="relative h-[300px] overflow-hidden bg-[#1a1a1a] sm:h-[380px] md:h-[500px]"
       aria-label={t('home.hero_title')}
       aria-busy={loading}
     >
@@ -85,7 +85,7 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
 
       <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 md:px-12 lg:px-20">
         <div className="max-w-sm md:max-w-lg">
-          <h1 className="mb-3 text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
+          <h1 className="mb-3 text-4xl font-bold leading-[1.1] tracking-[-0.03em] text-white md:text-5xl lg:text-[56px]">
             {t('home.hero_title')}
           </h1>
           <p className="mb-5 text-sm leading-relaxed text-white/90 md:text-base lg:text-lg">
@@ -95,13 +95,13 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href="/products"
-              className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#B76E79] px-6 text-base font-semibold text-white shadow-lg shadow-[#B76E79]/30 transition-colors duration-150 hover:bg-[#a55d68]"
+              className="inline-flex min-h-12 items-center justify-center rounded-[10px] bg-[#B76E79] px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#9B5A64] active:scale-[0.98]"
             >
               {t('home.hero_cta_primary')}
             </Link>
             <Link
               href="/wholesale"
-              className="inline-flex min-h-12 items-center justify-center rounded-xl border-2 border-white/60 bg-white/15 px-6 text-base font-semibold text-white transition-colors duration-150 hover:bg-white/25"
+              className="inline-flex min-h-12 items-center justify-center rounded-[10px] border-2 border-white/70 bg-transparent px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-white/25"
             >
               {t('home.hero_cta_secondary')}
             </Link>

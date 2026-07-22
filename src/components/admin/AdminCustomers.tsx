@@ -167,10 +167,10 @@ const SEGMENT_BADGES: Record<Exclude<SegmentKey, "all">, string> = {
 }
 
 const LOYALTY_TIERS = [
-  { name: "Bronze",   min: 100,   color: "text-amber-700",   icon: "🥉" },
-  { name: "Silver",   min: 500,   color: "text-slate-500",   icon: "🥈" },
-  { name: "Gold",     min: 1000,  color: "text-yellow-600",  icon: "🥇" },
-  { name: "Platinum", min: 5000,  color: "text-indigo-600",  icon: "💎" },
+  { name: "Bronze",   min: 100,   color: "text-amber-700",   icon: "" },
+  { name: "Silver",   min: 500,   color: "text-slate-500",   icon: "" },
+  { name: "Gold",     min: 1000,  color: "text-yellow-600",  icon: "" },
+  { name: "Platinum", min: 5000,  color: "text-indigo-600",  icon: "" },
 ] as const
 
 const VIP_THRESHOLD = 100_000 // RWF total spent
@@ -1343,7 +1343,7 @@ function SmsModal({
           </div>
 
           <p className="rounded-lg bg-amber-50 px-3 py-2 text-[10px] text-amber-800">
-            ⚠️ Standard SMS rates apply. Bilingual (EN/KIN) messages count as 2 SMS per send.
+             Standard SMS rates apply. Bilingual (EN/KIN) messages count as 2 SMS per send.
           </p>
         </div>
 

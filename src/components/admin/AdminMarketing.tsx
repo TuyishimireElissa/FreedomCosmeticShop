@@ -236,11 +236,11 @@ const COUPON_TEMPLATES: { label: string; preset: CouponPreset }[] = [
 ]
 
 const PLACEMENT_LABELS: Record<string, { label: string; icon: string }> = {
-  HOME_HERO: { label: "Home Hero", icon: "🏠" },
-  HOME_PROMO: { label: "Home Promo", icon: "📣" },
-  SIDEBAR: { label: "Sidebar", icon: "📋" },
-  CATEGORY_TOP: { label: "Category Top", icon: "🏷️" },
-  CHECKOUT_BANNER: { label: "Checkout", icon: "💳" },
+  HOME_HERO: { label: "Home Hero", icon: "" },
+  HOME_PROMO: { label: "Home Promo", icon: "" },
+  SIDEBAR: { label: "Sidebar", icon: "" },
+  CATEGORY_TOP: { label: "Category Top", icon: "" },
+  CHECKOUT_BANNER: { label: "Checkout", icon: "" },
 }
 
 type SegmentKey = "all" | "vip" | "loyal" | "new" | "at_risk" | "regular"
@@ -792,10 +792,10 @@ function CouponsTab() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="active">✅ Active</SelectItem>
-            <SelectItem value="upcoming">🕐 Upcoming</SelectItem>
-            <SelectItem value="expired">⏰ Expired</SelectItem>
-            <SelectItem value="inactive">⏸️ Inactive</SelectItem>
+            <SelectItem value="active"> Active</SelectItem>
+            <SelectItem value="upcoming"> Upcoming</SelectItem>
+            <SelectItem value="expired"> Expired</SelectItem>
+            <SelectItem value="inactive"> Inactive</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -815,10 +815,10 @@ function CouponsTab() {
           {filtered.map((c) => {
             const status = couponStatus(c)
             const statusBadge: Record<string, { label: string; class: string }> = {
-              active: { label: "✅ Active", class: "bg-emerald-100 text-emerald-700" },
-              upcoming: { label: "🕐 Upcoming", class: "bg-sky-100 text-sky-700" },
-              expired: { label: "⏰ Expired", class: "bg-red-100 text-red-700" },
-              inactive: { label: "⏸️ Inactive", class: "bg-secondary text-secondary-foreground" },
+              active: { label: " Active", class: "bg-emerald-100 text-emerald-700" },
+              upcoming: { label: " Upcoming", class: "bg-sky-100 text-sky-700" },
+              expired: { label: " Expired", class: "bg-red-100 text-red-700" },
+              inactive: { label: " Inactive", class: "bg-secondary text-secondary-foreground" },
             }
             return (
               <div
@@ -1268,11 +1268,11 @@ function BannersTab() {
             const status = bannerStatus(b)
             const statusBadge: Record<string, { label: string; class: string }> = {
               live: { label: "● Live", class: "bg-emerald-100 text-emerald-700" },
-              scheduled: { label: "🕐 Scheduled", class: "bg-sky-100 text-sky-700" },
-              ended: { label: "⏰ Ended", class: "bg-secondary text-secondary-foreground" },
-              inactive: { label: "⏸️ Inactive", class: "bg-secondary text-secondary-foreground" },
+              scheduled: { label: " Scheduled", class: "bg-sky-100 text-sky-700" },
+              ended: { label: " Ended", class: "bg-secondary text-secondary-foreground" },
+              inactive: { label: " Inactive", class: "bg-secondary text-secondary-foreground" },
             }
-            const placement = PLACEMENT_LABELS[b.placement] || { label: b.placement, icon: "📍" }
+            const placement = PLACEMENT_LABELS[b.placement] || { label: b.placement, icon: "" }
             return (
               <div key={b.id} className="overflow-hidden rounded-xl border bg-card">
                 {/* Preview thumbnail */}
@@ -1813,8 +1813,8 @@ function CampaignsTab() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">🇬🇧 English only</SelectItem>
-                  <SelectItem value="rw">🇷🇼 Kinyarwanda only</SelectItem>
+                  <SelectItem value="en"> English only</SelectItem>
+                  <SelectItem value="rw"> Kinyarwanda only</SelectItem>
                   <SelectItem value="both">Both (EN + RW)</SelectItem>
                 </SelectContent>
               </Select>
@@ -1846,7 +1846,7 @@ function CampaignsTab() {
           {(language === "en" || language === "both") && (
             <div>
               <Label htmlFor="msg-en" className="text-xs">
-                🇬🇧 English message
+                 English message
               </Label>
               <Textarea
                 id="msg-en"
@@ -1865,7 +1865,7 @@ function CampaignsTab() {
           {(language === "rw" || language === "both") && (
             <div>
               <Label htmlFor="msg-rw" className="text-xs">
-                🇷🇼 Kinyarwanda message
+                 Kinyarwanda message
               </Label>
               <Textarea
                 id="msg-rw"
@@ -2037,7 +2037,7 @@ function ShareCouponModal({
   const [phone, setPhone] = useState("")
   const [sending, setSending] = useState(false)
 
-  const message = `🎁 Your code ${coupon.code} gives you ${formatDiscount(coupon)} on your next FreedomCosmeticShop order! Use it at checkout. Valid while supplies last.`
+  const message = ` Your code ${coupon.code} gives you ${formatDiscount(coupon)} on your next FreedomCosmeticShop order! Use it at checkout. Valid while supplies last.`
 
   const handleSend = async () => {
     if (!phone) {

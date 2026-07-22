@@ -14,14 +14,14 @@ interface CategoryGridProps {
 }
 
 const categoryIcons: Record<string, string> = {
-  skincare: '🧴',
-  makeup: '💄',
-  haircare: '💇🏾‍♀️',
-  'hair-care': '💇🏾‍♀️',
-  fragrance: '🌸',
-  'bath-body': '🛁',
-  'body-care': '🧼',
-  'mens-grooming': '🪒',
+  skincare: '',
+  makeup: '',
+  haircare: '',
+  'hair-care': '',
+  fragrance: '',
+  'bath-body': '',
+  'body-care': '',
+  'mens-grooming': '',
 }
 
 export function CategoryGrid({ categories, loading = false, error, onRetry }: CategoryGridProps) {
@@ -56,7 +56,7 @@ export function CategoryGrid({ categories, loading = false, error, onRetry }: Ca
           <div className="scrollbar-hide scroll-smooth-ios -mx-4 grid auto-cols-[88px] grid-flow-col grid-rows-2 gap-3 overflow-x-auto px-4 pb-2 touch-pan-x md:hidden">
             {categories.map((category) => (
               <button key={category.id} type="button" onClick={() => router.push(`/products?category=${encodeURIComponent(category.slug)}`)} className="flex h-20 w-[88px] touch-manipulation flex-col items-center justify-center gap-1 rounded-xl border border-gray-100 bg-white px-1 text-center shadow-sm transition-colors active:bg-rose-50">
-                <span className="text-3xl" aria-hidden="true">{categoryIcons[category.slug] || category.icon || '✨'}</span>
+                <span className="text-3xl" aria-hidden="true">{categoryIcons[category.slug] || category.icon || ''}</span>
                 <span className="w-full truncate text-xs font-medium leading-tight text-gray-700">{category.name}</span>
               </button>
             ))}
@@ -64,10 +64,10 @@ export function CategoryGrid({ categories, loading = false, error, onRetry }: Ca
           <div className="hidden gap-4 md:grid md:grid-cols-3 lg:grid-cols-6">
             {categories.slice(0, 6).map((category) => (
               <button key={category.id} type="button" onClick={() => router.push(`/products?category=${encodeURIComponent(category.slug)}`)} className="group relative aspect-square overflow-hidden rounded-2xl bg-[#f4e8ea] text-left shadow-[0_7px_24px_rgba(26,26,26,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_34px_rgba(183,110,121,0.18)]">
-                {category.image ? <img src={category.image} alt={category.name} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" /> : <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#f9edef] to-[#e8cdd2]"><span className="text-5xl" aria-hidden="true">{categoryIcons[category.slug] || '✨'}</span></div>}
+                {category.image ? <img src={category.image} alt={category.name} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" /> : <div className="absolute inset-0 grid place-items-center bg-gradient-to-br from-[#f9edef] to-[#e8cdd2]"><span className="text-5xl" aria-hidden="true">{categoryIcons[category.slug] || ''}</span></div>}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-4">
-                  <span className="text-xl drop-shadow" aria-hidden="true">{categoryIcons[category.slug] || category.icon || '✨'}</span>
+                  <span className="text-xl drop-shadow" aria-hidden="true">{categoryIcons[category.slug] || category.icon || ''}</span>
                   <h3 className="mt-1 text-base font-extrabold text-white">{category.name}</h3>
                   <div className="mt-1 flex items-center justify-between gap-2">
                     <span className="truncate text-xs text-white/70">{t('home.products_count', { count: category._count?.products ?? 0 })}</span>

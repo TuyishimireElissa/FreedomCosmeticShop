@@ -91,7 +91,7 @@ export function ReviewsSection() {
                       {review.skinType && KNOWN_SKIN_TYPES.has(review.skinType) && <p className="text-xs text-gray-500">{t(`skin_types.${review.skinType}`)}</p>}
                     </div>
                   </div>
-                  {review.isVerified && <span className="shrink-0 text-xs font-medium text-green-700">✓ {t('product.verified_purchase')}</span>}
+                  {review.isVerified && <span className="shrink-0 text-xs font-medium text-green-700"> {t('product.verified_purchase')}</span>}
                 </div>
 
                 <p className="mt-2 line-clamp-1 text-xs text-gray-500">{t('home.purchased_product', { product: review.product.name })}</p>

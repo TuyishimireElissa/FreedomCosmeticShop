@@ -261,7 +261,7 @@ export function AdminOverview() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500"></span>
             </span>
-            🔴 LIVE WEBSITE ACTIVITY
+             LIVE WEBSITE ACTIVITY
           </h3>
           <span className="text-[10px] text-muted-foreground">Updates every 5s</span>
         </div>
@@ -308,7 +308,7 @@ export function AdminOverview() {
                     evt.type === "product" ? "bg-amber-100 text-amber-600" :
                     "bg-secondary text-muted-foreground"
                   }`}>
-                    {evt.type === "order" ? "🛒" : evt.type === "payment" ? "💳" : evt.type === "product" ? "📦" : "ℹ️"}
+                    {evt.type === "order" ? "" : evt.type === "payment" ? "" : evt.type === "product" ? "" : "ℹ"}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">{evt.title}</p>
@@ -436,7 +436,7 @@ export function AdminOverview() {
                   <div className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
                     <Clock className="h-2.5 w-2.5" />
                     {new Date(order.createdAt).toLocaleTimeString("en-RW", { hour: "2-digit", minute: "2-digit" })}
-                    <span className="ml-1">{order.paymentMethod === "MTN_MOMO" ? "💛" : order.paymentMethod === "AIRTEL_MONEY" ? "🔴" : order.paymentMethod === "CARD" ? "💳" : "💵"}</span>
+                    <span className="ml-1">{order.paymentMethod === "MTN_MOMO" ? "" : order.paymentMethod === "AIRTEL_MONEY" ? "" : order.paymentMethod === "CARD" ? "" : ""}</span>
                   </div>
                 </div>
               ))

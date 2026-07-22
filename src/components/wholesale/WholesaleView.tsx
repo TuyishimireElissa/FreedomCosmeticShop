@@ -137,7 +137,7 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
     <div>
       <section className="bg-gradient-to-br from-primary to-primary/80 px-4 py-16 text-primary-foreground sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl text-center">
-          <p className="text-5xl" aria-hidden="true">🏪</p>
+          <p className="text-5xl" aria-hidden="true"></p>
           <h1 className="mt-4 text-3xl font-bold sm:text-5xl">{t('wholesale.honest_hero_title')}</h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-primary-foreground/90 sm:text-lg">
             {t('wholesale.honest_hero_subtitle')}
@@ -169,7 +169,7 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {facts.map((fact) => (
-              <div key={fact.title} className="rounded-2xl border bg-card p-5">
+              <div key={fact.title} className="rounded-xl border bg-card p-5">
                 <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10">
                   <fact.icon className="h-5 w-5 text-primary" />
                 </div>
@@ -197,7 +197,7 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
 
       <section className="px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-2">
-          <div className="rounded-2xl border bg-card p-6">
+          <div className="rounded-xl border bg-card p-6">
             <h2 className="text-xl font-bold">{t('wholesale.honest_documents_title')}</h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{t('wholesale.honest_documents_initial')}</p>
             <ul className="mt-4 space-y-2 text-sm">
@@ -211,7 +211,7 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
             <p className="mt-4 text-xs text-muted-foreground">{t('wholesale.honest_documents_upload_notice')}</p>
           </div>
 
-          <div className="rounded-2xl border bg-card p-6">
+          <div className="rounded-xl border bg-card p-6">
             <h2 className="text-xl font-bold">{t('wholesale.honest_process_title')}</h2>
             <ol className="mt-4 space-y-4">
               {[1, 2, 3].map((step) => (
@@ -426,7 +426,7 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
 
       {/* Step 1: Business Information */}
       {step === 1 && (
-        <div className="space-y-4 rounded-2xl border bg-card p-6">
+        <div className="space-y-4 rounded-xl border bg-card p-6">
           <FormField id="biz-name" label={t('wholesale.business_name')} required error={fieldErrors.businessName} value={businessName} onChange={(event) => { setBusinessName(event.target.value); setFieldErrors((current) => ({ ...current, businessName: '' })) }} placeholder="Amina Beauty Salon" />
           <FormSelect id="biz-type" label={t('wholesale.business_type')} required value={businessType} onChange={(event) => setBusinessType(event.target.value)} options={BUSINESS_TYPES.map((businessTypeOption) => ({ value: businessTypeOption.value, label: t(businessTypeOption.label) }))} />
           <FormField id="biz-phone" label={t('wholesale.business_phone')} required error={fieldErrors.businessPhone} type="tel" value={businessPhone} onChange={(event) => { setBusinessPhone(event.target.value); setFieldErrors((current) => ({ ...current, businessPhone: '' })) }} placeholder="+250 780 000 001" autoComplete="tel" />
@@ -444,7 +444,7 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
 
       {/* Step 2: Owner Information */}
       {step === 2 && (
-        <div className="space-y-4 rounded-2xl border bg-card p-6">
+        <div className="space-y-4 rounded-xl border bg-card p-6">
           <FormField id="owner-name" label={t('wholesale.owner_full_name')} required error={fieldErrors.ownerName} value={ownerName} onChange={(event) => { setOwnerName(event.target.value); setFieldErrors((current) => ({ ...current, ownerName: '' })) }} placeholder="Amina Uwase" autoComplete="name" />
           <FormField id="owner-phone" label={t('wholesale.owner_phone')} required error={fieldErrors.ownerPhone} type="tel" value={ownerPhone} onChange={(event) => { setOwnerPhone(event.target.value); setFieldErrors((current) => ({ ...current, ownerPhone: '' })) }} placeholder="+250 780 000 001" autoComplete="tel" />
           <FormField id="owner-email" label={t('wholesale.owner_email_optional')} type="email" value={ownerEmail} onChange={(event) => setOwnerEmail(event.target.value)} placeholder="amina@gmail.com" autoComplete="email" />
@@ -459,9 +459,9 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
 
       {/* Step 3: Documents & Submit */}
       {step === 3 && (
-        <div className="space-y-4 rounded-2xl border bg-card p-6">
+        <div className="space-y-4 rounded-xl border bg-card p-6">
           <div className="rounded-lg border border-dashed p-4 text-center">
-            <p className="text-sm font-medium">📎 {t('wholesale.document_upload')}</p>
+            <p className="text-sm font-medium"> {t('wholesale.document_upload')}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               {t('wholesale.documents_hint')}
             </p>
@@ -533,7 +533,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
   }, [user, load])
 
   if (loading) {
-    return <div className="mx-auto max-w-md px-4 py-20"><Skeleton className="h-48 w-full rounded-2xl" /></div>
+    return <div className="mx-auto max-w-md px-4 py-20"><Skeleton className="h-48 w-full rounded-xl" /></div>
   }
 
   if (!user) {
@@ -568,7 +568,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
   if (status === 'PENDING') {
     return (
       <div className="mx-auto max-w-md px-4 py-12">
-        <div className="rounded-2xl border bg-card p-8 text-center">
+        <div className="rounded-xl border bg-card p-8 text-center">
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-amber-100"><Clock className="h-8 w-8 text-amber-600" /></div>
           <h1 className="mt-4 text-xl font-bold">{t('wholesale.under_review')}</h1>
           <p className="mt-1 font-mono text-sm text-muted-foreground">{t('wholesale.application_id')}: {applicationId}</p>
@@ -592,7 +592,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
   if (status === 'APPROVED') {
     return (
       <div className="mx-auto max-w-md px-4 py-12">
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center">
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-8 text-center">
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500"><CheckCircle2 className="h-8 w-8 text-white" /></div>
           <h1 className="mt-4 text-xl font-bold text-emerald-900">{t('wholesale.approved_title')}</h1>
           <p className="mt-2 text-sm leading-6 text-emerald-800">{t('wholesale.honest_approved_pricing')}</p>
@@ -609,7 +609,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
   if (status === 'REJECTED') {
     return (
       <div className="mx-auto max-w-md px-4 py-12">
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center">
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-red-100"><XCircle className="h-8 w-8 text-red-600" /></div>
           <h1 className="mt-4 text-xl font-bold text-red-900">{t('wholesale.not_approved')}</h1>
           <p className="mt-2 text-sm text-red-700">{t('wholesale.not_approved_hint')}</p>
@@ -644,7 +644,7 @@ function WholesaleSuccessPage({ onCheckStatus, onContinue }: { onCheckStatus: ()
   const t = useT()
   return (
     <div className="mx-auto max-w-md px-4 py-12">
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8 text-center">
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-8 text-center">
         <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500">
           <CheckCircle2 className="h-8 w-8 text-white" />
         </div>

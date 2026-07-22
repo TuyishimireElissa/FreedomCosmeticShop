@@ -417,7 +417,7 @@ export function AdminAnalytics() {
           </h3>
           {data.lowStock.length === 0 ? (
             <p className="mt-3 text-sm text-muted-foreground">
-              All products are well-stocked. ✅
+              All products are well-stocked.
             </p>
           ) : (
             <ul className="mt-3 space-y-2">

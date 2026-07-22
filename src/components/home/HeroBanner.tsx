@@ -179,7 +179,7 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
                   <div className="mt-4 hidden flex-wrap gap-x-5 gap-y-2 sm:flex md:mt-7 text-xs font-medium text-white/80 sm:text-xs">
                     <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-emerald-400" />{t('footer.genuine')}</span>
                     <span className="flex items-center gap-1.5"><Truck className="h-4 w-4 text-[#FFD700]" />{t('footer.all_districts')}</span>
-                    <span>💛 MTN MoMo</span>
+                    <span> MTN MoMo</span>
                   </div>
                 </div>
               </div>

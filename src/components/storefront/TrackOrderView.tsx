@@ -130,11 +130,11 @@ export function TrackOrderView() {
 
       // Show a toast notification for the status change
       const statusMessages: Record<string, string> = {
-        confirmed: `✅ ${t('orders.realtime_confirmed')}`,
-        processing: `📦 ${t('orders.realtime_processing')}`,
-        shipped: `🚚 ${t('orders.realtime_shipped')}`,
-        delivered: `🎉 ${t('orders.realtime_delivered')}`,
-        cancelled: `❌ ${t('orders.realtime_cancelled')}`,
+        confirmed: ` ${t('orders.realtime_confirmed')}`,
+        processing: ` ${t('orders.realtime_processing')}`,
+        shipped: ` ${t('orders.realtime_shipped')}`,
+        delivered: ` ${t('orders.realtime_delivered')}`,
+        cancelled: ` ${t('orders.realtime_cancelled')}`,
       }
       const action = event.replace("order:", "")
       const message = statusMessages[action]
@@ -179,7 +179,7 @@ export function TrackOrderView() {
         })
         .catch(() => {})
       toast({
-        title: `🏍️ ${t('orders.rider_assigned')}`,
+        title: ` ${t('orders.rider_assigned')}`,
         description: d.riderName
           ? `${d.riderName} — ${d.riderPhone || t('orders.phone_pending')}`
           : t('orders.on_the_way'),

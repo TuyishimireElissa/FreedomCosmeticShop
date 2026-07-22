@@ -19,7 +19,6 @@ import { Product } from "@/lib/types"
 import { useStore } from "@/store/useStore"
 import { formatRWF } from "@/lib/format"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Star, Plus, Check, ShieldCheck } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/lib/i18n/LanguageContext"
@@ -54,6 +53,17 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   const lowStock = product.isLowStock ?? (product.stock > 0 && product.stock <= product.lowStockThreshold)
   const isNewArrival = product.isNewArrival === true
   const isBestSeller = product.isBestSeller === true
+  const cardBadge = outOfStock
+    ? null
+    : hasDiscount
+      ? { label: `-${discountPercent}%`, className: 'bg-[#D64045] text-white' }
+      : isBestSeller
+        ? { label: t('categories.best_sellers'), className: 'bg-[#B76E79] text-white' }
+        : isNewArrival
+          ? { label: t('common.new'), className: 'bg-[#2D8A4E] text-white' }
+          : lowStock
+            ? { label: t('common.low_stock', { count: product.stock }), className: 'bg-[#E8A838] text-white' }
+            : null
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -80,7 +90,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
       : hasDiscount
         ? `-${discountPercent}%`
         : isBestSeller
-          ? `🔥 ${t('categories.best_sellers')}`
+          ? t('categories.best_sellers')
           : isNewArrival
             ? t('common.new')
             : null
@@ -92,7 +102,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
         className="block h-full touch-manipulation rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]"
       >
         <article className="h-full w-full overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-transform duration-150 active:scale-[0.98]">
-          <div className="relative aspect-[4/5] overflow-hidden bg-white">
+          <div className="relative aspect-square overflow-hidden bg-white">
             <SmartImage
               publicId={primaryImage?.publicId || undefined}
               fallbackSrc={primaryImage?.url || '/placeholder.svg'}
@@ -128,10 +138,10 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
   return (
     <article
       onClick={() => router.push(`/products/${product.slug}`)}
-      className="group bg-card relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+      className="group bg-card relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-[#EEEEEE] shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]"
     >
       {/* Image */}
-      <div className="relative aspect-[4/5] overflow-hidden bg-white">
+      <div className="relative aspect-square overflow-hidden bg-white">
         {primaryImage ? (
           <SmartImage
             publicId={primaryImage?.publicId || undefined}
@@ -150,28 +160,10 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
           </div>
         )}
 
-        {/* Top-left badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1.5">
-          {hasDiscount && (
-            <Badge className="bg-primary text-primary-foreground shadow">-{discountPercent}%</Badge>
-          )}
-          {isBestSeller && <Badge className="bg-orange-500 text-white shadow">🔥 {t('categories.best_sellers')}</Badge>}
-          {isNewArrival && <Badge className="bg-emerald-600 text-white shadow">{t('common.new')}</Badge>}
-          {lowStock && <Badge aria-hidden="true" className="bg-amber-500 text-white shadow">{t('common.low_stock', { count: product.stock })}</Badge>}
-        </div>
+        {/* One concise status badge maximum. */}
+        {cardBadge && <span className={`absolute left-2 top-2 rounded-full px-2.5 py-1 text-[10px] font-medium ${cardBadge.className}`}>{cardBadge.label}</span>}
 
-        {product.isAuthentic === true && (
-          <div className="absolute top-2 right-2 flex flex-col items-end gap-1.5">
-            <Badge
-              variant="outline"
-              className="border-emerald-500/30 bg-background/90 text-emerald-700 shadow backdrop-blur"
-              title={t('product.authenticity_verified')}
-            >
-              <ShieldCheck className="mr-1 h-3 w-3" />
-              {t('common.authentic')}
-            </Badge>
-          </div>
-        )}
+
 
         {/* Out-of-stock overlay */}
         {outOfStock && (
@@ -190,6 +182,7 @@ export function ProductCard({ product, compact = false }: ProductCardProps) {
             {product.brand.name}
           </p>
         )}
+        {product.isAuthentic === true && <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-[#2D8A4E]"><ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />{t('product.authenticity_verified')}</p>}
         <h3 className="mt-0.5 line-clamp-2 text-sm leading-snug font-medium sm:text-[15px]">
           {product.name}
         </h3>
