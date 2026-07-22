@@ -156,7 +156,8 @@ async function sendViaPindo(
   to: string,
   message: string
 ): Promise<SmsProviderResult> {
-  if (!env.PINDO_API_KEY) {
+  const pindoToken = env.PINDO_API_KEY || env.PINDO_API_TOKEN || process.env.PINDO_API_TOKEN
+  if (!pindoToken) {
     throw new Error(resolveTranslation('en', 'sms.pindo_not_configured'))
   }
 
@@ -167,7 +168,7 @@ async function sendViaPindo(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${env.PINDO_API_KEY}`,
+      Authorization: `Bearer ${pindoToken}`,
     },
     body: JSON.stringify({
       to: normalized,

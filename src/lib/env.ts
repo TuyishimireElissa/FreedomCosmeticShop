@@ -52,6 +52,7 @@ const envSchema = z.object({
   AT_USERNAME: z.string().optional(),
   AT_API_KEY: z.string().optional(),
   PINDO_API_KEY: z.string().optional(),
+  PINDO_API_TOKEN: z.string().optional(),
   AT_SENDER_ID: z.string().max(11).optional(),
 
   // Cloudinary - dohoc0tmp
@@ -159,8 +160,16 @@ function loadEnv(): Env {
 
 export const env = loadEnv()
 
+const africasTalkingConfigured = Boolean(process.env.AT_API_KEY && process.env.AT_USERNAME)
+const pindoConfigured = Boolean(process.env.PINDO_API_KEY || process.env.PINDO_API_TOKEN)
+export const smsConfiguration = {
+  configured: africasTalkingConfigured || pindoConfigured,
+  provider: africasTalkingConfigured ? 'AFRICAS_TALKING' : pindoConfigured ? 'PINDO' : null,
+} as const
+
 export const features = {
-  sms: env.ENABLE_SMS_NOTIFICATIONS,
+  // Credentials, not a stale feature flag, determine whether OTP delivery is usable.
+  sms: smsConfiguration.configured,
   email: env.ENABLE_EMAIL_NOTIFICATIONS,
   realPayments: env.ENABLE_REAL_PAYMENTS,
   searchIndexing: env.ENABLE_SEARCH_INDEXING,

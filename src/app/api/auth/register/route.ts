@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server'
 import { registerWithoutOtp, startRegistration } from '@/server/services/auth'
 import { setAuthCookies } from '@/lib/auth'
-import { features } from '@/lib/env'
+import { smsConfiguration } from '@/lib/env'
 import { rateLimit } from '@/lib/permissions'
 
 export async function POST(req: Request) {
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     if (!limit.allowed) return NextResponse.json({ error: 'Too many registration attempts. Please try again later.' }, { status: 429 })
     const body = await req.json()
 
-    if (!features.sms) {
+    if (!smsConfiguration.configured) {
       const result = await registerWithoutOtp(body)
       const response = NextResponse.json({ success: true, verificationRequired: false, user: result.user, message: 'Registration successful.' }, { status: 201 })
       return setAuthCookies(response, result.accessToken, result.refreshToken)

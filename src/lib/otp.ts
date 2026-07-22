@@ -72,7 +72,7 @@ export async function createOtp(options: CreateOtpOptions): Promise<CreateOtpRes
   }
 
   if (process.env.NODE_ENV === 'production' && !features.sms) {
-    return { success: false, error: 'SMS verification is temporarily unavailable. Please try again later.' }
+    return { success: false, error: 'SMS provider is not configured for this verification flow.' }
   }
 
   const code = generateOtpCode()

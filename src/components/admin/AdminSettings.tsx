@@ -103,6 +103,8 @@ export function AdminSettings() {
         </p>
       </div>
 
+      <SmsStatusCard />
+
       <Tabs defaultValue="logo">
         <TabsList className="mb-4 grid w-full max-w-md grid-cols-5">
           <TabsTrigger value="logo">Logo</TabsTrigger>
@@ -129,6 +131,32 @@ export function AdminSettings() {
         </TabsContent>
       </Tabs>
     </div>
+  )
+}
+
+interface SmsStatus {
+  configured: boolean
+  provider: 'AFRICAS_TALKING' | 'PINDO' | null
+  registrationRequiresOtp: boolean
+  message: string
+}
+
+function SmsStatusCard() {
+  const [status, setStatus] = useState<SmsStatus | null>(null)
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch('/api/admin/sms-status', { cache: 'no-store', signal: controller.signal })
+      .then((response) => response.ok ? response.json() as Promise<SmsStatus> : null)
+      .then((value) => { if (value) setStatus(value) })
+      .catch(() => {})
+    return () => controller.abort()
+  }, [])
+  if (!status) return null
+  return (
+    <section className={`mb-5 flex items-start gap-3 rounded-xl border p-4 ${status.configured ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`} aria-live="polite">
+      {status.configured ? <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" /> : <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />}
+      <div><h3 className="font-semibold text-gray-900">SMS verification: {status.configured ? 'Configured' : 'Not configured'}</h3><p className="mt-1 text-sm leading-6 text-gray-700">{status.message}</p>{status.provider && <p className="mt-1 text-xs font-semibold text-gray-600">Provider: {status.provider.replace('_', ' ')}</p>}</div>
+    </section>
   )
 }
 
