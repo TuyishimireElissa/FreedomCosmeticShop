@@ -29,7 +29,8 @@ export default function AdminProductImageManager({ productId, productName, onCha
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [workingId, setWorkingId] = useState<string | null>(null)
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
+  const [previews, setPreviews] = useState<string[]>([])
   const [imageType, setImageType] = useState('PRODUCT')
   const [altText, setAltText] = useState(productName)
   const [altTextRw, setAltTextRw] = useState('')
@@ -50,31 +51,38 @@ export default function AdminProductImageManager({ productId, productName, onCha
   }, [productId, toast])
 
   useEffect(() => { void load() }, [load])
+  useEffect(() => {
+    const urls = files.map((selected) => URL.createObjectURL(selected))
+    setPreviews(urls)
+    return () => urls.forEach((url) => URL.revokeObjectURL(url))
+  }, [files])
 
   const upload = async () => {
-    if (!file || altText.trim().length < 2) {
+    if (files.length === 0 || altText.trim().length < 2) {
       toast({ title: 'Choose an image and add descriptive alt text', variant: 'destructive' })
       return
     }
     setUploading(true)
     try {
-      const body = new FormData()
-      body.set('file', file)
-      body.set('imageType', imageType)
-      body.set('altText', altText.trim())
-      body.set('altTextRw', altTextRw.trim())
-      body.set('isPrimary', String(isPrimary))
-      const response = await fetch(`/api/admin/products/${productId}/images`, { method: 'POST', body })
-      const result = await response.json().catch(() => ({}))
-      if (!response.ok) throw new Error(result.error || 'Upload failed')
-      setFile(null)
+      for (const [index, selectedFile] of files.entries()) {
+        const body = new FormData()
+        body.set('file', selectedFile)
+        body.set('imageType', imageType)
+        body.set('altText', files.length === 1 ? altText.trim() : `${altText.trim()} ${index + 1}`)
+        body.set('altTextRw', altTextRw.trim())
+        body.set('isPrimary', String(isPrimary && index === 0))
+        const response = await fetch(`/api/admin/products/${productId}/images`, { method: 'POST', body })
+        const result = await response.json().catch(() => ({}))
+        if (!response.ok) throw new Error(result.error || `Upload failed for ${selectedFile.name}`)
+      }
+      setFiles([])
       setImageType('PRODUCT')
       setAltText(productName)
       setAltTextRw('')
       setIsPrimary(false)
       const input = document.getElementById(`product-image-file-${productId}`) as HTMLInputElement | null
       if (input) input.value = ''
-      toast({ title: 'Product image uploaded', description: `${result.image.imageType} · ${productName}` })
+      toast({ title: files.length === 1 ? 'Product image uploaded' : 'Product images uploaded', description: `${files.length} file${files.length === 1 ? '' : 's'} · ${productName}` })
       await load()
       onChanged?.()
     } catch (error) {
@@ -123,13 +131,14 @@ export default function AdminProductImageManager({ productId, productName, onCha
         <h3 className="flex items-center gap-2 font-semibold"><ImagePlus className="h-4 w-4 text-[#B76E79]" />Upload to Cloudinary</h3>
         <p className="mt-1 text-xs text-muted-foreground">JPEG, PNG, or WebP · maximum 8 MB · saved in freedomcosmeticshop/products</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div className="sm:col-span-2"><Label htmlFor={`product-image-file-${productId}`}>Image file *</Label><Input id={`product-image-file-${productId}`} type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => setFile(event.target.files?.[0] || null)} /></div>
+          <div className="sm:col-span-2"><Label htmlFor={`product-image-file-${productId}`}>Image files *</Label><Input id={`product-image-file-${productId}`} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(event) => setFiles(Array.from(event.target.files || []).slice(0, Math.max(0, 20 - images.length)))} /></div>
+          {previews.length > 0 && <div className="sm:col-span-2"><p className="mb-2 text-xs font-medium text-muted-foreground">Selected image preview</p><div className="grid grid-cols-3 gap-3 sm:grid-cols-5">{previews.map((url, index) => <div key={url} className="relative aspect-square overflow-hidden rounded-xl bg-gray-100"><img src={url} alt={`Selected upload ${index + 1}`} className="h-full w-full object-cover" /><button type="button" onClick={() => setFiles((current) => current.filter((_, fileIndex) => fileIndex !== index))} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-red-600 text-xs font-bold text-white" aria-label={`Remove selected image ${index + 1}`}><Trash2 className="h-3.5 w-3.5" /></button></div>)}</div></div>}
           <div><Label>Image purpose *</Label><Select value={imageType} onValueChange={setImageType}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{IMAGE_TYPES.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent></Select></div>
           <label className="flex items-end gap-2 pb-2 text-sm"><Checkbox checked={isPrimary} onCheckedChange={(value) => setIsPrimary(value === true)} />Make primary product image</label>
           <div><Label htmlFor={`image-alt-${productId}`}>English alt text *</Label><Input id={`image-alt-${productId}`} value={altText} maxLength={300} onChange={(event) => setAltText(event.target.value)} /></div>
           <div><Label htmlFor={`image-alt-rw-${productId}`}>Kinyarwanda alt text</Label><Input id={`image-alt-rw-${productId}`} value={altTextRw} maxLength={300} onChange={(event) => setAltTextRw(event.target.value)} /></div>
         </div>
-        <Button type="button" onClick={upload} disabled={uploading || !file || altText.trim().length < 2} className="mt-4">{uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImagePlus className="mr-2 h-4 w-4" />}Upload image</Button>
+        <Button type="button" onClick={upload} disabled={uploading || files.length === 0 || altText.trim().length < 2} className="mt-4">{uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImagePlus className="mr-2 h-4 w-4" />}{uploading ? 'Uploading…' : `Upload ${files.length || ''} image${files.length === 1 ? '' : 's'}`}</Button>
       </div>
 
       <div>

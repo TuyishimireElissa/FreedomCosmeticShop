@@ -55,7 +55,7 @@ server.log
 # Skills directory
 /skills/.env
 db/
-upload/
+/upload/
 
 # Local recovery deliverables (not production source)
 /FreedomCosmeticShop-*-files.zip

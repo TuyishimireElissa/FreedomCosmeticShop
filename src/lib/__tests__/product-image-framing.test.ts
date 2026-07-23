@@ -16,6 +16,7 @@ describe('product image framing', () => {
 
   it('resolves API and legacy image fields with the same scalar used by cart', () => {
     for (const field of ['product.images', 'product.image', 'product.imageUrl', 'product.productImages', 'product.thumbnailUrl']) expect(card).toContain(field)
+    expect(card.indexOf('product.productImages')).toBeLessThan(card.indexOf('product.images'))
     expect(card).toContain('<img')
     expect(card).toContain('src={imageUrl}')
     expect(cart).toContain('src={item.image}')

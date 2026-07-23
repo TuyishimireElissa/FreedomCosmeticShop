@@ -1,8 +1,10 @@
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+export const maxDuration = 30
 
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import cloudinary from '@/lib/cloudinary'
+import cloudinary, { cloudinaryIsConfigured, uploadImageBuffer } from '@/lib/cloudinary'
 import { prisma } from '@/lib/prisma'
 import { requirePermission, PERMISSIONS, rateLimit } from '@/lib/permissions'
 import { logActivity } from '@/server/services/activity'
@@ -26,6 +28,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   let uploadedPublicId = ''
   try {
     const admin = await requirePermission(PERMISSIONS.PRODUCTS_UPDATE)
+    if (!cloudinaryIsConfigured()) return NextResponse.json({ success: false, error: 'Cloudinary is not configured' }, { status: 503 })
     const limit = rateLimit(`admin:${admin.id}:product-image-upload`, { maxActions: 20, windowMs: 60_000 })
     if (!limit.allowed) return NextResponse.json({ success: false, error: 'Too many uploads. Try again later.' }, { status: 429 })
 
@@ -50,24 +53,16 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const count = await prisma.productImage.count({ where: { productId: id } })
     if (count >= 20) return NextResponse.json({ success: false, error: 'A product can have at most 20 structured images' }, { status: 400 })
 
-    const buffer = Buffer.from(await file.arrayBuffer())
-    const dataUri = `data:${file.type};base64,${buffer.toString('base64')}`
-    const upload = await cloudinary.uploader.upload(dataUri, {
-      folder: 'freedomcosmeticshop/products',
-      resource_type: 'image',
-      unique_filename: true,
-      overwrite: false,
-      transformation: [{ width: 1600, height: 1600, crop: 'limit' }, { quality: 'auto:good' }, { fetch_format: 'auto' }],
-    })
-    uploadedPublicId = upload.public_id
+    const upload = await uploadImageBuffer(Buffer.from(await file.arrayBuffer()), 'freedomcosmeticshop/products')
+    uploadedPublicId = upload.publicId
     const makePrimary = requestedPrimary || count === 0
     const image = await prisma.$transaction(async (tx) => {
       if (makePrimary) await tx.productImage.updateMany({ where: { productId: id, isPrimary: true }, data: { isPrimary: false } })
-      return tx.productImage.create({
+      const created = await tx.productImage.create({
         data: {
           productId: id,
-          publicId: upload.public_id,
-          url: upload.secure_url,
+          publicId: upload.publicId,
+          url: upload.url,
           altText,
           altTextRw: altTextRw || null,
           imageType: imageType.data,
@@ -75,6 +70,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           isPrimary: makePrimary,
         },
       })
+      const currentImages = await tx.productImage.findMany({ where: { productId: id }, orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }], select: { url: true } })
+      await tx.product.update({ where: { id }, data: { images: JSON.stringify(currentImages.map((entry) => entry.url)) } })
+      return created
     })
 
     void logActivity({ userId: admin.id, userName: admin.name, userRole: admin.role, action: 'PRODUCT_IMAGE_UPLOAD', entityType: 'PRODUCT', entityId: id, description: `Uploaded ${image.imageType} image for ${product.name}`, req }).catch(() => {})

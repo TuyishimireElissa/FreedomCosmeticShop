@@ -21,8 +21,16 @@ interface ProductCardProps {
   onToggleWishlist?: () => void
 }
 
-/** Resolve the public API's `images`/`productImages` fields and legacy aliases. */
+/** Prefer newly uploaded structured images, then fall back to legacy URL fields. */
 export function getImageUrl(product: ProductWithImageFallbacks): string | null {
+  const structuredImages: unknown = product.productImages
+  if (Array.isArray(structuredImages)) {
+    const primary = structuredImages.find((value): value is ProductImage => typeof value === 'object' && value !== null && 'isPrimary' in value && value.isPrimary === true)
+    const candidate: unknown = primary || structuredImages[0]
+    if (typeof candidate === 'string' && candidate.trim()) return candidate
+    if (typeof candidate === 'object' && candidate !== null && 'url' in candidate && typeof candidate.url === 'string' && candidate.url.trim()) return candidate.url
+  }
+
   const legacyImages: unknown = product.images
   if (Array.isArray(legacyImages)) {
     const first = legacyImages.find((value): value is string => typeof value === 'string' && value.trim().length > 0)
@@ -39,19 +47,9 @@ export function getImageUrl(product: ProductWithImageFallbacks): string | null {
     }
   }
 
-  for (const value of [product.image, product.imageUrl]) {
+  for (const value of [product.image, product.imageUrl, product.thumbnailUrl]) {
     if (typeof value === 'string' && value.trim()) return value
   }
-
-  const structuredImages: unknown = product.productImages
-  if (Array.isArray(structuredImages)) {
-    const primary = structuredImages.find((value): value is ProductImage => typeof value === 'object' && value !== null && 'isPrimary' in value && value.isPrimary === true)
-    const candidate: unknown = primary || structuredImages[0]
-    if (typeof candidate === 'string' && candidate.trim()) return candidate
-    if (typeof candidate === 'object' && candidate !== null && 'url' in candidate && typeof candidate.url === 'string' && candidate.url.trim()) return candidate.url
-  }
-
-  if (typeof product.thumbnailUrl === 'string' && product.thumbnailUrl.trim()) return product.thumbnailUrl
   return null
 }
 

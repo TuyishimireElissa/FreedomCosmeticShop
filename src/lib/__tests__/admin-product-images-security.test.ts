@@ -8,7 +8,7 @@ const imageRoute = readFileSync(resolve(process.cwd(), 'src/app/api/admin/produc
 describe('admin structured product image security', () => {
   it('requires product permissions and uses only the fixed product folder', () => {
     expect(uploadRoute).toContain('requirePermission(PERMISSIONS.PRODUCTS_UPDATE)')
-    expect(uploadRoute).toContain("folder: 'freedomcosmeticshop/products'")
+    expect(uploadRoute).toContain("uploadImageBuffer(Buffer.from(await file.arrayBuffer()), 'freedomcosmeticshop/products')")
     expect(uploadRoute).not.toContain("form.get('folder')")
   })
 
@@ -19,9 +19,11 @@ describe('admin structured product image security', () => {
     expect(uploadRoute).toContain('altText.length > 300')
   })
 
-  it('scopes updates and deletions to both product and image identifiers', () => {
+  it('scopes updates/deletions and synchronizes public product image URLs', () => {
     expect(imageRoute).toContain('where: { id: imageId, productId: id }')
     expect(imageRoute).toContain('requireDestructiveOperation(DESTRUCTIVE_OPERATIONS.PRODUCT_DELETE)')
+    expect(uploadRoute).toContain('images: JSON.stringify(currentImages.map((entry) => entry.url))')
+    expect(imageRoute).toContain('images: JSON.stringify(currentImages.map((entry) => entry.url))')
   })
 
   it('deletes Cloudinary assets only from the approved product folder', () => {

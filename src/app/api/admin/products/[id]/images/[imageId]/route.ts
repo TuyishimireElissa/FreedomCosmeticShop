@@ -30,7 +30,7 @@ export async function PATCH(req: Request, { params }: RouteParams) {
 
     const image = await prisma.$transaction(async (tx) => {
       if (parsed.data.isPrimary === true) await tx.productImage.updateMany({ where: { productId: id, id: { not: imageId }, isPrimary: true }, data: { isPrimary: false } })
-      return tx.productImage.update({
+      const updated = await tx.productImage.update({
         where: { id: imageId },
         data: {
           altText: parsed.data.altText,
@@ -41,6 +41,9 @@ export async function PATCH(req: Request, { params }: RouteParams) {
           isPrimary: parsed.data.isPrimary === true ? true : undefined,
         },
       })
+      const currentImages = await tx.productImage.findMany({ where: { productId: id }, orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }], select: { url: true } })
+      await tx.product.update({ where: { id }, data: { images: JSON.stringify(currentImages.map((entry) => entry.url)) } })
+      return updated
     })
     void logActivity({ userId: admin.id, userName: admin.name, userRole: admin.role, action: 'PRODUCT_IMAGE_UPDATE', entityType: 'PRODUCT', entityId: id, description: `Updated product image ${imageId}`, req }).catch(() => {})
     return NextResponse.json({ success: true, image })
@@ -64,6 +67,8 @@ export async function DELETE(req: Request, { params }: RouteParams) {
         const replacement = await tx.productImage.findFirst({ where: { productId: id }, orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }], select: { id: true } })
         if (replacement) await tx.productImage.update({ where: { id: replacement.id }, data: { isPrimary: true } })
       }
+      const currentImages = await tx.productImage.findMany({ where: { productId: id }, orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }], select: { url: true } })
+      await tx.product.update({ where: { id }, data: { images: JSON.stringify(currentImages.map((entry) => entry.url)) } })
     })
     if (existing.publicId.startsWith('freedomcosmeticshop/products/')) await cloudinary.uploader.destroy(existing.publicId).catch((error) => console.error('Cloudinary image cleanup failed:', error))
     void logActivity({ userId: admin.id, userName: admin.name, userRole: admin.role, action: 'PRODUCT_IMAGE_DELETE', entityType: 'PRODUCT', entityId: id, description: `Deleted product image ${imageId}`, req }).catch(() => {})
