@@ -107,6 +107,13 @@ model User {
   wholesaleBalance    Int       @default(0) // Current credit balance in RWF
   wholesaleDiscount   Int       @default(0) // Extra % discount on top of tier
 
+  // Optional relationship details assigned by an administrator. No manager,
+  // contact promise, or availability schedule is invented by the storefront.
+  assignedManagerName     String?
+  assignedManagerPhone    String?
+  assignedManagerWhatsApp String?
+  preferredDeliveryDays   String[] @default([])
+
   // Soft delete
   isDeleted Boolean   @default(false)
   deletedAt DateTime?

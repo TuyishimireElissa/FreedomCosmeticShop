@@ -393,55 +393,75 @@ export async function sendWholesaleSms(
  * Get wholesale dashboard data for a customer.
  */
 export async function getWholesaleDashboard(userId: string) {
-  const [recentOrders, invoices, orderCount, invoiceCount, reorderCount] = await Promise.all([
+  const now = new Date()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const [user, orders, invoices, reorderCount, application] = await Promise.all([
+    db.user.findUnique({ where: { id: userId }, select: { name: true, businessName: true, phone: true, loyaltyPoints: true, wholesaleDiscount: true, assignedManagerName: true, assignedManagerPhone: true, assignedManagerWhatsApp: true, preferredDeliveryDays: true } }),
     db.order.findMany({
-      where: { userId, orderType: "WHOLESALE" },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        orderNumber: true,
-        total: true,
-        status: true,
-        createdAt: true,
-        isCredit: true,
+      where: { userId, orderType: 'WHOLESALE' },
+      orderBy: { createdAt: 'desc' },
+      include: {
+        payments: { select: { status: true } },
+        items: { include: { product: { select: { id: true, name: true, slug: true, price: true, images: true, stock: true } } } },
       },
     }),
     db.wholesaleInvoice.findMany({
-      where: { userId },
-      orderBy: { issuedAt: "desc" },
-      take: 5,
-      select: {
-        id: true,
-        invoiceNumber: true,
-        totalAmount: true,
-        dueDate: true,
-        issuedAt: true,
-        order: {
-          select: {
-            payments: { select: { status: true, amount: true, method: true, completedAt: true } },
-          },
-        },
-      },
+      where: { userId }, orderBy: { issuedAt: 'desc' }, take: 5,
+      select: { id: true, invoiceNumber: true, totalAmount: true, dueDate: true, issuedAt: true, pdfUrl: true, order: { select: { payments: { select: { status: true, amount: true, method: true, completedAt: true } } } } },
     }),
-    db.order.count({ where: { userId, orderType: "WHOLESALE" } }),
-    db.wholesaleInvoice.count({ where: { userId } }),
     db.wholesaleReorder.count({ where: { userId } }),
+    db.wholesaleApplication.findUnique({ where: { userId }, select: { discountTier: true } }),
   ])
+  if (!user) throw new Error('Wholesale customer not found')
+
+  const completed = orders.filter((order) => order.status === 'DELIVERED' || order.payments.some((payment) => payment.status === 'PAID'))
+  const totalSpent = completed.reduce((sum, order) => sum + order.total, 0)
+  const totalSaved = completed.reduce((sum, order) => sum + order.discountAmount, 0)
+  const monthlySpent = completed.filter((order) => order.createdAt >= monthStart).reduce((sum, order) => sum + order.total, 0)
+  const lastMonthSpent = completed.filter((order) => order.createdAt >= lastMonthStart && order.createdAt < monthStart).reduce((sum, order) => sum + order.total, 0)
+
+  const productHistory = new Map<string, { product: NonNullable<(typeof orders)[number]['items'][number]['product']>; dates: Date[]; orderCount: number; totalQuantity: number }>()
+  for (const order of completed) {
+    for (const item of order.items) {
+      if (!item.product) continue
+      const current = productHistory.get(item.product.id) || { product: item.product, dates: [], orderCount: 0, totalQuantity: 0 }
+      current.dates.push(order.createdAt)
+      current.orderCount += 1
+      current.totalQuantity += item.quantity
+      productHistory.set(item.product.id, current)
+    }
+  }
+  const frequentProducts = [...productHistory.values()].sort((a, b) => b.orderCount - a.orderCount || b.totalQuantity - a.totalQuantity).slice(0, 5).map((entry) => ({
+    id: entry.product.id, name: entry.product.name, slug: entry.product.slug, retailPrice: entry.product.price, stock: entry.product.stock,
+    image: (() => { try { const parsed = JSON.parse(entry.product.images); return Array.isArray(parsed) ? parsed[0] || null : null } catch { return null } })(),
+    orderCount: entry.orderCount, totalQuantity: entry.totalQuantity,
+  }))
+  const restockSuggestions = [...productHistory.values()].flatMap((entry) => {
+    const dates = entry.dates.sort((a, b) => a.getTime() - b.getTime())
+    if (dates.length < 2) return []
+    const intervals = dates.slice(1).map((date, index) => (date.getTime() - dates[index].getTime()) / 86_400_000)
+    const averageDays = Math.round(intervals.reduce((sum, days) => sum + days, 0) / intervals.length)
+    const lastBoughtAt = dates[dates.length - 1]
+    const daysSince = Math.floor((now.getTime() - lastBoughtAt.getTime()) / 86_400_000)
+    return daysSince >= Math.max(7, Math.floor(averageDays * 0.85)) ? [{ id: entry.product.id, name: entry.product.name, slug: entry.product.slug, lastBoughtAt, daysSince, averageDays }] : []
+  }).sort((a, b) => b.daysSince - a.daysSince).slice(0, 3)
+
+  const recentOrders = orders.slice(0, 5).map((order) => ({ id: order.id, orderNumber: order.orderNumber, total: order.total, status: order.status, createdAt: order.createdAt, isCredit: order.isCredit }))
+  const lastOrder = orders[0] ? { id: orders[0].id, orderNumber: orders[0].orderNumber, total: orders[0].total, createdAt: orders[0].createdAt, items: orders[0].items.map((item) => ({ name: item.name, quantity: item.quantity, price: item.price })) } : null
 
   return {
     credit: null,
-    orderCount,
-    invoiceCount,
+    orderCount: orders.length,
+    invoiceCount: invoices.length,
     reorderCount,
     recentOrders,
-    recentInvoices: invoices.map((invoice) => ({
-      id: invoice.id,
-      invoiceNumber: invoice.invoiceNumber,
-      totalAmount: invoice.totalAmount,
-      dueDate: invoice.dueDate,
-      issuedAt: invoice.issuedAt,
-      ...getInvoicePaymentSummary(invoice.order.payments, invoice.totalAmount, invoice.dueDate),
-    })),
+    lastOrder,
+    frequentProducts,
+    restockSuggestions,
+    analytics: { totalSpent, totalSaved, monthlySpent, lastMonthSpent, averageOrder: completed.length ? Math.round(totalSpent / completed.length) : 0, completedOrderCount: completed.length },
+    relationship: { tier: application?.discountTier || null, accountDiscount: user.wholesaleDiscount, manager: user.assignedManagerName ? { name: user.assignedManagerName, phone: user.assignedManagerPhone, whatsapp: user.assignedManagerWhatsApp } : null, preferredDeliveryDays: user.preferredDeliveryDays },
+    user: { name: user.name, businessName: user.businessName || user.name, phone: user.phone, loyaltyPoints: user.loyaltyPoints },
+    recentInvoices: invoices.map((invoice) => ({ id: invoice.id, invoiceNumber: invoice.invoiceNumber, totalAmount: invoice.totalAmount, dueDate: invoice.dueDate, issuedAt: invoice.issuedAt, pdfUrl: invoice.pdfUrl, ...getInvoicePaymentSummary(invoice.order.payments, invoice.totalAmount, invoice.dueDate) })),
   }
 }

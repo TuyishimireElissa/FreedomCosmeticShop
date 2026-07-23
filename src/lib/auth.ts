@@ -64,6 +64,10 @@ export interface AuthUser {
   wholesaleStatus?: string | null
   wholesaleDiscount?: number
   businessName?: string | null
+  assignedManagerName?: string | null
+  assignedManagerPhone?: string | null
+  assignedManagerWhatsApp?: string | null
+  preferredDeliveryDays?: string[]
   mfaEnabled?: boolean
   mustChangePassword?: boolean
 }
@@ -248,6 +252,10 @@ export async function requireAuth(): Promise<AuthUser | null> {
       wholesaleStatus: true,
       wholesaleDiscount: true,
       businessName: true,
+      assignedManagerName: true,
+      assignedManagerPhone: true,
+      assignedManagerWhatsApp: true,
+      preferredDeliveryDays: true,
       mfaEnabled: true,
       mustChangePassword: true,
     },

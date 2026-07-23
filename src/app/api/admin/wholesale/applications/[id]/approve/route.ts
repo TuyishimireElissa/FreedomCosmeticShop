@@ -11,6 +11,9 @@ import { z } from 'zod'
 
 const ApproveSchema = z.object({
   notes: z.string().max(500).optional(),
+  managerName: z.string().trim().min(2).max(100).optional(),
+  managerPhone: z.string().trim().max(30).optional(),
+  managerWhatsApp: z.string().trim().max(30).optional(),
 }).strict()
 
 export async function PUT(
@@ -54,6 +57,9 @@ export async function PUT(
           wholesaleApprovedBy: adminUser.id,
           wholesaleLimit: 0,
           wholesaleDiscount: 0,
+          assignedManagerName: parsed.data.managerName || null,
+          assignedManagerPhone: parsed.data.managerPhone || null,
+          assignedManagerWhatsApp: parsed.data.managerWhatsApp || null,
         },
       }),
     ])

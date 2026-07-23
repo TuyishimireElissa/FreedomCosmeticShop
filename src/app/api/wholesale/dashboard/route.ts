@@ -15,14 +15,7 @@ export async function GET() {
     }
 
     const dashboard = await getWholesaleDashboard(user.id)
-    return NextResponse.json({
-      ...dashboard,
-      user: {
-        name: user.name,
-        businessName: user.businessName || user.name,
-        phone: user.phone,
-      },
-    })
+    return NextResponse.json(dashboard)
   } catch (error) {
     console.error("Wholesale dashboard error:", error)
     return NextResponse.json({ error: "Failed to fetch dashboard" }, { status: 500 })

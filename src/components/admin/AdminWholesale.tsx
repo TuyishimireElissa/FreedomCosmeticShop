@@ -140,6 +140,9 @@ function ApplicationsTab() {
 
   // Approval grants wholesale access only; credit and account-level discounts are disabled.
   const [approveNotes, setApproveNotes] = useState("")
+  const [managerName, setManagerName] = useState("")
+  const [managerPhone, setManagerPhone] = useState("")
+  const [managerWhatsApp, setManagerWhatsApp] = useState("")
   const [rejectReason, setRejectReason] = useState("")
 
   const load = useCallback(async () => {
@@ -164,13 +167,16 @@ function ApplicationsTab() {
       const res = await fetch(`/api/admin/wholesale/applications/${reviewTarget.id}/approve`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ notes: approveNotes }),
+        body: JSON.stringify({ notes: approveNotes, managerName: managerName || undefined, managerPhone: managerPhone || undefined, managerWhatsApp: managerWhatsApp || undefined }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || "Failed")
       toast({ title: " Application approved", description: `${reviewTarget.businessName} is now a wholesale customer` })
       setReviewTarget(null)
       setApproveNotes("")
+      setManagerName("")
+      setManagerPhone("")
+      setManagerWhatsApp("")
       load()
     } catch (e) {
       toast({ title: "Approval failed", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" })
@@ -288,7 +294,13 @@ function ApplicationsTab() {
               {/* Approve fields */}
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
                 <p className="text-xs font-semibold text-emerald-900">If Approving:</p>
-                <Input placeholder="Notes (optional)" value={approveNotes} onChange={(e) => setApproveNotes(e.target.value)} className="h-8 mt-2" />
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <Input placeholder="Account manager name" value={managerName} onChange={(e) => setManagerName(e.target.value)} className="h-9" />
+                  <Input placeholder="Manager phone" value={managerPhone} onChange={(e) => setManagerPhone(e.target.value)} className="h-9" />
+                  <Input placeholder="Manager WhatsApp" value={managerWhatsApp} onChange={(e) => setManagerWhatsApp(e.target.value)} className="h-9" />
+                  <Input placeholder="Approval notes (optional)" value={approveNotes} onChange={(e) => setApproveNotes(e.target.value)} className="h-9" />
+                </div>
+                <p className="mt-2 text-[11px] text-emerald-800">Leave manager fields blank rather than inventing a contact. They can be assigned later.</p>
                 <Button className="mt-2 w-full" onClick={handleApprove} disabled={actionLoading}>
                   {actionLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
                   Approve

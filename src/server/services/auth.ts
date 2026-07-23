@@ -87,6 +87,10 @@ function toAuthUser(user: {
   wholesaleStatus?: string | null
   wholesaleDiscount?: number
   businessName?: string | null
+  assignedManagerName?: string | null
+  assignedManagerPhone?: string | null
+  assignedManagerWhatsApp?: string | null
+  preferredDeliveryDays?: string[]
   mfaEnabled?: boolean
   mustChangePassword?: boolean
 }): AuthUser {
@@ -101,6 +105,10 @@ function toAuthUser(user: {
     wholesaleStatus: user.wholesaleStatus,
     wholesaleDiscount: user.wholesaleDiscount,
     businessName: user.businessName,
+    assignedManagerName: user.assignedManagerName,
+    assignedManagerPhone: user.assignedManagerPhone,
+    assignedManagerWhatsApp: user.assignedManagerWhatsApp,
+    preferredDeliveryDays: user.preferredDeliveryDays,
     mfaEnabled: user.mfaEnabled,
     mustChangePassword: user.mustChangePassword,
   }
