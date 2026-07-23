@@ -14,7 +14,8 @@ export async function POST(request: Request) {
   try {
     await requireRole('ADMIN', 'MANAGER', 'STAFF')
     if (!cloudinaryIsConfigured()) return NextResponse.json({ success: false, error: 'Cloudinary is not configured' }, { status: 503 })
-    const form = await request.formData()
+    const form = await request.formData().catch(() => null)
+    if (!form) return NextResponse.json({ success: false, error: 'A multipart form upload is required' }, { status: 400 })
     const file = form.get('file')
     const requestedFolder = String(form.get('folder') || 'products')
     const folder = allowedFolders.has(requestedFolder) ? requestedFolder : 'products'

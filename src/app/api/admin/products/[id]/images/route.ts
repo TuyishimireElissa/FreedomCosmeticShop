@@ -36,7 +36,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const product = await prisma.product.findFirst({ where: { id, isDeleted: false }, select: { id: true, name: true } })
     if (!product) return NextResponse.json({ success: false, error: 'Product not found' }, { status: 404 })
 
-    const form = await req.formData()
+    const form = await req.formData().catch(() => null)
+    if (!form) return NextResponse.json({ success: false, error: 'A multipart form upload is required' }, { status: 400 })
     const file = form.get('file')
     if (!(file instanceof File)) return NextResponse.json({ success: false, error: 'Image file is required' }, { status: 400 })
     if (!ALLOWED_TYPES.has(file.type)) return NextResponse.json({ success: false, error: 'Only JPEG, PNG, and WebP images are allowed' }, { status: 400 })
