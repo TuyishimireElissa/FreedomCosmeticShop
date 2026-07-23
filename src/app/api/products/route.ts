@@ -122,7 +122,8 @@ export async function GET(request: NextRequest) {
     }
 
     const response = NextResponse.json({ success: true, data: { products, pagination, total, pages: pagination.totalPages, query: search, filters, hasResults: total > 0 }, products, pagination })
-    response.headers.set('Cache-Control', search ? 'private, no-store' : 'public, s-maxage=60, stale-while-revalidate=300')
+    // Product images, prices, and stock must reflect admin changes immediately.
+    response.headers.set('Cache-Control', 'private, no-store, max-age=0')
     return response
   } catch (error) {
     console.error('Products API error:', error)
