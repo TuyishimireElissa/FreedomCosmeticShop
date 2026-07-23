@@ -188,8 +188,8 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   // Load categories + brands once
   useEffect(() => {
     Promise.all([
-      fetch("/api/categories").then((r) => r.json()),
-      fetch("/api/brands").then((r) => r.json()),
+      fetch("/api/admin/categories").then((r) => r.ok ? r.json() : Promise.reject(new Error('Categories failed to load'))),
+      fetch("/api/admin/brands").then((r) => r.ok ? r.json() : Promise.reject(new Error('Brands failed to load'))),
       fetch("/api/admin/suppliers").then((r) => r.ok ? r.json() : { suppliers: [] }),
     ])
       .then(([cats, brs, supplierData]) => {
@@ -309,10 +309,10 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   }
 
   const handleSave = async () => {
-    if (!form.name || !form.description || !form.price || !form.categoryId) {
+    if (!form.name.trim() || !form.price || Number(form.price) <= 0 || !form.categoryId) {
       toast({
         title: "Missing fields",
-        description: "Name, description, price, and category are required.",
+        description: "Product name, a price above zero, and category are required.",
         variant: "destructive",
       })
       return
@@ -321,21 +321,12 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       toast({ title: "Invalid inventory dates", description: "Expiry date must be after the manufacturing date.", variant: "destructive" })
       return
     }
-    if (form.images.length === 0) {
-      toast({
-        title: "Image required",
-        description: "Please upload at least one product photo.",
-        variant: "destructive",
-      })
-      return
-    }
-
     setSaving(true)
     try {
       const payload = {
-        name: form.name,
-        shortDescription: form.shortDescription || null,
-        description: form.description,
+        name: form.name.trim(),
+        shortDescription: form.shortDescription.trim() || null,
+        description: form.description.trim(),
         price: Number(form.price),
         compareAt: form.compareAt ? Number(form.compareAt) : null,
         costPrice: form.costPrice ? Number(form.costPrice) : null,
@@ -375,7 +366,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(err.error || "Save failed")
+        const fieldErrors = err.details?.fieldErrors as Record<string, string[] | undefined> | undefined
+        const firstFieldError = fieldErrors ? Object.values(fieldErrors).flat().find(Boolean) : undefined
+        throw new Error(firstFieldError || err.error || "Save failed")
       }
 
       toast({
@@ -825,7 +818,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
 
             {/* Description */}
             <div>
-              <Label htmlFor="p-desc">Full description *</Label>
+              <Label htmlFor="p-desc">Description</Label>
               <Textarea
                 id="p-desc"
                 value={form.description}
@@ -838,7 +831,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
             </div>
 
             {/* Price + Compare + Stock */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               <div>
                 <Label htmlFor="p-price">Price (RWF) *</Label>
                 <Input
@@ -862,7 +855,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 />
               </div>
               <div>
-                <Label htmlFor="p-stock">Stock</Label>
+                <Label htmlFor="p-stock">Stock quantity</Label>
                 <Input
                   id="p-stock"
                   type="number"
@@ -870,6 +863,10 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                   onChange={(e) => setForm({ ...form, stock: e.target.value })}
                   placeholder="48"
                 />
+              </div>
+              <div>
+                <Label htmlFor="p-volume">Volume / size</Label>
+                <Input id="p-volume" value={form.volume} onChange={(e) => setForm({ ...form, volume: e.target.value })} placeholder="50 ml" />
               </div>
             </div>
 
@@ -880,10 +877,10 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div><Label htmlFor="p-cost">Cost price (RWF)</Label><Input id="p-cost" type="number" min="0" value={form.costPrice} onChange={(e) => setForm({ ...form, costPrice: e.target.value })} /></div>
                 <div><Label htmlFor="p-threshold">Low-stock threshold</Label><Input id="p-threshold" type="number" min="0" value={form.lowStockThreshold} onChange={(e) => setForm({ ...form, lowStockThreshold: e.target.value })} /></div>
+                <div><Label htmlFor="p-sku">SKU (auto-generated if blank)</Label><Input id="p-sku" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="FCS-A1B2C3" /></div>
                 <div><Label htmlFor="p-real-sku">Distributor SKU</Label><Input id="p-real-sku" value={form.realSku} onChange={(e) => setForm({ ...form, realSku: e.target.value })} /></div>
                 <div><div className="flex items-center justify-between"><Label>Supplier</Label><button type="button" onClick={() => setShowSupplierForm(true)} className="text-xs font-medium text-primary">New supplier</button></div><Select value={form.supplierId} onValueChange={(value) => setForm({ ...form, supplierId: value })}><SelectTrigger><SelectValue placeholder="No supplier" /></SelectTrigger><SelectContent><SelectItem value="none">No supplier</SelectItem>{suppliers.map((supplier) => <SelectItem key={supplier.id} value={supplier.id}>{supplier.name}</SelectItem>)}</SelectContent></Select></div>
                 <div><Label htmlFor="p-batch">Current batch number</Label><Input id="p-batch" value={form.batchNumber} onChange={(e) => setForm({ ...form, batchNumber: e.target.value })} /></div>
-                <div><Label htmlFor="p-volume">Volume / weight label</Label><Input id="p-volume" value={form.volume} onChange={(e) => setForm({ ...form, volume: e.target.value })} placeholder="50 ml" /></div>
                 <div><Label htmlFor="p-manufactured">Manufactured date</Label><Input id="p-manufactured" type="date" value={form.manufacturedDate} onChange={(e) => setForm({ ...form, manufacturedDate: e.target.value })} /></div>
                 <div><Label htmlFor="p-expiry">Expiry date</Label><Input id="p-expiry" type="date" value={form.expiryDate} onChange={(e) => setForm({ ...form, expiryDate: e.target.value })} /></div>
                 <div><Label htmlFor="p-pao">Use after opening (months)</Label><Input id="p-pao" type="number" min="1" max="120" value={form.periodAfterOpening} onChange={(e) => setForm({ ...form, periodAfterOpening: e.target.value })} /></div>
@@ -893,7 +890,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
             </details>
 
             {/* Category + Brand + SKU */}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
                 <Label>Category *</Label>
                 <Select
@@ -930,15 +927,6 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="p-sku">SKU</Label>
-                <Input
-                  id="p-sku"
-                  value={form.sku}
-                  onChange={(e) => setForm({ ...form, sku: e.target.value })}
-                  placeholder="UB-VC-001"
-                />
-              </div>
             </div>
 
             {/* PRODUCT PHOTOS — upload directly from this device */}
@@ -963,8 +951,10 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
               ) : <p className="mt-1 text-xs text-gray-400">Maximum 5 photos reached. Remove one to add another.</p>}
             </div>
 
-            {/* Skin type */}
-            <div>
+            {/* Optional product attributes */}
+            <details className="rounded-xl border p-4">
+              <summary className="cursor-pointer font-semibold">Advanced product attributes</summary>
+              <div className="mt-3">
               <Label>Skin type</Label>
               <div className="mt-2 flex flex-wrap gap-2">
                 {["ALL", "OILY", "DRY", "COMBINATION", "SENSITIVE", "NORMAL"].map(
@@ -995,7 +985,8 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                   )
                 )}
               </div>
-            </div>
+              </div>
+            </details>
 
             {/* Shades */}
             <div>

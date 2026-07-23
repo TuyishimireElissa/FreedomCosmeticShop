@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic'
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
+import { randomBytes } from 'node:crypto'
 import { requireRole } from "@/lib/auth"
 import { broadcastProductEvent } from "@/lib/realtime"
 import { logActivity } from "@/server/services/activity"
@@ -20,9 +21,9 @@ import { z } from "zod"
 
 const CreateProductSchema = z.object({
   name: z.string().min(2).max(200),
-  description: z.string().min(10).max(5000),
+  description: z.string().max(5000).optional().default(''),
   shortDescription: z.string().max(300).optional().nullable(),
-  price: z.number().int().min(0),
+  price: z.number().int().positive(),
   compareAt: z.number().int().min(0).optional().nullable(),
   stock: z.number().int().min(0).default(0),
   lowStockThreshold: z.number().int().min(0).default(5),
@@ -37,7 +38,7 @@ const CreateProductSchema = z.object({
   volume: z.string().max(100).optional().nullable(),
   brandId: z.string().optional().nullable(),
   categoryId: z.string().min(1),
-  images: z.array(z.string().url()).min(1),
+  images: z.array(z.string().url()).max(5).optional().default([]),
   skinType: z.array(z.string()).optional().nullable(),
   shades: z.array(z.string()).optional().nullable(),
   ingredients: z.array(z.string()).optional().nullable(),
@@ -150,25 +151,34 @@ export async function POST(req: Request) {
       )
     }
     const data = parsed.data
+    const category = await prisma.category.findFirst({ where: { id: data.categoryId, isActive: true, isDeleted: false }, select: { id: true } })
+    if (!category) return NextResponse.json({ success: false, error: 'Please select a valid active category' }, { status: 400 })
+    if (data.brandId) {
+      const brand = await prisma.brand.findFirst({ where: { id: data.brandId, isActive: true, isDeleted: false }, select: { id: true } })
+      if (!brand) return NextResponse.json({ success: false, error: 'Selected brand is not available' }, { status: 400 })
+    }
 
-    // Generate unique slug
+    // Generate unique slug and SKU when the admin leaves them blank.
     let slug = slugify(data.name)
     const existing = await prisma.product.findFirst({ where: { slug } })
-    if (existing) {
-      slug = `${slug}-${Date.now().toString(36)}`
+    if (existing) slug = `${slug}-${Date.now().toString(36)}`
+    let sku = data.sku?.trim() || ''
+    if (!sku) {
+      do { sku = `FCS-${randomBytes(4).toString('hex').slice(0, 6).toUpperCase()}` }
+      while (await prisma.product.findUnique({ where: { sku }, select: { id: true } }))
     }
 
     const product = await prisma.product.create({
       data: {
         name: data.name,
         slug,
-        description: data.description,
+        description: data.description.trim(),
         shortDescription: data.shortDescription || null,
         price: data.price,
         compareAt: data.compareAt ?? null,
         stock: data.stock,
         lowStockThreshold: data.lowStockThreshold,
-        sku: data.sku || null,
+        sku,
         realSku: data.realSku || null,
         costPrice: data.costPrice ?? null,
         supplierId: data.supplierId || null,
@@ -233,6 +243,9 @@ export async function POST(req: Request) {
       { status: 201 }
     )
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ success: false, error: 'A product with this SKU or slug already exists' }, { status: 409 })
+    }
     if (error instanceof Error && "statusCode" in error) {
       return NextResponse.json(
         { success: false, error: error.message },

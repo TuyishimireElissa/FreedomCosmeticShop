@@ -23,7 +23,7 @@ import { z } from "zod"
 
 const UpdateProductSchema = z.object({
   name: z.string().min(2).max(200).optional(),
-  description: z.string().min(10).max(5000).optional(),
+  description: z.string().max(5000).optional(),
   shortDescription: z.string().max(300).optional().nullable(),
   price: z.number().int().min(0).optional(),
   compareAt: z.number().int().min(0).optional().nullable(),
