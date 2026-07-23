@@ -42,6 +42,9 @@ export interface AuthUser {
   wholesaleStatus?: string | null
   wholesaleDiscount?: number
   businessName?: string | null
+  assignedManagerName?: string | null
+  assignedManagerPhone?: string | null
+  assignedManagerWhatsApp?: string | null
   mfaEnabled?: boolean
   mustChangePassword?: boolean
 }

@@ -25,6 +25,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useStore } from '@/store/useStore'
 import { BUSINESS } from '@/lib/business-config'
 import LowDataToggle from '@/components/settings/LowDataToggle'
+import { wholesaleWhatsAppNumber } from '@/lib/wholesale-whatsapp'
 
 const categories = [
   { slug: 'skincare', translationKey: 'categories.skincare' },
@@ -72,6 +73,7 @@ export default function Navbar() {
   }, [mobileOpen])
 
   const count = mounted ? cartCount() : 0
+  const isWholesale = user?.wholesaleStatus === 'APPROVED'
 
   const navigate = (action: () => void) => {
     action()
@@ -160,9 +162,9 @@ export default function Navbar() {
 
           <button
             type="button"
-            onClick={() => router.push('/cart')}
+            onClick={() => { if (isWholesale) { toast({ title: 'Wholesale orders use WhatsApp', description: 'You will be connected to wholesale support.' }); window.open(`https://wa.me/${wholesaleWhatsAppNumber(user?.assignedManagerWhatsApp)}?text=${encodeURIComponent('Muraho! Ndi umukiriya wa wholesale. Nshaka gutuma ibicuruzwa.')}`, '_blank', 'noopener,noreferrer') } else router.push('/cart') }}
             className="relative grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-[#B76E79]"
-            aria-label={`${t('nav.cart')}: ${count}`}
+            aria-label={isWholesale ? 'Wholesale orders via WhatsApp' : `${t('nav.cart')}: ${count}`}
           >
             <ShoppingCart className="h-5 w-5" />
             {count > 0 && (

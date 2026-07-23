@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AlertCircle, Check, ChevronRight, Loader2, ShieldCheck, ShoppingBag, Truck } from 'lucide-react'
+import { AlertCircle, Check, ChevronRight, Loader2, MessageCircle, ShieldCheck, ShoppingBag, Truck } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { formatRWF } from '@/lib/format'
 import { normalizeRwandaPhone } from '@/lib/rwanda-locations'
@@ -13,6 +13,7 @@ import OrderSummary from '@/components/checkout/OrderSummary'
 import ConfirmationView, { type ConfirmedCheckoutOrder } from '@/components/checkout/ConfirmationView'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { useAnalytics } from '@/hooks/useAnalytics'
+import { wholesaleWhatsAppNumber } from '@/lib/wholesale-whatsapp'
 
 const initialAddress: CheckoutAddress = { fullName: '', phone: '+250 ', email: '', province: '', district: '', sector: '', cell: '', village: '', landmark: '', address: '' }
 type Step = 1 | 2 | 3
@@ -172,6 +173,8 @@ export default function CheckoutPage() {
     } catch (reason) { setCheckoutError(reason instanceof Error ? reason.message : t('checkout.checkout_failed')) }
     finally { setPlacing(false) }
   }
+
+  if (user?.wholesaleStatus === 'APPROVED') return <div className="mx-auto grid min-h-[65vh] max-w-2xl place-items-center px-4 text-center"><div><MessageCircle className="mx-auto h-14 w-14 text-emerald-600" /><h1 className="mt-5 text-2xl font-bold">Wholesale orders use WhatsApp</h1><p className="mt-2 text-sm text-gray-500">For personal pricing and order confirmation, contact your account manager or wholesale support.</p><a href={`https://wa.me/${wholesaleWhatsAppNumber(user.assignedManagerWhatsApp)}?text=${encodeURIComponent('Muraho! Ndi umukiriya wa wholesale. Nshaka gutuma ibicuruzwa.')}`} target="_blank" rel="noopener noreferrer" className="mt-5 inline-flex min-h-12 items-center rounded-xl bg-emerald-600 px-6 py-3 font-bold text-white">Order via WhatsApp</a></div></div>
 
   if (items.length === 0 && !completedOrder) return <div className="mx-auto grid min-h-[65vh] max-w-2xl place-items-center px-4 text-center"><div><ShoppingBag className="mx-auto h-14 w-14 text-[#B76E79]" /><h1 className="mt-5 text-2xl font-bold">{t('cart.empty')}</h1><p className="mt-2 text-sm text-gray-500">{t('empty.cart_hint')}</p><Link href="/products" className="mt-5 inline-flex min-h-12 items-center rounded-full bg-[#B76E79] px-6 py-3 text-base font-bold text-white">{t('nav.products')}</Link></div></div>
 

@@ -89,6 +89,7 @@ interface ProductFormState {
   shortDescription: string
   description: string
   price: string
+  wholesalePrice: string
   compareAt: string
   costPrice: string
   stock: string
@@ -125,6 +126,7 @@ const EMPTY_FORM: ProductFormState = {
   shortDescription: "",
   description: "",
   price: "",
+  wholesalePrice: "",
   compareAt: "",
   costPrice: "",
   stock: "0",
@@ -243,6 +245,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       shortDescription: product.shortDescription || "",
       description: product.description,
       price: String(product.price),
+      wholesalePrice: product.wholesalePrice !== null && product.wholesalePrice !== undefined ? String(product.wholesalePrice) : "",
       compareAt: product.compareAt ? String(product.compareAt) : "",
       costPrice: product.costPrice !== null ? String(product.costPrice) : "",
       stock: String(product.stock),
@@ -328,6 +331,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
         shortDescription: form.shortDescription.trim() || null,
         description: form.description.trim(),
         price: Number(form.price),
+        wholesalePrice: form.wholesalePrice ? Number(form.wholesalePrice) : null,
         compareAt: form.compareAt ? Number(form.compareAt) : null,
         costPrice: form.costPrice ? Number(form.costPrice) : null,
         stock: Number(form.stock) || 0,
@@ -495,6 +499,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       shortDescription: product.shortDescription || "",
       description: product.description,
       price: String(product.price),
+      wholesalePrice: product.wholesalePrice !== null && product.wholesalePrice !== undefined ? String(product.wholesalePrice) : "",
       compareAt: product.compareAt ? String(product.compareAt) : "",
       costPrice: product.costPrice !== null ? String(product.costPrice) : "",
       stock: String(product.stock),
@@ -831,7 +836,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
             </div>
 
             {/* Price + Compare + Stock */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
               <div>
                 <Label htmlFor="p-price">Price (RWF) *</Label>
                 <Input
@@ -841,6 +846,10 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
                   placeholder="12500"
                 />
+              </div>
+              <div>
+                <Label htmlFor="p-wholesale-price">Wholesale Price (RWF)</Label>
+                <Input id="p-wholesale-price" type="number" min="0" value={form.wholesalePrice} onChange={(e) => setForm({ ...form, wholesalePrice: e.target.value })} placeholder="Leave empty for retail price" />
               </div>
               <div>
                 <Label htmlFor="p-compare">Compare at (RWF)</Label>

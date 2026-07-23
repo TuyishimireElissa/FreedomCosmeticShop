@@ -13,6 +13,7 @@ export const PUBLIC_PRODUCT_SELECT = {
   description: true,
   shortDescription: true,
   price: true,
+  wholesalePrice: true,
   compareAt: true,
   stock: true,
   lowStockThreshold: true,

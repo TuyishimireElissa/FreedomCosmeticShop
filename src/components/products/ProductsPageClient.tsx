@@ -16,6 +16,8 @@ import { getItemListSchema } from '@/lib/structured-data'
 import { getProductPrimaryImage } from '@/lib/cloudinary-images'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { EVENTS, trackEvent } from '@/lib/analytics'
+import { useStore } from '@/store/useStore'
+import { wholesaleWhatsAppNumber } from '@/lib/wholesale-whatsapp'
 
 interface Pagination {
   page: number
@@ -46,6 +48,8 @@ export default function ProductsPageClient() {
 
 function ProductsContent() {
   const t = useT()
+  const user = useStore((state) => state.user)
+  const isWholesale = user?.wholesaleStatus === 'APPROVED'
   const { isLowData } = useLowData()
   const { filters, setFilter, buildApiQuery } = useProductFilters()
   const [products, setProducts] = useState<Product[]>([])
@@ -173,6 +177,8 @@ function ProductsContent() {
           <p className="mt-2 text-sm text-gray-500">{loading ? t('search.loading_products') : t('search.products_found', { count: pagination.total })}</p>
         </div>
       </header>
+
+      {isWholesale && <div className="border-b border-violet-100 bg-violet-50"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8"><div><p className="text-sm font-bold text-violet-900">You are viewing wholesale prices</p><p className="text-xs text-violet-700">{user?.businessName || user?.name} · All wholesale orders go through WhatsApp</p></div><a href={`https://wa.me/${wholesaleWhatsAppNumber(user?.assignedManagerWhatsApp)}?text=${encodeURIComponent('Muraho! Ndi umukiriya wa wholesale. Nshaka gutuma ibicuruzwa byinshi. Mwamfasha?')}`} target="_blank" rel="noopener noreferrer" className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">Order multiple products via WhatsApp</a></div></div>}
 
       <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
         <div className="mb-4 md:hidden"><SearchWithSuggestions variant="page" /></div>

@@ -267,9 +267,10 @@ model Product {
   shortDescription String? // For product cards (max ~150 chars)
 
   // Pricing (RWF)
-  price     Int
-  compareAt Int? // Original price for "on sale" display
-  costPrice Int? // For margin calculation (admin only)
+  price          Int
+  wholesalePrice Int? // Admin-entered per-unit RWF price for approved wholesale customers
+  compareAt      Int? // Original price for "on sale" display
+  costPrice      Int? // For margin calculation (admin only)
 
   // Inventory
   stock             Int     @default(0)

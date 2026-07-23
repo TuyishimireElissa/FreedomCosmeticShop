@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Check, Heart, Package, ShoppingCart, Star } from 'lucide-react'
+import { Check, Heart, MessageCircle, Package, ShoppingCart, Star } from 'lucide-react'
 import type { Product, ProductImage } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
+import { buildWholesaleWhatsAppOrder } from '@/lib/wholesale-whatsapp'
 
 type ProductWithImageFallbacks = Product & {
   image?: string | null
@@ -56,6 +57,7 @@ export function getImageUrl(product: ProductWithImageFallbacks): string | null {
 export function ProductCard({ product, wishlisted = false, onToggleWishlist }: ProductCardProps) {
   const { t } = useLanguage()
   const addToCart = useStore((state) => state.addToCart)
+  const user = useStore((state) => state.user)
   const { toast } = useToast()
   const [added, setAdded] = useState(false)
   const [imageFailed, setImageFailed] = useState(false)
@@ -69,7 +71,13 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
   const hasDiscount = product.compareAt !== null && product.compareAt > product.price
   const discount = hasDiscount ? Math.round((1 - product.price / product.compareAt!) * 100) : 0
   const size = product.volume || product.size
-  const badge = outOfStock
+  const isWholesale = user?.wholesaleStatus === 'APPROVED'
+  const wholesalePrice = isWholesale && product.wholesalePrice ? product.wholesalePrice : null
+  const displayPrice = wholesalePrice || product.price
+  const wholesaleSavings = wholesalePrice ? Math.max(0, product.price - wholesalePrice) : 0
+  const badge = wholesalePrice
+    ? { text: 'WHOLESALE', classes: 'bg-violet-700 text-white' }
+    : outOfStock
     ? { text: t('common.sold_out'), classes: 'bg-[#1a1a1a] text-white' }
     : hasDiscount
       ? { text: `-${discount}%`, classes: 'bg-[#D64045] text-white' }
@@ -149,11 +157,12 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
         )}
 
         <div className="mt-auto flex flex-wrap items-baseline gap-2 pt-3">
-          <span className="text-lg font-bold text-[#B76E79]">{formatRWF(product.price)}</span>
-          {hasDiscount && <span className="text-[13px] text-gray-400 line-through">{formatRWF(product.compareAt!)}</span>}
+          <span className="text-lg font-bold text-[#B76E79]">{formatRWF(displayPrice)}</span>
+          {wholesalePrice ? <span className="text-[13px] text-gray-400 line-through">{formatRWF(product.price)}</span> : hasDiscount && <span className="text-[13px] text-gray-400 line-through">{formatRWF(product.compareAt!)}</span>}
         </div>
+        {wholesaleSavings > 0 && <p className="mt-1 text-xs font-semibold text-emerald-700">Save {formatRWF(wholesaleSavings)} per unit</p>}
 
-        <button
+        {isWholesale ? <a href={buildWholesaleWhatsAppOrder({ product, unitPrice: displayPrice, managerWhatsApp: user?.assignedManagerWhatsApp })} target="_blank" rel="noopener noreferrer" className="relative mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 text-[13px] font-semibold text-white transition-colors hover:bg-emerald-700"><MessageCircle className="h-4 w-4" />Order via WhatsApp</a> : <button
           type="button"
           onClick={addProduct}
           disabled={outOfStock}
@@ -161,7 +170,7 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
         >
           {added ? <Check className="h-4 w-4" aria-hidden="true" /> : <ShoppingCart className="h-4 w-4" aria-hidden="true" />}
           {outOfStock ? t('common.sold_out') : added ? t('product.added') : t('product.add_to_cart')}
-        </button>
+        </button>}
       </div>
     </article>
   )

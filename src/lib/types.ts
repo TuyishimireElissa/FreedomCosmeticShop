@@ -50,6 +50,7 @@ export interface Product {
   description: string
   shortDescription: string | null
   price: number
+  wholesalePrice?: number | null
   compareAt: number | null
   costPrice: number | null
   stock: number
