@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+
+const authSource = readFileSync('src/lib/auth.ts', 'utf8')
 import {
   calculateMfaCoverage,
   canViewSecurityDashboard,
@@ -12,6 +15,10 @@ describe('security dashboard rules', () => {
     expect(canViewSecurityDashboard('MANAGER')).toBe(false)
     expect(canViewSecurityDashboard('STAFF')).toBe(false)
     expect(canViewSecurityDashboard('CUSTOMER')).toBe(false)
+  })
+
+  it('allows Super Admin through every route that grants Admin access', () => {
+    expect(authSource).toContain("user.role === 'SUPER_ADMIN' && allowedRoles.includes('ADMIN')")
   })
 
   it('masks phone identifiers shown in failed-login telemetry', () => {

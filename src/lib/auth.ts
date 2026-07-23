@@ -283,7 +283,10 @@ export async function requireRole(
   ...allowedRoles: string[]
 ): Promise<AuthUser> {
   const user = await requireAuthOrThrow()
-  if (!allowedRoles.includes(user.role)) {
+  // SUPER_ADMIN is a strict superset of ADMIN and must pass every route that
+  // grants ADMIN access, even when older handlers omit it from their list.
+  const superAdminCanActAsAdmin = user.role === 'SUPER_ADMIN' && allowedRoles.includes('ADMIN')
+  if (!allowedRoles.includes(user.role) && !superAdminCanActAsAdmin) {
     throw new AuthError("Forbidden: insufficient permissions", 403)
   }
   return user
