@@ -9,13 +9,13 @@
  *     images, skinType, shades, ingredients, etc.)
  *   - Delete (soft delete) with confirmation
  *   - Stock management (quick edit stock + isActive)
- *   - Image URL input (Cloudinary integration via /api/upload in future)
+ *   - Direct multi-photo Cloudinary uploads from the product form
  *   - Bulk actions placeholder (CSV import can be added later)
  *
  * Requires ADMIN role (enforced by /api/admin/products).
  */
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, type ChangeEvent } from "react"
 import { Product, Category, Brand } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -64,7 +64,6 @@ import {
   Tag,
 } from "lucide-react"
 import { WholesalePricingPanel } from "./WholesalePricingPanel"
-import AdminProductImageManager from "./AdminProductImageManager"
 
 interface AdminProductManagerProps {
   onStatsUpdate?: () => void
@@ -105,7 +104,6 @@ interface ProductFormState {
   categoryId: string
   brandId: string
   images: string[]
-  newImageUrl: string
   skinType: string[]
   shades: string[]
   newShade: string
@@ -142,7 +140,6 @@ const EMPTY_FORM: ProductFormState = {
   categoryId: "",
   brandId: "",
   images: [],
-  newImageUrl: "",
   skinType: [],
   shades: [],
   newShade: "",
@@ -174,13 +171,13 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState<ProductFormState>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const [uploadingPhotos, setUploadingPhotos] = useState(false)
 
   const [deleteTarget, setDeleteTarget] = useState<AdminProduct | null>(null)
   const [deleting, setDeleting] = useState(false)
 
   // Section 3: Wholesale pricing modal
   const [pricingTarget, setPricingTarget] = useState<AdminProduct | null>(null)
-  const [imageTarget, setImageTarget] = useState<AdminProduct | null>(null)
   const [batchTarget, setBatchTarget] = useState<AdminProduct | null>(null)
   const [batchForm, setBatchForm] = useState({ batchNumber: "", quantity: "", manufacturedDate: "", expiryDate: "", supplierInvoice: "", notes: "" })
   const [receivingBatch, setReceivingBatch] = useState(false)
@@ -261,7 +258,6 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       categoryId: product.categoryId,
       brandId: product.brandId || "",
       images: product.images || [],
-      newImageUrl: "",
       skinType: product.skinType || [],
       shades: product.shades || [],
       newShade: "",
@@ -274,6 +270,42 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       isActive: product.isActive,
     })
     setShowForm(true)
+  }
+
+  const handlePhotoUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files || []).slice(0, Math.max(0, 5 - form.images.length))
+    event.target.value = ''
+    if (selectedFiles.length === 0) return
+    setUploadingPhotos(true)
+    try {
+      const uploadedUrls: string[] = []
+      for (const selectedFile of selectedFiles) {
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(selectedFile.type)) {
+          toast({ title: 'Unsupported image', description: `${selectedFile.name}: use JPG, PNG, or WebP.`, variant: 'destructive' })
+          continue
+        }
+        if (selectedFile.size < 1 || selectedFile.size > 10 * 1024 * 1024) {
+          toast({ title: 'Image too large', description: `${selectedFile.name}: maximum size is 10 MB.`, variant: 'destructive' })
+          continue
+        }
+        const body = new FormData()
+        body.set('file', selectedFile)
+        body.set('folder', 'products')
+        const response = await fetch('/api/upload', { method: 'POST', body })
+        const result = await response.json().catch(() => ({}))
+        const url = result.image?.url || result.data?.image?.url || result.url
+        if (!response.ok || typeof url !== 'string') throw new Error(result.error || `Upload failed for ${selectedFile.name}`)
+        uploadedUrls.push(url)
+      }
+      if (uploadedUrls.length > 0) {
+        setForm((current) => ({ ...current, images: [...current.images, ...uploadedUrls].slice(0, 5) }))
+        toast({ title: 'Photos uploaded', description: `${uploadedUrls.length} photo${uploadedUrls.length === 1 ? '' : 's'} ready to save.` })
+      }
+    } catch (error) {
+      toast({ title: 'Photo upload failed', description: error instanceof Error ? error.message : 'Check your connection and try again.', variant: 'destructive' })
+    } finally {
+      setUploadingPhotos(false)
+    }
   }
 
   const handleSave = async () => {
@@ -292,7 +324,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     if (form.images.length === 0) {
       toast({
         title: "Image required",
-        description: "Please add at least one product image URL.",
+        description: "Please upload at least one product photo.",
         variant: "destructive",
       })
       return
@@ -485,7 +517,6 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       categoryId: product.categoryId,
       brandId: product.brandId || "",
       images: product.images || [],
-      newImageUrl: "",
       skinType: product.skinType || [],
       shades: product.shades || [],
       newShade: "",
@@ -712,16 +743,6 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 text-[#B76E79] hover:bg-rose-50"
-                          onClick={() => setImageTarget(p)}
-                          aria-label={`Manage images for ${p.name}`}
-                          title="Manage product images"
-                        >
-                          <ImagePlus className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
                           className="h-8 w-8 text-emerald-700 hover:bg-emerald-50"
                           onClick={() => { setBatchTarget(p); setBatchForm({ batchNumber: p.batchNumber || "", quantity: "", manufacturedDate: "", expiryDate: "", supplierInvoice: "", notes: "" }) }}
                           aria-label={`Receive inventory for ${p.name}`}
@@ -852,10 +873,11 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
               </div>
             </div>
 
-            <div className="rounded-xl border border-amber-200 bg-amber-50/40 p-4">
-              <h3 className="font-semibold text-amber-950">Private inventory and margin</h3>
-              <p className="mt-1 text-xs text-amber-800">Cost, supplier, batch, manufacturing, and expiry details are visible only to administrators.</p>
-              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <details className="rounded-xl border border-amber-200 bg-amber-50/40 p-4">
+              <summary className="cursor-pointer font-semibold text-amber-950">Advanced inventory and margin</summary>
+              <div className="mt-3">
+                <p className="text-xs text-amber-800">Optional cost, supplier, batch, manufacturing, expiry, and low-stock controls.</p>
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div><Label htmlFor="p-cost">Cost price (RWF)</Label><Input id="p-cost" type="number" min="0" value={form.costPrice} onChange={(e) => setForm({ ...form, costPrice: e.target.value })} /></div>
                 <div><Label htmlFor="p-threshold">Low-stock threshold</Label><Input id="p-threshold" type="number" min="0" value={form.lowStockThreshold} onChange={(e) => setForm({ ...form, lowStockThreshold: e.target.value })} /></div>
                 <div><Label htmlFor="p-real-sku">Distributor SKU</Label><Input id="p-real-sku" value={form.realSku} onChange={(e) => setForm({ ...form, realSku: e.target.value })} /></div>
@@ -866,8 +888,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 <div><Label htmlFor="p-expiry">Expiry date</Label><Input id="p-expiry" type="date" value={form.expiryDate} onChange={(e) => setForm({ ...form, expiryDate: e.target.value })} /></div>
                 <div><Label htmlFor="p-pao">Use after opening (months)</Label><Input id="p-pao" type="number" min="1" max="120" value={form.periodAfterOpening} onChange={(e) => setForm({ ...form, periodAfterOpening: e.target.value })} /></div>
               </div>
-              {form.costPrice && form.price && <p className={`mt-3 text-sm font-semibold ${Number(form.price) - Number(form.costPrice) < 0 ? "text-destructive" : "text-emerald-700"}`}>Estimated margin: {Number(form.price) > 0 ? (((Number(form.price) - Number(form.costPrice)) / Number(form.price)) * 100).toFixed(1) : "0.0"}% · RWF {(Number(form.price) - Number(form.costPrice)).toLocaleString()}</p>}
-            </div>
+                {form.costPrice && form.price && <p className={`mt-3 text-sm font-semibold ${Number(form.price) - Number(form.costPrice) < 0 ? "text-destructive" : "text-emerald-700"}`}>Estimated margin: {Number(form.price) > 0 ? (((Number(form.price) - Number(form.costPrice)) / Number(form.price)) * 100).toFixed(1) : "0.0"}% · RWF {(Number(form.price) - Number(form.costPrice)).toLocaleString()}</p>}
+              </div>
+            </details>
 
             {/* Category + Brand + SKU */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -918,66 +941,26 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
               </div>
             </div>
 
-            {/* Images */}
+            {/* PRODUCT PHOTOS — upload directly from this device */}
             <div>
-              <Label>Product images *</Label>
-              <div className="mt-1 flex gap-2">
-                <Input
-                  type="url"
-                  value={form.newImageUrl}
-                  onChange={(e) =>
-                    setForm({ ...form, newImageUrl: e.target.value })
-                  }
-                  placeholder="https://images.unsplash.com/..."
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => {
-                    if (form.newImageUrl) {
-                      setForm({
-                        ...form,
-                        images: [...form.images, form.newImageUrl],
-                        newImageUrl: "",
-                      })
-                    }
-                  }}
-                >
-                  <ImagePlus className="h-4 w-4" />
-                </Button>
-              </div>
+              <Label>Product Photos *</Label>
               {form.images.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {form.images.map((img, i) => (
-                    <div
-                      key={i}
-                      className="relative h-16 w-16 overflow-hidden rounded-md border"
-                    >
-                      <img
-                        src={img}
-                        alt={`Product ${i + 1}`}
-                        className="h-full w-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setForm({
-                            ...form,
-                            images: form.images.filter((_, idx) => idx !== i),
-                          })
-                        }
-                        className="absolute right-0 top-0 rounded-bl-md bg-destructive/80 px-1 text-white"
-                        aria-label="Remove image"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
+                <div className="mb-3 mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                  {form.images.map((url, index) => (
+                    <div key={`${url}-${index}`} className="relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                      <img src={url} alt={`Product photo ${index + 1}`} className="h-full w-full object-cover" />
+                      <button type="button" onClick={() => setForm((current) => ({ ...current, images: current.images.filter((_, imageIndex) => imageIndex !== index) }))} className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-red-600 text-white hover:bg-red-700" aria-label={`Remove product photo ${index + 1}`}><X className="h-3.5 w-3.5" /></button>
+                      {index === 0 && <span className="absolute bottom-1 left-1 rounded bg-black/65 px-1.5 py-0.5 text-[10px] font-semibold text-white">Main</span>}
                     </div>
                   ))}
                 </div>
               )}
-              <p className="mt-1 text-xs text-muted-foreground">
-Legacy URL images. Save the product, then use “Manage product images” for structured Cloudinary uploads, image types, bilingual alt text, and primary-image selection.
-              </p>
+              {form.images.length < 5 ? (
+                <label className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-center transition-colors hover:border-[#B76E79] hover:bg-gray-50">
+                  <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhotos} />
+                  {uploadingPhotos ? <><Loader2 className="mb-2 h-8 w-8 animate-spin text-[#B76E79]" /><span className="text-sm text-gray-500">Uploading photos…</span></> : <><ImagePlus className="mb-2 h-8 w-8 text-gray-400" /><span className="text-sm font-medium text-gray-600">Click to upload or drag photos here</span><span className="mt-1 text-xs text-gray-400">JPG, PNG, WebP · Max 10 MB each · Up to 5</span></>}
+                </label>
+              ) : <p className="mt-1 text-xs text-gray-400">Maximum 5 photos reached. Remove one to add another.</p>}
             </div>
 
             {/* Skin type */}
@@ -1238,15 +1221,6 @@ Legacy URL images. Save the product, then use “Manage product images” for st
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {imageTarget && (
-        <Dialog open={!!imageTarget} onOpenChange={(open) => !open && setImageTarget(null)}>
-          <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
-            <DialogHeader><DialogTitle>Product images — {imageTarget.name}</DialogTitle></DialogHeader>
-            <AdminProductImageManager productId={imageTarget.id} productName={imageTarget.name} onChanged={() => void loadProducts()} />
-          </DialogContent>
-        </Dialog>
-      )}
 
       <Dialog open={showSupplierForm} onOpenChange={setShowSupplierForm}>
         <DialogContent className="max-w-md">
