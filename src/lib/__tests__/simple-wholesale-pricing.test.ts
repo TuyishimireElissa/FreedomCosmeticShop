@@ -18,18 +18,19 @@ describe('simple Rwanda wholesale pricing', () => {
     expect(adminForm).toContain('Wholesale Price (RWF)')
   })
 
-  it('shows WhatsApp ordering only to approved wholesale customers', () => {
+  it('shows approved wholesale pricing while retaining the shared Add to Cart button', () => {
     expect(card).toContain("user?.wholesaleStatus === 'APPROVED'")
-    expect(card).toContain('Order via WhatsApp')
-    expect(card).toContain('buildWholesaleWhatsAppOrder')
+    expect(card).toContain('price: displayPrice')
+    expect(card).toContain('retailPrice: product.price')
     expect(card).toContain('Save {formatRWF(wholesaleSavings)} per unit')
+    expect(card).toContain("t('product.add_to_cart')")
   })
 
-  it('uses wholesale price and quantity on product detail', () => {
+  it('adds product-detail quantities at the active wholesale or retail price', () => {
     expect(detail).toContain('Wholesale pricing')
     expect(detail).toContain('Math.min(12')
-    expect(detail).toContain('displayPrice * quantity')
-    expect(detail).toContain('buildWholesaleWhatsAppOrder')
+    expect(detail).toContain('price: displayPrice')
+    expect(detail).toContain('formatRWF(displayPrice * quantity)')
   })
 
   it('disables online checkout for approved wholesale customers', () => {

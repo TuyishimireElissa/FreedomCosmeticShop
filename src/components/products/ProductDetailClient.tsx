@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, Heart, MessageCircle, Minus, Plus, RefreshCw, ShieldCheck, ShoppingBag, Star } from 'lucide-react'
+import { ChevronLeft, Heart, Minus, Plus, RefreshCw, ShieldCheck, ShoppingBag, Star } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
 import { useStore } from '@/store/useStore'
@@ -17,7 +17,6 @@ import IconButton from '@/components/a11y/IconButton'
 import StockStatus from '@/components/a11y/StockStatus'
 import { getProductPrimaryImage } from '@/lib/cloudinary-images'
 import { useAnalytics } from '@/hooks/useAnalytics'
-import { buildWholesaleWhatsAppOrder } from '@/lib/wholesale-whatsapp'
 
 interface ProductResponse { product: Product; related: Product[] }
 
@@ -73,7 +72,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
   const add = () => {
     if (outOfStock) return
-    addToCart({ productId: product.id, slug: product.slug, name: product.name, price: product.price, image: primaryImage?.url || '', stock: product.stock }, quantity)
+    addToCart({ productId: product.id, slug: product.slug, name: product.name, price: displayPrice, retailPrice: product.price, wholesalePrice: product.wholesalePrice || undefined, image: primaryImage?.url || '', volume: product.volume || product.size || undefined, stock: product.stock }, quantity)
     toast({ title: t('product.added'), description: `${quantity} × ${product.name}${shade ? ` · ${shade}` : ''}` })
   }
 
@@ -96,12 +95,12 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
             {product.shades && product.shades.length > 0 && <div className="mt-6"><p className="text-xs font-bold uppercase tracking-wider text-gray-500">{t('product.select_shade')} <span className="ml-1 normal-case text-[#B76E79]">{shade}</span></p><div className="mt-2 flex flex-wrap gap-2">{product.shades.map((value) => <button key={value} type="button" onClick={() => setShade(value)} className={`rounded-xl border-2 px-3 py-2 text-sm font-bold ${shade === value ? 'border-[#B76E79] bg-rose-50 text-[#B76E79]' : 'border-gray-200 text-gray-600'}`}>{value}</button>)}</div></div>}
 
-            <div className="mt-7 flex flex-wrap gap-3"><div className="flex h-12 items-center overflow-hidden rounded-xl border border-gray-200"><IconButton label={t('product.decrease_quantity')} icon={<Minus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1} variant="ghost" className="h-full rounded-none" /><span className="grid h-full min-w-11 place-items-center border-x border-gray-200 text-sm font-bold">{quantity}</span><IconButton label={t('product.increase_quantity')} icon={<Plus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.min(product.stock, value + 1))} disabled={quantity >= product.stock} variant="ghost" className="h-full rounded-none" /></div>{isWholesale ? <a href={buildWholesaleWhatsAppOrder({ product, unitPrice: displayPrice, quantity, managerWhatsApp: user?.assignedManagerWhatsApp })} target="_blank" rel="noopener noreferrer" className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-6 text-sm font-bold text-white hover:bg-emerald-700"><MessageCircle className="h-5 w-5" />Order via WhatsApp · {formatRWF(displayPrice * quantity)}</a> : <button type="button" onClick={add} disabled={outOfStock} className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 text-sm font-bold text-white hover:bg-[#9B5A64] disabled:bg-gray-300"><ShoppingBag className="h-5 w-5" />{outOfStock ? t('common.sold_out') : `${t('product.add_to_cart')} · ${formatRWF(product.price * quantity)}`}</button>}<IconButton label={wishlisted ? t('product.remove_from_wishlist') : t('product.add_to_wishlist')} icon={<Heart className={`h-5 w-5 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} />} aria-pressed={wishlisted} onClick={() => setWishlisted((value) => !value)} size="lg" className="rounded-xl border border-gray-200" /></div>
+            <div className="mt-7 flex flex-wrap gap-3"><div className="flex h-12 items-center overflow-hidden rounded-xl border border-gray-200"><IconButton label={t('product.decrease_quantity')} icon={<Minus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1} variant="ghost" className="h-full rounded-none" /><span className="grid h-full min-w-11 place-items-center border-x border-gray-200 text-sm font-bold">{quantity}</span><IconButton label={t('product.increase_quantity')} icon={<Plus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.min(product.stock, value + 1))} disabled={quantity >= product.stock} variant="ghost" className="h-full rounded-none" /></div><button type="button" onClick={add} disabled={outOfStock} className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 text-sm font-bold text-white hover:bg-[#9B5A64] disabled:bg-gray-300"><ShoppingBag className="h-5 w-5" />{outOfStock ? t('common.sold_out') : `${t('product.add_to_cart')} · ${formatRWF(displayPrice * quantity)}`}</button><IconButton label={wishlisted ? t('product.remove_from_wishlist') : t('product.add_to_wishlist')} icon={<Heart className={`h-5 w-5 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} />} aria-pressed={wishlisted} onClick={() => setWishlisted((value) => !value)} size="lg" className="rounded-xl border border-gray-200" /></div>
 
             {isWholesale && user?.assignedManagerName && <div className="mt-4 rounded-xl border bg-gray-50 p-3 text-sm"><p className="font-semibold">Your account manager: {user.assignedManagerName}</p><div className="mt-2 flex gap-3">{user.assignedManagerWhatsApp && <a className="font-semibold text-emerald-700" href={`https://wa.me/${user.assignedManagerWhatsApp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>}{user.assignedManagerPhone && <a className="font-semibold text-[#B76E79]" href={`tel:${user.assignedManagerPhone}`}>Call</a>}</div></div>}
             {!isWholesale && <><div className="my-4 flex items-center gap-3"><span className="h-px flex-1 bg-gray-100" /><span className="text-xs text-gray-400">{t('common.or')}</span><span className="h-px flex-1 bg-gray-100" /></div><OrderViaWhatsApp product={{ id: product.id, name: product.name, slug: product.slug, price: product.price, stock: product.stock }} selectedShade={shade || undefined} selectedSize={product.volume || product.size || undefined} quantity={quantity} variant="compact" className="w-full" /></>}
 
-            <div className="mt-6"><DeliveryEstimator orderTotal={product.price * quantity} /></div>
+            <div className="mt-6"><DeliveryEstimator orderTotal={displayPrice * quantity} /></div>
           </div>
         </div>
 

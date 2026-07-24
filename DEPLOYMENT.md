@@ -83,8 +83,8 @@ npx tsx scripts/seed.ts
 
 ## Step 7: Delete old project
 
-Go to: https://vercel.com/tuyishimire-elissa/samuel-cosmetic-shop/settings
-Scroll to bottom → Click "Delete Project" → Type: samuel-cosmetic-shop → Delete
+Go to: https://vercel.com/tuyishimire-elissa/FreedomCosmeticShop/settings
+Scroll to bottom → Click "Delete Project" → Type: FreedomCosmeticShop → Delete
 
 ## Step 8: Verify
 

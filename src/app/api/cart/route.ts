@@ -22,10 +22,11 @@ export async function GET() {
     const data = cart
       ? {
           ...cart,
-          items: cart.items.map((item) => ({
-            ...item,
-            product: serializePublicProduct(item.product, sales.get(item.productId) || 0),
-          })),
+          items: cart.items.map((item) => {
+            const product = serializePublicProduct(item.product, sales.get(item.productId) || 0)
+            const price = user.wholesaleStatus === 'APPROVED' && product.wholesalePrice ? product.wholesalePrice : product.price
+            return { ...item, price, product }
+          }),
         }
       : { items: [], totalItems: 0, subtotal: 0 }
     return NextResponse.json({ success: true, data: { cart: data }, cart: data })
@@ -36,11 +37,11 @@ export async function POST(request: Request) {
   try {
     const user = await requireAuth(); if (!user) return fail('Unauthorized', 401)
     const parsed = itemSchema.safeParse(await request.json()); if (!parsed.success) return fail('Invalid productId or quantity', 400)
-    const product = await prisma.product.findFirst({ where: { id: parsed.data.productId, isActive: true, isDeleted: false } }); if (!product) return fail('Product not found', 404); if (product.stock < parsed.data.quantity) return fail('Insufficient stock', 400)
+    const product = await prisma.product.findFirst({ where: { id: parsed.data.productId, isActive: true, isDeleted: false } }); if (!product) return fail('Product not found', 404); const unitPrice = user.wholesaleStatus === 'APPROVED' && product.wholesalePrice ? product.wholesalePrice : product.price; if (product.stock < parsed.data.quantity) return fail('Insufficient stock', 400)
     const cart = await prisma.cart.upsert({ where: { userId: user.id }, create: { userId: user.id }, update: {} })
     const existing = await prisma.cartItem.findUnique({ where: { cartId_productId: { cartId: cart.id, productId: product.id } } })
     const quantity = Math.min((existing?.quantity || 0) + parsed.data.quantity, product.stock)
-    const item = existing ? await prisma.cartItem.update({ where: { id: existing.id }, data: { quantity, price: product.price } }) : await prisma.cartItem.create({ data: { cartId: cart.id, productId: product.id, quantity, price: product.price } })
+    const item = existing ? await prisma.cartItem.update({ where: { id: existing.id }, data: { quantity, price: unitPrice } }) : await prisma.cartItem.create({ data: { cartId: cart.id, productId: product.id, quantity, price: unitPrice } })
     const updated = await recalculate(cart.id)
     await syncAbandonedCartReminder(user.id, updated).catch(() => null)
     return NextResponse.json({ success: true, data: { item, cart: updated }, item, cart: updated }, { status: 201 })
@@ -53,7 +54,8 @@ export async function PATCH(request: Request) {
     const parsed = itemSchema.safeParse(await request.json()); if (!parsed.success) return fail('Invalid productId or quantity', 400)
     const cart = await prisma.cart.findUnique({ where: { userId: user.id } }); if (!cart) return fail('Cart not found', 404)
     const product = await prisma.product.findUnique({ where: { id: parsed.data.productId } }); if (!product || product.stock < parsed.data.quantity) return fail('Insufficient stock', 400)
-    const item = await prisma.cartItem.update({ where: { cartId_productId: { cartId: cart.id, productId: product.id } }, data: { quantity: parsed.data.quantity, price: product.price } })
+    const unitPrice = user.wholesaleStatus === 'APPROVED' && product.wholesalePrice ? product.wholesalePrice : product.price
+    const item = await prisma.cartItem.update({ where: { cartId_productId: { cartId: cart.id, productId: product.id } }, data: { quantity: parsed.data.quantity, price: unitPrice } })
     const updated = await recalculate(cart.id)
     await syncAbandonedCartReminder(user.id, updated).catch(() => null)
     return NextResponse.json({ success: true, data: { item, cart: updated }, item, cart: updated })

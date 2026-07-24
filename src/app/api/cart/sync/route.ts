@@ -23,11 +23,14 @@ export async function POST(request: Request) {
     const parsed = schema.safeParse(await request.json())
     if (!parsed.success) return NextResponse.json({ success: false, error: 'INVALID_CART' }, { status: 400 })
 
+    const isWholesale = user.wholesaleStatus === 'APPROVED'
+    const unitPrice = (product: { price: number; wholesalePrice: number | null }) => isWholesale && product.wholesalePrice ? product.wholesalePrice : product.price
+
     const requested = new Map<string, number>()
     for (const item of parsed.data.items) requested.set(item.productId, Math.min(99, (requested.get(item.productId) || 0) + item.quantity))
     const products = await prisma.product.findMany({
       where: { id: { in: [...requested.keys()] }, isActive: true, isDeleted: false },
-      select: { id: true, name: true, slug: true, price: true, compareAt: true, stock: true, volume: true, images: true, category: { select: { slug: true } }, brand: { select: { name: true } }, productImages: { select: { url: true, publicId: true, altText: true, isPrimary: true, sortOrder: true }, orderBy: { sortOrder: 'asc' } } },
+      select: { id: true, name: true, slug: true, price: true, wholesalePrice: true, compareAt: true, stock: true, volume: true, images: true, category: { select: { slug: true } }, brand: { select: { name: true } }, productImages: { select: { url: true, publicId: true, altText: true, isPrimary: true, sortOrder: true }, orderBy: { sortOrder: 'asc' } } },
     })
 
     const accepted = products.flatMap((product) => {
@@ -35,13 +38,13 @@ export async function POST(request: Request) {
       return quantity > 0 ? [{ product, quantity }] : []
     })
     const totalItems = accepted.reduce((sum, item) => sum + item.quantity, 0)
-    const subtotal = accepted.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
+    const subtotal = accepted.reduce((sum, item) => sum + unitPrice(item.product) * item.quantity, 0)
 
     const cart = await prisma.$transaction(async (tx) => {
       const current = await tx.cart.upsert({ where: { userId: user.id }, create: { userId: user.id }, update: {} })
       await tx.cartItem.deleteMany({ where: { cartId: current.id } })
       if (accepted.length > 0) {
-        await tx.cartItem.createMany({ data: accepted.map(({ product, quantity }) => ({ cartId: current.id, productId: product.id, quantity, price: product.price })) })
+        await tx.cartItem.createMany({ data: accepted.map(({ product, quantity }) => ({ cartId: current.id, productId: product.id, quantity, price: unitPrice(product) })) })
       }
       return tx.cart.update({ where: { id: current.id }, data: { totalItems, subtotal } })
     })
@@ -53,9 +56,9 @@ export async function POST(request: Request) {
       return {
         productId: product.id,
         quantity,
-        price: product.price,
+        price: unitPrice(product),
         product: {
-          id: product.id, name: product.name, slug: product.slug, price: product.price, compareAt: product.compareAt,
+          id: product.id, name: product.name, slug: product.slug, price: product.price, wholesalePrice: product.wholesalePrice, compareAt: product.compareAt,
           stock: product.stock, volume: product.volume, images: parseImages(product.images), category: product.category, brand: product.brand,
           productImages: image ? [image] : [],
         },

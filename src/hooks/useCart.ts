@@ -13,24 +13,27 @@ export function useCart() {
   const t = useT()
   const store = useCartStore()
   const importLegacyItems = useCartStore((state) => state.importLegacyItems)
+  const repriceItems = useCartStore((state) => state.repriceItems)
+  const isWholesale = useStore((state) => state.user?.wholesaleStatus === 'APPROVED')
   useEffect(() => {
     try {
       const legacy = JSON.parse(localStorage.getItem('freedom-store') || '{}')?.state || {}
       const map = (item: Record<string, unknown>, index: number): CartItem => ({
         id: `legacy-${index}-${String(item.productId || '')}`,
         productId: String(item.productId || ''), slug: String(item.slug || ''), name: String(item.name || ''),
-        price: Number(item.price || 0), quantity: Number(item.quantity || 1), maxQuantity: Number(item.stock || item.maxQuantity || 0),
-        image: typeof item.image === 'string' ? item.image : undefined, bundleId: typeof item.bundleId === 'string' ? item.bundleId : undefined, isBundle: item.isBundle === true,
+        price: Number(item.price || 0), retailPrice: Number(item.retailPrice || item.price || 0), wholesalePrice: item.wholesalePrice ? Number(item.wholesalePrice) : undefined, quantity: Number(item.quantity || 1), maxQuantity: Number(item.stock || item.maxQuantity || 0),
+        volume: typeof item.volume === 'string' ? item.volume : undefined, image: typeof item.image === 'string' ? item.image : undefined, bundleId: typeof item.bundleId === 'string' ? item.bundleId : undefined, isBundle: item.isBundle === true,
       })
       const items = Array.isArray(legacy.items) ? legacy.items.map(map).filter((item: CartItem) => item.productId && item.maxQuantity > 0) : []
       const saved = Array.isArray(legacy.savedItems) ? legacy.savedItems.map(map).filter((item: CartItem) => item.productId && item.maxQuantity > 0) : []
       importLegacyItems(items, saved)
     } catch {}
   }, [importLegacyItems])
+  useEffect(() => { repriceItems(isWholesale) }, [isWholesale, repriceItems])
   useEffect(() => {
     useStore.setState({
-      items: store.items.map((item) => ({ productId: item.productId, slug: item.slug, name: item.name, price: item.price, image: item.image || '', quantity: item.quantity, stock: item.maxQuantity, bundleId: item.bundleId, isBundle: item.isBundle })),
-      savedItems: store.savedItems.map((item) => ({ productId: item.productId, slug: item.slug, name: item.name, price: item.price, image: item.image || '', quantity: item.quantity, stock: item.maxQuantity, bundleId: item.bundleId, isBundle: item.isBundle })),
+      items: store.items.map((item) => ({ productId: item.productId, slug: item.slug, name: item.name, price: item.price, retailPrice: item.retailPrice, wholesalePrice: item.wholesalePrice, image: item.image || '', volume: item.volume, quantity: item.quantity, stock: item.maxQuantity, bundleId: item.bundleId, isBundle: item.isBundle })),
+      savedItems: store.savedItems.map((item) => ({ productId: item.productId, slug: item.slug, name: item.name, price: item.price, retailPrice: item.retailPrice, wholesalePrice: item.wholesalePrice, image: item.image || '', volume: item.volume, quantity: item.quantity, stock: item.maxQuantity, bundleId: item.bundleId, isBundle: item.isBundle })),
     })
   }, [store.items, store.savedItems])
   const addToCart = useCallback((item: Omit<CartItem, 'id'> & { id?: string }) => {

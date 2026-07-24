@@ -21,11 +21,12 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet"
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
+import { Check, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
 import { useCartUpdates } from "@/hooks/use-realtime"
 import { useToast } from "@/hooks/use-toast"
 import { useT } from '@/lib/i18n/LanguageContext'
 import IconButton from '@/components/a11y/IconButton'
+import WholesaleCartOrderButton from '@/components/cart/WholesaleCartOrderButton'
 
 export function CartDrawer() {
   const t = useT()
@@ -39,10 +40,13 @@ export function CartDrawer() {
     cartSubtotal,
     goCart,
     goCheckout,
+    user,
+    clearCart,
     goProduct,
   } = useStore()
 
   const subtotal = cartSubtotal()
+  const isWholesale = user?.wholesaleStatus === 'APPROVED'
 
   // ─── Section 2: Real-time cart sync ───────────────────────────────
   // When a product in the cart goes out of stock, changes price, or is
@@ -65,7 +69,11 @@ export function CartDrawer() {
       // since there's no dedicated "updatePrice" action
       useStore.setState({
         items: useStore.getState().items.map((i) =>
-          i.productId === p.id ? { ...i, price: p.price! } : i
+          i.productId === p.id
+            ? isWholesale
+              ? { ...i, retailPrice: p.price! }
+              : { ...i, price: p.price!, retailPrice: p.price! }
+            : i
         ),
       })
       toast({
@@ -142,7 +150,7 @@ export function CartDrawer() {
                     >
                       {item.name}
                     </button>
-                    <p className="text-muted-foreground text-xs">{formatRWF(item.price)}</p>
+                    <p className="text-muted-foreground text-xs">{formatRWF(item.price)} each</p>{isWholesale && item.retailPrice && item.retailPrice > item.price && <><p className="text-[11px] text-gray-400 line-through">Retail: {formatRWF(item.retailPrice)}</p><p className="text-[11px] font-semibold text-emerald-700">Save {formatRWF(item.retailPrice - item.price)} per unit</p></>}
                     <div className="mt-auto flex items-center justify-between pt-1">
                       <div className="flex items-center rounded-md border">
                         <IconButton label={`${t('product.decrease_quantity')}: ${item.name}`} icon={<Minus className="h-3 w-3" />} onClick={() => updateQuantity(item.productId, item.quantity - 1)} disabled={item.quantity <= 1} variant="ghost" className="rounded-r-none" />
@@ -165,28 +173,20 @@ export function CartDrawer() {
                 <span className="text-muted-foreground text-sm">{t('cart.subtotal')}</span>
                 <span className="text-lg font-bold">{formatRWF(subtotal)}</span>
               </div>
-              <p className="text-muted-foreground mb-3 text-xs">
-                {t('cart.delivery_fee_checkout')}
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setCartOpen(false)
-                    goCart()
-                  }}
-                >
+              {isWholesale ? <p className="mb-3 flex items-center gap-1.5 text-xs font-bold text-emerald-700"><Check className="h-4 w-4" />Wholesale prices applied</p> : <p className="text-muted-foreground mb-3 text-xs">{t('cart.delivery_fee_checkout')}</p>}
+              <div className={isWholesale ? 'space-y-2' : 'grid grid-cols-2 gap-2'}>
+                <Button variant="outline" className="w-full" onClick={() => { setCartOpen(false); goCart() }}>
                   {t('cart.view_cart')}
                 </Button>
-                <Button
-                  onClick={() => {
-                    setCartOpen(false)
-                    goCheckout()
-                  }}
-                >
+                {isWholesale ? <WholesaleCartOrderButton
+                  items={items}
+                  managerWhatsApp={user?.assignedManagerWhatsApp}
+                  onClearCart={clearCart}
+                  onNavigate={() => setCartOpen(false)}
+                /> : <Button onClick={() => { setCartOpen(false); goCheckout() }}>
                   {t('checkout.title')}
                   <ArrowRight className="ml-1.5 h-4 w-4" />
-                </Button>
+                </Button>}
               </div>
             </div>
           </>

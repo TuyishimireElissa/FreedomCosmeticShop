@@ -7,11 +7,11 @@ import { useOfflineDetection } from '@/hooks/useOfflineDetection'
 
 const RETRY_DELAYS = [0, 1000, 2500]
 
-type ServerCartEntry = { id?: string; productId: string; quantity: number; product: { name: string; slug: string; price: number; stock: number; compareAt?: number | null; volume?: string | null; images?: string[]; productImages?: Array<{ url: string; publicId: string; altText: string }>; brand?: { name: string } | null; category?: { slug: string } | null } }
+type ServerCartEntry = { id?: string; productId: string; quantity: number; price?: number; product: { name: string; slug: string; price: number; wholesalePrice?: number | null; stock: number; compareAt?: number | null; volume?: string | null; images?: string[]; productImages?: Array<{ url: string; publicId: string; altText: string }>; brand?: { name: string } | null; category?: { slug: string } | null } }
 function mapServerItem(entry: ServerCartEntry): CartItem {
   const product = entry.product
   const image = product.productImages?.[0]
-  return { id: entry.id || `server-${entry.productId}`, productId: entry.productId, name: product.name, slug: product.slug, price: product.price, comparePrice: product.compareAt || undefined, quantity: entry.quantity, maxQuantity: product.stock, image: image?.url || product.images?.[0], imagePublicId: image?.publicId, imageAlt: image?.altText || product.name, volume: product.volume || undefined, brandName: product.brand?.name, categorySlug: product.category?.slug }
+  return { id: entry.id || `server-${entry.productId}`, productId: entry.productId, name: product.name, slug: product.slug, price: entry.price ?? product.price, retailPrice: product.price, wholesalePrice: product.wholesalePrice || undefined, comparePrice: product.compareAt || undefined, quantity: entry.quantity, maxQuantity: product.stock, image: image?.url || product.images?.[0], imagePublicId: image?.publicId, imageAlt: image?.altText || product.name, volume: product.volume || undefined, brandName: product.brand?.name, categorySlug: product.category?.slug }
 }
 
 export function useCartSync() {

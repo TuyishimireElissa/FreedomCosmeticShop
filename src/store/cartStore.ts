@@ -10,6 +10,8 @@ export interface CartItem {
   nameRw?: string
   slug: string
   price: number
+  retailPrice?: number
+  wholesalePrice?: number
   comparePrice?: number
   quantity: number
   maxQuantity: number
@@ -43,6 +45,7 @@ interface CartStore {
   updateQuantity: (productId: string, quantity: number) => void
   undoRemove: () => boolean
   clearCart: () => void
+  repriceItems: (isWholesale: boolean) => void
   saveForLater: (productId: string) => void
   moveToCart: (productId: string) => void
   removeSaved: (productId: string) => void
@@ -88,6 +91,10 @@ export const useCartStore = create<CartStore>()(
         return true
       },
       clearCart: () => set({ items: [], lastRemoved: null }),
+      repriceItems: (isWholesale) => set((state) => ({
+        items: state.items.map((item) => ({ ...item, price: isWholesale && item.wholesalePrice ? item.wholesalePrice : item.retailPrice || item.price })),
+        savedItems: state.savedItems.map((item) => ({ ...item, price: isWholesale && item.wholesalePrice ? item.wholesalePrice : item.retailPrice || item.price })),
+      })),
       saveForLater: (productId) => set((state) => { const item = state.items.find((value) => value.productId === productId); if (!item) return state; return { items: state.items.filter((value) => value.productId !== productId), savedItems: [...state.savedItems.filter((value) => value.productId !== productId), { ...item, savedForLater: true }] } }),
       moveToCart: (productId) => set((state) => { const item = state.savedItems.find((value) => value.productId === productId); if (!item) return state; const existing = state.items.find((value) => value.productId === productId); const moved = { ...item, savedForLater: false }; return { savedItems: state.savedItems.filter((value) => value.productId !== productId), items: existing ? state.items.map((value) => value.productId === productId ? { ...value, quantity: safeQuantity(value.quantity + moved.quantity, moved.maxQuantity) } : value) : [...state.items, moved] } }),
       removeSaved: (productId) => set((state) => ({ savedItems: state.savedItems.filter((item) => item.productId !== productId) })),

@@ -53,8 +53,11 @@ export interface CartItem {
   productId: string
   slug: string
   name: string
-  price: number // RWF
+  price: number // active retail or wholesale RWF unit price
+  retailPrice?: number // always the public retail unit price
+  wholesalePrice?: number // admin-entered wholesale unit price
   image: string
+  volume?: string
   quantity: number
   stock: number
   bundleId?: string
@@ -143,6 +146,14 @@ interface StoreState {
 
 /* ---------- Store ---------- */
 
+function repriceItemsForUser(items: CartItem[], user: AuthUser | null): CartItem[] {
+  const wholesale = user?.wholesaleStatus === 'APPROVED'
+  return items.map((item) => ({
+    ...item,
+    price: wholesale && item.wholesalePrice ? item.wholesalePrice : item.retailPrice || item.price,
+  }))
+}
+
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
@@ -222,25 +233,25 @@ export const useStore = create<StoreState>()(
           const res = await fetch("/api/auth/me")
           if (res.ok) {
             const data = await res.json()
-            set({ user: data.user, authLoading: false })
+            set((state) => ({ user: data.user, authLoading: false, items: repriceItemsForUser(state.items, data.user), savedItems: repriceItemsForUser(state.savedItems, data.user) }))
           } else {
             // Try to refresh the token
             const refreshRes = await fetch("/api/auth/refresh", { method: "POST" })
             if (refreshRes.ok) {
               const refreshData = await refreshRes.json()
-              set({ user: refreshData.user, authLoading: false })
+              set((state) => ({ user: refreshData.user, authLoading: false, items: repriceItemsForUser(state.items, refreshData.user), savedItems: repriceItemsForUser(state.savedItems, refreshData.user) }))
             } else {
-              set({ user: null, authLoading: false })
+              set((state) => ({ user: null, authLoading: false, items: repriceItemsForUser(state.items, null), savedItems: repriceItemsForUser(state.savedItems, null) }))
             }
           }
         } catch {
-          set({ user: null, authLoading: false })
+          set((state) => ({ user: null, authLoading: false, items: repriceItemsForUser(state.items, null), savedItems: repriceItemsForUser(state.savedItems, null) }))
         }
       },
-      setUser: (user) => set({ user }),
+      setUser: (user) => set((state) => ({ user, items: repriceItemsForUser(state.items, user), savedItems: repriceItemsForUser(state.savedItems, user) })),
       logout: async () => {
         try { await fetch("/api/auth/logout", { method: "POST" }) } catch {}
-        set({ user: null, isAdminAuthenticated: false })
+        set((state) => ({ user: null, isAdminAuthenticated: false, items: repriceItemsForUser(state.items, null), savedItems: repriceItemsForUser(state.savedItems, null) }))
       },
       login: async (phone: string, password: string) => {
         const res = await fetch("/api/auth/login", {
@@ -250,7 +261,7 @@ export const useStore = create<StoreState>()(
         })
         const data = await res.json()
         if (!res.ok) throw new Error(data.error || "Login failed")
-        set({ user: data.user })
+        set((state) => ({ user: data.user, items: repriceItemsForUser(state.items, data.user), savedItems: repriceItemsForUser(state.savedItems, data.user) }))
       },
       setAdminAuthenticated: (val: boolean) => set({ isAdminAuthenticated: val }),
 
@@ -261,7 +272,7 @@ export const useStore = create<StoreState>()(
           const newQty = Math.min(existing.quantity + qty, item.stock)
           set({
             items: get().items.map((i) =>
-              i.productId === item.productId ? { ...i, quantity: newQty } : i
+              i.productId === item.productId ? { ...i, ...item, quantity: newQty } : i
             ),
             isCartOpen: true,
           })

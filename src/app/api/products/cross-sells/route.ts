@@ -43,7 +43,7 @@ export async function GET(request: Request) {
         stock: { gt: 0 },
       },
       select: {
-        id: true, name: true, slug: true, price: true, compareAt: true, stock: true, volume: true, categoryId: true,
+        id: true, name: true, slug: true, price: true, wholesalePrice: true, compareAt: true, stock: true, volume: true, categoryId: true,
         category: { select: { slug: true } },
         brand: { select: { name: true } },
         images: true,
@@ -63,6 +63,7 @@ export async function GET(request: Request) {
           name: product.name,
           slug: product.slug,
           price: product.price,
+          wholesalePrice: product.wholesalePrice,
           compareAt: product.compareAt,
           stock: product.stock,
           volume: product.volume,

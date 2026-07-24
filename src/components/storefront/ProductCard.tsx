@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Check, Heart, MessageCircle, Package, ShoppingCart, Star } from 'lucide-react'
+import { Check, Heart, Package, ShoppingCart, Star } from 'lucide-react'
 import type { Product, ProductImage } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
-import { buildWholesaleWhatsAppOrder } from '@/lib/wholesale-whatsapp'
 
 type ProductWithImageFallbacks = Product & {
   image?: string | null
@@ -93,8 +92,11 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
       productId: product.id,
       slug: product.slug,
       name: product.name,
-      price: product.price,
+      price: displayPrice,
+      retailPrice: product.price,
+      wholesalePrice: product.wholesalePrice || undefined,
       image: imageUrl || '',
+      volume: size || undefined,
       stock: product.stock,
     })
     setAdded(true)
@@ -162,7 +164,7 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
         </div>
         {wholesaleSavings > 0 && <p className="mt-1 text-xs font-semibold text-emerald-700">Save {formatRWF(wholesaleSavings)} per unit</p>}
 
-        {isWholesale ? <a href={buildWholesaleWhatsAppOrder({ product, unitPrice: displayPrice, managerWhatsApp: user?.assignedManagerWhatsApp })} target="_blank" rel="noopener noreferrer" className="relative mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 text-[13px] font-semibold text-white transition-colors hover:bg-emerald-700"><MessageCircle className="h-4 w-4" />Order via WhatsApp</a> : <button
+        <button
           type="button"
           onClick={addProduct}
           disabled={outOfStock}
@@ -170,7 +172,7 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
         >
           {added ? <Check className="h-4 w-4" aria-hidden="true" /> : <ShoppingCart className="h-4 w-4" aria-hidden="true" />}
           {outOfStock ? t('common.sold_out') : added ? t('product.added') : t('product.add_to_cart')}
-        </button>}
+        </button>
       </div>
     </article>
   )
