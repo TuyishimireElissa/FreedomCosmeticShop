@@ -49,18 +49,17 @@ describe('approved wholesale cart ordering', () => {
     expect(detail).toContain('retailPrice: product.price')
   })
 
-  it('shows wholesale WhatsApp completion actions while retaining retail checkout', () => {
+  it('routes wholesale checkout through the invoice preview while retaining retail checkout', () => {
     const cart = read('src/components/storefront/CartView.tsx')
     const drawer = read('src/components/storefront/CartDrawer.tsx')
-    const confirmation = read('src/components/cart/WholesaleCartOrderButton.tsx')
+    const wholesaleCta = read('src/components/cart/WholesaleCartOrderButton.tsx')
     for (const source of [cart, drawer]) {
       expect(source).toContain("user?.wholesaleStatus === 'APPROVED'")
       expect(source).toContain('WholesaleCartOrderButton')
     }
     expect(cart).toContain('href="/checkout"')
-    expect(confirmation).toContain('Yes, clear my cart')
-    expect(confirmation).toContain('No, keep items')
-    expect(confirmation).toContain('Continue Shopping')
+    expect(wholesaleCta).toContain('href="/wholesale/order-preview"')
+    expect(wholesaleCta).toContain('Order via WhatsApp')
   })
 
   it('enforces authoritative wholesale prices in server cart APIs', () => {
