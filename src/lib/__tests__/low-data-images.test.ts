@@ -64,12 +64,13 @@ describe('low-data responsive images', () => {
     expect(legacy).not.toContain('w_1200')
   })
 
-  it('uses the API image URL directly on cards and responsive detail galleries', () => {
+  it('uses responsive, low-data-aware images on cards and detail galleries', () => {
     expect(productCard).toContain('export function getImageUrl')
     expect(productCard).toContain('product.images')
     expect(productCard).toContain('product.productImages')
-    expect(productCard).toContain('loading="lazy"')
-    expect(productCard).toContain('decoding="async"')
+    expect(productCard).toContain('<SmartImage')
+    expect(productCard).toContain('context="card"')
+    expect(productCard).toContain('publicId={imagePublicId}')
     expect(gallery).toContain('context="detail"')
     expect(gallery).toContain('context="thumbnail"')
   })

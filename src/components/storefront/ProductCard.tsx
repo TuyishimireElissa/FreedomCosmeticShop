@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { Check, Heart, Package, ShoppingCart, Star } from 'lucide-react'
 import type { Product, ProductImage } from '@/lib/types'
@@ -8,6 +8,7 @@ import { formatRWF } from '@/lib/format'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
+import SmartImage from '@/components/ui/SmartImage'
 
 type ProductWithImageFallbacks = Product & {
   image?: string | null
@@ -53,17 +54,21 @@ export function getImageUrl(product: ProductWithImageFallbacks): string | null {
   return null
 }
 
+
+export function getImagePublicId(product: ProductWithImageFallbacks): string | undefined {
+  const images = Array.isArray(product.productImages) ? product.productImages : []
+  const selected = images.find((image) => image.isPrimary) || images[0]
+  return selected?.publicId || undefined
+}
+
 export function ProductCard({ product, wishlisted = false, onToggleWishlist }: ProductCardProps) {
   const { t } = useLanguage()
   const addToCart = useStore((state) => state.addToCart)
   const user = useStore((state) => state.user)
   const { toast } = useToast()
   const [added, setAdded] = useState(false)
-  const [imageFailed, setImageFailed] = useState(false)
-
   const imageUrl = getImageUrl(product)
-
-  useEffect(() => setImageFailed(false), [imageUrl])
+  const imagePublicId = getImagePublicId(product)
 
   const imageAlt = product.name
   const outOfStock = product.isOutOfStock ?? product.stock < 1
@@ -108,14 +113,15 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
     <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg">
       <div className="relative aspect-square w-full overflow-hidden rounded-t-xl bg-[#f5f5f5]">
         <Link href={`/products/${product.slug}`} className="block h-full w-full" aria-label={t('product.view_product', { product: product.name })}>
-          {imageUrl && !imageFailed ? (
-            <img
-              src={imageUrl}
+          {imageUrl ? (
+            <SmartImage
+              publicId={imagePublicId}
+              fallbackSrc={imageUrl}
+              context="card"
               alt={imageAlt}
-              className={`h-full w-full object-contain p-4 transition-transform duration-300 ease-out group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`}
-              loading="lazy"
-              decoding="async"
-              onError={() => setImageFailed(true)}
+              fill
+              aspectRatio={1}
+              className={`object-contain p-4 transition-transform duration-300 ease-out group-hover:scale-105 ${outOfStock ? 'opacity-60' : ''}`}
             />
           ) : (
             <span role="img" aria-label={imageAlt} className="flex h-full w-full flex-col items-center justify-center px-3 text-center text-gray-300">

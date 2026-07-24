@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma'
 import { requirePermission, PERMISSIONS, rateLimit } from '@/lib/permissions'
 import { logActivity } from '@/server/services/activity'
 
-const MAX_FILE_BYTES = 8 * 1024 * 1024
+const MAX_FILE_BYTES = 10 * 1024 * 1024
 const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const ImageTypeSchema = z.enum(['PRODUCT', 'PACKAGING', 'BACK_LABEL', 'SEAL', 'TEXTURE', 'SIZE_SCALE', 'SHADE', 'LIFESTYLE', 'VIDEO_THUMB'])
 
@@ -41,7 +41,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const file = form.get('file')
     if (!(file instanceof File)) return NextResponse.json({ success: false, error: 'Image file is required' }, { status: 400 })
     if (!ALLOWED_TYPES.has(file.type)) return NextResponse.json({ success: false, error: 'Only JPEG, PNG, and WebP images are allowed' }, { status: 400 })
-    if (file.size < 1 || file.size > MAX_FILE_BYTES) return NextResponse.json({ success: false, error: 'Image must be between 1 byte and 8 MB' }, { status: 400 })
+    if (file.size < 1 || file.size > MAX_FILE_BYTES) return NextResponse.json({ success: false, error: 'Image must be between 1 byte and 10 MB' }, { status: 400 })
 
     const imageType = ImageTypeSchema.safeParse(String(form.get('imageType') || 'PRODUCT'))
     const altText = String(form.get('altText') || '').trim()

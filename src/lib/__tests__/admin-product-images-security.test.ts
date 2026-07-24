@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 const uploadRoute = readFileSync(resolve(process.cwd(), 'src/app/api/admin/products/[id]/images/route.ts'), 'utf8')
+const genericUploadRoute = readFileSync(resolve(process.cwd(), 'src/app/api/upload/route.ts'), 'utf8')
 const imageRoute = readFileSync(resolve(process.cwd(), 'src/app/api/admin/products/[id]/images/[imageId]/route.ts'), 'utf8')
 const productManager = readFileSync(resolve(process.cwd(), 'src/components/admin/AdminProductManager.tsx'), 'utf8')
 
@@ -14,7 +15,7 @@ describe('admin structured product image security', () => {
   })
 
   it('limits file type, file size, image count, and public metadata lengths', () => {
-    expect(uploadRoute).toContain('MAX_FILE_BYTES = 8 * 1024 * 1024')
+    expect(uploadRoute).toContain('MAX_FILE_BYTES = 10 * 1024 * 1024')
     expect(uploadRoute).toContain("'image/jpeg', 'image/png', 'image/webp'")
     expect(uploadRoute).toContain('if (count >= 20)')
     expect(uploadRoute).toContain('altText.length > 300')
@@ -32,6 +33,10 @@ describe('admin structured product image security', () => {
     expect(productManager).toContain('5 - form.images.length')
     expect(productManager).toContain('10 * 1024 * 1024')
     expect(productManager).toContain('multiple onChange={handlePhotoUpload}')
+    expect(productManager).toContain('onDrop={(event) =>')
+    expect(productManager).toContain('event.dataTransfer.files')
+    expect(genericUploadRoute).toContain('generic-image-upload')
+    expect(genericUploadRoute).toContain('maxActions: 20')
     expect(productManager).toContain('Advanced inventory and margin')
     expect(productManager).not.toContain('newImageUrl')
     expect(productManager).not.toContain('Legacy URL images')

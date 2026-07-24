@@ -275,10 +275,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     setShowForm(true)
   }
 
-  const handlePhotoUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = Array.from(event.target.files || []).slice(0, Math.max(0, 5 - form.images.length))
-    event.target.value = ''
-    if (selectedFiles.length === 0) return
+  const uploadPhotoFiles = async (incomingFiles: File[]) => {
+    const selectedFiles = incomingFiles.slice(0, Math.max(0, 5 - form.images.length))
+    if (selectedFiles.length === 0 || uploadingPhotos) return
     setUploadingPhotos(true)
     try {
       const uploadedUrls: string[] = []
@@ -309,6 +308,12 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     } finally {
       setUploadingPhotos(false)
     }
+  }
+
+  const handlePhotoUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files || [])
+    event.target.value = ''
+    void uploadPhotoFiles(selectedFiles)
   }
 
   const handleSave = async () => {
@@ -953,7 +958,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 </div>
               )}
               {form.images.length < 5 ? (
-                <label className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-center transition-colors hover:border-[#B76E79] hover:bg-gray-50">
+                <label onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'copy' }} onDrop={(event) => { event.preventDefault(); void uploadPhotoFiles(Array.from(event.dataTransfer.files)) }} className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-center transition-colors hover:border-[#B76E79] hover:bg-gray-50">
                   <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handlePhotoUpload} className="hidden" disabled={uploadingPhotos} />
                   {uploadingPhotos ? <><Loader2 className="mb-2 h-8 w-8 animate-spin text-[#B76E79]" /><span className="text-sm text-gray-500">Uploading photos…</span></> : <><ImagePlus className="mb-2 h-8 w-8 text-gray-400" /><span className="text-sm font-medium text-gray-600">Click to upload or drag photos here</span><span className="mt-1 text-xs text-gray-400">JPG, PNG, WebP · Max 10 MB each · Up to 5</span></>}
                 </label>
