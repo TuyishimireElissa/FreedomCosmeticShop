@@ -36,8 +36,8 @@ describe('premium cosmetics design system', () => {
     expect(productGrid).toContain('grid-cols-2')
     expect(productGrid).toContain('md:grid-cols-3')
     expect(productGrid).toContain('lg:grid-cols-4')
-    expect(productCard).toContain('aspect-square')
-    expect(productCard).toContain('<Package className="mb-2 h-16 w-16"')
+    expect(productCard).toContain('aspect-[4/5]')
+    expect(productCard).toContain('<ImageIcon className="mx-auto h-12 w-12 text-gray-300"')
     expect(productCard).not.toContain("t('product.no_reviews')")
   })
 

@@ -52,7 +52,7 @@ export default function PersonalizedRecommendations() {
           <Link href="/products" className="flex min-h-11 shrink-0 items-center px-2 text-sm font-medium text-[#8a4b55] hover:text-[#9B5A64]">{t('home.view_all')}</Link>
         </div>
 
-        <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
           {result.products.map((product) => <div key={product.id} className="flex min-w-0 flex-col"><p className="mb-1 min-h-5 text-xs font-semibold text-[#8a4b55]">{t(reasonKeys[result.reasons[product.id]] || 'personalized_recommendations.reason_activity')}</p><ProductCard product={product} /></div>)}
         </div>
         <p className="mt-4 text-xs leading-5 text-gray-500">{t('personalized_recommendations.privacy_note')}</p>

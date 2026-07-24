@@ -7,12 +7,12 @@ const publicProduct = readFileSync('src/lib/public-product.ts', 'utf8')
 const gallery = readFileSync('src/components/products/ProductImageGallery.tsx', 'utf8')
 
 describe('product image framing', () => {
-  it('renders a square image-led card with a visible fallback', () => {
-    expect(card).toContain('aspect-square')
+  it('renders a large studio-style image card with an intentional fallback', () => {
+    expect(card).toContain('aspect-[4/5]')
     expect(card).toContain('object-contain p-4')
     expect(card).toContain('<SmartImage')
     expect(card).toContain('context="card"')
-    expect(card).toContain('<Package className="mb-2 h-16 w-16"')
+    expect(card).toContain('<ImageIcon className="mx-auto h-12 w-12 text-gray-300"')
   })
 
   it('resolves API and legacy image fields with the same scalar used by cart', () => {

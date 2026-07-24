@@ -40,8 +40,8 @@ describe('accessible icon actions', () => {
 
   it('migrates search, wishlist, product, pagination, quiz, and wholesale icon actions', () => {
     expect(search).toContain("<IconButton label={t('common.clear')}")
-    expect(productCard).toContain("aria-label={`${t('product.add_to_wishlist')}: ${product.name}`}")
-    expect(productCard).toContain('aria-pressed={wishlisted}')
+    expect(productCard).toContain("t('product.remove_from_wishlist') : t('product.add_to_wishlist')")
+    expect(productCard).toContain('aria-pressed={activeWishlisted}')
     expect(productDetail.match(/<IconButton/g)?.length).toBeGreaterThanOrEqual(3)
     expect(wishlist).toContain('<IconButton')
     expect(products).toContain("t('search.load_more_products')")

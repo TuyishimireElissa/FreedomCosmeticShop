@@ -22,7 +22,7 @@ describe('simple Rwanda wholesale pricing', () => {
     expect(card).toContain("user?.wholesaleStatus === 'APPROVED'")
     expect(card).toContain('price: displayPrice')
     expect(card).toContain('retailPrice: product.price')
-    expect(card).toContain('Save {formatRWF(wholesaleSavings)} per unit')
+    expect(card).toContain('You save {formatRWF(savings)}')
     expect(card).toContain("t('product.add_to_cart')")
   })
 
