@@ -65,6 +65,8 @@ import {
 } from "lucide-react"
 import { WholesalePricingPanel } from "./WholesalePricingPanel"
 import { optimizedImageUrl } from "@/lib/cloudinary-images"
+import { useStore } from '@/store/useStore'
+import { canAdminPermission } from '@/lib/admin-roles'
 
 interface AdminProductManagerProps {
   onStatsUpdate?: () => void
@@ -158,11 +160,15 @@ const EMPTY_FORM: ProductFormState = {
 export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps) {
   const t = useT()
   const { toast } = useToast()
+  const user = useStore((state) => state.user)
+  const canCreateProduct = canAdminPermission(user?.role, user?.permissions, 'products.crud')
 
   const [products, setProducts] = useState<AdminProduct[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
   const [suppliers, setSuppliers] = useState<SupplierOption[]>([])
+  const [referenceLoading, setReferenceLoading] = useState(true)
+  const [referenceError, setReferenceError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [productPage, setProductPage] = useState(1)
@@ -175,6 +181,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
 
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState<ProductFormState>(EMPTY_FORM)
+  const [formError, setFormError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [uploadingPhotos, setUploadingPhotos] = useState(false)
 
@@ -190,20 +197,41 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   const [supplierForm, setSupplierForm] = useState({ name: "", email: "", phone: "", country: "" })
   const [savingSupplier, setSavingSupplier] = useState(false)
 
-  // Load categories + brands once
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/admin/categories").then((r) => r.ok ? r.json() : Promise.reject(new Error('Categories failed to load'))),
-      fetch("/api/admin/brands").then((r) => r.ok ? r.json() : Promise.reject(new Error('Brands failed to load'))),
-      fetch("/api/admin/suppliers").then((r) => r.ok ? r.json() : { suppliers: [] }),
-    ])
-      .then(([cats, brs, supplierData]) => {
-        setCategories(cats.categories || [])
-        setBrands(brs.brands || [])
-        setSuppliers(supplierData.suppliers || [])
-      })
-      .catch((e) => console.error(e))
+  // Load the active references required by the create form.
+  const loadReferences = useCallback(async () => {
+    setReferenceLoading(true)
+    setReferenceError(null)
+    try {
+      const responses = await Promise.all([
+        fetch('/api/admin/categories', { cache: 'no-store' }),
+        fetch('/api/admin/brands', { cache: 'no-store' }),
+        fetch('/api/admin/suppliers', { cache: 'no-store' }),
+      ])
+      if (responses.some((response) => response.status === 401)) throw new Error('Your session expired. Sign in again.')
+      if (responses.some((response) => response.status === 403)) throw new Error('Your account does not have product-management permission.')
+      if (!responses[0].ok) throw new Error('Categories failed to load.')
+      if (!responses[1].ok) throw new Error('Brands failed to load.')
+      const categoryData = await responses[0].json() as { categories?: Category[] }
+      const brandData = await responses[1].json() as { brands?: Brand[] }
+      const supplierData = responses[2].ok ? await responses[2].json() as { suppliers?: SupplierOption[] } : {}
+      const activeCategories = (categoryData.categories || []).filter((category) => category.isActive)
+      const activeBrands = (brandData.brands || []).filter((brand) => brand.isActive)
+      setCategories(activeCategories)
+      setBrands(activeBrands)
+      setSuppliers(supplierData.suppliers || [])
+      if (activeCategories.length === 0) setReferenceError('Create or activate at least one category before adding a product.')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Product form options failed to load.'
+      setReferenceError(message)
+      setCategories([])
+      setBrands([])
+      setSuppliers([])
+    } finally {
+      setReferenceLoading(false)
+    }
   }, [])
+
+  useEffect(() => { void loadReferences() }, [loadReferences])
 
   const loadProducts = useCallback(async () => {
     setLoading(true)
@@ -236,14 +264,21 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   }, [loadProducts])
 
   const openCreate = () => {
-    setForm({
-      ...EMPTY_FORM,
-      categoryId: categories[0]?.id || "",
-    })
+    if (!canCreateProduct) {
+      toast({ title: 'Create access required', description: 'Ask the store owner for the products.crud permission.', variant: 'destructive' })
+      return
+    }
+    if (referenceLoading || referenceError || categories.length === 0) {
+      toast({ title: 'Product form is not ready', description: referenceError || 'Categories are still loading. Try again shortly.', variant: 'destructive' })
+      return
+    }
+    setForm({ ...EMPTY_FORM, categoryId: categories[0].id })
+    setFormError(null)
     setShowForm(true)
   }
 
   const openEdit = (product: AdminProduct) => {
+    setFormError(null)
     setForm({
       id: product.id,
       name: product.name,
@@ -322,47 +357,67 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   }
 
   const handleSave = async () => {
-    if (!form.name.trim() || !form.price || Number(form.price) <= 0 || !form.categoryId) {
-      toast({
-        title: "Missing fields",
-        description: "Product name, a price above zero, and category are required.",
-        variant: "destructive",
-      })
-      return
+    if (saving) return
+    setFormError(null)
+    const reject = (title: string, description: string) => {
+      setFormError(description)
+      toast({ title, description, variant: 'destructive' })
     }
-    if (form.manufacturedDate && form.expiryDate && form.expiryDate <= form.manufacturedDate) {
-      toast({ title: "Invalid inventory dates", description: "Expiry date must be after the manufacturing date.", variant: "destructive" })
-      return
+    if (!form.id && !canCreateProduct) return reject('Create access required', 'Your account cannot create products.')
+    if (uploadingPhotos) return reject('Photos are still uploading', 'Wait for every photo upload to finish before saving.')
+    if (form.name.trim().length < 2 || !form.categoryId) return reject('Missing fields', 'A product name and active category are required.')
+    if (!categories.some((category) => category.id === form.categoryId)) return reject('Invalid category', 'The selected category is inactive or no longer exists. Reload options and select an active category.')
+    if (form.brandId && !brands.some((brand) => brand.id === form.brandId)) return reject('Invalid brand', 'The selected brand is inactive or no longer exists.')
+    if (form.supplierId !== 'none' && !suppliers.some((supplier) => supplier.id === form.supplierId)) return reject('Invalid supplier', 'The selected supplier is no longer available.')
+
+    const price = Number(form.price)
+    const wholesalePrice = form.wholesalePrice.trim() ? Number(form.wholesalePrice) : null
+    const compareAt = form.compareAt.trim() ? Number(form.compareAt) : null
+    const costPrice = form.costPrice.trim() ? Number(form.costPrice) : null
+    const stock = Number(form.stock)
+    const lowStockThreshold = Number(form.lowStockThreshold)
+    const periodAfterOpening = form.periodAfterOpening.trim() ? Number(form.periodAfterOpening) : null
+    const requiredIntegers = [price, stock, lowStockThreshold]
+    const optionalIntegers = [wholesalePrice, compareAt, costPrice, periodAfterOpening].filter((value): value is number => value !== null)
+    if (!requiredIntegers.every(Number.isFinite) || !optionalIntegers.every(Number.isFinite) || ![...requiredIntegers, ...optionalIntegers].every(Number.isInteger)) {
+      return reject('Whole numbers required', 'Prices, stock, thresholds, and opening period must be whole numbers.')
     }
+    if (price <= 0) return reject('Invalid price', 'Selling price must be above zero.')
+    if (stock < 0 || lowStockThreshold < 0 || (costPrice !== null && costPrice < 0)) return reject('Invalid number', 'Stock, threshold, and cost cannot be negative.')
+    if (wholesalePrice !== null && (wholesalePrice <= 0 || wholesalePrice > price)) return reject('Invalid wholesale price', 'Wholesale price must be above zero and cannot exceed retail price.')
+    if (compareAt !== null && compareAt !== 0 && compareAt <= price) return reject('Invalid compare-at price', 'Compare-at price must be greater than the selling price.')
+    if (periodAfterOpening !== null && (periodAfterOpening < 1 || periodAfterOpening > 120)) return reject('Invalid opening period', 'Use-after-opening must be between 1 and 120 months.')
+    if (form.manufacturedDate && form.expiryDate && form.expiryDate <= form.manufacturedDate) return reject('Invalid inventory dates', 'Expiry date must be after the manufacturing date.')
+
     setSaving(true)
     try {
       const payload = {
         name: form.name.trim(),
         shortDescription: form.shortDescription.trim() || null,
         description: form.description.trim(),
-        price: Number(form.price),
-        wholesalePrice: form.wholesalePrice ? Number(form.wholesalePrice) : null,
-        compareAt: form.compareAt ? Number(form.compareAt) : null,
-        costPrice: form.costPrice ? Number(form.costPrice) : null,
-        stock: Number(form.stock) || 0,
-        lowStockThreshold: Number(form.lowStockThreshold) || 0,
-        sku: form.sku || null,
-        realSku: form.realSku || null,
+        price,
+        wholesalePrice,
+        compareAt,
+        costPrice,
+        stock,
+        lowStockThreshold,
+        sku: form.sku.trim() || null,
+        realSku: form.realSku.trim() || null,
         supplierId: form.supplierId === "none" ? null : form.supplierId,
-        batchNumber: form.batchNumber || null,
+        batchNumber: form.batchNumber.trim() || null,
         manufacturedDate: form.manufacturedDate ? new Date(`${form.manufacturedDate}T00:00:00.000Z`).toISOString() : null,
         expiryDate: form.expiryDate ? new Date(`${form.expiryDate}T00:00:00.000Z`).toISOString() : null,
-        periodAfterOpening: form.periodAfterOpening ? Number(form.periodAfterOpening) : null,
-        volume: form.volume || null,
+        periodAfterOpening,
+        volume: form.volume.trim() || null,
         categoryId: form.categoryId,
         brandId: form.brandId || null,
         images: form.images,
         skinType: form.skinType.length ? form.skinType : null,
-        shades: form.shades.length ? form.shades : null,
-        ingredients: form.ingredients.length ? form.ingredients : null,
-        size: form.size || null,
-        usageInstructions: form.usageInstructions || null,
-        warnings: form.warnings || null,
+        shades: form.shades.map((value) => value.trim()).filter(Boolean),
+        ingredients: form.ingredients.map((value) => value.trim()).filter(Boolean),
+        size: form.size.trim() || null,
+        usageInstructions: form.usageInstructions.trim() || null,
+        warnings: form.warnings.trim() || null,
         featured: form.featured,
         isActive: form.isActive,
       }
@@ -380,9 +435,11 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
+        if (res.status === 401) throw new Error('Your session expired. Sign in again, then reopen the product form.')
+        if (res.status === 403) throw new Error('Your account can view products but does not have permission to create or edit them.')
         const fieldErrors = err.details?.fieldErrors as Record<string, string[] | undefined> | undefined
         const firstFieldError = fieldErrors ? Object.values(fieldErrors).flat().find(Boolean) : undefined
-        throw new Error(firstFieldError || err.error || "Save failed")
+        throw new Error(firstFieldError || err.error || `Save failed (${res.status})`)
       }
 
       toast({
@@ -390,12 +447,16 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
         description: form.name,
       })
       setShowForm(false)
-      loadProducts()
+      setForm(EMPTY_FORM)
+      setFormError(null)
+      await loadProducts()
       onStatsUpdate?.()
     } catch (e) {
+      const message = e instanceof Error ? e.message : "Unknown error"
+      setFormError(message)
       toast({
         title: "Save failed",
-        description: e instanceof Error ? e.message : "Unknown error",
+        description: message,
         variant: "destructive",
       })
     } finally {
@@ -504,6 +565,11 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
 
   // NEW: Duplicate a product (opens create form pre-filled with product data)
   const handleDuplicate = (product: AdminProduct) => {
+    if (!canCreateProduct) {
+      toast({ title: 'Create access required', variant: 'destructive' })
+      return
+    }
+    setFormError(null)
     setForm({
       name: `${product.name} (Copy)`,
       shortDescription: product.shortDescription || "",
@@ -590,11 +656,14 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
           <Button variant="outline" size="sm" onClick={handleExportCSV}>
             <Download className="mr-1.5 h-4 w-4" /> Export
           </Button>
-          <Button onClick={openCreate}>
-            <Plus className="mr-1.5 h-4 w-4" /> Add product
-          </Button>
+          {canCreateProduct && <Button onClick={openCreate} disabled={referenceLoading || categories.length === 0}>
+            {referenceLoading ? <Loader2 className="mr-1.5 h-4 w-4 animate-spin" /> : <Plus className="mr-1.5 h-4 w-4" />} Add product
+          </Button>}
         </div>
       </div>
+
+      {referenceError && <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900" role="alert"><span>{referenceError}</span><Button type="button" size="sm" variant="outline" onClick={() => void loadReferences()} disabled={referenceLoading}>{referenceLoading ? 'Loading…' : 'Retry options'}</Button></div>}
+      {!canCreateProduct && <p className="mb-4 rounded-xl border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900">You can view products, but only an Admin/Super Admin or staff member with <code>products.crud</code> can add products.</p>}
 
       {/* Search + Filters */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -802,12 +871,13 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       {pagination.totalPages > 1 && <nav className="mt-4 flex items-center justify-between" aria-label="Product pages"><Button type="button" variant="outline" size="sm" onClick={() => setProductPage((page) => Math.max(1, page - 1))} disabled={productPage <= 1}>Previous</Button><span className="text-xs text-muted-foreground">Page {pagination.page} of {pagination.totalPages}</span><Button type="button" variant="outline" size="sm" onClick={() => setProductPage((page) => Math.min(pagination.totalPages, page + 1))} disabled={productPage >= pagination.totalPages}>Next</Button></nav>}
 
       {/* Create/Edit Dialog */}
-      <Dialog open={showForm} onOpenChange={setShowForm}>
+      <Dialog open={showForm} onOpenChange={(open) => { setShowForm(open); if (!open) setFormError(null) }}>
         <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{form.id ? "Edit product" : "Add product"}</DialogTitle>
           </DialogHeader>
 
+          {formError && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-800" role="alert" aria-live="assertive">{formError}</div>}
           <div className="space-y-4">
             {/* Name */}
             <div>
@@ -855,6 +925,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 <Input
                   id="p-price"
                   type="number"
+                  min="1"
+                  step="1"
+                  inputMode="numeric"
                   value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
                   placeholder="12500"
@@ -862,13 +935,16 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
               </div>
               <div>
                 <Label htmlFor="p-wholesale-price">Wholesale Price (RWF)</Label>
-                <Input id="p-wholesale-price" type="number" min="0" value={form.wholesalePrice} onChange={(e) => setForm({ ...form, wholesalePrice: e.target.value })} placeholder="Leave empty for retail price" />
+                <Input id="p-wholesale-price" type="number" min="1" step="1" inputMode="numeric" value={form.wholesalePrice} onChange={(e) => setForm({ ...form, wholesalePrice: e.target.value })} placeholder="Leave empty for retail price" />
               </div>
               <div>
                 <Label htmlFor="p-compare">Compare at (RWF)</Label>
                 <Input
                   id="p-compare"
                   type="number"
+                  min="0"
+                  step="1"
+                  inputMode="numeric"
                   value={form.compareAt}
                   onChange={(e) =>
                     setForm({ ...form, compareAt: e.target.value })
@@ -881,6 +957,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 <Input
                   id="p-stock"
                   type="number"
+                  min="0"
+                  step="1"
+                  inputMode="numeric"
                   value={form.stock}
                   onChange={(e) => setForm({ ...form, stock: e.target.value })}
                   placeholder="48"
@@ -897,15 +976,15 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
               <div className="mt-3">
                 <p className="text-xs text-amber-800">Optional cost, supplier, batch, manufacturing, expiry, and low-stock controls.</p>
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <div><Label htmlFor="p-cost">Cost price (RWF)</Label><Input id="p-cost" type="number" min="0" value={form.costPrice} onChange={(e) => setForm({ ...form, costPrice: e.target.value })} /></div>
-                <div><Label htmlFor="p-threshold">Low-stock threshold</Label><Input id="p-threshold" type="number" min="0" value={form.lowStockThreshold} onChange={(e) => setForm({ ...form, lowStockThreshold: e.target.value })} /></div>
+                <div><Label htmlFor="p-cost">Cost price (RWF)</Label><Input id="p-cost" type="number" min="0" step="1" inputMode="numeric" value={form.costPrice} onChange={(e) => setForm({ ...form, costPrice: e.target.value })} /></div>
+                <div><Label htmlFor="p-threshold">Low-stock threshold</Label><Input id="p-threshold" type="number" min="0" step="1" inputMode="numeric" value={form.lowStockThreshold} onChange={(e) => setForm({ ...form, lowStockThreshold: e.target.value })} /></div>
                 <div><Label htmlFor="p-sku">SKU (auto-generated if blank)</Label><Input id="p-sku" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="FCS-A1B2C3" /></div>
                 <div><Label htmlFor="p-real-sku">Distributor SKU</Label><Input id="p-real-sku" value={form.realSku} onChange={(e) => setForm({ ...form, realSku: e.target.value })} /></div>
                 <div><div className="flex items-center justify-between"><Label>Supplier</Label><button type="button" onClick={() => setShowSupplierForm(true)} className="text-xs font-medium text-primary">New supplier</button></div><Select value={form.supplierId} onValueChange={(value) => setForm({ ...form, supplierId: value })}><SelectTrigger><SelectValue placeholder="No supplier" /></SelectTrigger><SelectContent><SelectItem value="none">No supplier</SelectItem>{suppliers.map((supplier) => <SelectItem key={supplier.id} value={supplier.id}>{supplier.name}</SelectItem>)}</SelectContent></Select></div>
                 <div><Label htmlFor="p-batch">Current batch number</Label><Input id="p-batch" value={form.batchNumber} onChange={(e) => setForm({ ...form, batchNumber: e.target.value })} /></div>
                 <div><Label htmlFor="p-manufactured">Manufactured date</Label><Input id="p-manufactured" type="date" value={form.manufacturedDate} onChange={(e) => setForm({ ...form, manufacturedDate: e.target.value })} /></div>
                 <div><Label htmlFor="p-expiry">Expiry date</Label><Input id="p-expiry" type="date" value={form.expiryDate} onChange={(e) => setForm({ ...form, expiryDate: e.target.value })} /></div>
-                <div><Label htmlFor="p-pao">Use after opening (months)</Label><Input id="p-pao" type="number" min="1" max="120" value={form.periodAfterOpening} onChange={(e) => setForm({ ...form, periodAfterOpening: e.target.value })} /></div>
+                <div><Label htmlFor="p-pao">Use after opening (months)</Label><Input id="p-pao" type="number" min="1" max="120" step="1" inputMode="numeric" value={form.periodAfterOpening} onChange={(e) => setForm({ ...form, periodAfterOpening: e.target.value })} /></div>
               </div>
                 {form.costPrice && form.price && <p className={`mt-3 text-sm font-semibold ${Number(form.price) - Number(form.costPrice) < 0 ? "text-destructive" : "text-emerald-700"}`}>Estimated margin: {Number(form.price) > 0 ? (((Number(form.price) - Number(form.costPrice)) / Number(form.price)) * 100).toFixed(1) : "0.0"}% · RWF {(Number(form.price) - Number(form.costPrice)).toLocaleString()}</p>}
               </div>
@@ -1198,11 +1277,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
             <Button variant="outline" onClick={() => setShowForm(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : null}
-              {form.id ? "Save changes" : "Create product"}
+            <Button onClick={handleSave} disabled={saving || uploadingPhotos || referenceLoading || categories.length === 0 || (!form.id && !canCreateProduct)}>
+              {saving || uploadingPhotos ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              {uploadingPhotos ? 'Uploading photos…' : form.id ? "Save changes" : "Create product"}
             </Button>
           </DialogFooter>
         </DialogContent>

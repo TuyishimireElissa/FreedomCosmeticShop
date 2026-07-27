@@ -14,52 +14,11 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { Prisma } from "@prisma/client"
 import { randomBytes } from 'node:crypto'
-import { PERMISSIONS, requirePermission } from '@/lib/permissions'
+import { PERMISSIONS, rateLimit, requirePermission } from '@/lib/permissions'
 import { broadcastProductEvent } from "@/lib/realtime"
 import { logActivity } from "@/server/services/activity"
-import { z } from "zod"
 import { indexProduct } from '@/server/services/search'
-
-const CreateProductSchema = z.object({
-  name: z.string().min(2).max(200),
-  description: z.string().max(5000).optional().default(''),
-  shortDescription: z.string().max(300).optional().nullable(),
-  price: z.number().int().positive(),
-  wholesalePrice: z.number().int().positive().optional().nullable(),
-  compareAt: z.number().int().min(0).optional().nullable(),
-  stock: z.number().int().min(0).default(0),
-  lowStockThreshold: z.number().int().min(0).default(5),
-  sku: z.string().max(100).optional().nullable(),
-  realSku: z.string().max(100).optional().nullable(),
-  costPrice: z.number().int().min(0).optional().nullable(),
-  supplierId: z.string().optional().nullable(),
-  manufacturedDate: z.string().datetime().optional().nullable(),
-  expiryDate: z.string().datetime().optional().nullable(),
-  periodAfterOpening: z.number().int().min(1).max(120).optional().nullable(),
-  batchNumber: z.string().max(100).optional().nullable(),
-  volume: z.string().max(100).optional().nullable(),
-  brandId: z.string().optional().nullable(),
-  categoryId: z.string().min(1),
-  images: z.array(z.string().url()).max(5).optional().default([]),
-  skinType: z.array(z.string()).optional().nullable(),
-  shades: z.array(z.string()).optional().nullable(),
-  ingredients: z.array(z.string()).optional().nullable(),
-  size: z.string().optional().nullable(),
-  usageInstructions: z.string().optional().nullable(),
-  warnings: z.string().optional().nullable(),
-  featured: z.boolean().default(false),
-  isActive: z.boolean().default(true),
-}).superRefine((value, ctx) => {
-  if (value.compareAt !== null && value.compareAt !== undefined && value.compareAt !== 0 && value.compareAt <= value.price) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['compareAt'], message: 'Compare-at price must be greater than the selling price' })
-  }
-  if (value.wholesalePrice !== null && value.wholesalePrice !== undefined && value.wholesalePrice > value.price) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['wholesalePrice'], message: 'Wholesale price cannot exceed the retail price' })
-  }
-  if (value.manufacturedDate && value.expiryDate && new Date(value.expiryDate) <= new Date(value.manufacturedDate)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['expiryDate'], message: 'Expiry date must be after the manufactured date' })
-  }
-})
+import { CreateProductSchema } from '@/lib/admin-product-schema'
 
 function addProfitInfo<T extends { price: number; costPrice: number | null }>(product: T) {
   if (product.costPrice === null || product.price <= 0) return product
@@ -153,8 +112,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const adminUser = await requirePermission(PERMISSIONS.PRODUCTS_CRUD)
+    const limit = rateLimit(`admin:${adminUser.id}:product-create`, { maxActions: 20, windowMs: 60_000 })
+    if (!limit.allowed) return NextResponse.json({ success: false, error: 'Too many product creation attempts. Wait a minute and try again.' }, { status: 429 })
 
-    const body = await req.json()
+    const body = await req.json().catch(() => null)
     const parsed = CreateProductSchema.safeParse(body)
     if (!parsed.success) {
       return NextResponse.json(
@@ -163,17 +124,32 @@ export async function POST(req: Request) {
       )
     }
     const data = parsed.data
-    const category = await prisma.category.findFirst({ where: { id: data.categoryId, isActive: true, isDeleted: false }, select: { id: true } })
-    if (!category) return NextResponse.json({ success: false, error: 'Please select a valid active category' }, { status: 400 })
-    if (data.brandId) {
-      const brand = await prisma.brand.findFirst({ where: { id: data.brandId, isActive: true, isDeleted: false }, select: { id: true } })
-      if (!brand) return NextResponse.json({ success: false, error: 'Selected brand is not available' }, { status: 400 })
+    const [category, brand, supplier] = await Promise.all([
+      prisma.category.findFirst({ where: { id: data.categoryId, isActive: true, isDeleted: false }, select: { id: true } }),
+      data.brandId ? prisma.brand.findFirst({ where: { id: data.brandId, isActive: true, isDeleted: false }, select: { id: true } }) : Promise.resolve(null),
+      data.supplierId ? prisma.supplier.findFirst({ where: { id: data.supplierId, isActive: true }, select: { id: true } }) : Promise.resolve(null),
+    ])
+    if (!category) return NextResponse.json({ success: false, error: 'Please select a valid active category', code: 'INVALID_CATEGORY', details: { fieldErrors: { categoryId: ['Select an active category and try again.'] } } }, { status: 400 })
+    if (data.brandId && !brand) return NextResponse.json({ success: false, error: 'Selected brand is not available', code: 'INVALID_BRAND', details: { fieldErrors: { brandId: ['Select an active brand or choose no brand.'] } } }, { status: 400 })
+    if (data.supplierId && !supplier) return NextResponse.json({ success: false, error: 'Selected supplier is not available', code: 'INVALID_SUPPLIER', details: { fieldErrors: { supplierId: ['Select an active supplier or choose no supplier.'] } } }, { status: 400 })
+
+    const duplicateIdentifiers = [
+      data.sku ? { sku: data.sku } : null,
+      data.realSku ? { realSku: data.realSku } : null,
+    ].filter(Boolean) as Array<{ sku: string } | { realSku: string }>
+    if (duplicateIdentifiers.length > 0) {
+      const duplicate = await prisma.product.findFirst({ where: { OR: duplicateIdentifiers }, select: { sku: true, realSku: true } })
+      if (duplicate) {
+        const field = data.sku && duplicate.sku === data.sku ? 'sku' : 'realSku'
+        return NextResponse.json({ success: false, error: field === 'sku' ? 'SKU is already used by another product' : 'Distributor SKU is already used by another product', code: 'DUPLICATE_IDENTIFIER', details: { fieldErrors: { [field]: ['This value must be unique.'] } } }, { status: 409 })
+      }
     }
 
-    // Generate unique slug and SKU when the admin leaves them blank.
-    let slug = slugify(data.name)
-    const existing = await prisma.product.findFirst({ where: { slug } })
-    if (existing) slug = `${slug}-${Date.now().toString(36)}`
+    // Generate a URL-safe non-empty unique slug and SKU.
+    const slugBase = slugify(data.name) || `product-${randomBytes(4).toString('hex')}`
+    let slug = slugBase
+    let slugSuffix = 1
+    while (await prisma.product.findUnique({ where: { slug }, select: { id: true } })) slug = `${slugBase}-${slugSuffix++}`
     let sku = data.sku?.trim() || ''
     if (!sku) {
       do { sku = `FCS-${randomBytes(4).toString('hex').slice(0, 6).toUpperCase()}` }
@@ -259,7 +235,11 @@ export async function POST(req: Request) {
     )
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      return NextResponse.json({ success: false, error: 'A product with this SKU or slug already exists' }, { status: 409 })
+      const target = Array.isArray(error.meta?.target) ? String(error.meta?.target[0] || 'identifier') : String(error.meta?.target || 'identifier')
+      return NextResponse.json({ success: false, error: `A product with this ${target} already exists`, code: 'DUPLICATE_PRODUCT', details: { fieldErrors: { [target]: ['This value must be unique.'] } } }, { status: 409 })
+    }
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+      return NextResponse.json({ success: false, error: 'A selected category, brand, or supplier no longer exists. Reload the form and try again.', code: 'INVALID_REFERENCE' }, { status: 409 })
     }
     if (error instanceof Error && "statusCode" in error) {
       return NextResponse.json(

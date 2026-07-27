@@ -34,6 +34,7 @@ export async function GET() {
   try {
     await requirePermission(PERMISSIONS.PRODUCTS_READ)
     const categories = await db.category.findMany({
+      where: { isDeleted: false },
       orderBy: { name: "asc" },
       include: { _count: { select: { products: true } } },
     })
