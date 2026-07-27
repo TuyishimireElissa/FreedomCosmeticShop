@@ -1,0 +1,349 @@
+/**
+ * Authentication utilities: password hashing, JWT sign/verify, cookie helpers.
+ *
+ * Uses:
+ *   - bcryptjs for password hashing (10 rounds)
+ *   - jose for JWT (Edge-compatible, works in middleware)
+ *
+ * Token strategy:
+ *   - Access token: 15 minutes, stored in httpOnly cookie "ub_access"
+ *     Contains: { userId, role, phone }
+ *   - Refresh token: 30 days, stored in httpOnly cookie "ub_refresh"
+ *     Contains: { userId, tokenVersion }
+ *
+ * Cookies:
+ *   - httpOnly: true (not accessible via JS — XSS protection)
+ *   - secure: true in production (HTTPS only)
+ *   - sameSite: "lax" (CSRF protection)
+ *   - path: "/"
+ */
+
+import { SignJWT, jwtVerify } from "jose"
+import bcrypt from "bcryptjs"
+import { cookies, headers } from "next/headers"
+import { NextRequest, NextResponse } from "next/server"
+import { resolveAuthSecret } from "@/lib/auth-secret"
+
+const ACCESS_TOKEN_NAME = "ub_access"
+const REFRESH_TOKEN_NAME = "ub_refresh"
+
+const ACCESS_TOKEN_TTL = "15m" // 15 minutes
+const ACCESS_TOKEN_TTL_SECONDS = 15 * 60
+
+export const SESSION_REFRESH_TOKEN_TTL_SECONDS = 24 * 60 * 60
+export const REMEMBERED_REFRESH_TOKEN_TTL_SECONDS = 30 * 24 * 60 * 60
+
+// Production fails closed if neither configured secret is strong enough.
+const JWT_SECRET = new TextEncoder().encode(resolveAuthSecret(
+  process.env.NEXTAUTH_SECRET,
+  process.env.JWT_SECRET,
+  process.env.NODE_ENV,
+))
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+export interface AccessTokenPayload {
+  userId: string
+  role: string
+  phone: string
+  sessionVersion: number
+  sessionId: string
+  iat?: number
+}
+
+export interface RefreshTokenPayload {
+  userId: string
+  sessionVersion: number
+  sessionId: string
+  rememberDevice: boolean
+  iat?: number
+}
+
+export interface AuthUser {
+  id: string
+  name: string
+  phone: string
+  email: string | null
+  role: string
+  loyaltyPoints?: number
+  userType?: string
+  wholesaleStatus?: string | null
+  wholesaleDiscount?: number
+  businessName?: string | null
+  assignedManagerName?: string | null
+  assignedManagerPhone?: string | null
+  assignedManagerWhatsApp?: string | null
+  preferredDeliveryDays?: string[]
+  mfaEnabled?: boolean
+  mustChangePassword?: boolean
+  permissions?: string[]
+}
+
+// ─── Password hashing ────────────────────────────────────────────────────────
+
+const BCRYPT_ROUNDS = 12
+
+export async function hashPassword(plain: string): Promise<string> {
+  return bcrypt.hash(plain, BCRYPT_ROUNDS)
+}
+
+export async function verifyPassword(
+  plain: string,
+  hash: string
+): Promise<boolean> {
+  return bcrypt.compare(plain, hash)
+}
+
+// ─── JWT sign / verify ───────────────────────────────────────────────────────
+
+export async function signAccessToken(payload: AccessTokenPayload): Promise<string> {
+  return new SignJWT({ ...payload })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(ACCESS_TOKEN_TTL)
+    .setIssuer("freedom-cosmetic-shop")
+    .setAudience("freedom-cosmetic-shop")
+    .sign(JWT_SECRET)
+}
+
+export async function signRefreshToken(
+  payload: RefreshTokenPayload,
+  ttlSeconds: number,
+): Promise<string> {
+  return new SignJWT({ ...payload })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(`${ttlSeconds}s`)
+    .setIssuer("freedom-cosmetic-shop")
+    .setAudience("freedom-cosmetic-shop")
+    .sign(JWT_SECRET)
+}
+
+export async function verifyAccessToken(token: string): Promise<AccessTokenPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET, {
+      issuer: "freedom-cosmetic-shop",
+      audience: "freedom-cosmetic-shop",
+    })
+    return payload as unknown as AccessTokenPayload
+  } catch {
+    return null
+  }
+}
+
+export async function verifyRefreshToken(
+  token: string
+): Promise<RefreshTokenPayload | null> {
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET, {
+      issuer: "freedom-cosmetic-shop",
+      audience: "freedom-cosmetic-shop",
+    })
+    return payload as unknown as RefreshTokenPayload
+  } catch {
+    return null
+  }
+}
+
+// ─── Cookie helpers (server-side, using next/headers) ────────────────────────
+
+interface CookieOptions {
+  httpOnly?: boolean
+  secure?: boolean
+  sameSite?: "strict" | "lax" | "none"
+  path?: string
+  maxAge?: number
+}
+
+function defaultCookieOptions(maxAge?: number): CookieOptions {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    ...(typeof maxAge === 'number' ? { maxAge } : {}),
+  }
+}
+
+/**
+ * Set auth cookies on the response (for API routes).
+ * Call this when issuing tokens after login/register/verify.
+ */
+export function setAuthCookies(
+  res: NextResponse,
+  accessToken: string,
+  refreshToken: string,
+  rememberDevice = false,
+): NextResponse {
+  res.cookies.set(ACCESS_TOKEN_NAME, accessToken, {
+    ...defaultCookieOptions(ACCESS_TOKEN_TTL_SECONDS),
+  })
+  // Unremembered logins use a browser-session cookie. The JWT still expires
+  // after one day as a fail-safe. Remembered devices receive a 30-day cookie.
+  res.cookies.set(REFRESH_TOKEN_NAME, refreshToken, {
+    ...defaultCookieOptions(rememberDevice ? REMEMBERED_REFRESH_TOKEN_TTL_SECONDS : undefined),
+  })
+  return res
+}
+
+/**
+ * Clear auth cookies (for logout).
+ */
+export function clearAuthCookies(res: NextResponse): NextResponse {
+  res.cookies.set(ACCESS_TOKEN_NAME, "", { path: "/", maxAge: 0 })
+  res.cookies.set(REFRESH_TOKEN_NAME, "", { path: "/", maxAge: 0 })
+  return res
+}
+
+/**
+ * Read the access token from the request cookies (server-side).
+ * Use this in API routes via next/headers.
+ */
+export async function getAccessTokenFromCookies(): Promise<string | undefined> {
+  const cookieStore = await cookies()
+  const cookieToken = cookieStore.get(ACCESS_TOKEN_NAME)?.value
+  if (cookieToken) return cookieToken
+  const authorization = (await headers()).get('authorization')
+  return authorization?.startsWith('Bearer ') ? authorization.slice(7) : undefined
+}
+
+export async function getRefreshTokenFromCookies(): Promise<string | undefined> {
+  const cookieStore = await cookies()
+  const cookieToken = cookieStore.get(REFRESH_TOKEN_NAME)?.value
+  if (cookieToken) return cookieToken
+  const requestHeaders = await headers()
+  return requestHeaders.get('x-refresh-token') || undefined
+}
+
+/**
+ * Read the access token from a NextRequest (for middleware).
+ */
+export function getAccessTokenFromRequest(req: NextRequest): string | undefined {
+  return req.cookies.get(ACCESS_TOKEN_NAME)?.value
+}
+
+export function getRefreshTokenFromRequest(req: NextRequest): string | undefined {
+  return req.cookies.get(REFRESH_TOKEN_NAME)?.value
+}
+
+export const AUTH_COOKIE_NAMES = {
+  access: ACCESS_TOKEN_NAME,
+  refresh: REFRESH_TOKEN_NAME,
+} as const
+
+// ─── requireAuth: use in API routes to get the authenticated user ────────────
+
+import { db } from "@/lib/db"
+
+/**
+ * Verifies the access token from cookies and returns the user.
+ *
+ * Returns null if not authenticated (no token, invalid, or expired).
+ * API routes should check for null and return 401 if the route is protected.
+ *
+ * Usage:
+ *   const user = await requireAuth()
+ *   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+ */
+export async function requireAuth(): Promise<AuthUser | null> {
+  const token = await getAccessTokenFromCookies()
+  if (!token) return null
+
+  const payload = await verifyAccessToken(token)
+  if (!payload) return null
+
+  // Fetch the user to ensure they still exist and that this exact token
+  // generation has not been revoked by logout, password reset, or staff action.
+  const account = await db.user.findFirst({
+    where: {
+      id: payload.userId,
+      isDeleted: false,
+    },
+    select: {
+      id: true,
+      name: true,
+      phone: true,
+      email: true,
+      role: true,
+      loyaltyPoints: true,
+      userType: true,
+      wholesaleStatus: true,
+      wholesaleDiscount: true,
+      businessName: true,
+      assignedManagerName: true,
+      assignedManagerPhone: true,
+      assignedManagerWhatsApp: true,
+      preferredDeliveryDays: true,
+      mfaEnabled: true,
+      mustChangePassword: true,
+      staffProfile: { select: { permissions: true, isActive: true } },
+      sessionVersion: true,
+      passwordChangedAt: true,
+    },
+  })
+  if (!account || !payload.sessionId || payload.sessionVersion !== account.sessionVersion) return null
+  if (account.passwordChangedAt && (!payload.iat || payload.iat * 1000 < account.passwordChangedAt.getTime())) return null
+  const session = await db.authSession.findFirst({
+    where: { id: payload.sessionId, userId: account.id, revokedAt: null, expiresAt: { gt: new Date() } },
+    select: { id: true },
+  })
+  if (!session) return null
+
+  const { sessionVersion: _sessionVersion, passwordChangedAt: _passwordChangedAt, staffProfile, ...user } = account
+  let permissions: string[] = []
+  if (staffProfile?.isActive) {
+    try {
+      const parsed = JSON.parse(staffProfile.permissions)
+      if (Array.isArray(parsed)) permissions = parsed.filter((value): value is string => typeof value === 'string')
+    } catch {
+      permissions = []
+    }
+  }
+  return { ...user, permissions }
+}
+
+/**
+ * Like requireAuth, but throws a 401 response if not authenticated.
+ * Use in protected API routes.
+ *
+ * Usage:
+ *   const user = await requireAuthOrThrow()
+ *   // ... use user.id, user.role
+ */
+export async function requireAuthOrThrow(): Promise<AuthUser> {
+  const user = await requireAuth()
+  if (!user) {
+    throw new AuthError("Unauthorized", 401)
+  }
+  return user
+}
+
+/**
+ * Require a specific role. Returns the user if they have the role,
+ * otherwise throws a 403.
+ *
+ * Usage:
+ *   const admin = await requireRole("ADMIN")
+ */
+export async function requireRole(
+  ...allowedRoles: string[]
+): Promise<AuthUser> {
+  const user = await requireAuthOrThrow()
+  // SUPER_ADMIN is a strict superset of ADMIN and must pass every route that
+  // grants ADMIN access, even when older handlers omit it from their list.
+  const superAdminCanActAsAdmin = user.role === 'SUPER_ADMIN' && allowedRoles.includes('ADMIN')
+  if (!allowedRoles.includes(user.role) && !superAdminCanActAsAdmin) {
+    throw new AuthError("Forbidden: insufficient permissions", 403)
+  }
+  return user
+}
+
+/** Custom error class for auth errors */
+export class AuthError extends Error {
+  statusCode: number
+  constructor(message: string, statusCode: number = 401) {
+    super(message)
+    this.name = "AuthError"
+    this.statusCode = statusCode
+  }
+}

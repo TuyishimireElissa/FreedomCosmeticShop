@@ -1,0 +1,51 @@
+name: quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: local-ci-password
+          POSTGRES_DB: freedom_ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U app -d freedom_ci"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://app:local-ci-password@localhost:5432/freedom_ci
+      DIRECT_URL: postgresql://app:local-ci-password@localhost:5432/freedom_ci
+      NEXTAUTH_SECRET: ci-only-auth-secret-never-use-in-production-123456
+      JWT_SECRET: ci-only-jwt-secret-never-use-in-production-123456789
+      MFA_ENCRYPTION_KEY: ci-only-mfa-secret-never-use-in-production-123456789
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      ALLOW_SEED: 'false'
+      ENABLE_REAL_PAYMENTS: 'false'
+      ENABLE_EMAIL_NOTIFICATIONS: 'false'
+      ENABLE_SEARCH_INDEXING: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx prisma db push --skip-generate
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --omit=dev --audit-level=high

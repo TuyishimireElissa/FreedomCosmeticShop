@@ -1,0 +1,17 @@
+# Prettier ignore
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+db/
+scripts/seed-data/
+*.lock
+*.log
+.env*
+!.env.example
+prisma/migrations/
+.github/
+.vercel
+.turbo

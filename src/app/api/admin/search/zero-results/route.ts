@@ -1,0 +1,36 @@
+export const dynamic = 'force-dynamic'
+
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { PERMISSIONS, requirePermission } from '@/lib/permissions'
+
+export async function GET() {
+  try {
+    await requirePermission(PERMISSIONS.ANALYTICS_READ)
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    const searches = await prisma.searchLog.groupBy({
+      by: ['query'],
+      where: { hasResults: false, createdAt: { gte: thirtyDaysAgo } },
+      _count: { _all: true },
+      _max: { createdAt: true },
+      orderBy: { _count: { query: 'desc' } },
+      take: 50,
+    })
+    const data = searches
+      .filter((search) => search.query.startsWith('sha256:'))
+      .map((search) => ({
+        queryHash: search.query,
+        count: search._count._all,
+        lastSearched: search._max.createdAt?.toISOString() || null,
+      }))
+    const response = NextResponse.json({ success: true, data, periodDays: 30, methodology: { rawQueriesStored: false } })
+    response.headers.set('Cache-Control', 'private, no-store')
+    return response
+  } catch (error) {
+    if (error instanceof Error && 'statusCode' in error) {
+      return NextResponse.json({ success: false, error: error.message }, { status: (error as { statusCode: number }).statusCode })
+    }
+    console.error('Admin zero-result searches error:', error)
+    return NextResponse.json({ success: false, error: 'Failed to fetch zero-result searches' }, { status: 500 })
+  }
+}

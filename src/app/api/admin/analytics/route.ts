@@ -1,0 +1,421 @@
+export const dynamic = 'force-dynamic'
+
+/**
+ * GET /api/admin/analytics
+ *
+ * Returns comprehensive analytics data for the admin dashboard.
+ *
+ * Query params:
+ *   - range: "today" | "week" | "month" | "year" (default: "month")
+ *
+ * Returns:
+ *   - Revenue summary (today, week, month, year)
+ *   - Revenue over time (daily data points for line chart)
+ *   - Order status breakdown
+ *   - Payment method breakdown
+ *   - Top selling products
+ *   - Orders by district
+ *   - Sales by category
+ *   - New customers count
+ *   - Low stock alerts
+ */
+import { NextResponse } from "next/server"
+import { db } from "@/lib/db"
+import { PERMISSIONS, requirePermission } from "@/lib/permissions"
+
+function getRangeStart(range: string): Date {
+  const now = new Date()
+  switch (range) {
+    case "today":
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    case "week": {
+      const weekStart = new Date(now)
+      const day = now.getDay()
+      const diff = day === 0 ? 6 : day - 1 // Monday as start
+      weekStart.setDate(now.getDate() - diff)
+      weekStart.setHours(0, 0, 0, 0)
+      return weekStart
+    }
+    case "year":
+      return new Date(now.getFullYear(), 0, 1)
+    case "month":
+    default:
+      return new Date(now.getFullYear(), now.getMonth(), 1)
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    await requirePermission(PERMISSIONS.ANALYTICS_READ)
+
+    const { searchParams } = new URL(req.url)
+    const range = searchParams.get("range") || "month"
+
+    const now = new Date()
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const weekStart = new Date(now)
+    const day = now.getDay()
+    const diff = day === 0 ? 6 : day - 1
+    weekStart.setDate(now.getDate() - diff)
+    weekStart.setHours(0, 0, 0, 0)
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    const yearStart = new Date(now.getFullYear(), 0, 1)
+    const rangeStart = getRangeStart(range)
+
+    // ─── Revenue summary ──────────────────────────────────────────────
+    const [todayOrders, weekOrders, monthOrders, yearOrders, rangeOrders] = await Promise.all([
+      db.order.aggregate({
+        where: { createdAt: { gte: todayStart }, status: { not: "CANCELLED" } },
+        _sum: { total: true },
+        _count: true,
+      }),
+      db.order.aggregate({
+        where: { createdAt: { gte: weekStart }, status: { not: "CANCELLED" } },
+        _sum: { total: true },
+        _count: true,
+      }),
+      db.order.aggregate({
+        where: { createdAt: { gte: monthStart }, status: { not: "CANCELLED" } },
+        _sum: { total: true },
+        _count: true,
+      }),
+      db.order.aggregate({
+        where: { createdAt: { gte: yearStart }, status: { not: "CANCELLED" } },
+        _sum: { total: true },
+        _count: true,
+      }),
+      db.order.aggregate({
+        where: { createdAt: { gte: rangeStart }, status: { not: "CANCELLED" } },
+        _sum: { total: true },
+        _count: true,
+      }),
+    ])
+
+    // ─── Revenue over time (daily for the selected range) ─────────────
+    const rangeOrdersRaw = await db.order.findMany({
+      where: { createdAt: { gte: rangeStart }, status: { not: "CANCELLED" } },
+      select: { total: true, createdAt: true },
+      orderBy: { createdAt: "asc" },
+    })
+
+    // Group by day
+    const revenueByDay = new Map<string, { date: string; revenue: number; orders: number }>()
+    for (const o of rangeOrdersRaw) {
+      const dateKey = o.createdAt.toISOString().slice(0, 10) // YYYY-MM-DD
+      const existing = revenueByDay.get(dateKey) || { date: dateKey, revenue: 0, orders: 0 }
+      existing.revenue += o.total
+      existing.orders += 1
+      revenueByDay.set(dateKey, existing)
+    }
+
+    const revenueOverTime = Array.from(revenueByDay.values()).map((d) => ({
+      ...d,
+      date: new Date(d.date).toLocaleDateString("en-RW", {
+        month: "short",
+        day: "numeric",
+      }),
+    }))
+
+    // ─── Order status breakdown ───────────────────────────────────────
+    const statusBreakdown = await db.order.groupBy({
+      by: ["status"],
+      _count: true,
+      where: { createdAt: { gte: rangeStart } },
+    })
+
+    // ─── Payment method breakdown ─────────────────────────────────────
+    const paymentBreakdown = await db.payment.groupBy({
+      by: ["method"],
+      _count: true,
+      _sum: { amount: true },
+      where: {
+        status: "PAID",
+        initiatedAt: { gte: rangeStart },
+      },
+    })
+
+    // ─── Top selling products ─────────────────────────────────────────
+    const topItems = await db.orderItem.groupBy({
+      by: ["productId"],
+      _sum: { quantity: true },
+      _count: true,
+      orderBy: { _sum: { quantity: "desc" } },
+      take: 10,
+    })
+
+    const topProductIds = topItems.filter((t) => t.productId).map((t) => t.productId!)
+    const topProductsData = await db.product.findMany({
+      where: { id: { in: topProductIds } },
+      select: { id: true, name: true, slug: true, price: true, images: true, categoryId: true },
+    })
+
+    const topProducts = topItems
+      .map((t) => {
+        const p = topProductsData.find((pd) => pd.id === t.productId)
+        if (!p) return null
+        return {
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          price: p.price,
+          image: JSON.parse(p.images)[0] || null,
+          totalSold: t._sum.quantity || 0,
+          orderCount: t._count,
+          revenue: (t._sum.quantity || 0) * p.price,
+        }
+      })
+      .filter(Boolean)
+
+    // ─── Orders by district ───────────────────────────────────────────
+    const districtOrders = await db.order.groupBy({
+      by: ["district"],
+      _count: true,
+      _sum: { total: true },
+      where: { createdAt: { gte: rangeStart }, status: { not: "CANCELLED" } },
+      orderBy: { _count: { district: "desc" } },
+      take: 10,
+    })
+
+    const ordersByDistrict = districtOrders
+      .filter((d) => d.district)
+      .map((d) => ({
+        district: d.district,
+        orders: d._count,
+        revenue: (d._sum && d._sum.total) || 0,
+      }))
+
+    // ─── Sales by category ────────────────────────────────────────────
+    const categorySalesRaw = await db.orderItem.findMany({
+      where: {
+        order: { createdAt: { gte: rangeStart }, status: { not: "CANCELLED" } },
+      },
+      select: {
+        quantity: true,
+        price: true,
+        product: { select: { category: { select: { name: true } } } },
+      },
+    })
+
+    const categoryMap = new Map<string, { revenue: number; quantity: number }>()
+    for (const item of categorySalesRaw) {
+      const catName = item.product?.category?.name || "Uncategorized"
+      const existing = categoryMap.get(catName) || { revenue: 0, quantity: 0 }
+      existing.revenue += item.price * item.quantity
+      existing.quantity += item.quantity
+      categoryMap.set(catName, existing)
+    }
+
+    const salesByCategory = Array.from(categoryMap.entries())
+      .map(([category, data]) => ({ category, ...data }))
+      .sort((a, b) => b.revenue - a.revenue)
+
+    // ─── New customers ────────────────────────────────────────────────
+    const newCustomers = await db.user.count({
+      where: {
+        role: "CUSTOMER",
+        createdAt: { gte: rangeStart },
+        isDeleted: false,
+      },
+    })
+
+    // ─── Low stock alerts ─────────────────────────────────────────────
+    const lowStockProducts = await db.product.findMany({
+      where: {
+        isDeleted: false,
+        isActive: true,
+        stock: { lte: 5 },
+      },
+      select: {
+        id: true,
+        name: true,
+        stock: true,
+        lowStockThreshold: true,
+        images: true,
+      },
+      orderBy: { stock: "asc" },
+      take: 10,
+    })
+
+    const lowStock = lowStockProducts.map((p) => ({
+      ...p,
+      image: JSON.parse(p.images)[0] || null,
+      images: undefined,
+    }))
+
+    // ─── Recent orders ────────────────────────────────────────────────
+    const recentOrders = await db.order.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      include: { items: true, payments: true },
+    })
+
+    // ─── Section 10 enhancements ─────────────────────────────────────
+    //
+    // (a) Customer growth — daily new customers + cumulative count
+    // (b) Hourly orders — 24-point distribution (0..23) for the selected range
+    // (c) Conversion funnel — orders placed → paid → delivered
+    // (d) Repeat customer rate — % of customers in range with ≥2 orders
+    // (e) AOV trend — daily average order value
+
+    // (a) Customer growth
+    const newCustomersRaw = await db.user.findMany({
+      where: {
+        role: "CUSTOMER",
+        createdAt: { gte: rangeStart },
+        isDeleted: false,
+      },
+      select: { createdAt: true },
+      orderBy: { createdAt: "asc" },
+    })
+    const customerByDay = new Map<string, number>()
+    for (const u of newCustomersRaw) {
+      const key = u.createdAt.toISOString().slice(0, 10)
+      customerByDay.set(key, (customerByDay.get(key) || 0) + 1)
+    }
+    let cumulative = 0
+    // Seed cumulative with customers who joined before rangeStart
+    const preRangeCustomers = await db.user.count({
+      where: {
+        role: "CUSTOMER",
+        createdAt: { lt: rangeStart },
+        isDeleted: false,
+      },
+    })
+    cumulative = preRangeCustomers
+    const customerGrowth = Array.from(customerByDay.entries())
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([date, count]) => {
+        cumulative += count
+        return {
+          date: new Date(date).toLocaleDateString("en-RW", { month: "short", day: "numeric" }),
+          newCustomers: count,
+          cumulative,
+        }
+      })
+
+    // (b) Hourly orders — distribution by hour-of-day across the range
+    const hourlyBuckets = new Array(24).fill(0)
+    for (const o of rangeOrdersRaw) {
+      const hour = o.createdAt.getHours()
+      hourlyBuckets[hour]++
+    }
+    const hourlyOrders = hourlyBuckets.map((count, hour) => ({
+      hour: `${hour.toString().padStart(2, "0")}:00`,
+      orders: count,
+    }))
+
+    // (c) Conversion funnel
+    const placedCount = rangeOrdersRaw.length
+    const paidOrdersRaw = await db.order.count({
+      where: {
+        createdAt: { gte: rangeStart },
+        status: { not: "CANCELLED" },
+        payments: { some: { status: "PAID" } },
+      },
+    })
+    const deliveredCount = await db.order.count({
+      where: {
+        createdAt: { gte: rangeStart },
+        status: "DELIVERED",
+      },
+    })
+    const conversionFunnel = [
+      { stage: "Orders Placed", count: placedCount, color: "#94a3b8" },
+      { stage: "Paid", count: paidOrdersRaw, color: "#3b82f6" },
+      { stage: "Delivered", count: deliveredCount, color: "#10b981" },
+    ]
+
+    // (d) Repeat customer rate
+    const customerOrderCounts = await db.order.groupBy({
+      by: ["userId"],
+      _count: true,
+      where: {
+        createdAt: { gte: rangeStart },
+        status: { not: "CANCELLED" },
+        userId: { not: null },
+      },
+    })
+    const uniqueCustomers = customerOrderCounts.length
+    const repeatCustomers = customerOrderCounts.filter((c) => c._count >= 2).length
+    const repeatCustomerRate = uniqueCustomers > 0
+      ? Math.round((repeatCustomers / uniqueCustomers) * 100)
+      : 0
+
+    // (e) AOV trend — daily average order value
+    const aovByDay = new Map<string, { total: number; count: number }>()
+    for (const o of rangeOrdersRaw) {
+      const key = o.createdAt.toISOString().slice(0, 10)
+      const existing = aovByDay.get(key) || { total: 0, count: 0 }
+      existing.total += o.total
+      existing.count += 1
+      aovByDay.set(key, existing)
+    }
+    const aovTrend = Array.from(aovByDay.entries())
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([date, d]) => ({
+        date: new Date(date).toLocaleDateString("en-RW", { month: "short", day: "numeric" }),
+        aov: d.count > 0 ? Math.round(d.total / d.count) : 0,
+      }))
+
+    return NextResponse.json({
+      revenue: {
+        today: todayOrders._sum.total || 0,
+        todayCount: todayOrders._count,
+        week: weekOrders._sum.total || 0,
+        weekCount: weekOrders._count,
+        month: monthOrders._sum.total || 0,
+        monthCount: monthOrders._count,
+        year: yearOrders._sum.total || 0,
+        yearCount: yearOrders._count,
+        range: rangeOrders._sum.total || 0,
+        rangeCount: rangeOrders._count,
+      },
+      revenueOverTime,
+      statusBreakdown: statusBreakdown.map((s) => ({
+        status: s.status,
+        count: s._count,
+      })),
+      paymentBreakdown: paymentBreakdown.map((p) => ({
+        method: p.method,
+        count: p._count,
+        amount: p._sum.amount || 0,
+      })),
+      topProducts,
+      ordersByDistrict,
+      salesByCategory,
+      newCustomers,
+      lowStock,
+      recentOrders: recentOrders.map((o) => ({
+        id: o.id,
+        orderNumber: o.orderNumber,
+        customerName: o.customerName,
+        customerPhone: o.customerPhone,
+        total: o.total,
+        status: o.status,
+        createdAt: o.createdAt,
+        itemCount: o.items.length,
+        paymentMethod: o.payments[0]?.method || "COD",
+        paymentStatus: o.payments[0]?.status || "PENDING",
+      })),
+      // ─── Section 10 additions ───
+      customerGrowth,
+      hourlyOrders,
+      conversionFunnel,
+      repeatCustomerRate,
+      repeatCustomers,
+      uniqueCustomers,
+      aovTrend,
+      rangeStart: rangeStart.toISOString(),
+      rangeEnd: now.toISOString(),
+    })
+  } catch (error) {
+    if (error instanceof Error && "statusCode" in error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: (error as { statusCode: number }).statusCode }
+      )
+    }
+    console.error("Analytics error:", error)
+    return NextResponse.json({ error: "Failed to fetch analytics" }, { status: 500 })
+  }
+}

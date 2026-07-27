@@ -1,0 +1,2075 @@
+// =============================================================================
+// FreedomCosmeticShop — Complete Prisma Schema (PostgreSQL / Production)
+// =============================================================================
+//
+// 32 models for a production-ready Rwanda cosmetics e-commerce platform:
+//   1.  User           — with +250 phone, role enum, soft delete, wholesale
+//   2.  StaffProfile   — extends User for admin/staff
+//   3.  Category       — hierarchical (parent/child self-relation)
+//   4.  Brand          — product brands
+//   5.  Product        — with skinType, shade, ingredients, wholesale pricing
+//   6.  Cart           — authenticated user cart
+//   7.  CartItem       — cart line items
+//   8.  Order          — RWF currency, sequential order number, wholesale
+//   9.  OrderItem      — snapshot line items
+//  10.  Payment        — MTN MoMo / Airtel / Card / COD / Credit
+//  11.  PaymentAttempt — payment retry tracking
+//  12.  Delivery       — driver + tracking
+//  13.  Review         — with photos, skin type, shade used
+//  14.  Wishlist       — user ↔ product
+//  15.  Address        — Rwanda province/district/sector/cell/village
+//  16.  Coupon         — percentage / fixed / free shipping
+//  17.  LoyaltyPoints  — points ledger (earn / redeem / expire)
+//  18.  BlogPost       — content marketing
+//  19.  Banner         — promotional banners
+//  20.  Notification   — in-app / SMS / email / push
+//  21.  DeliveryZoneSettings — admin-manageable delivery fees
+//  22.  ActivityLog    — audit trail for staff/admin actions
+//  23.  WholesaleApplication — business wholesale applications
+//  24.  ProductPricing — wholesale tier pricing per product
+//  25.  WholesaleTier  — quantity-based price breaks
+//  26.  WholesaleCredit — credit account for wholesale customers
+//  27.  CreditHistory  — credit transaction ledger
+//  28.  WholesaleInvoice — professional invoices for wholesale orders
+//  29. StoreSettings  — store name, logo, colors, social links
+//  30. Supplier       — supplier identity for admin inventory
+//  31. ProductImage   — structured Cloudinary product images
+//  32. ProductBatch   — real stock batches and expiry dates
+//  33. SearchLog      — real search-result analytics and product-gap tracking
+//  34. OtpVerification — durable hashed OTP state for serverless authentication
+//  35. Bundle         — real product routines and sets
+//  36. BundleProduct  — products, quantities, and order within a bundle
+//  37. QuizResult     — recommendation answers and real result references
+//
+// PostgreSQL production schema — uses Supabase.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// =============================================================================
+// 1. USER
+// =============================================================================
+// Rwanda phone format: +250 7XX XXX XXX (stored as "+2507XXXXXXXX" or "07XXXXXXXX")
+// Validated in app code via regex: /^(?:\+250|0)?7[0-9]{8}$/
+
+model User {
+  id           String  @id @default(cuid())
+  name         String
+  email        String? @unique
+  phone        String  @unique // Rwanda: +2507XXXXXXXX
+  passwordHash String?
+
+  // Role: CUSTOMER | ADMIN | STAFF | MANAGER
+  role String @default("CUSTOMER")
+
+  avatar String?
+
+  // Loyalty program
+  loyaltyPoints Int @default(0)
+
+  // Email verification
+  emailVerifiedAt DateTime?
+
+  // Admin security
+  mfaEnabled         Boolean   @default(false)
+  mfaSecret          String?
+  mfaBackupCodes     String[]  @default([])
+  failedLoginCount   Int       @default(0)
+  lockedUntil        DateTime?
+  lastLoginAt        DateTime?
+  lastLoginIp        String?
+  lastLoginDevice    String?
+  passwordChangedAt  DateTime?
+  mustChangePassword Boolean   @default(false)
+  isTestAccount      Boolean   @default(false)
+  // Increment to revoke every access/refresh token for this account.
+  sessionVersion     Int       @default(0)
+
+  // ─── Section 1: Wholesale fields ──────────────────────────────────
+  // userType: RETAIL (default) | WHOLESALE | BOTH
+  userType            String    @default("RETAIL") // UserType enum as string (SQLite)
+  wholesaleStatus     String? // PENDING | APPROVED | REJECTED | SUSPENDED
+  businessName        String?
+  businessType        String? // BEAUTY_SALON | HAIR_SALON | SPA | SHOP | MARKET_VENDOR | BEAUTY_SCHOOL | HOTEL | RESELLER | OTHER
+  businessPhone       String?
+  businessAddress     String?
+  businessDistrict    String?
+  tinNumber           String? // Rwanda Tax ID
+  wholesaleApprovedAt DateTime?
+  wholesaleApprovedBy String?
+  wholesaleLimit      Int? // Credit limit in RWF
+  wholesaleBalance    Int       @default(0) // Current credit balance in RWF
+  wholesaleDiscount   Int       @default(0) // Extra % discount on top of tier
+
+  // Optional relationship details assigned by an administrator. No manager,
+  // contact promise, or availability schedule is invented by the storefront.
+  assignedManagerName     String?
+  assignedManagerPhone    String?
+  assignedManagerWhatsApp String?
+  preferredDeliveryDays   String[] @default([])
+
+  // Soft delete
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  orders               Order[]
+  cart                 Cart?
+  reviews              Review[]
+  wishlistItems        Wishlist[]
+  addresses            Address[]
+  notifications        Notification[]
+  loyaltyTransactions  LoyaltyPoints[]
+  blogPosts            BlogPost[]
+  staffProfile         StaffProfile?
+  activityLogs         ActivityLog[]
+  authSessions         AuthSession[]
+  wholesaleApplication WholesaleApplication?
+  wholesaleCredit      WholesaleCredit?
+  wholesaleInvoices    WholesaleInvoice[]
+  quizResults           QuizResult[]
+
+  // Privacy-first retention relations. Contact details remain on User and are
+  // resolved only at send time after current consent is checked.
+  referralCode            ReferralCode?
+  referralRedemptions     ReferralRedemption[] @relation("ReferredCustomer")
+  birthdayRewards         BirthdayReward[]
+  reorderReminders        ReorderReminder[]
+  stockAlerts             StockAlert[]
+  communicationPreference CommunicationPreference?
+  customerSegment         CustomerSegment?
+  abandonedCartReminders  AbandonedCartReminder[]
+
+  @@index([phone])
+  @@index([email])
+  @@index([role])
+  @@index([isDeleted])
+  @@index([userType])
+  @@index([wholesaleStatus])
+}
+
+// =============================================================================
+// 2. STAFF PROFILE (Admin/Staff — model #19)
+// =============================================================================
+// Extends User with staff-specific fields. 1:1 relation.
+// Created when role = ADMIN, STAFF, or MANAGER.
+
+model StaffProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Staff identification
+  employeeId String @unique
+  // Department: SALES | MARKETING | LOGISTICS | SUPPORT | FINANCE | MANAGEMENT
+  department String
+  position   String
+
+  hireDate DateTime @default(now())
+  isActive Boolean  @default(true)
+
+  // Permissions: JSON array like ["orders.read", "orders.update", "products.crud"]
+  permissions String
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([department])
+  @@index([isActive])
+}
+
+// =============================================================================
+// 3. CATEGORY (hierarchical — parent/child)
+// =============================================================================
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String
+  slug        String  @unique
+  description String?
+  image       String?
+  icon        String?
+
+  // Hierarchical self-relation
+  parentId String?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryHierarchy")
+
+  // Display
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  // Soft delete
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  products Product[]
+
+  @@index([slug])
+  @@index([parentId])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// =============================================================================
+// 4. BRAND
+// =============================================================================
+
+model Brand {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+  logo        String?
+  website     String?
+  country     String? // Country of origin
+  isActive    Boolean @default(true)
+
+  // Soft delete
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+
+  @@index([slug])
+  @@index([isActive])
+}
+
+// =============================================================================
+// 5. PRODUCT (with cosmetics-specific fields)
+// =============================================================================
+// Prices in RWF (Rwandan Franc) as Int to avoid float precision issues.
+// Legacy images, skinType, shades, and ingredients remain JSON strings for backward compatibility.
+
+model Product {
+  id               String  @id @default(cuid())
+  name             String
+  slug             String  @unique
+  description      String
+  shortDescription String? // For product cards (max ~150 chars)
+
+  // Pricing (RWF)
+  price          Int
+  wholesalePrice Int? // Admin-entered per-unit RWF price for approved wholesale customers
+  compareAt      Int? // Original price for "on sale" display
+  costPrice      Int? // For margin calculation (admin only)
+
+  // Inventory
+  stock             Int     @default(0)
+  lowStockThreshold Int     @default(5)
+  sku               String? @unique
+  // Real SKU supplied by the distributor. Kept separate from the legacy SKU.
+  realSku           String? @unique
+  barcode           String?
+
+  // Supplier and batch metadata are admin-only and must never be selected by public APIs.
+  supplierId        String?
+  supplier          Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  manufacturedDate  DateTime?
+  expiryDate        DateTime?
+  periodAfterOpening Int?
+  batchNumber       String?
+
+  // Physical product measurements.
+  volume            String?
+  volumeMl          Decimal?
+  weightGrams       Decimal?
+
+  // Media — JSON array of image URLs: '["url1", "url2"]'
+  images   String  @default("[]")
+  videoUrl String?
+
+  // ─── Cosmetics-specific fields ───────────────────────────────────
+  // skinType: JSON array of values from: ALL, OILY, DRY, COMBINATION, SENSITIVE, NORMAL
+  // Example: '["OILY", "COMBINATION"]'
+  skinType          String? // JSON array
+  // shades: JSON array of shade names for makeup products
+  // Example: '["Deep", "Medium", "Light"]'
+  shades            String? // JSON array
+  // ingredients: JSON array of ingredient names
+  // Example: '["Vitamin C", "Hyaluronic Acid", "Glycerin"]'
+  ingredients       String? // Legacy JSON array; retained for backward compatibility
+  ingredientsRw     String? @db.Text
+  // size: e.g., "50ml", "100g", "30 capsules"
+  size              String?
+  // usageInstructions: legacy usage field retained for backward compatibility
+  usageInstructions String?
+  howToUse          String? @db.Text
+  howToUseRw        String? @db.Text
+  // warnings: cautions and warnings
+  warnings          String?
+  warningsRw        String? @db.Text
+  allergens         String[] @default([])
+
+  // Additional cosmetic attributes.
+  hairType          HairType?
+  shade             String?
+  shadeHex          String?
+  undertone         String?
+  fragranceNotes    Json?
+
+  // Honest expected results. These fields must not contain medical claims.
+  expectedResults   String? @db.Text
+  expectedResultsRw String? @db.Text
+  resultsTimeframe  String?
+
+  // Authenticity and origin information.
+  isAuthentic       Boolean @default(false)
+  authenticityInfo String?
+  countryOfOrigin   String?
+  importedBy        String?
+  // ─── End cosmetics-specific fields ───────────────────────────────
+
+  // Ratings (denormalized for quick display)
+  rating       Float @default(0)
+  reviewsCount Int   @default(0)
+
+  // Flags
+  featured Boolean @default(false)
+  isNew    Boolean @default(false)
+  isActive Boolean @default(true)
+
+  // ─── Section 1: Wholesale product fields ──────────────────────────
+  minWholesaleQty Int     @default(6)
+  wholesaleActive Boolean @default(true)
+
+  // Soft delete
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  brandId String?
+  brand   Brand?  @relation(fields: [brandId], references: [id])
+
+  orderItems    OrderItem[]
+  reviews       Review[]
+  wishlistItems Wishlist[]
+  cartItems     CartItem[]
+  pricing       ProductPricing?
+  productImages ProductImage[]
+  batches       ProductBatch[]
+  bundles       BundleProduct[]
+  reorderReminders ReorderReminder[]
+  stockAlerts      StockAlert[]
+
+  @@index([slug])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([supplierId])
+  @@index([expiryDate])
+  @@index([featured])
+  @@index([isActive])
+  @@index([isDeleted])
+  @@index([price])
+  @@index([createdAt])
+  @@index([wholesaleActive])
+}
+
+// =============================================================================
+// PRODUCT INVENTORY SUPPORT — supplier, structured images, and stock batches
+// =============================================================================
+
+enum HairType {
+  NATURAL
+  RELAXED
+  WAVY
+  CURLY
+  COILY
+  ALL_HAIR
+}
+
+enum ImageType {
+  PRODUCT
+  PACKAGING
+  BACK_LABEL
+  SEAL
+  TEXTURE
+  SIZE_SCALE
+  SHADE
+  LIFESTYLE
+  VIDEO_THUMB
+}
+
+enum BundleType {
+  ROUTINE
+  CONCERN
+  HAIR
+  MAKEUP
+  GIFT
+  STARTER
+}
+
+model Supplier {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  address   String?
+  country   String?
+  isActive  Boolean  @default(true)
+  products  Product[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@index([isActive])
+}
+
+model ProductImage {
+  id        String    @id @default(cuid())
+  productId String
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  publicId  String
+  url       String
+  altText   String
+  altTextRw String?
+  imageType ImageType @default(PRODUCT)
+  sortOrder Int       @default(0)
+  isPrimary Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  @@index([productId])
+  @@index([isPrimary])
+  @@index([imageType])
+}
+
+model ProductBatch {
+  id               String   @id @default(cuid())
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  batchNumber      String
+  quantity         Int
+  manufacturedDate DateTime?
+  expiryDate       DateTime?
+  receivedDate     DateTime @default(now())
+  supplierInvoice  String?
+  notes            String?
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  @@unique([productId, batchNumber])
+  @@index([productId])
+  @@index([expiryDate])
+  @@index([isActive])
+}
+
+// =============================================================================
+// PRODUCT BUNDLES AND QUIZ RECOMMENDATION ANALYTICS
+// =============================================================================
+
+model Bundle {
+  id                  String          @id @default(cuid())
+  name                String
+  nameRw              String?
+  slug                String          @unique
+  description         String?         @db.Text
+  descriptionRw       String?         @db.Text
+  bundleType          BundleType      @default(ROUTINE)
+
+  // RWF prices use integer storage, consistent with Product and OrderItem.
+  // Public APIs must recalculate normalTotal and savings from current products.
+  bundlePrice         Int
+  normalTotal         Int             @default(0)
+
+  coverImage          String?
+  coverImageUrl       String?
+  isActive            Boolean         @default(true)
+  isFeatured          Boolean         @default(false)
+  // Cached admin value only; public APIs must recalculate from product stock.
+  isInStock           Boolean         @default(true)
+
+  targetConcern       String?
+  targetSkinType      String?
+  targetHairType      String?
+  targetCategory      String?
+  usageInstructions   String?         @db.Text
+  usageInstructionsRw String?         @db.Text
+
+  products            BundleProduct[]
+  orderItems          OrderItem[]
+  totalSales          Int             @default(0)
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  deletedAt           DateTime?
+
+  @@index([slug])
+  @@index([bundleType])
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([deletedAt])
+}
+
+model BundleProduct {
+  id          String   @id @default(cuid())
+  bundleId    String
+  bundle      Bundle   @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  stepOrder   Int      @default(0)
+  stepLabel   String?
+  stepLabelRw String?
+  quantity    Int      @default(1)
+  isOptional  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@unique([bundleId, productId])
+  @@index([bundleId])
+  @@index([productId])
+}
+
+model QuizResult {
+  id                       String   @id @default(cuid())
+  sessionId                String?
+  userId                   String?
+  user                     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  category                 String
+  mainConcern              String
+  skinType                 String?
+  hairType                 String?
+  preferredResult          String
+  budget                   String
+  sensitivity              String
+  recommendedProductIds    String[] @default([])
+  recommendedBundleIds     String[] @default([])
+  language                 String   @default("rw")
+  createdAt                DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([category])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// 6. CART (for authenticated users)
+// =============================================================================
+
+model Cart {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Cached totals (updated on every CartItem change)
+  totalItems Int @default(0)
+  subtotal   Int @default(0) // RWF
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items               CartItem[]
+  abandonedReminder AbandonedCartReminder?
+
+  @@index([userId])
+}
+
+// =============================================================================
+// 7. CART ITEM
+// =============================================================================
+
+model CartItem {
+  id        String  @id @default(cuid())
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity Int
+  // Price snapshot (in case product price changes after adding to cart)
+  price    Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Prevent duplicate products in same cart — update quantity instead
+  @@unique([cartId, productId])
+  @@index([cartId])
+  @@index([productId])
+}
+
+// =============================================================================
+// 8. ORDER (RWF currency)
+// =============================================================================
+// Order numbers: sequential, human-readable. Format: UB-YYYY-NNNNN
+// e.g., UB-2026-00001
+
+model Order {
+  id          String @id @default(cuid())
+  orderNumber String @unique
+
+  // Customer snapshot (works for guest checkout)
+  customerName  String
+  customerPhone String // Rwanda: +2507XXXXXXXX
+  customerEmail String?
+
+  // Optional link to authenticated user
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  // Delivery address (Rwanda structure)
+  address  String
+  city     String
+  district String?
+  sector   String?
+  province String
+  notes    String?
+
+  // Totals in RWF
+  subtotal       Int
+  discountAmount Int @default(0)
+  deliveryFee    Int @default(0)
+  total          Int
+
+  // Coupon applied
+  couponId String?
+  coupon   Coupon? @relation(fields: [couponId], references: [id])
+
+  // Loyalty points earned from this order
+  loyaltyPointsEarned Int @default(0)
+
+  // Status: PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED | RETURNED
+  status String @default("PENDING")
+
+  // ─── Section 1: Wholesale order fields ────────────────────────────
+  orderType     String    @default("RETAIL") // RETAIL | WHOLESALE
+  priceType     String    @default("RETAIL") // RETAIL | WHOLESALE | SPECIAL
+  isCredit      Boolean   @default(false) // true if wholesale order on credit
+  creditDueDate DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  items            OrderItem[]
+  payments         Payment[]
+  delivery         Delivery?
+  reviews          Review[]
+  reviewRequests   ReviewRequest[]
+  wholesaleInvoice WholesaleInvoice?
+  reorderReminders ReorderReminder[]
+
+  @@index([orderNumber])
+  @@index([status])
+  @@index([customerPhone])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([couponId])
+  @@index([orderType])
+}
+
+// =============================================================================
+// 9. ORDER ITEM (snapshot at purchase time)
+// =============================================================================
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+
+  // Optional bundle snapshot link. Individual product rows remain intact.
+  bundleId String?
+  bundle   Bundle? @relation(fields: [bundleId], references: [id], onDelete: SetNull)
+
+  // Snapshot fields (preserved even if product is deleted)
+  name     String
+  price    Int // RWF at time of purchase
+  quantity Int
+  image    String?
+  // Selected shade (for makeup products)
+  shade    String?
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([bundleId])
+}
+
+// =============================================================================
+// 10. PAYMENT (MTN MoMo / Airtel / Card / COD)
+// =============================================================================
+
+model Payment {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Method: MTN_MOMO | AIRTEL_MONEY | CARD | COD
+  method String
+
+  // Provider transaction details
+  providerTransactionId String? @unique // From PayPack / Flutterwave
+  providerReference     String?
+
+  // Amount in RWF
+  amount Int
+
+  // Status: PENDING | PAID | FAILED | REFUNDED
+  status String @default("PENDING")
+
+  // Mobile money
+  phoneNumber String? // Customer's MoMo phone number
+
+  // Card (last 4 digits only — never store full card number)
+  cardLast4 String?
+  cardBrand String? // VISA | MASTERCARD | AMEX
+
+  // Failure
+  failureReason String?
+
+  // ─── New fields for PayPack integration ───────────────────────────
+  // Network: MTN | AIRTEL (for MoMo payments)
+  network     String?
+  // Raw webhook payload (JSON string — SQLite doesn't support Json type)
+  webhookData String?
+  // ─── End new fields ────────────────────────────────────────────────
+
+  // Timestamps
+  initiatedAt DateTime  @default(now())
+  completedAt DateTime?
+
+  @@index([orderId])
+  @@index([providerTransactionId])
+  @@index([status])
+  @@index([method])
+  @@index([network])
+}
+
+// =============================================================================
+// 10b. PAYMENT ATTEMPT (tracks retry attempts for MoMo/Airtel payments)
+// =============================================================================
+// NEW MODEL — does not affect existing Payment model.
+// Used to track individual payment attempts (customer may retry with different phones).
+
+model PaymentAttempt {
+  id           String   @id @default(cuid())
+  orderId      String
+  phone        String
+  amount       Int // RWF
+  network      String // MTN | AIRTEL
+  reference    String? // PayPack transaction reference
+  status       String   @default("PENDING") // PENDING | SUCCESS | FAILED
+  attemptCount Int      @default(1)
+  lastError    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([phone])
+  @@index([status])
+  @@index([reference])
+}
+
+// =============================================================================
+// 11. DELIVERY (driver + tracking)
+// =============================================================================
+
+model Delivery {
+  id      String @id @default(cuid())
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  // Status: PENDING | ASSIGNED | PICKED_UP | IN_TRANSIT | DELIVERED | FAILED
+  status String @default("PENDING")
+
+  // Driver / courier
+  driverName   String?
+  driverPhone  String? // Rwanda: +2507XXXXXXXX
+  vehiclePlate String?
+
+  // Tracking
+  trackingCode     String?   @unique
+  estimatedArrival DateTime?
+  actualArrival    DateTime?
+
+  // Failure
+  failureReason String?
+
+  // Internal notes
+  notes String?
+
+  // Timestamps
+  assignedAt  DateTime?
+  pickedUpAt  DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status])
+  @@index([driverPhone])
+  @@index([trackingCode])
+}
+
+// =============================================================================
+// 12. REVIEW (with photo upload)
+// =============================================================================
+
+model Review {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // Kept nullable for legacy rows. Every new review API must require a real user,
+  // delivered order, and matching order item before setting isVerified=true.
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderNumber String?
+
+  // Review content. Existing `body` is retained to avoid destructive renames.
+  rating Int // 1-5, validated by the API
+  title  String?
+  body   String? @db.Text
+
+  // Existing JSON string representation is retained for backward compatibility.
+  // Submission APIs validate a maximum of five Cloudinary URLs.
+  photos String? // '["url1", "url2"]'
+
+  // Customer context
+  skinType    String?
+  hairType    HairType?
+  shadeUsed   String?
+  shadeMatched Boolean?
+
+  // Verification is false for legacy/unlinked reviews and can only be set after
+  // checking a delivered order containing this product.
+  isVerified Boolean @default(false)
+
+  // Moderation. Negative ratings are never a reason to hide a review.
+  isApproved       Boolean @default(false)
+  isFeatured       Boolean @default(false)
+  isHidden         Boolean @default(false)
+  moderationReason String?
+
+  // Existing helpfulVotes is the canonical helpful counter.
+  helpfulVotes    Int @default(0)
+  notHelpfulCount Int @default(0)
+  votes           ReviewVote[]
+  reports         ReviewReport[]
+
+  merchantResponse   String? @db.Text
+  merchantResponseAt DateTime?
+
+  // Equal reward bookkeeping; rating never affects these values.
+  pointsAwarded   Int @default(0)
+  pointsAwardedAt DateTime?
+
+  // Legacy soft-delete fields are preserved. Moderation APIs may use them only
+  // for spam, abuse, legal, or privacy reasons—not negative sentiment.
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  reviewRequest ReviewRequest?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId, orderId])
+  @@index([productId])
+  @@index([userId])
+  @@index([orderId])
+  @@index([isVerified])
+  @@index([isApproved])
+  @@index([isHidden])
+  @@index([rating])
+  @@index([createdAt])
+}
+
+model ReviewRequest {
+  id              String   @id @default(cuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId          String
+  productId       String
+  requestedAt     DateTime @default(now())
+  smsSent         Boolean  @default(false)
+  smsSentAt       DateTime?
+  smsClaimedAt    DateTime?
+  smsAttempts     Int      @default(0)
+  lastSmsError    String?
+  reviewSubmitted Boolean  @default(false)
+  reviewId        String?  @unique
+  review          Review?  @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+
+  @@unique([orderId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@index([requestedAt])
+}
+
+model ReviewVote {
+  id        String   @id @default(cuid())
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  userId    String
+  isHelpful Boolean
+  createdAt DateTime @default(now())
+
+  @@unique([reviewId, userId])
+  @@index([reviewId])
+  @@index([userId])
+}
+
+model ReviewReport {
+  id         String   @id @default(cuid())
+  reviewId   String
+  review     Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reportedBy String
+  reason     String
+  resolved   Boolean  @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+  createdAt  DateTime @default(now())
+
+  @@unique([reviewId, reportedBy])
+  @@index([reviewId])
+  @@index([resolved])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// 13. WISHLIST
+// =============================================================================
+
+model Wishlist {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  // Prevent duplicate wishlist entries
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+}
+
+// =============================================================================
+// 14. ADDRESS (Rwanda districts / sectors)
+// =============================================================================
+// Rwanda administrative structure:
+//   Province (5) → District (30) → Sector → Cell → Village
+// Reference data in src/lib/rwanda-locations.ts
+
+model Address {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  label          String // "Home", "Work", etc.
+  recipientName  String
+  recipientPhone String // Rwanda: +2507XXXXXXXX
+
+  // Rwanda administrative hierarchy
+  province      String
+  district      String // e.g., "Nyarugenge", "Gasabo"
+  sector        String // e.g., "Nyarugenge", "Kimirombe"
+  cell          String?
+  village       String?
+  streetAddress String? // Additional street-level detail
+
+  // GPS coordinates (optional, for delivery optimization)
+  latitude  Float?
+  longitude Float?
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([district])
+  @@index([province])
+}
+
+// =============================================================================
+// 15. COUPON / DISCOUNT
+// =============================================================================
+
+model Coupon {
+  id          String  @id @default(cuid())
+  code        String  @unique
+  description String?
+
+  // Type: PERCENTAGE | FIXED | FREE_SHIPPING
+  type  String
+  // For PERCENTAGE: 0-100 (e.g., 10 = 10% off)
+  // For FIXED: amount in RWF (e.g., 5000 = RWF 5,000 off)
+  value Int
+
+  // Minimum order amount to qualify (RWF)
+  minOrderAmount    Int?
+  // Maximum discount cap (for PERCENTAGE type, in RWF)
+  maxDiscountAmount Int?
+
+  // Usage limits
+  usageLimit        Int? // Total times usable (null = unlimited)
+  usageLimitPerUser Int  @default(1)
+  usedCount         Int  @default(0)
+
+  // Validity window
+  startsAt DateTime
+  endsAt   DateTime?
+
+  // Applicability
+  appliesToAllProducts Boolean @default(true)
+  // JSON arrays of IDs when appliesToAllProducts = false
+  categoryIds          String? // '["catId1", "catId2"]'
+  productIds           String? // '["prodId1", "prodId2"]'
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([code])
+  @@index([isActive])
+  @@index([startsAt])
+  @@index([endsAt])
+}
+
+// =============================================================================
+// 16. LOYALTY POINTS (ledger)
+// =============================================================================
+// Each row is one transaction (earn / redeem / expire / bonus).
+// User.loyaltyPoints is the current balance (denormalized for quick reads).
+
+model LoyaltyPoints {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Transaction
+  points Int // Positive = earned, Negative = redeemed
+  // Type: EARNED | REDEEMED | EXPIRED | BONUS | ADJUSTMENT
+  type   String
+  reason String // e.g., "Order UB-2026-00001", "Signup bonus"
+
+  // Related order (if earned from an order)
+  orderId String?
+
+  // Balance after this transaction
+  balanceAfter Int
+
+  // Expiry (earned points may expire)
+  expiresAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([orderId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([expiresAt])
+}
+
+// =============================================================================
+// 17. BLOG POST
+// =============================================================================
+
+model BlogPost {
+  id        String  @id @default(cuid())
+  title     String
+  titleRw   String?
+  slug      String  @unique
+  excerpt   String?
+  excerptRw String? @db.Text
+  content   String // Markdown or HTML
+  contentRw String? @db.Text
+
+  coverImage String?
+  imageAlt   String?
+  imageAltRw String?
+  category   String?
+
+  // Author
+  authorId   String?
+  author     User?   @relation(fields: [authorId], references: [id])
+  authorName String?
+
+  // SEO
+  metaTitle         String?
+  metaTitleRw       String?
+  metaDescription   String?
+  metaDescriptionRw String?
+
+  // Tags — JSON array: '["skincare", "routine", "kigali"]'
+  tags String?
+
+  // Status: DRAFT | PUBLISHED | ARCHIVED
+  status      String    @default("DRAFT")
+  publishedAt DateTime?
+
+  // Metrics
+  viewCount Int @default(0)
+
+  // Soft delete
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([authorId])
+}
+
+// =============================================================================
+// 18. BANNER / PROMOTION
+// =============================================================================
+
+model Banner {
+  id          String  @id @default(cuid())
+  title       String
+  subtitle    String?
+  image       String // Desktop image URL
+  mobileImage String? // Mobile-optimized image
+
+  // CTA link
+  // linkType: PRODUCT | CATEGORY | URL | BLOG_POST | NONE
+  linkType String?
+  linkUrl  String?
+
+  // Placement: HOME_HERO | HOME_PROMO | SIDEBAR | CATEGORY_TOP | CHECKOUT_BANNER
+  placement String @default("HOME_HERO")
+
+  // Scheduling
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  // Display
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([placement])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// =============================================================================
+// 19. NOTIFICATION
+// =============================================================================
+
+model Notification {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Type: ORDER_UPDATE | PROMOTION | REVIEW_REQUEST | SYSTEM | LOW_STOCK
+  type  String
+  title String
+  body  String
+
+  // Additional context — JSON: '{"orderId": "abc123", "status": "SHIPPED"}'
+  data String?
+
+  // Deep link
+  // linkType: ORDER | PRODUCT | CATEGORY | URL | NONE
+  linkType String?
+  linkUrl  String?
+
+  // Status
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  // Channel: IN_APP | SMS | EMAIL | PUSH
+  channel String    @default("IN_APP")
+  sentAt  DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@index([channel])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// 20. DELIVERY ZONE SETTINGS (admin-manageable delivery fees per zone)
+// =============================================================================
+// NEW MODEL — does not affect existing delivery logic.
+// Admin can edit fees, toggle same-day, set cutoff times.
+
+model DeliveryZoneSettings {
+  id            String   @id @default(cuid())
+  zoneName      String // "Kigali Same Day", "Northern Province", etc.
+  zoneCode      String   @unique // "KIGALI_SAME_DAY", "NORTHERN", etc.
+  baseFee       Int // RWF
+  freeThreshold Int      @default(50000) // Orders above this = free delivery
+  estimatedDays Int      @default(3) // Business days
+  isSameDay     Boolean  @default(false)
+  sameDayCutoff String? // "14:00" — orders before 2PM get same-day
+  isActive      Boolean  @default(true)
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
+
+  @@index([zoneCode])
+  @@index([isActive])
+}
+
+// =============================================================================
+// 21. ACTIVITY LOG (audit trail for staff/admin actions)
+// =============================================================================
+// Lightweight audit log — one row per staff action (login, order update,
+// refund, customer block, coupon create, etc.). Used by the Staff & Security
+// tab in the admin dashboard.
+//
+// Note: writes are best-effort. If the table is missing or the write fails,
+// the calling operation should still succeed (we don't want audit logging
+// to break business logic). The helper `logActivity()` in src/server/services/activity.ts
+// wraps this in a try/catch.
+
+model ActivityLog {
+  id String @id @default(cuid())
+
+  // Who performed the action (nullable for system/anonymized events)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Snapshot of who (denormalized for resilience — survives user deletion)
+  userName String?
+  userRole String?
+
+  // What happened
+  // Action categories: AUTH_LOGIN | AUTH_LOGOUT | AUTH_FAILED | ORDER_UPDATE |
+  //   PAYMENT_REFUND | CUSTOMER_BLOCK | CUSTOMER_UNBLOCK | COUPON_CREATE |
+  //   COUPON_UPDATE | COUPON_DELETE | BANNER_CREATE | BANNER_UPDATE | BANNER_DELETE |
+  //   PRODUCT_CREATE | PRODUCT_UPDATE | PRODUCT_DELETE | DELIVERY_ASSIGN |
+  //   DELIVERY_UPDATE | SMS_SEND | SETTINGS_UPDATE | STAFF_CREATE | STAFF_UPDATE
+  action String
+
+  // Optional entity reference (e.g., order ID, customer ID, coupon code)
+  entityType String? // ORDER | CUSTOMER | COUPON | BANNER | PRODUCT | DELIVERY | PAYMENT | STAFF
+  entityId   String?
+
+  // Human-readable description (e.g., "Updated order UB-2026-00001 to SHIPPED")
+  description String?
+
+  // IP + user agent for security forensics
+  ipAddress String?
+  userAgent String?
+
+  // Severity: info | warn | critical
+  severity String @default("info")
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// 22. WHOLESALE APPLICATION (businesses applying for wholesale accounts)
+// =============================================================================
+
+model WholesaleApplication {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Existing identity fields are preserved for current application APIs.
+  businessName String
+  businessType String
+  tradingName  String?
+
+  // Rwanda business registration identifiers support evidence requested during
+  // review without forcing document uploads in the initial application.
+  tinNumber     String?
+  rdbNumber     String?
+  vatRegistered Boolean @default(false)
+
+  businessPhone    String
+  businessEmail    String?
+  businessDistrict String
+  businessSector   String?
+  businessAddress  String
+
+  // Optional for legacy compatibility; the improved application flow will
+  // require the owner fields selected by the final published policy.
+  ownerName       String?
+  nationalId      String?
+  ownerPhone      String?
+  ownerEmail      String?
+  yearsInBusiness Int?
+
+  monthlyRevenue        String?
+  estimatedMonthlyOrder String?
+  numberOfEmployees     Int?
+  heardFrom             String?
+
+  // Existing JSON document list remains intact. Structured slots make real
+  // RDB/TIN/owner proof auditable without destroying old applications.
+  documents               String @default("[]")
+  businessRegistrationDoc String?
+  tinCertificateDoc       String?
+  ownerIdDoc               String?
+  additionalDocs           String @default("[]")
+  notes                    String?
+
+  status          String @default("PENDING")
+  reviewedBy      String?
+  reviewNotes     String?
+  rejectionReason String?
+  reviewedAt      DateTime?
+  approvedAt      DateTime?
+  approvedBy      String?
+
+  // Integer RWF is retained across the project to avoid destructive Decimal
+  // conversion and floating-point money behavior.
+  approvedCreditLimit Int @default(0)
+  paymentTermsDays    Int @default(0)
+  discountTier        String?
+  assignedAgentId     String?
+
+  appliedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([businessDistrict])
+  @@index([tinNumber])
+  @@index([rdbNumber])
+}
+
+// =============================================================================
+// 23. PRODUCT PRICING (wholesale tier pricing per product)
+// =============================================================================
+
+model ProductPricing {
+  id        String  @id @default(cuid())
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String  @unique
+
+  priceType   String @default("RETAIL") // RETAIL | WHOLESALE | SPECIAL
+  retailPrice Int // Copy of Product.price for reference
+
+  tiers WholesaleTier[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// =============================================================================
+// 24. WHOLESALE TIER (quantity-based price breaks)
+// =============================================================================
+
+model WholesaleTier {
+  id        String         @id @default(cuid())
+  pricing   ProductPricing @relation(fields: [pricingId], references: [id], onDelete: Cascade)
+  pricingId String
+
+  tierName        String // e.g., "Buy 6+", "Buy 12+", "Buy 48+"
+  minQuantity     Int // Minimum quantity for this tier
+  maxQuantity     Int? // Maximum quantity (null = unlimited)
+  pricePerUnit    Int // Price per unit in RWF at this tier
+  discountPercent Int // Discount % off retail (e.g., 12 = 12% off)
+
+  @@index([pricingId])
+  @@index([minQuantity])
+}
+
+// =============================================================================
+// 25. WHOLESALE CREDIT (credit account for approved wholesale customers)
+// =============================================================================
+
+model WholesaleCredit {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+
+  // Integer RWF fields remain compatible with orders, invoices, and services.
+  creditLimit     Int @default(0)
+  usedCredit      Int @default(0)
+  availableCredit Int @default(0)
+  paymentTermDays Int @default(30)
+
+  // Credit must be explicitly activated by an operational approval workflow.
+  isActive   Boolean @default(false)
+  approvedAt DateTime?
+  approvedBy String?
+
+  totalPaid      Int @default(0)
+  totalOverdue   Int @default(0)
+  overdueDays    Int @default(0)
+  lastPaymentDate DateTime?
+
+  riskScore    Int    @default(50)
+  creditRating String @default("NEW")
+
+  isSuspended      Boolean @default(false)
+  suspendedAt      DateTime?
+  suspensionReason String?
+
+  history CreditHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([creditRating])
+  @@index([isSuspended])
+}
+
+// =============================================================================
+// 26. CREDIT HISTORY (ledger of credit transactions)
+// =============================================================================
+
+model CreditHistory {
+  id       String          @id @default(cuid())
+  credit   WholesaleCredit @relation(fields: [creditId], references: [id], onDelete: Cascade)
+  creditId String
+
+  type        String // DEBIT (order placed) | CREDIT (payment received) | ADJUSTMENT
+  amount      Int // RWF amount
+  description String
+  orderId     String?
+
+  createdAt DateTime @default(now())
+
+  @@index([creditId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+// =============================================================================
+// 27. WHOLESALE INVOICE (professional invoice for wholesale orders)
+// =============================================================================
+
+model WholesaleInvoice {
+  id            String @id @default(cuid())
+  invoiceNumber String @unique
+  order         Order  @relation(fields: [orderId], references: [id])
+  orderId       String @unique
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id])
+
+  businessName    String
+  businessAddress String
+  tinNumber       String?
+  businessRdb     String?
+
+  // Existing integer RWF invoice fields are retained.
+  subtotal    Int
+  tax         Int @default(0)
+  discount    Int @default(0)
+  totalAmount Int
+  paidAmount  Int @default(0)
+  balanceDue  Int @default(0)
+
+  paymentTerms  String?
+  dueDate       DateTime?
+  isPaid        Boolean @default(false)
+  paidAt        DateTime?
+  paymentMethod String?
+
+  isOverdue           Boolean @default(false)
+  daysOverdue         Int @default(0)
+  overdueRemindersSent Int @default(0)
+  lastReminderDate    DateTime?
+
+  pdfUrl String?
+  notes  String?
+
+  issuedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([invoiceNumber])
+  @@index([userId])
+  @@index([businessName])
+  @@index([isPaid])
+  @@index([isOverdue])
+  @@index([dueDate])
+}
+
+model WholesaleReorder {
+  id              String   @id @default(cuid())
+  userId          String
+  originalOrderId String
+  newOrderId      String?
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([originalOrderId])
+  @@index([newOrderId])
+  @@index([createdAt])
+}
+
+model WholesaleRetentionMetric {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  firstOrderDate DateTime?
+  lastOrderDate  DateTime?
+  totalOrders    Int @default(0)
+  totalSpent     Int @default(0)
+  averageOrderValue Int @default(0)
+
+  daysSinceFirstOrder Int?
+  daysSinceLastOrder  Int?
+  // Basis points per month (10,000 = 1.0 order/month) avoid floating money/rates.
+  ordersPerMonthBps Int @default(0)
+
+  status      String @default("ACTIVE")
+  isChurned   Boolean @default(false)
+  churnedAt   DateTime?
+  churnReason String?
+
+  reorderCount   Int @default(0)
+  reorderRateBps Int @default(0)
+
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([isChurned])
+  @@index([userId])
+}
+
+// =============================================================================
+// 28. STORE SETTINGS (logo, brand, contact, social)
+// =============================================================================
+
+model StoreSettings {
+  id String @id @default(cuid())
+
+  storeName      String  @default("FreedomCosmeticShop")
+  storeShortName String  @default("Freedom Cosmetic")
+  storeTagline   String? @default("Rwanda's Beauty Freedom")
+  storeEmail     String? @default("hello@freedomcosmeticshop.rw")
+  storePhone     String? @default("+250788123456")
+  storeWhatsApp  String? @default("+250788123456")
+  storeAddress   String? @default("Kigali, Rwanda")
+
+  logoUrl       String?
+  logoPublicId  String?
+  faviconUrl    String?
+  logoUpdatedAt DateTime?
+
+  primaryColor   String @default("#B76E79")
+  secondaryColor String @default("#1a1a1a")
+  accentColor    String @default("#FFD700")
+
+  metaTitle       String?
+  metaDescription String?
+
+  socialInstagram String?
+  socialFacebook  String?
+  socialTikTok    String?
+  socialYoutube   String?
+  socialTwitter   String?
+
+  currency String @default("RWF")
+  timezone String @default("Africa/Kigali")
+  language String @default("en")
+
+  updatedAt DateTime @updatedAt
+}
+
+// =============================================================================
+// SEARCH ANALYTICS — real customer searches and zero-result product gaps
+// =============================================================================
+
+model WhatsAppClick {
+  id          String   @id @default(cuid())
+  eventType   String
+  productId   String?
+  productSlug String?
+  cartTotal   Int?
+  district    String?
+  language    String   @default("rw")
+  pagePath    String?
+  createdAt   DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+  @@index([productId])
+  @@index([language])
+}
+
+model SearchLog {
+  id          String   @id @default(cuid())
+  // Deterministic HMAC identifier only; raw customer search text is never stored.
+  query       String
+  hasResults  Boolean  @default(true)
+  resultCount Int      @default(0)
+  userId      String?
+  sessionId   String?
+  filters     Json?
+  createdAt   DateTime @default(now())
+
+  @@index([query])
+  @@index([hasResults])
+  @@index([createdAt])
+  @@index([sessionId])
+}
+
+// Privacy-minimized 404 analytics. Raw IP addresses, query strings, and full
+// browser user-agent strings are never stored.
+model NotFoundLog {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  userAgent String?
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([path])
+  @@index([createdAt])
+}
+
+// Consent-gated, privacy-minimized first-party analytics. No direct customer
+// identifiers, contact details, addresses, payment references, or credentials.
+model AnalyticsEvent {
+  id              String   @id @default(cuid())
+  event           String
+  category        String?
+  path            String?
+  productId       String?
+  productSlug     String?
+  productCategory String?
+  searchQueryHash String?
+  device          String?
+  district        String?
+  language        String?
+  paymentMethod   String?
+  isNewUser       Boolean  @default(false)
+  isKigali        Boolean  @default(false)
+  sessionHash     String?
+  userHash        String?
+  value           Decimal?
+  currency        String   @default("RWF")
+  metadata        Json?
+  createdAt       DateTime @default(now())
+
+  @@index([event])
+  @@index([createdAt])
+  @@index([productId])
+  @@index([sessionHash])
+  @@index([district])
+  @@index([device])
+}
+
+// =============================================================================
+// RETENTION FOUNDATION — consent-first, policy-neutral records
+// =============================================================================
+// These models do not activate rewards or communications by themselves. Reward
+// values and timing remain nullable until an authorized business policy is
+// configured. Reminder delivery code must re-check CommunicationPreference at
+// send time so an opt-out blocks queued, unsent messages immediately.
+
+model ReferralCode {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Codes are generated from cryptographic randomness in the service layer;
+  // customer names and contact details must never be embedded in them.
+  code     String  @unique
+  isActive Boolean @default(false)
+
+  // No reward or discount is assumed. Section 4 may use these values only
+  // after an authorized policy explicitly configures and activates the code.
+  pointsPerUse       Int?
+  discountType       String?
+  discountValue      Int?
+  maxUses            Int?
+  usedCount          Int       @default(0)
+  startsAt           DateTime?
+  endsAt             DateTime?
+  policyConfiguredAt DateTime?
+
+  redemptions ReferralRedemption[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+}
+
+model ReferralRedemption {
+  id             String       @id @default(cuid())
+  referralCodeId String
+  referralCode   ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Restrict)
+
+  // One authenticated customer can redeem a referral only once. No customer
+  // name, phone, email, or address snapshot is retained here.
+  referredUserId String @unique
+  referredUser   User   @relation("ReferredCustomer", fields: [referredUserId], references: [id], onDelete: Restrict)
+
+  referrerPointsAwarded Int    @default(0)
+  discountType          String?
+  discountValue         Int?
+  discountRedeemedAt    DateTime?
+  status                String @default("RECORDED")
+  createdAt             DateTime @default(now())
+
+  @@index([referralCodeId, createdAt])
+  @@index([status])
+}
+
+model BirthdayReward {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Month/day supports the feature while minimizing retained date information.
+  birthMonth Int
+  birthDay   Int
+  rewardYear Int
+
+  // A record is non-claimable until a policy sets a value and explicitly
+  // grants it. There is intentionally no default reward or expiry period.
+  rewardPoints     Int?
+  status           String    @default("BLOCKED")
+  consentGranted   Boolean   @default(false)
+  consentCheckedAt DateTime?
+  grantedAt        DateTime?
+  redeemedAt       DateTime?
+  expiresAt        DateTime?
+  revokedAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, rewardYear])
+  @@index([status])
+  @@index([rewardYear, birthMonth, birthDay])
+}
+
+model ReorderReminder {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sourceOrderId String?
+  sourceOrder   Order?  @relation(fields: [sourceOrderId], references: [id], onDelete: SetNull)
+
+  // Usage periods are product/policy configuration, never guessed defaults.
+  estimatedDays Int?
+  dueAt         DateTime?
+  channel       String?
+
+  // BLOCKED + false is the safe queue state. A sender must re-check current
+  // channel and reorder consent instead of relying only on this snapshot.
+  status           String    @default("BLOCKED")
+  consentGranted   Boolean   @default(false)
+  consentCheckedAt DateTime?
+  sentAt           DateTime?
+  cancelledAt      DateTime?
+  lastErrorCode    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([productId])
+  @@index([sourceOrderId])
+  @@index([dueAt, status])
+}
+
+model AbandonedCartReminder {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartId String @unique
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  channel String @default("SMS")
+  dueAt   DateTime
+
+  status           String   @default("BLOCKED")
+  consentGranted   Boolean  @default(false)
+  consentCheckedAt DateTime?
+  sentAt           DateTime?
+  cancelledAt      DateTime?
+  lastErrorCode    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([dueAt, status])
+}
+
+model StockAlert {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  alertType   String
+  targetPrice Int?
+  channel     String?
+
+  // No phone/name/address snapshot is stored. Contact information is resolved
+  // from the authenticated user only after current purpose + channel consent.
+  status           String    @default("BLOCKED")
+  consentGranted   Boolean   @default(false)
+  consentCheckedAt DateTime?
+  sentAt           DateTime?
+  cancelledAt      DateTime?
+  lastErrorCode    String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId, alertType])
+  @@index([productId, alertType, status])
+  @@index([userId, status])
+}
+
+model CommunicationPreference {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  language String @default("rw")
+
+  // Channel consent is explicit and disabled by default.
+  smsEnabled          Boolean   @default(false)
+  whatsappEnabled     Boolean   @default(false)
+  emailEnabled        Boolean   @default(false)
+  smsConsentedAt      DateTime?
+  whatsappConsentedAt DateTime?
+  emailConsentedAt    DateTime?
+  smsRevokedAt        DateTime?
+  whatsappRevokedAt   DateTime?
+  emailRevokedAt      DateTime?
+
+  // Purpose consent is independent from channel consent. A message may be sent
+  // only when both its purpose and selected channel are currently enabled.
+  reorderReminders       Boolean @default(false)
+  priceDropAlerts        Boolean @default(false)
+  backInStockAlerts      Boolean @default(false)
+  birthdayRewards        Boolean @default(false)
+  postDeliveryTips       Boolean @default(false)
+  abandonedCartReminders Boolean @default(false)
+  wishlistReminders      Boolean @default(false)
+
+  reorderConsentedAt       DateTime?
+  priceDropConsentedAt     DateTime?
+  backInStockConsentedAt   DateTime?
+  birthdayConsentedAt      DateTime?
+  postDeliveryConsentedAt  DateTime?
+  abandonedCartConsentedAt DateTime?
+  wishlistConsentedAt      DateTime?
+
+  reorderRevokedAt       DateTime?
+  priceDropRevokedAt     DateTime?
+  backInStockRevokedAt   DateTime?
+  birthdayRevokedAt      DateTime?
+  postDeliveryRevokedAt  DateTime?
+  abandonedCartRevokedAt DateTime?
+  wishlistRevokedAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([updatedAt])
+}
+
+model CustomerSegment {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // No business thresholds are assumed. Segmentation remains inactive and
+  // unclassified until a versioned definition is explicitly configured.
+  segment           String    @default("UNCLASSIFIED")
+  isActive          Boolean   @default(false)
+  definitionVersion String?
+  assignedAt        DateTime?
+  calculatedAt      DateTime?
+  expiresAt         DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([segment, isActive])
+  @@index([calculatedAt])
+}
+
+// =============================================================================
+// DURABLE OTP VERIFICATION — registration/login/reset across serverless instances
+// =============================================================================
+
+model OtpVerification {
+  id               String   @id @default(cuid())
+  phone            String
+  type             String
+  codeHash         String
+  registrationData Json?
+  ipAddress        String?
+  attempts         Int      @default(0)
+  isUsed           Boolean  @default(false)
+  usedAt           DateTime?
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  @@index([phone, type, isUsed, createdAt])
+  @@index([ipAddress, createdAt])
+  @@index([expiresAt])
+}
+
+// =============================================================================
+// ADMIN SECURITY
+// =============================================================================
+
+model AdminActivityLog {
+  id         String   @id @default(cuid())
+  userId     String
+  userName   String
+  userRole   String
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  status     String   @default("SUCCESS")
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+  @@index([resource])
+}
+
+model AuthSession {
+  id             String    @id
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash      String    @unique
+  rememberDevice Boolean   @default(false)
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  lastUsedAt     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+}
+
+model FailedLoginAttempt {
+  id        String   @id @default(cuid())
+  phone     String?
+  email     String?
+  ipAddress String?
+  userAgent String?
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+  @@index([ipAddress])
+  @@index([createdAt])
+}
+
+model SecurityAlert {
+  id         String    @id @default(cuid())
+  type       String
+  severity   String    @default("HIGH")
+  title      String
+  message    String
+  userId     String?
+  ipAddress  String?
+  isResolved Boolean   @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+  metadata   Json?
+  createdAt  DateTime  @default(now())
+
+  @@index([type])
+  @@index([isResolved])
+  @@index([createdAt])
+}
+
+model StaffAccount {
+  id             String    @id @default(cuid())
+  userId         String    @unique
+  employeeName   String
+  employeePhone  String
+  department     String?
+  createdBy      String
+  isActive       Boolean   @default(true)
+  lastActivityAt DateTime?
+  permissions    Json?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model PasswordResetLog {
+  id            String    @id @default(cuid())
+  userId        String
+  requestedAt   DateTime  @default(now())
+  completedAt   DateTime?
+  ipAddress     String?
+  wasSuccessful Boolean   @default(false)
+
+  @@index([userId])
+}
+
+model MFAVerification {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String
+  type      String   @default("TOTP")
+  expiresAt DateTime
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

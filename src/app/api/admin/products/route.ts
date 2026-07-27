@@ -1,0 +1,273 @@
+export const dynamic = 'force-dynamic'
+
+/**
+ * /api/admin/products
+ *
+ * GET — list all products for admin (includes inactive + deleted=false).
+ *       Supports search, pagination, sorting.
+ *
+ * POST — create a new product. Requires ADMIN role.
+ *        Accepts: name, description, price, compareAt?, stock, brandId, categoryId,
+ *                  images (array), skinType?, shades?, ingredients?, size?, etc.
+ */
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
+import { Prisma } from "@prisma/client"
+import { randomBytes } from 'node:crypto'
+import { PERMISSIONS, requirePermission } from '@/lib/permissions'
+import { broadcastProductEvent } from "@/lib/realtime"
+import { logActivity } from "@/server/services/activity"
+import { z } from "zod"
+import { indexProduct } from '@/server/services/search'
+
+const CreateProductSchema = z.object({
+  name: z.string().min(2).max(200),
+  description: z.string().max(5000).optional().default(''),
+  shortDescription: z.string().max(300).optional().nullable(),
+  price: z.number().int().positive(),
+  wholesalePrice: z.number().int().positive().optional().nullable(),
+  compareAt: z.number().int().min(0).optional().nullable(),
+  stock: z.number().int().min(0).default(0),
+  lowStockThreshold: z.number().int().min(0).default(5),
+  sku: z.string().max(100).optional().nullable(),
+  realSku: z.string().max(100).optional().nullable(),
+  costPrice: z.number().int().min(0).optional().nullable(),
+  supplierId: z.string().optional().nullable(),
+  manufacturedDate: z.string().datetime().optional().nullable(),
+  expiryDate: z.string().datetime().optional().nullable(),
+  periodAfterOpening: z.number().int().min(1).max(120).optional().nullable(),
+  batchNumber: z.string().max(100).optional().nullable(),
+  volume: z.string().max(100).optional().nullable(),
+  brandId: z.string().optional().nullable(),
+  categoryId: z.string().min(1),
+  images: z.array(z.string().url()).max(5).optional().default([]),
+  skinType: z.array(z.string()).optional().nullable(),
+  shades: z.array(z.string()).optional().nullable(),
+  ingredients: z.array(z.string()).optional().nullable(),
+  size: z.string().optional().nullable(),
+  usageInstructions: z.string().optional().nullable(),
+  warnings: z.string().optional().nullable(),
+  featured: z.boolean().default(false),
+  isActive: z.boolean().default(true),
+}).superRefine((value, ctx) => {
+  if (value.compareAt !== null && value.compareAt !== undefined && value.compareAt !== 0 && value.compareAt <= value.price) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['compareAt'], message: 'Compare-at price must be greater than the selling price' })
+  }
+  if (value.wholesalePrice !== null && value.wholesalePrice !== undefined && value.wholesalePrice > value.price) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['wholesalePrice'], message: 'Wholesale price cannot exceed the retail price' })
+  }
+  if (value.manufacturedDate && value.expiryDate && new Date(value.expiryDate) <= new Date(value.manufacturedDate)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['expiryDate'], message: 'Expiry date must be after the manufactured date' })
+  }
+})
+
+function addProfitInfo<T extends { price: number; costPrice: number | null }>(product: T) {
+  if (product.costPrice === null || product.price <= 0) return product
+  const profitAmount = product.price - product.costPrice
+  return {
+    ...product,
+    profitAmount,
+    profitMargin: Math.round((profitAmount / product.price) * 1000) / 10,
+  }
+}
+
+function slugify(s: string) {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+}
+
+export async function GET(req: Request) {
+  try {
+    await requirePermission(PERMISSIONS.PRODUCTS_READ)
+
+    const { searchParams } = new URL(req.url)
+    const search = searchParams.get("search")?.trim() || ""
+    const page = Math.max(1, Number(searchParams.get("page") || "1"))
+    const pageSize = Math.min(
+      100,
+      Math.max(1, Number(searchParams.get("pageSize") || "50"))
+    )
+
+    const where: Prisma.ProductWhereInput = { isDeleted: false }
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { sku: { contains: search, mode: "insensitive" } },
+        { realSku: { contains: search, mode: "insensitive" } },
+        { batchNumber: { contains: search, mode: "insensitive" } },
+        { supplier: { name: { contains: search, mode: "insensitive" } } },
+        { brand: { name: { contains: search, mode: "insensitive" } } },
+      ]
+    }
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          category: true,
+          brand: true,
+          supplier: true,
+          productImages: { orderBy: { sortOrder: "asc" } },
+          batches: { orderBy: { createdAt: "desc" }, take: 5 },
+        },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      prisma.product.count({ where }),
+    ])
+
+    const serialized = products.map((p) => addProfitInfo({
+      ...p,
+      images: JSON.parse(p.images) as string[],
+      skinType: p.skinType ? JSON.parse(p.skinType) : null,
+      shades: p.shades ? JSON.parse(p.shades) : null,
+      ingredients: p.ingredients ? JSON.parse(p.ingredients) : null,
+    }))
+
+    return NextResponse.json({
+      success: true,
+      data: { products: serialized, pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      } },
+      products: serialized,
+      pagination: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) },
+    })
+  } catch (error) {
+    if (error instanceof Error && "statusCode" in error) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: (error as { statusCode: number }).statusCode }
+      )
+    }
+    console.error("Admin products GET error:", error)
+    return NextResponse.json({ success: false, error: "Failed to fetch products" }, { status: 500 })
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const adminUser = await requirePermission(PERMISSIONS.PRODUCTS_CRUD)
+
+    const body = await req.json()
+    const parsed = CreateProductSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, error: "Invalid product data", details: parsed.error.flatten() },
+        { status: 400 }
+      )
+    }
+    const data = parsed.data
+    const category = await prisma.category.findFirst({ where: { id: data.categoryId, isActive: true, isDeleted: false }, select: { id: true } })
+    if (!category) return NextResponse.json({ success: false, error: 'Please select a valid active category' }, { status: 400 })
+    if (data.brandId) {
+      const brand = await prisma.brand.findFirst({ where: { id: data.brandId, isActive: true, isDeleted: false }, select: { id: true } })
+      if (!brand) return NextResponse.json({ success: false, error: 'Selected brand is not available' }, { status: 400 })
+    }
+
+    // Generate unique slug and SKU when the admin leaves them blank.
+    let slug = slugify(data.name)
+    const existing = await prisma.product.findFirst({ where: { slug } })
+    if (existing) slug = `${slug}-${Date.now().toString(36)}`
+    let sku = data.sku?.trim() || ''
+    if (!sku) {
+      do { sku = `FCS-${randomBytes(4).toString('hex').slice(0, 6).toUpperCase()}` }
+      while (await prisma.product.findUnique({ where: { sku }, select: { id: true } }))
+    }
+
+    const product = await prisma.product.create({
+      data: {
+        name: data.name,
+        slug,
+        description: data.description.trim(),
+        shortDescription: data.shortDescription || null,
+        price: data.price,
+        wholesalePrice: data.wholesalePrice ?? null,
+        compareAt: data.compareAt ?? null,
+        stock: data.stock,
+        lowStockThreshold: data.lowStockThreshold,
+        sku,
+        realSku: data.realSku || null,
+        costPrice: data.costPrice ?? null,
+        supplierId: data.supplierId || null,
+        manufacturedDate: data.manufacturedDate ? new Date(data.manufacturedDate) : null,
+        expiryDate: data.expiryDate ? new Date(data.expiryDate) : null,
+        periodAfterOpening: data.periodAfterOpening ?? null,
+        batchNumber: data.batchNumber || null,
+        volume: data.volume || null,
+        brandId: data.brandId || null,
+        categoryId: data.categoryId,
+        images: JSON.stringify(data.images),
+        skinType: data.skinType ? JSON.stringify(data.skinType) : null,
+        shades: data.shades ? JSON.stringify(data.shades) : null,
+        ingredients: data.ingredients ? JSON.stringify(data.ingredients) : null,
+        size: data.size || null,
+        usageInstructions: data.usageInstructions || null,
+        warnings: data.warnings || null,
+        featured: data.featured,
+        isActive: data.isActive,
+        isNew: false,
+        rating: 0,
+        reviewsCount: 0,
+      },
+      include: { category: true, brand: true },
+    })
+
+    const serializedProduct = {
+      ...product,
+      images: JSON.parse(product.images),
+      skinType: product.skinType ? JSON.parse(product.skinType) : null,
+      shades: product.shades ? JSON.parse(product.shades) : null,
+      ingredients: product.ingredients ? JSON.parse(product.ingredients) : null,
+    }
+    void indexProduct({ id: product.id, name: product.name, slug: product.slug, price: product.price, image: data.images[0] || '', brand: product.brand?.name, category: product.category.name })
+      .catch((error) => console.error('Product search indexing failed:', error instanceof Error ? error.message : 'unknown'))
+
+    // ─── Section 2: Real-time broadcast ──────────────────────────────
+    // Notify all connected storefront clients that a new product was created.
+    // This busts the Next.js cache + pushes an SSE event so the product
+    // appears instantly on the storefront without a page refresh.
+    await broadcastProductEvent("created", {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      stock: product.stock,
+      isActive: product.isActive,
+    }, { source: adminUser.name })
+
+    // Best-effort audit log
+    void logActivity({
+      userId: adminUser.id,
+      userName: adminUser.name,
+      userRole: adminUser.role,
+      action: "PRODUCT_CREATE",
+      entityType: "PRODUCT",
+      entityId: product.id,
+      description: `Created product: ${product.name} (${product.price} RWF)`,
+      req,
+    }).catch(() => {})
+
+    return NextResponse.json(
+      { success: true, data: { product: serializedProduct }, product: serializedProduct },
+      { status: 201 }
+    )
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ success: false, error: 'A product with this SKU or slug already exists' }, { status: 409 })
+    }
+    if (error instanceof Error && "statusCode" in error) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: (error as { statusCode: number }).statusCode }
+      )
+    }
+    console.error("Admin product POST error:", error)
+    return NextResponse.json({ success: false, error: "Failed to create product" }, { status: 500 })
+  }
+}

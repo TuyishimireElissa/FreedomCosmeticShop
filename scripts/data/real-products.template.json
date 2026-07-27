@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "instructions": [
+    "Copy this file before editing it.",
+    "Replace every REPLACE_* value with verified information from the physical product, supplier invoice, or manufacturer documentation.",
+    "Upload product images through the admin Cloudinary image manager and copy their public IDs here.",
+    "Set enabled to true only after every claim, price, stock count, date, and image has been checked.",
+    "The importer never creates reviews, ratings, sales, Best Seller badges, or New badges.",
+    "The importer never deletes products and skips an existing slug."
+  ],
+  "products": [
+    {
+      "enabled": false,
+      "name": "REPLACE_PRODUCT_NAME",
+      "slug": "replace-product-slug",
+      "categorySlug": "replace-existing-category-slug",
+      "brandSlug": "replace-existing-brand-slug",
+      "description": "REPLACE_WITH_VERIFIED_PRODUCT_DESCRIPTION",
+      "shortDescription": "REPLACE_WITH_VERIFIED_SHORT_DESCRIPTION",
+      "price": 0,
+      "compareAt": null,
+      "costPrice": null,
+      "stock": 0,
+      "lowStockThreshold": 0,
+      "sku": null,
+      "realSku": null,
+      "supplier": null,
+      "batchNumber": null,
+      "manufacturedDate": null,
+      "expiryDate": null,
+      "periodAfterOpening": null,
+      "volume": null,
+      "volumeMl": null,
+      "weightGrams": null,
+      "skinType": null,
+      "hairType": null,
+      "shades": null,
+      "shade": null,
+      "shadeHex": null,
+      "undertone": null,
+      "ingredients": null,
+      "ingredientsRw": null,
+      "howToUse": null,
+      "howToUseRw": null,
+      "warnings": null,
+      "warningsRw": null,
+      "allergens": [],
+      "fragranceNotes": null,
+      "expectedResults": null,
+      "expectedResultsRw": null,
+      "resultsTimeframe": null,
+      "isAuthentic": false,
+      "authenticityInfo": null,
+      "countryOfOrigin": null,
+      "importedBy": null,
+      "featured": false,
+      "isActive": false,
+      "images": [
+        {
+          "publicId": "freedomcosmeticshop/products/REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "REPLACE_WITH_ACCURATE_ENGLISH_ALT_TEXT",
+          "altTextRw": null,
+          "imageType": "PRODUCT",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ],
+      "initialBatch": null
+    }
+  ]
+}
