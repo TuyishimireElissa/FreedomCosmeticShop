@@ -147,6 +147,10 @@ export async function PATCH(
     if (statusChanged && !(ALLOWED_STATUS_TRANSITIONS[oldStatus] || []).includes(parsed.data.status!)) {
       return NextResponse.json({ error: `Invalid order transition: ${oldStatus} → ${parsed.data.status}` }, { status: 409 })
     }
+    const primaryPayment = existing.payments[0]
+    if (parsed.data.status === 'CONFIRMED' && primaryPayment && primaryPayment.method !== 'COD' && primaryPayment.status !== 'PAID') {
+      return NextResponse.json({ error: 'Online orders can be confirmed only after verified payment.' }, { status: 409 })
+    }
     if (parsed.data.paymentStatus === 'PAID' && existing.payments[0]?.method !== 'COD') {
       return NextResponse.json({ error: 'Online payments can be marked paid only by a verified provider webhook.' }, { status: 409 })
     }

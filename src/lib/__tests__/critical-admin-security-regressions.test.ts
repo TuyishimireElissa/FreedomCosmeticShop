@@ -10,6 +10,8 @@ const status = read('src/app/api/payments/status/[txId]/route.ts')
 const adminLogin = read('src/components/admin/AdminLoginScreen.tsx')
 const auth = read('src/lib/auth.ts')
 const authService = read('src/server/services/auth.ts')
+const mobileQuickAction = read('src/app/api/mobile/admin/quick-action/route.ts')
+const deliveryUpdate = read('src/app/api/admin/deliveries/[id]/route.ts')
 
 
 describe('critical admin and customer privacy regressions', () => {
@@ -49,5 +51,19 @@ describe('critical admin and customer privacy regressions', () => {
     expect(authService).toContain('db.authSession.updateMany')
     expect(authService).toContain('sessionVersion: { increment: 1 }')
     expect(authService).not.toContain('no token versioning')
+  })
+
+  it('authenticates mobile admin actions before parsing and enforces paid/state workflows', () => {
+    expect(mobileQuickAction.indexOf("requireRole('SUPER_ADMIN'")).toBeLessThan(mobileQuickAction.indexOf('QuickActionSchema.safeParse'))
+    expect(mobileQuickAction).toContain("order.status !== 'PROCESSING'")
+    expect(mobileQuickAction).toContain("payment.status !== 'PAID'")
+    expect(mobileQuickAction).toContain("if (!features.sms)")
+  })
+
+  it('enforces delivery transitions and payment consistency atomically', () => {
+    expect(deliveryUpdate).toContain('Invalid delivery transition')
+    expect(deliveryUpdate).toContain('Online-payment delivery cannot be completed before verified payment')
+    expect(deliveryUpdate).toContain('db.$transaction')
+    expect(deliveryUpdate).toContain("primaryPayment?.method === 'COD'")
   })
 })

@@ -18,6 +18,8 @@ export const dynamic = 'force-dynamic'
  */
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { requireRole } from '@/lib/auth'
+import { normalizeRwandaPhone } from '@/lib/phone'
 import {
   requirePermission,
   PERMISSIONS,
@@ -36,14 +38,16 @@ import { z } from "zod"
 const QuickActionSchema = z.object({
   action: z.enum(["confirm_order", "ship_order", "send_sms"]),
   orderId: z.string().optional(),
-  riderName: z.string().optional(),
-  riderPhone: z.string().optional(),
-  phone: z.string().optional(),
-  message: z.string().optional(),
-})
+  riderName: z.string().trim().min(2).max(100).optional(),
+  riderPhone: z.string().min(9).max(20).optional(),
+  phone: z.string().min(9).max(20).optional(),
+  message: z.string().trim().min(1).max(480).optional(),
+}).strict()
 
 export async function POST(req: Request) {
   try {
+    // Authenticate before parsing so anonymous callers learn nothing about the action schema.
+    await requireRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'STAFF')
     const body = await req.json()
     const parsed = QuickActionSchema.safeParse(body)
     if (!parsed.success) {
@@ -72,15 +76,24 @@ export async function POST(req: Request) {
 
       const order = await db.order.findFirst({
         where: { OR: [{ id: parsed.data.orderId }, { orderNumber: parsed.data.orderId }] },
+        include: { payments: true },
       })
       if (!order) {
         return NextResponse.json({ error: "Order not found" }, { status: 404 })
       }
+      if (order.status !== 'PENDING') {
+        return NextResponse.json({ error: `Only pending orders can be confirmed (current: ${order.status})` }, { status: 409 })
+      }
+      const payment = order.payments[0]
+      if (payment && payment.method !== 'COD' && payment.status !== 'PAID') {
+        return NextResponse.json({ error: 'Online orders can be confirmed only after verified payment' }, { status: 409 })
+      }
 
-      await db.order.update({
-        where: { id: order.id },
+      const confirmed = await db.order.updateMany({
+        where: { id: order.id, status: 'PENDING' },
         data: { status: "CONFIRMED" },
       })
+      if (confirmed.count !== 1) return NextResponse.json({ error: 'Order status changed; refresh and try again' }, { status: 409 })
 
       await broadcastOrderEvent(
         "confirmed",
@@ -136,23 +149,27 @@ export async function POST(req: Request) {
       if (!order) {
         return NextResponse.json({ error: "Order not found" }, { status: 404 })
       }
-
-      await db.order.update({
-        where: { id: order.id },
-        data: { status: "SHIPPED" },
-      })
-
-      if (order.delivery) {
-        await db.delivery.update({
-          where: { orderId: order.id },
-          data: {
-            status: "IN_TRANSIT",
-            driverName: parsed.data.riderName || null,
-            driverPhone: parsed.data.riderPhone || null,
-            pickedUpAt: new Date(),
-          },
-        })
+      if (order.status !== 'PROCESSING') {
+        return NextResponse.json({ error: `Only processing orders can be shipped (current: ${order.status})` }, { status: 409 })
       }
+      let riderPhone: string | null = null
+      if (parsed.data.riderPhone) {
+        try { riderPhone = normalizeRwandaPhone(parsed.data.riderPhone) }
+        catch { return NextResponse.json({ error: 'Invalid Rwanda rider phone' }, { status: 400 }) }
+      }
+
+      const shipped = await db.$transaction(async (tx) => {
+        const changed = await tx.order.updateMany({ where: { id: order.id, status: 'PROCESSING' }, data: { status: 'SHIPPED' } })
+        if (changed.count !== 1) return false
+        if (order.delivery) {
+          await tx.delivery.update({
+            where: { orderId: order.id },
+            data: { status: 'IN_TRANSIT', driverName: parsed.data.riderName || null, driverPhone: riderPhone, pickedUpAt: new Date() },
+          })
+        }
+        return true
+      })
+      if (!shipped) return NextResponse.json({ error: 'Order status changed; refresh and try again' }, { status: 409 })
 
       await broadcastOrderEvent(
         "shipped",
@@ -174,7 +191,7 @@ export async function POST(req: Request) {
           orderNumber: order.orderNumber,
           userId: order.userId,
           riderName: parsed.data.riderName,
-          riderPhone: parsed.data.riderPhone,
+          riderPhone: riderPhone || undefined,
         },
         { source: adminUser.name }
       )
@@ -183,7 +200,7 @@ export async function POST(req: Request) {
         const msg = getSmsMessage("ORDER_SHIPPED", "en", {
           orderNumber: order.orderNumber,
           riderName: parsed.data.riderName,
-          riderPhone: parsed.data.riderPhone || "N/A",
+          riderPhone: riderPhone || "N/A",
           etaDays: "1-2",
         })
         enqueueSms(order.customerPhone, msg, {
@@ -212,12 +229,17 @@ export async function POST(req: Request) {
     // ─── Send SMS ──────────────────────────────────────────────────
     if (action === "send_sms") {
       const adminUser = await requirePermission(PERMISSIONS.SMS_SEND)
+      if (!features.sms) return NextResponse.json({ error: 'SMS provider is not configured' }, { status: 503 })
       if (!parsed.data.phone || !parsed.data.message) {
         return NextResponse.json(
           { error: "phone and message required" },
           { status: 400 }
         )
       }
+
+      let recipient: string
+      try { recipient = normalizeRwandaPhone(parsed.data.phone) }
+      catch { return NextResponse.json({ error: 'Invalid Rwanda recipient phone' }, { status: 400 }) }
 
       const rl = rateLimit(`admin:${adminUser.id}:sms-send`, {
         maxActions: 20,
@@ -230,7 +252,7 @@ export async function POST(req: Request) {
         )
       }
 
-      enqueueSms(parsed.data.phone, parsed.data.message, {
+      enqueueSms(recipient, parsed.data.message, {
         priority: 1,
         template: "PROMOTIONAL",
       })
@@ -241,14 +263,14 @@ export async function POST(req: Request) {
         userRole: adminUser.role,
         action: "SMS_SEND",
         entityType: "CUSTOMER",
-        entityId: parsed.data.phone,
-        description: `Sent SMS to ${parsed.data.phone} (mobile)`,
+        entityId: recipient,
+        description: `Queued SMS from mobile admin`,
         req,
       }).catch(() => {})
 
       return NextResponse.json({
         success: true,
-        message: `SMS sent to ${parsed.data.phone}`,
+        message: `SMS queued successfully`,
       })
     }
 
