@@ -67,6 +67,7 @@ import { WholesalePricingPanel } from "./WholesalePricingPanel"
 import { optimizedImageUrl } from "@/lib/cloudinary-images"
 import { useStore } from '@/store/useStore'
 import { canAdminPermission } from '@/lib/admin-roles'
+import { isWholeNumber, parseProductBrief } from '@/lib/product-brief'
 
 interface AdminProductManagerProps {
   onStatsUpdate?: () => void
@@ -184,6 +185,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   const [formError, setFormError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [uploadingPhotos, setUploadingPhotos] = useState(false)
+  const [productBrief, setProductBrief] = useState("")
 
   const [deleteTarget, setDeleteTarget] = useState<AdminProduct | null>(null)
   const [deleting, setDeleting] = useState(false)
@@ -272,12 +274,14 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       toast({ title: 'Product form is not ready', description: referenceError || 'Categories are still loading. Try again shortly.', variant: 'destructive' })
       return
     }
+    setProductBrief("")
     setForm({ ...EMPTY_FORM, categoryId: categories[0].id })
     setFormError(null)
     setShowForm(true)
   }
 
   const openEdit = (product: AdminProduct) => {
+    setProductBrief("")
     setFormError(null)
     setForm({
       id: product.id,
@@ -313,6 +317,39 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       isActive: product.isActive,
     })
     setShowForm(true)
+  }
+
+  const applyProductBrief = () => {
+    if (!productBrief.trim()) return
+    const parsed = parseProductBrief(productBrief)
+    const categoryParts = parsed.categoryText.split(/[→>/]/).map((part) => part.trim().toLowerCase()).filter(Boolean)
+    const matchedCategory = categories.find((category) => categoryParts.some((part) => category.name.toLowerCase() === part || category.slug.toLowerCase() === part.replace(/\s+/g, '-')))
+    const normalizedBrand = parsed.brandText.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const matchedBrand = brands.find((brand) => brand.name.toLowerCase().replace(/[^a-z0-9]/g, '') === normalizedBrand)
+    setForm((current) => ({
+      ...current,
+      name: parsed.name || current.name,
+      shortDescription: parsed.shortDescription || current.shortDescription,
+      description: parsed.description || current.description,
+      volume: parsed.volume || current.volume,
+      sku: parsed.sku || current.sku,
+      usageInstructions: parsed.usageInstructions || current.usageInstructions,
+      warnings: parsed.warnings || current.warnings,
+      skinType: parsed.skinType.length ? parsed.skinType : current.skinType,
+      ingredients: parsed.ingredients.length ? parsed.ingredients : current.ingredients,
+      price: parsed.price || current.price,
+      wholesalePrice: parsed.wholesalePrice || current.wholesalePrice,
+      categoryId: matchedCategory?.id || current.categoryId,
+      brandId: matchedBrand?.id || current.brandId,
+    }))
+    const remaining = [
+      parsed.priceNeedsExactValue && 'enter one exact retail price',
+      parsed.wholesaleNeedsExactValue && 'enter one exact wholesale price',
+      parsed.categoryText && !matchedCategory && 'select an existing category',
+      parsed.brandText && !matchedBrand && 'select or create the brand',
+      /IngredientBenefit/i.test(productBrief) && 'add ingredients individually',
+    ].filter(Boolean)
+    toast({ title: 'Product brief applied', description: remaining.length ? `Still required: ${remaining.join('; ')}.` : 'Review the fields, add photos, then save.' })
   }
 
   const uploadPhotoFiles = async (incomingFiles: File[]) => {
@@ -365,6 +402,13 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     }
     if (!form.id && !canCreateProduct) return reject('Create access required', 'Your account cannot create products.')
     if (uploadingPhotos) return reject('Photos are still uploading', 'Wait for every photo upload to finish before saving.')
+    if (form.name.trim().length > 200) return reject('Name is too long', 'Product name must be 200 characters or fewer.')
+    if (form.shortDescription.length > 300) return reject('Short description is too long', 'Short description must be 300 characters or fewer.')
+    if (form.description.length > 5000) return reject('Description is too long', 'Full description must be 5,000 characters or fewer.')
+    if (!form.price.trim()) return reject('Exact retail price required', 'Enter one exact retail price such as 7000. Do not enter RWF, commas, or a range.')
+    if (!isWholeNumber(form.price)) return reject('Invalid retail price', 'Retail price must be one whole-number RWF amount. Do not enter RWF, commas, percentages, or a range.')
+    if (form.wholesalePrice.trim() && !isWholeNumber(form.wholesalePrice)) return reject('Invalid wholesale price', 'Wholesale price must be one whole-number RWF amount, not a range.')
+    if (form.compareAt.trim() && !isWholeNumber(form.compareAt)) return reject('Invalid compare-at price', 'Compare-at price must be one whole-number RWF amount.')
     if (form.name.trim().length < 2 || !form.categoryId) return reject('Missing fields', 'A product name and active category are required.')
     if (!categories.some((category) => category.id === form.categoryId)) return reject('Invalid category', 'The selected category is inactive or no longer exists. Reload options and select an active category.')
     if (form.brandId && !brands.some((brand) => brand.id === form.brandId)) return reject('Invalid brand', 'The selected brand is inactive or no longer exists.')
@@ -879,6 +923,21 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
 
           {formError && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-800" role="alert" aria-live="assertive">{formError}</div>}
           <div className="space-y-4">
+            {!form.id && <details className="rounded-xl border border-blue-200 bg-blue-50/40 p-4">
+              <summary className="cursor-pointer font-semibold text-blue-950">Paste a product brief from ChatGPT or Gemini</summary>
+              <p className="mt-2 text-xs leading-5 text-blue-800">Paste the complete structured brief. Recognized sections are copied into the correct fields. Price ranges are never guessed—you must enter one exact RWF amount.</p>
+              <Textarea value={productBrief} onChange={(event) => setProductBrief(event.target.value)} rows={10} maxLength={15000} className="mt-3 bg-white" placeholder="Product name
+
+Short Description
+...
+
+Full Description
+...
+
+Retail Price (Rwanda)
+7000" />
+              <div className="mt-2 flex items-center justify-between gap-3"><span className="text-xs text-blue-700">{productBrief.length.toLocaleString()} / 15,000 characters</span><Button type="button" variant="outline" onClick={applyProductBrief} disabled={!productBrief.trim()}>Apply brief to form</Button></div>
+            </details>}
             {/* Name */}
             <div>
               <Label htmlFor="p-name">Name *</Label>
@@ -887,13 +946,15 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="e.g. Vitamin C Brightening Serum"
+                maxLength={200}
               />
+              <p className="mt-1 text-right text-xs text-muted-foreground">{form.name.length} / 200</p>
             </div>
 
             {/* Short description */}
             <div>
               <Label htmlFor="p-short">Short description (for cards)</Label>
-              <Input
+              <Textarea
                 id="p-short"
                 value={form.shortDescription}
                 onChange={(e) =>
@@ -901,7 +962,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 }
                 placeholder="e.g. 15% Vitamin C serum for bright skin."
                 maxLength={300}
+                rows={3}
               />
+              <p className="mt-1 text-right text-xs text-muted-foreground">{form.shortDescription.length} / 300</p>
             </div>
 
             {/* Description */}
@@ -913,9 +976,11 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
                 }
-                rows={4}
+                rows={8}
+                maxLength={5000}
                 placeholder="Detailed product description..."
               />
+              <p className="mt-1 text-right text-xs text-muted-foreground">{form.description.length.toLocaleString()} / 5,000</p>
             </div>
 
             {/* Price + Compare + Stock */}
@@ -967,9 +1032,10 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
               </div>
               <div>
                 <Label htmlFor="p-volume">Volume / size</Label>
-                <Input id="p-volume" value={form.volume} onChange={(e) => setForm({ ...form, volume: e.target.value })} placeholder="50 ml" />
+                <Input id="p-volume" maxLength={100} value={form.volume} onChange={(e) => setForm({ ...form, volume: e.target.value })} placeholder="50 ml" />
               </div>
             </div>
+            <p className="text-xs leading-5 text-muted-foreground">Enter one exact whole-number RWF amount, for example <strong>7000</strong>. Do not enter “RWF 7,000”, percentages, or ranges such as “5,500–8,500”.</p>
 
             <details className="rounded-xl border border-amber-200 bg-amber-50/40 p-4">
               <summary className="cursor-pointer font-semibold text-amber-950">Advanced inventory and margin</summary>
@@ -1229,6 +1295,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 value={form.size}
                 onChange={(e) => setForm({ ...form, size: e.target.value })}
                 placeholder="e.g. 30ml"
+                maxLength={100}
               />
             </div>
             <div>
@@ -1239,7 +1306,8 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 onChange={(e) =>
                   setForm({ ...form, usageInstructions: e.target.value })
                 }
-                rows={2}
+                rows={5}
+                maxLength={3000}
                 placeholder="Apply 3-4 drops every morning..."
               />
             </div>
@@ -1249,7 +1317,8 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
                 id="p-warnings"
                 value={form.warnings}
                 onChange={(e) => setForm({ ...form, warnings: e.target.value })}
-                rows={2}
+                rows={5}
+                maxLength={3000}
                 placeholder="Patch test before use. Avoid contact with eyes."
               />
             </div>
