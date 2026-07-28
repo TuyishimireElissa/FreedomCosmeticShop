@@ -393,6 +393,34 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     void uploadPhotoFiles(selectedFiles)
   }
 
+  const addShade = () => {
+    const shade = form.newShade.trim()
+    if (!shade) return
+    if (form.shades.length >= 100) {
+      toast({ title: 'Shade limit reached', description: 'A product can list up to 100 shades.', variant: 'destructive' })
+      return
+    }
+    if (form.shades.some((existing) => existing.toLowerCase() === shade.toLowerCase())) {
+      toast({ title: 'Shade already added', description: `${shade} is already in the list.`, variant: 'destructive' })
+      return
+    }
+    setForm((current) => ({ ...current, shades: [...current.shades, shade], newShade: '' }))
+  }
+
+  const addIngredient = () => {
+    const ingredient = form.newIngredient.trim()
+    if (!ingredient) return
+    if (form.ingredients.length >= 100) {
+      toast({ title: 'Ingredient limit reached', description: 'A product can list up to 100 key ingredients.', variant: 'destructive' })
+      return
+    }
+    if (form.ingredients.some((existing) => existing.toLowerCase() === ingredient.toLowerCase())) {
+      toast({ title: 'Ingredient already added', description: `${ingredient} is already in the list.`, variant: 'destructive' })
+      return
+    }
+    setForm((current) => ({ ...current, ingredients: [...current.ingredients, ingredient], newIngredient: '' }))
+  }
+
   const handleSave = async () => {
     if (saving) return
     setFormError(null)
@@ -405,6 +433,9 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     if (form.name.trim().length > 200) return reject('Name is too long', 'Product name must be 200 characters or fewer.')
     if (form.shortDescription.length > 300) return reject('Short description is too long', 'Short description must be 300 characters or fewer.')
     if (form.description.length > 5000) return reject('Description is too long', 'Full description must be 5,000 characters or fewer.')
+    if (form.skinType.length > 10) return reject('Too many skin types', 'Select 10 skin types or fewer.')
+    if (form.shades.length > 100) return reject('Too many shades', 'A product can list up to 100 shades. Remove some before saving.')
+    if (form.ingredients.length > 100) return reject('Too many ingredients', 'A product can list up to 100 key ingredients. Remove some before saving.')
     if (!form.price.trim()) return reject('Exact retail price required', 'Enter one exact retail price such as 7000. Do not enter RWF, commas, or a range.')
     if (!isWholeNumber(form.price)) return reject('Invalid retail price', 'Retail price must be one whole-number RWF amount. Do not enter RWF, commas, percentages, or a range.')
     if (form.wholesalePrice.trim() && !isWholeNumber(form.wholesalePrice)) return reject('Invalid wholesale price', 'Wholesale price must be one whole-number RWF amount, not a range.')
@@ -1161,33 +1192,20 @@ Retail Price (Rwanda)
               <div className="mt-1 flex gap-2">
                 <Input
                   value={form.newShade}
+                  maxLength={100}
                   onChange={(e) => setForm({ ...form, newShade: e.target.value })}
                   placeholder="e.g. Deep"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault()
-                      if (form.newShade) {
-                        setForm({
-                          ...form,
-                          shades: [...form.shades, form.newShade],
-                          newShade: "",
-                        })
-                      }
+                      addShade()
                     }
                   }}
                 />
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => {
-                    if (form.newShade) {
-                      setForm({
-                        ...form,
-                        shades: [...form.shades, form.newShade],
-                        newShade: "",
-                      })
-                    }
-                  }}
+                  onClick={addShade}
                 >
                   Add
                 </Button>
@@ -1225,6 +1243,7 @@ Retail Price (Rwanda)
               <div className="mt-1 flex gap-2">
                 <Input
                   value={form.newIngredient}
+                  maxLength={200}
                   onChange={(e) =>
                     setForm({ ...form, newIngredient: e.target.value })
                   }
@@ -1232,28 +1251,14 @@ Retail Price (Rwanda)
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault()
-                      if (form.newIngredient) {
-                        setForm({
-                          ...form,
-                          ingredients: [...form.ingredients, form.newIngredient],
-                          newIngredient: "",
-                        })
-                      }
+                      addIngredient()
                     }
                   }}
                 />
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={() => {
-                    if (form.newIngredient) {
-                      setForm({
-                        ...form,
-                        ingredients: [...form.ingredients, form.newIngredient],
-                        newIngredient: "",
-                      })
-                    }
-                  }}
+                  onClick={addIngredient}
                 >
                   Add
                 </Button>
