@@ -98,6 +98,7 @@ import {
   Radio,
   Languages,
   RefreshCw,
+  Upload,
 } from "lucide-react"
 
 // ============================================================================
@@ -135,6 +136,8 @@ interface Banner {
   endsAt: string | null
   sortOrder: number
   isActive: boolean
+  textPosition: string | null
+  textColor: string | null
   createdAt: string
 }
 
@@ -1099,6 +1102,7 @@ function BannersTab() {
   const [editing, setEditing] = useState<Banner | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Banner | null>(null)
   const [saving, setSaving] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [previewTarget, setPreviewTarget] = useState<Banner | null>(null)
 
   const [form, setForm] = useState({
@@ -1112,6 +1116,8 @@ function BannersTab() {
     endsAt: "",
     isActive: true,
     sortOrder: "0",
+    textPosition: "left",
+    textColor: "light",
   })
 
   const load = useCallback(async () => {
@@ -1145,6 +1151,8 @@ function BannersTab() {
       endsAt: "",
       isActive: true,
       sortOrder: "0",
+      textPosition: "left",
+      textColor: "light",
     })
     setShowForm(true)
   }
@@ -1162,8 +1170,37 @@ function BannersTab() {
       endsAt: b.endsAt ? b.endsAt.slice(0, 10) : "",
       isActive: b.isActive,
       sortOrder: String(b.sortOrder),
+      textPosition: b.textPosition || "left",
+      textColor: b.textColor || "light",
     })
     setShowForm(true)
+  }
+
+  const uploadBannerImage = async (file: File) => {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast({ title: "Unsupported image", description: `${file.name}: use JPG, PNG, or WebP.`, variant: "destructive" })
+      return
+    }
+    if (file.size < 1 || file.size > 10 * 1024 * 1024) {
+      toast({ title: "Image too large", description: `${file.name}: maximum size is 10 MB.`, variant: "destructive" })
+      return
+    }
+    setUploadingImage(true)
+    try {
+      const body = new FormData()
+      body.set("file", file)
+      body.set("folder", "banners")
+      const response = await fetch("/api/upload", { method: "POST", body })
+      const result = await response.json().catch(() => ({}))
+      const url = result.image?.url || result.data?.image?.url || result.url
+      if (!response.ok || typeof url !== "string") throw new Error(result.error || `Upload failed for ${file.name}`)
+      setForm((current) => ({ ...current, image: url }))
+      toast({ title: "Image uploaded", description: "Banner image ready to save." })
+    } catch (error) {
+      toast({ title: "Image upload failed", description: error instanceof Error ? error.message : "Check your connection and try again.", variant: "destructive" })
+    } finally {
+      setUploadingImage(false)
+    }
   }
 
   const handleSave = async () => {
@@ -1184,6 +1221,8 @@ function BannersTab() {
         endsAt: form.endsAt || null,
         isActive: form.isActive,
         sortOrder: Number(form.sortOrder) || 0,
+        textPosition: form.textPosition,
+        textColor: form.textColor,
       }
       const url = editing ? `/api/admin/banners/${editing.id}` : "/api/admin/banners"
       const method = editing ? "PUT" : "POST"
@@ -1404,6 +1443,24 @@ function BannersTab() {
                 onChange={(e) => setForm({ ...form, image: e.target.value })}
                 placeholder="https://..."
               />
+              <div className="mt-2 flex items-center gap-2">
+                <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3 text-sm font-medium text-gray-600 hover:border-[#B76E79] hover:text-[#B76E79]">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    disabled={uploadingImage}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0]
+                      event.target.value = ''
+                      if (file) void uploadBannerImage(file)
+                    }}
+                  />
+                  {uploadingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  {uploadingImage ? 'Uploading…' : 'Upload image'}
+                </label>
+                <span className="text-xs text-gray-400">JPG, PNG, WebP · Max 10 MB · Recommended 1920×600</span>
+              </div>
               {form.image && (
                 <div className="mt-2 h-24 overflow-hidden rounded-lg border">
                   <img src={form.image} alt="Preview" className="h-full w-full object-cover" />
@@ -1456,6 +1513,39 @@ function BannersTab() {
                 onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
                 placeholder="/products/skincare"
               />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="b-text-position">Text position</Label>
+                <Select
+                  value={form.textPosition}
+                  onValueChange={(v) => setForm({ ...form, textPosition: v })}
+                >
+                  <SelectTrigger id="b-text-position">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="left">Left</SelectItem>
+                    <SelectItem value="center">Center</SelectItem>
+                    <SelectItem value="right">Right</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="b-text-color">Text colour</Label>
+                <Select
+                  value={form.textColor}
+                  onValueChange={(v) => setForm({ ...form, textColor: v })}
+                >
+                  <SelectTrigger id="b-text-color">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="light">Light text (dark overlay)</SelectItem>
+                    <SelectItem value="dark">Dark text (light overlay)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>

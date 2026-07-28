@@ -15,6 +15,7 @@ import StructuredData from '@/components/seo/StructuredData'
 import { getItemListSchema } from '@/lib/structured-data'
 import { getProductPrimaryImage } from '@/lib/cloudinary-images'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
+import BannerCarousel from '@/components/banner/BannerCarousel'
 import { EVENTS, trackEvent } from '@/lib/analytics'
 import { useStore } from '@/store/useStore'
 import { wholesaleWhatsAppNumber } from '@/lib/wholesale-whatsapp'
@@ -169,6 +170,9 @@ function ProductsContent() {
       <div className="min-h-screen bg-[#f8f9fa]">
       <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
         <Breadcrumbs items={breadcrumbItems} />
+      </div>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <BannerCarousel placement="CATEGORY_TOP" />
       </div>
       <header className="border-b border-gray-100 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">

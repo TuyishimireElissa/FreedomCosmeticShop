@@ -27,6 +27,8 @@ const UpdateBannerSchema = z.object({
   endsAt: z.string().optional().nullable().transform((s) => (s ? new Date(s) : null)),
   sortOrder: z.number().int().optional(),
   isActive: z.boolean().optional(),
+  textPosition: z.enum(["left", "center", "right"]).optional().nullable(),
+  textColor: z.enum(["light", "dark"]).optional().nullable(),
 })
 
 export async function PUT(

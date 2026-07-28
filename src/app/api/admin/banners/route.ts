@@ -31,6 +31,8 @@ const CreateBannerSchema = z.object({
   endsAt: z.string().optional().nullable().transform((s) => (s ? new Date(s) : null)),
   sortOrder: z.number().int().default(0),
   isActive: z.boolean().default(true),
+  textPosition: z.enum(["left", "center", "right"]).optional().nullable(),
+  textColor: z.enum(["light", "dark"]).optional().nullable(),
 })
 
 export async function GET() {
