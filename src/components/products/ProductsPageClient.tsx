@@ -175,14 +175,14 @@ function ProductsContent() {
             <Breadcrumbs items={breadcrumbItems} />
           </div>
         </div>
+        <header className="custom-banner-slider__scrim pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-8 pt-20 sm:pb-10">
+          <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-10">
+            <span className="custom-banner-slider__heading-text text-[10px] font-black uppercase tracking-[0.2em] text-[#F5C6CE]">{t('search.catalog')}</span>
+            <h1 className="custom-banner-slider__heading-text mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">{t('categories.all')}</h1>
+            <p className="custom-banner-slider__heading-text mt-2 text-sm text-white/85">{loading ? t('search.loading_products') : t('search.products_found', { count: pagination.total })}</p>
+          </div>
+        </header>
       </div>
-      <header className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">
-          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B76E79]">{t('search.catalog')}</span>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[#1a1a1a] sm:text-4xl">{t('categories.all')}</h1>
-          <p className="mt-2 text-sm text-gray-500">{loading ? t('search.loading_products') : t('search.products_found', { count: pagination.total })}</p>
-        </div>
-      </header>
 
       {isWholesale && <div className="border-b border-violet-100 bg-violet-50"><div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8"><div><p className="text-sm font-bold text-violet-900">You are viewing wholesale prices</p><p className="text-xs text-violet-700">{user?.businessName || user?.name} · All wholesale orders go through WhatsApp</p></div><a href={`https://wa.me/${wholesaleWhatsAppNumber(user?.assignedManagerWhatsApp)}?text=${encodeURIComponent('Muraho! Ndi umukiriya wa wholesale. Nshaka gutuma ibicuruzwa byinshi. Mwamfasha?')}`} target="_blank" rel="noopener noreferrer" className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">Order multiple products via WhatsApp</a></div></div>}
 

@@ -400,3 +400,22 @@
     animation: none;
   }
 }
+
+/* -----------------------------------------------------------------------------
+   Catalogue heading overlaid on the promotional slider.
+   The scrim is translucent; the text on top stays fully opaque so it reads
+   against both the pale and the dark banner photographs.
+   -------------------------------------------------------------------------- */
+
+.custom-banner-slider__scrim {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.45) 35%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.custom-banner-slider__heading-text {
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}

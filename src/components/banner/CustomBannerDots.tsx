@@ -23,7 +23,7 @@ export default function CustomBannerDots({ count, current, onSelect, label }: Cu
     <div
       role="tablist"
       aria-label="Promotional slides"
-      className="custom-banner-slider__dots absolute inset-x-0 bottom-2 z-20 flex items-center justify-center gap-1 sm:bottom-4"
+      className="custom-banner-slider__dots absolute bottom-2 right-2 z-30 flex items-center justify-end gap-1 sm:bottom-6 sm:right-6 lg:right-10"
     >
       {Array.from({ length: count }, (_, index) => (
         <button

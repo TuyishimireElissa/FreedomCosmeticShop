@@ -113,7 +113,7 @@ export default function CustomBannerSlider() {
     <section
       aria-label="Promotions"
       aria-roledescription="carousel"
-      className="custom-banner-slider group relative left-1/2 h-[280px] w-screen -translate-x-1/2 overflow-hidden bg-gray-100 shadow-sm sm:h-[420px] lg:h-[60vh] lg:max-h-[600px] lg:min-h-[500px]"
+      className="custom-banner-slider group relative left-1/2 h-[380px] w-screen -translate-x-1/2 overflow-hidden bg-gray-100 shadow-sm sm:h-[480px] lg:h-[65vh] lg:max-h-[650px] lg:min-h-[500px]"
       onMouseEnter={() => setInteractionPaused(true)}
       onMouseLeave={() => setInteractionPaused(false)}
       onFocusCapture={() => setInteractionPaused(true)}

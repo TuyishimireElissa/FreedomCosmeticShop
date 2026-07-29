@@ -52,11 +52,12 @@ describe('promotional banner carousel', () => {
     expect(staticSlider).toContain('left-1/2')
     expect(staticSlider).toContain('w-screen')
     expect(staticSlider).toContain('-translate-x-1/2')
-    expect(staticSlider).toContain('h-[280px]')
-    expect(staticSlider).toContain('sm:h-[420px]')
-    expect(staticSlider).toContain('lg:h-[60vh]')
+    // Tall enough to seat the catalogue heading inside the artwork.
+    expect(staticSlider).toContain('h-[380px]')
+    expect(staticSlider).toContain('sm:h-[480px]')
+    expect(staticSlider).toContain('lg:h-[65vh]')
     expect(staticSlider).toContain('lg:min-h-[500px]')
-    expect(staticSlider).toContain('lg:max-h-[600px]')
+    expect(staticSlider).toContain('lg:max-h-[650px]')
     expect(staticSlider).toContain('object-cover')
   })
 
@@ -187,11 +188,34 @@ describe('promotional banner carousel', () => {
     expect(productsPage).toContain('<BannerCarousel placement="CATEGORY_TOP" />')
     const bannerIndex = productsPage.indexOf('<BannerCarousel')
     const breadcrumbIndex = productsPage.indexOf('<Breadcrumbs items={breadcrumbItems} />')
-    const headerIndex = productsPage.indexOf('<header className="border-b border-gray-100 bg-white">')
+    const headerIndex = productsPage.indexOf('custom-banner-slider__scrim')
     // The breadcrumb is retained, now layered over the top of the slider.
     expect(breadcrumbIndex).toBeGreaterThan(-1)
     expect(breadcrumbIndex).toBeGreaterThan(bannerIndex)
+    // The catalogue heading now sits inside the slider, below the breadcrumb.
     expect(headerIndex).toBeGreaterThan(breadcrumbIndex)
+  })
+
+  it('seats the catalogue heading inside the slider on a readable scrim', () => {
+    // Text keeps its own markup and translation keys; only placement changed.
+    expect(productsPage).toContain("{t('search.catalog')}")
+    expect(productsPage).toContain("{t('categories.all')}")
+    expect(productsPage).toContain("t('search.products_found', { count: pagination.total })")
+    // Light type on a dark scrim reads over both the pale and dark banners.
+    expect(productsPage).toContain('text-[#F5C6CE]')
+    expect(productsPage).toContain('text-white')
+    expect(productsPage).toContain('text-white/85')
+    expect(productsPage).toContain('custom-banner-slider__scrim')
+    expect(productsPage).toContain('custom-banner-slider__heading-text')
+    // Scrim is translucent, the type on top is not.
+    expect(globalCss).toContain('.custom-banner-slider__scrim')
+    expect(globalCss).toContain('rgba(0, 0, 0, 0.72) 0%')
+    expect(globalCss).toContain('text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7)')
+    // The old white heading band is gone, so no blank strip under the slider.
+    expect(productsPage).not.toContain('<header className="border-b border-gray-100 bg-white">')
+    // Dots move to the right so they never collide with the heading.
+    expect(customDots).toContain('right-2')
+    expect(customDots).toContain('justify-end')
   })
 
   it('overlays the breadcrumb on a readable translucent bar without hiding the navbar', () => {
