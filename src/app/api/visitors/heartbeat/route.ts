@@ -21,6 +21,7 @@ import {
   detectBrowser,
   detectDevice,
   firstPublicIp,
+  geoFromHeaders,
   lookupGeo,
   normalizeVisitorPath,
   visitorSessionHash,
@@ -69,8 +70,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true }, { headers: noStore })
     }
 
-    // Only pay for a geolocation lookup once per session.
-    const geo = await lookupGeo(firstPublicIp(forwardedFor, realIp), networkHash)
+    // Vercel resolves country and region at the edge for free; only fall back
+    // to an outbound lookup when those headers are absent.
+    const geo = geoFromHeaders(request.headers)
+      ?? await lookupGeo(firstPublicIp(forwardedFor, realIp), networkHash)
     await prisma.visitorSession.create({
       data: {
         sessionHash,

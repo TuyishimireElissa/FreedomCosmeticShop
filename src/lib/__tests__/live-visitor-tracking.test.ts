@@ -5,6 +5,7 @@ import {
   detectBrowser,
   detectDevice,
   firstPublicIp,
+  geoFromHeaders,
   normalizeRwandaGeo,
   normalizeVisitorPath,
   rangeStart,
@@ -15,6 +16,7 @@ import { getCellsForSector, getVillagesForCell, isValidRwandaLocation } from '@/
 const read = (path: string) => readFileSync(path, 'utf8')
 const schema = read('prisma/schema.prisma')
 const heartbeat = read('src/app/api/visitors/heartbeat/route.ts')
+const visitorLib = read('src/lib/visitor-tracking.ts')
 const locationRoute = read('src/app/api/visitors/location/route.ts')
 const adminRoute = read('src/app/api/admin/visitors/route.ts')
 const exportRoute = read('src/app/api/admin/visitors/export/route.ts')
@@ -82,6 +84,29 @@ describe('live visitor tracking', () => {
     expect(normalizeRwandaGeo('Somewhere', 'Nowhere')).toEqual({ province: null, district: null })
     expect(dashboard).toContain('estimate')
     expect(dashboard).toContain('stated')
+  })
+
+  it('prefers Vercel edge geo headers over an outbound lookup', () => {
+    // ipapi.co throttles on the calling server's IP, and serverless egress
+    // addresses are shared, so it 429s in production. Edge headers cannot.
+    expect(heartbeat).toContain('geoFromHeaders(request.headers)')
+    expect(visitorLib).not.toContain('ipapi.co')
+    expect(visitorLib).toContain('ipwho.is')
+
+    const rwanda = geoFromHeaders(new Headers({
+      'x-vercel-ip-country': 'RW',
+      'x-vercel-ip-country-region': 'Kigali',
+      'x-vercel-ip-city': 'Gasabo',
+    }))
+    expect(rwanda).toEqual({ country: 'Rwanda', countryCode: 'RW', province: 'Kigali City', district: 'Gasabo' })
+
+    // Non-Rwandan traffic records the country but never a Rwandan district.
+    const abroad = geoFromHeaders(new Headers({ 'x-vercel-ip-country': 'KE' }))
+    expect(abroad?.countryCode).toBe('KE')
+    expect(abroad?.district).toBeNull()
+
+    // Absent headers fall through to the lookup rather than inventing a value.
+    expect(geoFromHeaders(new Headers())).toBeNull()
   })
 
   it('classifies device, browser and referrer without identifying anyone', () => {

@@ -123,20 +123,49 @@ export function normalizeRwandaGeo(regionName: string | null, cityName: string |
   return { province: null, district: null }
 }
 
-interface IpapiResponse {
+interface IpProviderResponse {
   country_name?: unknown
+  country?: unknown
   country_code?: unknown
   region?: unknown
   city?: unknown
+  success?: unknown
   error?: unknown
 }
 
 /**
- * Look up an IP with ipapi.co, server side only.
+ * Read the geolocation Vercel already attaches to the request.
  *
- * Results are cached per network hash for 24h, which keeps the free tier
- * (1,000 lookups/day) comfortable and means a repeat visitor costs nothing.
- * Every failure path returns EMPTY_GEO: tracking must never break a page.
+ * This is the primary source: it costs nothing, adds no latency, and cannot be
+ * rate limited. Vercel resolves country and region at the edge before the
+ * function runs.
+ */
+export function geoFromHeaders(headers: Headers): VisitorGeo | null {
+  const countryCode = headers.get('x-vercel-ip-country')
+  if (!countryCode) return null
+  const region = headers.get('x-vercel-ip-country-region')
+  const city = headers.get('x-vercel-ip-city')
+  const decodedCity = city ? decodeURIComponent(city) : null
+  const { province, district } = countryCode === 'RW'
+    ? normalizeRwandaGeo(region, decodedCity)
+    : { province: null, district: null }
+  return {
+    country: countryCode === 'RW' ? 'Rwanda' : countryCode,
+    countryCode,
+    province,
+    district,
+  }
+}
+
+/**
+ * Fallback lookup for environments without Vercel's edge headers.
+ *
+ * Uses ipwho.is. Providers that throttle on the *calling* server's address are
+ * unusable here: serverless egress IPs are shared between tenants, so they
+ * return 429 in production regardless of our own request volume.
+ *
+ * Results are cached 24h per network hash. Every failure path returns
+ * EMPTY_GEO, because tracking must never break a page.
  */
 export async function lookupGeo(ip: string | null, cacheKey: string | null): Promise<VisitorGeo> {
   if (!ip) return EMPTY_GEO
@@ -147,7 +176,7 @@ export async function lookupGeo(ip: string | null, cacheKey: string | null): Pro
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), GEO_TIMEOUT_MS)
   try {
-    const response = await fetch(`https://ipapi.co/${encodeURIComponent(ip)}/json/`, {
+    const response = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`, {
       signal: controller.signal,
       headers: { accept: 'application/json' },
     })
@@ -155,13 +184,15 @@ export async function lookupGeo(ip: string | null, cacheKey: string | null): Pro
       console.warn('Visitor geo lookup rejected:', response.status)
       return EMPTY_GEO
     }
-    const payload = (await response.json()) as IpapiResponse
-    if (payload.error) {
-      console.warn('Visitor geo lookup error payload')
+    const payload = (await response.json()) as IpProviderResponse
+    if (payload.success === false) {
+      console.warn('Visitor geo lookup returned no match')
       return EMPTY_GEO
     }
 
-    const country = typeof payload.country_name === 'string' ? payload.country_name : null
+    const country = typeof payload.country === 'string'
+      ? payload.country
+      : typeof payload.country_name === 'string' ? payload.country_name : null
     const countryCode = typeof payload.country_code === 'string' ? payload.country_code : null
     const region = typeof payload.region === 'string' ? payload.region : null
     const city = typeof payload.city === 'string' ? payload.city : null
