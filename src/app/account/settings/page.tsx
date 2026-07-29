@@ -5,6 +5,7 @@ import { ArrowLeft, Gauge } from 'lucide-react'
 import LowDataToggle from '@/components/settings/LowDataToggle'
 import { useT } from '@/lib/i18n/LanguageContext'
 import { AnalyticsConsentSettings } from '@/components/analytics/AnalyticsConsent'
+import VisitorLocationForm from '@/components/visitors/VisitorLocationForm'
 import CommunicationPreferences from '@/components/settings/CommunicationPreferences'
 
 export default function AccountSettingsPage() {
@@ -29,6 +30,7 @@ export default function AccountSettingsPage() {
           <CommunicationPreferences />
           <LowDataToggle />
           <AnalyticsConsentSettings />
+          <VisitorLocationForm />
         </div>
       </div>
     </main>

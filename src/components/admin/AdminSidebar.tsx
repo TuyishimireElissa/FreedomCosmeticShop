@@ -62,6 +62,7 @@ const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
     group: 'Growth',
     items: [
       { label: 'Analytics', tab: 'analytics', icon: BarChart3, permission: 'analytics.read' },
+      { label: 'Live Visitors', tab: 'analytics', icon: Users, permission: 'analytics.read', href: '/admin/visitors' },
       { label: 'WA Analytics', tab: 'analytics', icon: BarChart3, permission: 'analytics.read', href: '/admin/analytics', translationKey: 'whatsapp.admin_analytics' },
       { label: 'WhatsApp Guide', tab: 'analytics', icon: MessageCircle, href: '/admin/whatsapp-guide', translationKey: 'whatsapp.admin_guide' },
       { label: 'Reports', tab: 'reports', icon: FileText, permission: 'reports.read' },

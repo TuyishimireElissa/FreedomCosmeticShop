@@ -2079,3 +2079,61 @@ model MFAVerification {
 
   @@index([userId])
 }
+
+// =============================================================================
+// LIVE VISITOR TRACKING
+// =============================================================================
+
+// One row per anonymous browsing session.
+//
+// No raw IP address is ever stored. The visitor is identified by an HMAC of
+// their client session id, and the geo lookup is keyed by a daily-rotating
+// network hash, matching the privacy model already used by AnalyticsEvent.
+//
+// ipProvince and ipDistrict are approximations: Rwandan mobile traffic is
+// carrier-NATed through a small number of Kigali gateways, so IP geolocation
+// cannot resolve below district, and is often wrong outside Kigali.
+model VisitorSession {
+  id          String  @id @default(cuid())
+  sessionHash String  @unique
+  networkHash String?
+
+  country     String?
+  countryCode String?
+  ipProvince  String?
+  ipDistrict  String?
+
+  device      String?
+  browser     String?
+  referrer    String?
+  currentPath String?
+  pageViews   Int     @default(1)
+
+  startedAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  location VisitorLocation?
+
+  @@index([lastSeenAt])
+  @@index([startedAt])
+  @@index([ipDistrict])
+}
+
+// Precise location a visitor volunteered through the optional form.
+// Sector, cell and village can only ever come from here - they are not
+// derivable from an IP address.
+model VisitorLocation {
+  id        String         @id @default(cuid())
+  sessionId String         @unique
+  session   VisitorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  province String
+  district String
+  sector   String?
+  cell     String?
+  village  String?
+
+  submittedAt DateTime @default(now())
+
+  @@index([province, district])
+}
