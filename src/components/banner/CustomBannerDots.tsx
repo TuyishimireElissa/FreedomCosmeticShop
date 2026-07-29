@@ -5,6 +5,8 @@ interface CustomBannerDotsProps {
   current: number
   onSelect: (index: number) => void
   label: (index: number) => string
+  /** Increments on every slide change so the progress fill restarts. */
+  cycle: number
 }
 
 /**
@@ -16,7 +18,7 @@ interface CustomBannerDotsProps {
  *
  * Keeps the 44px touch target and tab semantics of the original dots.
  */
-export default function CustomBannerDots({ count, current, onSelect, label }: CustomBannerDotsProps) {
+export default function CustomBannerDots({ count, current, onSelect, label, cycle }: CustomBannerDotsProps) {
   if (count < 2) return null
 
   return (
@@ -38,12 +40,19 @@ export default function CustomBannerDots({ count, current, onSelect, label }: Cu
         >
           <span
             aria-hidden="true"
-            className={`block h-2 rounded-full shadow-md transition-all duration-[400ms] ease-in-out will-change-transform group-hover/dot:scale-125 motion-reduce:transition-none motion-reduce:group-hover/dot:scale-100 ${
+            className={`relative block h-2 overflow-hidden rounded-full shadow-md transition-all duration-[400ms] ease-in-out will-change-transform group-hover/dot:scale-125 motion-reduce:transition-none motion-reduce:group-hover/dot:scale-100 ${
               index === current
-                ? 'w-[30px] bg-[#B76E79] group-hover/dot:bg-[#9B5A64]'
+                ? 'w-[30px] bg-[#B76E79]/40 shadow-[0_0_10px_rgba(183,110,121,0.9)]'
                 : 'w-2 bg-white/70 group-hover/dot:bg-white'
             }`}
-          />
+          >
+            {index === current && (
+              <span
+                key={cycle}
+                className="custom-banner-slider__dot-progress absolute inset-0 block rounded-full bg-[#B76E79] will-change-transform"
+              />
+            )}
+          </span>
         </button>
       ))}
     </div>

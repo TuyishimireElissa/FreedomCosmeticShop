@@ -107,6 +107,16 @@ export default function CustomBannerSlider() {
     if (current >= total) setCurrent(0)
   }, [current, total])
 
+  // Warm the next frame while the current one is on screen so the transition
+  // never waits on a decode.
+  useEffect(() => {
+    if (total < 2) return
+    const upcoming = slides[(current + 1) % total]
+    if (!upcoming) return
+    const preload = new window.Image()
+    preload.src = upcoming
+  }, [current, slides, total])
+
   if (total === 0) return null
 
   return (
@@ -158,7 +168,13 @@ export default function CustomBannerSlider() {
             alt=""
             loading={index === 0 ? 'eager' : 'lazy'}
             decoding="async"
-            className={`custom-banner-slider__image h-full w-full object-cover will-change-transform ${index === current ? 'custom-banner-slider__image--active' : ''}`}
+            className={`custom-banner-slider__image h-full w-full object-cover will-change-transform ${
+              index === current
+                ? index % 2 === 0
+                  ? 'custom-banner-slider__image--active'
+                  : 'custom-banner-slider__image--active-alt'
+                : ''
+            }`}
           />
 
           {SLIDE_CAPTIONS[source] && (
@@ -197,6 +213,7 @@ export default function CustomBannerSlider() {
         count={total}
         current={current}
         onSelect={selectSlide}
+        cycle={cycle}
         label={(index) => `Show slide ${index + 1}`}
       />
 

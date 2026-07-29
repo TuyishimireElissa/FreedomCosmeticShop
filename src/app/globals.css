@@ -334,34 +334,47 @@
    Transform + opacity only, so both animations stay on the GPU.
    ========================================================================== */
 
-@keyframes custom-banner-ken-burns {
+/* Ken Burns: zoom plus a diagonal drift. Two variants alternate by slide index
+   so consecutive images never travel the same way. */
+@keyframes custom-banner-ken-burns-a {
   from {
-    transform: scale(1) translateZ(0);
+    transform: scale(1) translate3d(-1.5%, 1%, 0);
   }
   to {
-    transform: scale(1.15) translateZ(0);
+    transform: scale(1.12) translate3d(1.5%, -1%, 0);
   }
 }
 
+@keyframes custom-banner-ken-burns-b {
+  from {
+    transform: scale(1) translate3d(1.5%, 1%, 0);
+  }
+  to {
+    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+/* Incoming frame arrives from the right, settling out of a slight over-scale. */
 @keyframes custom-banner-slide-in {
   from {
     opacity: 0;
-    transform: translate3d(6%, 0, 0);
+    transform: translate3d(4%, 0, 0) scale(1.06);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
+/* Outgoing frame recedes rather than simply fading, which reads as depth. */
 @keyframes custom-banner-slide-out {
   from {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
   to {
     opacity: 0;
-    transform: translate3d(-6%, 0, 0);
+    transform: translate3d(-3%, 0, 0) scale(0.96);
   }
 }
 
@@ -376,27 +389,77 @@
   }
 }
 
+@keyframes custom-banner-heading-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Progress indicator inside the active dot, timed to the slide interval. */
+@keyframes custom-banner-dot-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 .custom-banner-slider__image--active {
-  animation: custom-banner-ken-burns 3s linear both;
+  animation: custom-banner-ken-burns-a 3s linear both;
+}
+
+.custom-banner-slider__image--active-alt {
+  animation: custom-banner-ken-burns-b 3s linear both;
 }
 
 .custom-banner-slider__slide--enter {
-  animation: custom-banner-slide-in 1.2s ease-in-out both;
+  animation: custom-banner-slide-in 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .custom-banner-slider__slide--exit {
-  animation: custom-banner-slide-out 1.2s ease-in-out both;
+  animation: custom-banner-slide-out 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .custom-banner-slider__caption--active {
   animation: custom-banner-caption-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 }
 
+/* Staggered entrance for the catalogue heading, played once on mount. */
+.custom-banner-slider__heading-line {
+  animation: custom-banner-heading-rise 0.5s ease-out both;
+}
+
+.custom-banner-slider__heading-line--1 {
+  animation-delay: 0ms;
+}
+
+.custom-banner-slider__heading-line--2 {
+  animation-delay: 100ms;
+}
+
+.custom-banner-slider__heading-line--3 {
+  animation-delay: 200ms;
+}
+
+.custom-banner-slider__dot-progress {
+  transform-origin: left center;
+  animation: custom-banner-dot-progress 3s linear both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .custom-banner-slider__image--active,
+  .custom-banner-slider__image--active-alt,
   .custom-banner-slider__slide--enter,
   .custom-banner-slider__slide--exit,
-  .custom-banner-slider__caption--active {
+  .custom-banner-slider__caption--active,
+  .custom-banner-slider__heading-line,
+  .custom-banner-slider__dot-progress {
     animation: none;
   }
 }

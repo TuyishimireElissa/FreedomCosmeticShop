@@ -64,13 +64,22 @@ describe('promotional banner carousel', () => {
   it('animates with GPU-friendly Ken Burns, fade, and caption transitions', () => {
     expect(globalCss).toContain('@keyframes custom-banner-ken-burns')
     expect(globalCss).toContain('@keyframes custom-banner-caption-rise')
-    expect(globalCss).toContain('transform: scale(1.15) translateZ(0)')
+    expect(globalCss).toContain('transform: scale(1.12) translate3d(1.5%, -1%, 0)')
     expect(globalCss).toContain('@keyframes custom-banner-slide-in')
     expect(globalCss).toContain('@keyframes custom-banner-slide-out')
+    // Two Ken Burns variants alternate by index so neighbours drift differently.
+    expect(globalCss).toContain('@keyframes custom-banner-ken-burns-a')
+    expect(globalCss).toContain('@keyframes custom-banner-ken-burns-b')
+    expect(staticSlider).toContain("custom-banner-slider__image--active-alt")
+    expect(staticSlider).toContain('index % 2 === 0')
     // 3s linear matches SLIDE_INTERVAL_MS so the zoom completes once per slide.
-    expect(globalCss).toContain('animation: custom-banner-ken-burns 3s linear both')
-    expect(globalCss).toContain('animation: custom-banner-slide-in 1.2s ease-in-out both')
-    expect(globalCss).toContain('animation: custom-banner-slide-out 1.2s ease-in-out both')
+    expect(globalCss).toContain('animation: custom-banner-ken-burns-a 3s linear both')
+    expect(globalCss).toContain('animation: custom-banner-ken-burns-b 3s linear both')
+    // Premium Material easing at the faster 0.7s cross-transition.
+    expect(globalCss).toContain('animation: custom-banner-slide-in 0.7s cubic-bezier(0.4, 0, 0.2, 1) both')
+    expect(globalCss).toContain('animation: custom-banner-slide-out 0.7s cubic-bezier(0.4, 0, 0.2, 1) both')
+    // filter/blur is not compositor-only, so it must stay out of the keyframes.
+    expect(globalCss).not.toMatch(/@keyframes custom-banner-[\s\S]*?filter:/)
     expect(staticSlider).toContain('custom-banner-slider__image--active')
     expect(staticSlider).toContain('custom-banner-slider__slide--enter')
     expect(staticSlider).toContain('custom-banner-slider__slide--exit')
@@ -86,6 +95,8 @@ describe('promotional banner carousel', () => {
     expect(globalCss).toContain('animation: none')
     expect(globalCss).toContain('.custom-banner-slider__slide--enter,')
     expect(globalCss).toContain('.custom-banner-slider__slide--exit,')
+    expect(globalCss).toContain('.custom-banner-slider__heading-line,')
+    expect(globalCss).toContain('.custom-banner-slider__dot-progress {')
     expect(customDots).toContain('motion-reduce:transition-none')
   })
 
@@ -101,6 +112,26 @@ describe('promotional banner carousel', () => {
     expect(customDots).toContain('w-[30px]')
     expect(customDots).toContain('h-11 w-11')
     expect(customDots).toContain('role="tab"')
+  })
+
+  it('staggers the catalogue heading and shows slide progress in the active dot', () => {
+    expect(globalCss).toContain('@keyframes custom-banner-heading-rise')
+    expect(globalCss).toContain('animation-delay: 0ms')
+    expect(globalCss).toContain('animation-delay: 100ms')
+    expect(globalCss).toContain('animation-delay: 200ms')
+    expect(productsPage).toContain('custom-banner-slider__heading-line--1')
+    expect(productsPage).toContain('custom-banner-slider__heading-line--2')
+    expect(productsPage).toContain('custom-banner-slider__heading-line--3')
+    // Progress fill is timed to the slide interval and re-keyed each cycle.
+    expect(globalCss).toContain('animation: custom-banner-dot-progress 3s linear both')
+    expect(customDots).toContain('custom-banner-slider__dot-progress')
+    expect(customDots).toContain('key={cycle}')
+    expect(customDots).toContain('shadow-[0_0_10px_rgba(183,110,121,0.9)]')
+  })
+
+  it('preloads the next frame so transitions never wait on a decode', () => {
+    expect(staticSlider).toContain('const preload = new window.Image()')
+    expect(staticSlider).toContain('preload.src = upcoming')
   })
 
   it('gives the static fallback the same behaviour as the admin carousel', () => {

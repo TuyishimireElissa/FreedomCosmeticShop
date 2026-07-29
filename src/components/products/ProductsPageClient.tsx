@@ -177,9 +177,9 @@ function ProductsContent() {
         </div>
         <header className="custom-banner-slider__scrim pointer-events-none absolute inset-x-0 bottom-0 z-20 pb-8 pt-20 sm:pb-10">
           <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-10">
-            <span className="custom-banner-slider__heading-text text-[10px] font-black uppercase tracking-[0.2em] text-[#F5C6CE]">{t('search.catalog')}</span>
-            <h1 className="custom-banner-slider__heading-text mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">{t('categories.all')}</h1>
-            <p className="custom-banner-slider__heading-text mt-2 text-sm text-white/85">{loading ? t('search.loading_products') : t('search.products_found', { count: pagination.total })}</p>
+            <span className="custom-banner-slider__heading-text custom-banner-slider__heading-line custom-banner-slider__heading-line--1 text-[10px] font-black uppercase tracking-[0.2em] text-[#F5C6CE]">{t('search.catalog')}</span>
+            <h1 className="custom-banner-slider__heading-text custom-banner-slider__heading-line custom-banner-slider__heading-line--2 mt-2 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">{t('categories.all')}</h1>
+            <p className="custom-banner-slider__heading-text custom-banner-slider__heading-line custom-banner-slider__heading-line--3 mt-2 text-sm text-white/85">{loading ? t('search.loading_products') : t('search.products_found', { count: pagination.total })}</p>
           </div>
         </header>
       </div>
