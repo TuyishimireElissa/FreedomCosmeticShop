@@ -1,6 +1,8 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
+const bannerFiles = ['banner1.jpg', 'banner2.jpg', 'banner3.jpg', 'banner4.jpg', 'banner5.jpg']
+const staticSlider = readFileSync('src/components/banner/CustomBannerSlider.tsx', 'utf8')
 const carousel = readFileSync('src/components/banner/BannerCarousel.tsx', 'utf8')
 const slide = readFileSync('src/components/banner/BannerSlide.tsx', 'utf8')
 const dots = readFileSync('src/components/banner/BannerDots.tsx', 'utf8')
@@ -13,10 +15,42 @@ const publicRoute = readFileSync('src/app/api/banners/route.ts', 'utf8')
 const schema = readFileSync('prisma/schema.prisma', 'utf8')
 
 describe('promotional banner carousel', () => {
-  it('renders nothing when no active slides exist so the page is unchanged', () => {
-    expect(carousel).toContain('if (total === 0) return null')
+  it('falls back to the static slider when no admin slide is configured', () => {
+    expect(carousel).toContain('if (total === 0) return <CustomBannerSlider />')
+    expect(carousel).toContain("import CustomBannerSlider from './CustomBannerSlider'")
     // No skeleton or placeholder box may be emitted before slides are known.
     expect(carousel).not.toContain('animate-pulse')
+  })
+
+  it('renders nothing at all when neither admin nor static slides exist', () => {
+    // The static fallback is the last line of defence: if its files are absent
+    // it must also collapse to null so the products page is untouched.
+    expect(staticSlider).toContain('if (total === 0) return null')
+    expect(staticSlider).toContain('probe.onerror = () => resolve(false)')
+    expect(staticSlider).toContain('setSlides(SLIDE_SOURCES.filter((_, index) => results[index]))')
+    expect(staticSlider).not.toContain('animate-pulse')
+  })
+
+  it('serves the static fallback from public/images with unique class names', () => {
+    expect(staticSlider).toContain("'/images/banner1.jpg'")
+    expect(staticSlider).toContain("'/images/banner5.jpg'")
+    expect(staticSlider).toContain('const SLIDE_INTERVAL_MS = 3000')
+    expect(staticSlider).toContain('custom-banner-slider')
+    expect(staticSlider).toContain('custom-banner-slider__slide')
+    expect(staticSlider).toContain('custom-banner-slider__image')
+    for (const file of bannerFiles) {
+      expect(existsSync(`public/images/${file}`)).toBe(true)
+    }
+  })
+
+  it('gives the static fallback the same behaviour as the admin carousel', () => {
+    expect(staticSlider).toContain('window.setInterval(next, SLIDE_INTERVAL_MS)')
+    expect(staticSlider).toContain('if (prefersReducedMotion || interactionPaused || total < 2) return')
+    expect(staticSlider).toContain('onMouseEnter={() => setInteractionPaused(true)}')
+    expect(staticSlider).toContain('onMouseLeave={() => setInteractionPaused(false)}')
+    expect(staticSlider).toContain("if (event.key === 'ArrowRight')")
+    expect(staticSlider).toContain('aria-roledescription="carousel"')
+    expect(staticSlider).toContain('const SWIPE_THRESHOLD_PX = 50')
   })
 
   it('caps the carousel at five slides and auto-rotates every three seconds', () => {

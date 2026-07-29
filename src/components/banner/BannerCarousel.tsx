@@ -6,6 +6,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import BannerArrows from './BannerArrows'
 import BannerDots from './BannerDots'
 import BannerSlide, { type PromoBanner } from './BannerSlide'
+import CustomBannerSlider from './CustomBannerSlider'
 
 interface BannerCarouselProps {
   placement?: string
@@ -99,7 +100,9 @@ export default function BannerCarousel({ placement = 'CATEGORY_TOP' }: BannerCar
     if (current >= total) setCurrent(0)
   }, [current, total])
 
-  if (total === 0) return null
+  // No admin-managed slide for this placement: fall back to the static
+  // /public/images/bannerN.jpg set, which itself renders nothing if absent.
+  if (total === 0) return <CustomBannerSlider />
 
   return (
     <section
