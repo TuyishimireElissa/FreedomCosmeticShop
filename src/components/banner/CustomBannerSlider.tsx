@@ -52,8 +52,25 @@ export default function CustomBannerSlider() {
   const prefersReducedMotion = useReducedMotion()
   const [slides, setSlides] = useState<string[]>([])
   const [current, setCurrent] = useState(0)
+  /** Slide leaving the viewport, so it can play the exit animation. */
+  const [previousIndex, setPreviousIndex] = useState(-1)
+  /**
+   * Bumped on every change so the active <img> is re-keyed and React remounts
+   * it. Without this the Ken Burns animation would only ever run once.
+   */
+  const [cycle, setCycle] = useState(0)
   const [interactionPaused, setInteractionPaused] = useState(false)
   const touchStartX = useRef(0)
+
+  const goTo = useCallback((resolveNext: (value: number) => number) => {
+    setCurrent((value) => {
+      const target = resolveNext(value)
+      if (target === value) return value
+      setPreviousIndex(value)
+      setCycle((count) => count + 1)
+      return target
+    })
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -69,12 +86,16 @@ export default function CustomBannerSlider() {
   const total = slides.length
 
   const next = useCallback(() => {
-    setCurrent((value) => (total > 1 ? (value + 1) % total : value))
-  }, [total])
+    goTo((value) => (total > 1 ? (value + 1) % total : value))
+  }, [goTo, total])
 
   const previous = useCallback(() => {
-    setCurrent((value) => (total > 1 ? (value - 1 + total) % total : value))
-  }, [total])
+    goTo((value) => (total > 1 ? (value - 1 + total) % total : value))
+  }, [goTo, total])
+
+  const selectSlide = useCallback((index: number) => {
+    goTo(() => index)
+  }, [goTo])
 
   useEffect(() => {
     if (prefersReducedMotion || interactionPaused || total < 2) return
@@ -92,7 +113,7 @@ export default function CustomBannerSlider() {
     <section
       aria-label="Promotions"
       aria-roledescription="carousel"
-      className="custom-banner-slider group relative left-1/2 mb-4 h-[280px] w-screen -translate-x-1/2 overflow-hidden bg-gray-100 shadow-sm sm:h-[420px] lg:h-[60vh] lg:max-h-[600px] lg:min-h-[500px]"
+      className="custom-banner-slider group relative left-1/2 h-[280px] w-screen -translate-x-1/2 overflow-hidden bg-gray-100 shadow-sm sm:h-[420px] lg:h-[60vh] lg:max-h-[600px] lg:min-h-[500px]"
       onMouseEnter={() => setInteractionPaused(true)}
       onMouseLeave={() => setInteractionPaused(false)}
       onFocusCapture={() => setInteractionPaused(true)}
@@ -119,11 +140,20 @@ export default function CustomBannerSlider() {
           aria-hidden={index !== current}
           aria-roledescription="slide"
           aria-label={`Slide ${index + 1} of ${total}`}
-          className={`custom-banner-slider__slide absolute inset-0 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${index === current ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'}`}
+          className={`custom-banner-slider__slide absolute inset-0 will-change-transform ${
+            index === current
+              ? 'custom-banner-slider__slide--enter z-10'
+              : index === previousIndex
+                ? 'custom-banner-slider__slide--exit pointer-events-none z-0'
+                : 'pointer-events-none z-0 opacity-0'
+          }`}
         >
           {/* Plain <img>: these are operator-supplied static files, mirroring how
-              ProductCard and HeroBanner serve their images. */}
+              ProductCard and HeroBanner serve their images.
+              The key changes on every activation so React remounts the element
+              and the Ken Burns animation restarts instead of running only once. */}
           <img
+            key={index === current ? `${source}-${cycle}` : source}
             src={source}
             alt=""
             loading={index === 0 ? 'eager' : 'lazy'}
@@ -166,7 +196,7 @@ export default function CustomBannerSlider() {
       <CustomBannerDots
         count={total}
         current={current}
-        onSelect={setCurrent}
+        onSelect={selectSlide}
         label={(index) => `Show slide ${index + 1}`}
       />
 

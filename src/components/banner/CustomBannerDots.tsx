@@ -38,9 +38,9 @@ export default function CustomBannerDots({ count, current, onSelect, label }: Cu
         >
           <span
             aria-hidden="true"
-            className={`block h-2 rounded-full shadow-md transition-all duration-300 ease-in-out will-change-transform group-hover/dot:scale-125 motion-reduce:transition-none motion-reduce:group-hover/dot:scale-100 ${
+            className={`block h-2 rounded-full shadow-md transition-all duration-[400ms] ease-in-out will-change-transform group-hover/dot:scale-125 motion-reduce:transition-none motion-reduce:group-hover/dot:scale-100 ${
               index === current
-                ? 'w-8 bg-[#B76E79] group-hover/dot:bg-[#9B5A64]'
+                ? 'w-[30px] bg-[#B76E79] group-hover/dot:bg-[#9B5A64]'
                 : 'w-2 bg-white/70 group-hover/dot:bg-white'
             }`}
           />

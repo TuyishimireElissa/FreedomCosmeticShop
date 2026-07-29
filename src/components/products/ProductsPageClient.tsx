@@ -168,11 +168,13 @@ function ProductsContent() {
     <>
       {itemListSchema && <StructuredData data={itemListSchema} />}
       <div className="min-h-screen bg-[#f8f9fa]">
-      <div className="mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-        <Breadcrumbs items={breadcrumbItems} />
-      </div>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative">
         <BannerCarousel placement="CATEGORY_TOP" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-20 bg-white/45 backdrop-blur-sm">
+          <div className="pointer-events-auto mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Breadcrumbs items={breadcrumbItems} />
+          </div>
+        </div>
       </div>
       <header className="border-b border-gray-100 bg-white">
         <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">

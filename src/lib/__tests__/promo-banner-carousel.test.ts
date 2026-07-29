@@ -63,10 +63,19 @@ describe('promotional banner carousel', () => {
   it('animates with GPU-friendly Ken Burns, fade, and caption transitions', () => {
     expect(globalCss).toContain('@keyframes custom-banner-ken-burns')
     expect(globalCss).toContain('@keyframes custom-banner-caption-rise')
-    expect(globalCss).toContain('transform: scale(1.1) translateZ(0)')
+    expect(globalCss).toContain('transform: scale(1.15) translateZ(0)')
+    expect(globalCss).toContain('@keyframes custom-banner-slide-in')
+    expect(globalCss).toContain('@keyframes custom-banner-slide-out')
+    // 3s linear matches SLIDE_INTERVAL_MS so the zoom completes once per slide.
+    expect(globalCss).toContain('animation: custom-banner-ken-burns 3s linear both')
+    expect(globalCss).toContain('animation: custom-banner-slide-in 1.2s ease-in-out both')
+    expect(globalCss).toContain('animation: custom-banner-slide-out 1.2s ease-in-out both')
     expect(staticSlider).toContain('custom-banner-slider__image--active')
-    expect(staticSlider).toContain('duration-1000')
+    expect(staticSlider).toContain('custom-banner-slider__slide--enter')
+    expect(staticSlider).toContain('custom-banner-slider__slide--exit')
     expect(staticSlider).toContain('will-change-transform')
+    // Re-keying the active image is what makes the zoom replay every cycle.
+    expect(staticSlider).toContain('key={index === current ? `${source}-${cycle}` : source}')
     // Only transform/opacity may animate: no layout-triggering properties.
     expect(globalCss).not.toMatch(/@keyframes custom-banner-[\s\S]*?(width:|height:|margin:|top:)/)
   })
@@ -74,7 +83,8 @@ describe('promotional banner carousel', () => {
   it('keeps every animation behind prefers-reduced-motion', () => {
     expect(globalCss).toContain('@media (prefers-reduced-motion: reduce)')
     expect(globalCss).toContain('animation: none')
-    expect(staticSlider).toContain('motion-reduce:transition-none')
+    expect(globalCss).toContain('.custom-banner-slider__slide--enter,')
+    expect(globalCss).toContain('.custom-banner-slider__slide--exit,')
     expect(customDots).toContain('motion-reduce:transition-none')
   })
 
@@ -86,7 +96,8 @@ describe('promotional banner carousel', () => {
     expect(sharedDots).not.toContain('group-hover/dot')
     expect(customDots).toContain('group-hover/dot:scale-125')
     expect(customDots).toContain('ease-in-out')
-    expect(customDots).toContain('w-8')
+    expect(customDots).toContain('duration-[400ms]')
+    expect(customDots).toContain('w-[30px]')
     expect(customDots).toContain('h-11 w-11')
     expect(customDots).toContain('role="tab"')
   })
@@ -171,15 +182,26 @@ describe('promotional banner carousel', () => {
     expect(publicRoute).toContain('orderBy: { sortOrder: "asc" }')
   })
 
-  it('mounts between the breadcrumb and the catalog heading on the products page', () => {
+  it('mounts above the catalog heading with the breadcrumb overlaid on the slider', () => {
     expect(productsPage).toContain("import BannerCarousel from '@/components/banner/BannerCarousel'")
     expect(productsPage).toContain('<BannerCarousel placement="CATEGORY_TOP" />')
     const bannerIndex = productsPage.indexOf('<BannerCarousel')
     const breadcrumbIndex = productsPage.indexOf('<Breadcrumbs items={breadcrumbItems} />')
     const headerIndex = productsPage.indexOf('<header className="border-b border-gray-100 bg-white">')
+    // The breadcrumb is retained, now layered over the top of the slider.
     expect(breadcrumbIndex).toBeGreaterThan(-1)
-    expect(bannerIndex).toBeGreaterThan(breadcrumbIndex)
-    expect(headerIndex).toBeGreaterThan(bannerIndex)
+    expect(breadcrumbIndex).toBeGreaterThan(bannerIndex)
+    expect(headerIndex).toBeGreaterThan(breadcrumbIndex)
+  })
+
+  it('overlays the breadcrumb on a readable translucent bar without hiding the navbar', () => {
+    // Light scrim keeps the dark breadcrumb text legible over any photo.
+    expect(productsPage).toContain('bg-white/45 backdrop-blur-sm')
+    // Below the sticky navbar (z-50) so the menu stays visible and clickable.
+    expect(productsPage).toContain('absolute inset-x-0 top-0 z-20')
+    // The bar ignores pointer events; only the breadcrumb itself stays clickable.
+    expect(productsPage).toContain('pointer-events-none absolute inset-x-0 top-0')
+    expect(productsPage).toContain('pointer-events-auto mx-auto max-w-7xl')
   })
 
   it('persists overlay presentation through the existing banner model and routes', () => {
