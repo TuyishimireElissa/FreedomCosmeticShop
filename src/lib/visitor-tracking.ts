@@ -17,7 +17,7 @@ import { DISTRICT_TO_PROVINCE_MAP, getAllDistricts, type RwandaProvince } from '
 export const VISITOR_ONLINE_WINDOW_MS = 60_000
 export const VISITOR_HEARTBEAT_MS = 30_000
 const GEO_CACHE_TTL_MS = 24 * 60 * 60 * 1000
-const GEO_TIMEOUT_MS = 2_500
+const GEO_TIMEOUT_MS = 6_000
 
 export type VisitorDevice = 'mobile' | 'tablet' | 'desktop'
 
@@ -151,9 +151,15 @@ export async function lookupGeo(ip: string | null, cacheKey: string | null): Pro
       signal: controller.signal,
       headers: { accept: 'application/json' },
     })
-    if (!response.ok) return EMPTY_GEO
+    if (!response.ok) {
+      console.warn('Visitor geo lookup rejected:', response.status)
+      return EMPTY_GEO
+    }
     const payload = (await response.json()) as IpapiResponse
-    if (payload.error) return EMPTY_GEO
+    if (payload.error) {
+      console.warn('Visitor geo lookup error payload')
+      return EMPTY_GEO
+    }
 
     const country = typeof payload.country_name === 'string' ? payload.country_name : null
     const countryCode = typeof payload.country_code === 'string' ? payload.country_code : null
@@ -166,7 +172,8 @@ export async function lookupGeo(ip: string | null, cacheKey: string | null): Pro
     const geo: VisitorGeo = { country, countryCode, province, district }
     geoCache.set(key, { geo, expiresAt: Date.now() + GEO_CACHE_TTL_MS })
     return geo
-  } catch {
+  } catch (error) {
+    console.warn('Visitor geo lookup failed:', error instanceof Error ? error.name : 'unknown')
     return EMPTY_GEO
   } finally {
     clearTimeout(timeout)
