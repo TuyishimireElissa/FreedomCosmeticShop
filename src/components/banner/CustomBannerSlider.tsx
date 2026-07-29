@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import BannerArrows from './BannerArrows'
-import BannerDots from './BannerDots'
+import CustomBannerDots from './CustomBannerDots'
 
 /**
  * Static promotional slider for /public/images/banner1.jpg … banner5.jpg.
@@ -28,6 +28,13 @@ const SLIDE_SOURCES = [
   '/images/banner4.jpg',
   '/images/banner5.jpg',
 ] as const
+
+/**
+ * Optional overlay text, keyed by image path. Leave a slide out (or leave this
+ * object empty) and that slide shows the image only — no overlay is rendered.
+ * Captions animate up into place when their slide becomes active.
+ */
+const SLIDE_CAPTIONS: Partial<Record<(typeof SLIDE_SOURCES)[number], { title: string; subtitle?: string }>> = {}
 
 const SWIPE_THRESHOLD_PX = 50
 
@@ -85,7 +92,7 @@ export default function CustomBannerSlider() {
     <section
       aria-label="Promotions"
       aria-roledescription="carousel"
-      className="custom-banner-slider group relative mb-4 aspect-[16/7] w-full overflow-hidden rounded-2xl bg-gray-100 shadow-sm sm:aspect-[3/1] lg:aspect-[1000/280]"
+      className="custom-banner-slider group relative left-1/2 mb-4 h-[280px] w-screen -translate-x-1/2 overflow-hidden bg-gray-100 shadow-sm sm:h-[420px] lg:h-[60vh] lg:max-h-[600px] lg:min-h-[500px]"
       onMouseEnter={() => setInteractionPaused(true)}
       onMouseLeave={() => setInteractionPaused(false)}
       onFocusCapture={() => setInteractionPaused(true)}
@@ -112,7 +119,7 @@ export default function CustomBannerSlider() {
           aria-hidden={index !== current}
           aria-roledescription="slide"
           aria-label={`Slide ${index + 1} of ${total}`}
-          className={`custom-banner-slider__slide absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none ${index === current ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'}`}
+          className={`custom-banner-slider__slide absolute inset-0 transition-opacity duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none ${index === current ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'}`}
         >
           {/* Plain <img>: these are operator-supplied static files, mirroring how
               ProductCard and HeroBanner serve their images. */}
@@ -121,8 +128,29 @@ export default function CustomBannerSlider() {
             alt=""
             loading={index === 0 ? 'eager' : 'lazy'}
             decoding="async"
-            className="custom-banner-slider__image h-full w-full object-cover"
+            className={`custom-banner-slider__image h-full w-full object-cover will-change-transform ${index === current ? 'custom-banner-slider__image--active' : ''}`}
           />
+
+          {SLIDE_CAPTIONS[source] && (
+            <>
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent"
+              />
+              <div
+                className={`custom-banner-slider__caption absolute inset-0 z-10 flex flex-col items-start justify-center gap-2 px-6 sm:px-10 md:px-16 ${index === current ? 'custom-banner-slider__caption--active' : 'opacity-0'}`}
+              >
+                <h2 className="max-w-xl text-xl font-black leading-tight tracking-tight text-white drop-shadow-lg sm:text-3xl md:text-4xl">
+                  {SLIDE_CAPTIONS[source]?.title}
+                </h2>
+                {SLIDE_CAPTIONS[source]?.subtitle && (
+                  <p className="max-w-xl text-sm text-white/90 drop-shadow sm:text-base md:text-lg">
+                    {SLIDE_CAPTIONS[source]?.subtitle}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
         </div>
       ))}
 
@@ -135,7 +163,7 @@ export default function CustomBannerSlider() {
         />
       )}
 
-      <BannerDots
+      <CustomBannerDots
         count={total}
         current={current}
         onSelect={setCurrent}

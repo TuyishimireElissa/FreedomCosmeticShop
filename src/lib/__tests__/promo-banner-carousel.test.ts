@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest'
 
 const bannerFiles = ['banner1.jpg', 'banner2.jpg', 'banner3.jpg', 'banner4.jpg', 'banner5.jpg']
 const staticSlider = readFileSync('src/components/banner/CustomBannerSlider.tsx', 'utf8')
+const customDots = readFileSync('src/components/banner/CustomBannerDots.tsx', 'utf8')
+const sharedDots = readFileSync('src/components/banner/BannerDots.tsx', 'utf8')
+const globalCss = readFileSync('src/app/globals.css', 'utf8')
 const carousel = readFileSync('src/components/banner/BannerCarousel.tsx', 'utf8')
 const slide = readFileSync('src/components/banner/BannerSlide.tsx', 'utf8')
 const dots = readFileSync('src/components/banner/BannerDots.tsx', 'utf8')
@@ -41,6 +44,51 @@ describe('promotional banner carousel', () => {
     for (const file of bannerFiles) {
       expect(existsSync(`public/images/${file}`)).toBe(true)
     }
+  })
+
+  it('renders the static slider full-bleed at the agreed responsive heights', () => {
+    // Escapes the max-w-7xl wrapper from inside the component, so the products
+    // page markup does not have to change.
+    expect(staticSlider).toContain('left-1/2')
+    expect(staticSlider).toContain('w-screen')
+    expect(staticSlider).toContain('-translate-x-1/2')
+    expect(staticSlider).toContain('h-[280px]')
+    expect(staticSlider).toContain('sm:h-[420px]')
+    expect(staticSlider).toContain('lg:h-[60vh]')
+    expect(staticSlider).toContain('lg:min-h-[500px]')
+    expect(staticSlider).toContain('lg:max-h-[600px]')
+    expect(staticSlider).toContain('object-cover')
+  })
+
+  it('animates with GPU-friendly Ken Burns, fade, and caption transitions', () => {
+    expect(globalCss).toContain('@keyframes custom-banner-ken-burns')
+    expect(globalCss).toContain('@keyframes custom-banner-caption-rise')
+    expect(globalCss).toContain('transform: scale(1.1) translateZ(0)')
+    expect(staticSlider).toContain('custom-banner-slider__image--active')
+    expect(staticSlider).toContain('duration-1000')
+    expect(staticSlider).toContain('will-change-transform')
+    // Only transform/opacity may animate: no layout-triggering properties.
+    expect(globalCss).not.toMatch(/@keyframes custom-banner-[\s\S]*?(width:|height:|margin:|top:)/)
+  })
+
+  it('keeps every animation behind prefers-reduced-motion', () => {
+    expect(globalCss).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(globalCss).toContain('animation: none')
+    expect(staticSlider).toContain('motion-reduce:transition-none')
+    expect(customDots).toContain('motion-reduce:transition-none')
+  })
+
+  it('isolates the animated dots so the admin carousel keeps its own styling', () => {
+    expect(staticSlider).toContain("import CustomBannerDots from './CustomBannerDots'")
+    expect(staticSlider).not.toContain("import BannerDots from './BannerDots'")
+    // The admin carousel must still use the original, unmodified dots.
+    expect(carousel).toContain("import BannerDots from './BannerDots'")
+    expect(sharedDots).not.toContain('group-hover/dot')
+    expect(customDots).toContain('group-hover/dot:scale-125')
+    expect(customDots).toContain('ease-in-out')
+    expect(customDots).toContain('w-8')
+    expect(customDots).toContain('h-11 w-11')
+    expect(customDots).toContain('role="tab"')
   })
 
   it('gives the static fallback the same behaviour as the admin carousel', () => {

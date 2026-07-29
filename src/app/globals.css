@@ -326,3 +326,45 @@
     padding: 12px;
   }
 }
+
+/* =============================================================================
+   Promotional slider animations (custom-banner-slider)
+   Scoped to the products-page slider. Uniquely named to avoid collisions with
+   the Tailwind keyframes declared in tailwind.config.ts (slideUp / fadeIn).
+   Transform + opacity only, so both animations stay on the GPU.
+   ========================================================================== */
+
+@keyframes custom-banner-ken-burns {
+  from {
+    transform: scale(1) translateZ(0);
+  }
+  to {
+    transform: scale(1.1) translateZ(0);
+  }
+}
+
+@keyframes custom-banner-caption-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.custom-banner-slider__image--active {
+  animation: custom-banner-ken-burns 4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.custom-banner-slider__caption--active {
+  animation: custom-banner-caption-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-banner-slider__image--active,
+  .custom-banner-slider__caption--active {
+    animation: none;
+  }
+}
