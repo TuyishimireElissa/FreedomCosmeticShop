@@ -21,7 +21,7 @@ import CustomBannerDots from './CustomBannerDots'
  * Motion configuration. Every timing the carousel uses lives here so the
  * cadence can be retuned without hunting through the component.
  */
-const SLIDE_INTERVAL_MS = 5000      // slide display time, transition included
+const SLIDE_INTERVAL_MS = 2000      // slide display time, transition included
 const TRANSITION_MS = 1200          // incoming reveal
 const CLICK_LOCKOUT_MS = 1000       // rejects rapid double-navigation
 const MANUAL_PAUSE_MS = 6000        // autoplay rest after manual navigation

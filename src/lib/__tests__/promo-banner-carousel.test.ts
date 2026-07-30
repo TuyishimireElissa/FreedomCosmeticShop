@@ -37,7 +37,7 @@ describe('promotional banner carousel', () => {
   it('serves the static fallback from public/images with unique class names', () => {
     expect(staticSlider).toContain("'/images/banner1.jpg'")
     expect(staticSlider).toContain("'/images/banner5.jpg'")
-    expect(staticSlider).toContain('const SLIDE_INTERVAL_MS = 5000')
+    expect(staticSlider).toContain('const SLIDE_INTERVAL_MS = 2000')
     expect(staticSlider).toContain('const TRANSITION_MS = 1200')
     expect(staticSlider).toContain('const CLICK_LOCKOUT_MS = 1000')
     expect(staticSlider).toContain('custom-banner-slider')
@@ -126,7 +126,7 @@ describe('promotional banner carousel', () => {
     expect(productsPage).toContain('custom-banner-slider__heading-line--2')
     expect(productsPage).toContain('custom-banner-slider__heading-line--3')
     // Progress fill is timed to the slide interval and re-keyed each cycle.
-    expect(globalCss).toContain('animation: cb-dot-progress 5000ms linear both')
+    expect(globalCss).toContain('animation: cb-dot-progress 2000ms linear both')
     expect(customDots).toContain('custom-banner-slider__dot-progress')
     expect(customDots).toContain('key={cycle}')
     expect(customDots).toContain('shadow-[0_0_10px_rgba(183,110,121,0.9)]')

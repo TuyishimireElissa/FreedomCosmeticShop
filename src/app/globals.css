@@ -449,7 +449,7 @@
 
 .custom-banner-slider__dot-progress {
   transform-origin: left center;
-  animation: cb-dot-progress 5000ms linear both;
+  animation: cb-dot-progress 2000ms linear both;
 }
 .custom-banner-slider__dot-progress--paused { animation-play-state: paused; }
 
