@@ -336,133 +336,151 @@
 
 /* Ken Burns: zoom plus a diagonal drift. Two variants alternate by slide index
    so consecutive images never travel the same way. */
-@keyframes custom-banner-ken-burns-a {
-  from {
-    transform: scale(1) translate3d(-1.5%, 1%, 0);
-  }
-  to {
-    transform: scale(1.12) translate3d(1.5%, -1%, 0);
-  }
+/* Motion tokens. Adjust timing in one place; every rule below reads these. */
+.custom-banner-slider {
+  --cb-ease-master: cubic-bezier(0.22, 1, 0.36, 1);
+  --cb-ease-exit: cubic-bezier(0.55, 0, 1, 0.45);
+  --cb-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cb-drift: 1;        /* scales camera travel per breakpoint */
+  --cb-sweep-peak: 0.12;
 }
 
-@keyframes custom-banner-ken-burns-b {
-  from {
-    transform: scale(1) translate3d(1.5%, 1%, 0);
-  }
-  to {
-    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
-  }
+/* ── 2A. Camera motion: five distinct moves, one per slide ─────────────────
+   Linear is deliberate. Any eased curve makes a multi-second zoom visibly
+   accelerate, which reads as a glitch rather than a camera. */
+@keyframes cb-camera-1 {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to   { transform: scale(1.08) translate3d(calc(-12px * var(--cb-drift)), calc(-8px * var(--cb-drift)), 0); }
+}
+@keyframes cb-camera-2 {
+  from { transform: scale(1.02) translate3d(calc(-10px * var(--cb-drift)), 0, 0); }
+  to   { transform: scale(1.07) translate3d(calc(10px * var(--cb-drift)), calc(-4px * var(--cb-drift)), 0); }
+}
+@keyframes cb-camera-3 {
+  from { transform: scale(1) translate3d(0, 0, 0); }
+  to   { transform: scale(1.1) translate3d(0, 0, 0); }
+}
+@keyframes cb-camera-4 {
+  from { transform: scale(1.03) translate3d(calc(8px * var(--cb-drift)), calc(-6px * var(--cb-drift)), 0); }
+  to   { transform: scale(1.06) translate3d(calc(-8px * var(--cb-drift)), calc(6px * var(--cb-drift)), 0); }
+}
+@keyframes cb-camera-5 {
+  from { transform: scale(1.05) translate3d(calc(10px * var(--cb-drift)), 0, 0); }
+  to   { transform: scale(1.02) translate3d(calc(-10px * var(--cb-drift)), calc(4px * var(--cb-drift)), 0); }
 }
 
-/* Incoming frame arrives from the right, settling out of a slight over-scale. */
-@keyframes custom-banner-slide-in {
-  from {
-    opacity: 0;
-    transform: translate3d(4%, 0, 0) scale(1.06);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
+/* ── 2B. Slide transition. Direction-aware: the incoming frame enters from
+   the side the visitor is travelling towards. clip-path gives the soft
+   cinematic edge without the per-frame repaint cost of a blur filter. */
+@keyframes cb-slide-in-forward {
+  from { opacity: 0; transform: translate3d(20px, 0, 0) scale(1.15); clip-path: inset(0 12% 0 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); clip-path: inset(0 0 0 0); }
+}
+@keyframes cb-slide-in-backward {
+  from { opacity: 0; transform: translate3d(-20px, 0, 0) scale(1.15); clip-path: inset(0 0 0 12%); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0) scale(1); clip-path: inset(0 0 0 0); }
+}
+@keyframes cb-slide-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(1.12); }
 }
 
-/* Outgoing frame recedes rather than simply fading, which reads as depth. */
-@keyframes custom-banner-slide-out {
-  from {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translate3d(-3%, 0, 0) scale(0.96);
-  }
+/* ── 2C. Warm light sweep: natural light crossing glass, not a lens flare. */
+@keyframes cb-sweep {
+  from { transform: translate3d(-100%, 0, 0); }
+  to   { transform: translate3d(100%, 0, 0); }
 }
 
-@keyframes custom-banner-caption-rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 16px, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+/* ── 2D. Text choreography, played once on mount. */
+@keyframes cb-text-rise {
+  from { opacity: 0; transform: translate3d(0, calc(30px * var(--cb-text-shift, 1)), 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes cb-text-rise-soft {
+  from { opacity: 0; transform: translate3d(0, calc(18px * var(--cb-text-shift, 1)), 0); }
+  to   { opacity: 0.85; transform: translate3d(0, 0, 0); }
+}
+@keyframes cb-label-rise {
+  from { opacity: 0; transform: translate3d(0, calc(14px * var(--cb-text-shift, 1)), 0); letter-spacing: 0.4em; }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); letter-spacing: 0.2em; }
 }
 
-@keyframes custom-banner-heading-rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 20px, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+@keyframes cb-dot-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
 
-/* Progress indicator inside the active dot, timed to the slide interval. */
-@keyframes custom-banner-dot-progress {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
+/* Camera assignment. The slider adds --n by slide index. */
+.custom-banner-slider__image--cam-1 { animation: cb-camera-1 6200ms linear both; }
+.custom-banner-slider__image--cam-2 { animation: cb-camera-2 6200ms linear both; }
+.custom-banner-slider__image--cam-3 { animation: cb-camera-3 6200ms linear both; }
+.custom-banner-slider__image--cam-4 { animation: cb-camera-4 6200ms linear both; }
+.custom-banner-slider__image--cam-5 { animation: cb-camera-5 6200ms linear both; }
+
+.custom-banner-slider__slide--enter { animation: cb-slide-in-forward 1200ms var(--cb-ease-master) both; }
+.custom-banner-slider__slide--enter-back { animation: cb-slide-in-backward 1200ms var(--cb-ease-master) both; }
+.custom-banner-slider__slide--exit { animation: cb-slide-out 900ms var(--cb-ease-master) both; }
+
+.custom-banner-slider__sweep {
+  position: absolute;
+  inset: 0 -50%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 35%,
+    rgba(255, 248, 240, calc(var(--cb-sweep-peak) * 0.5)) 45%,
+    rgba(255, 248, 240, var(--cb-sweep-peak)) 50%,
+    rgba(255, 248, 240, calc(var(--cb-sweep-peak) * 0.5)) 55%,
+    transparent 65%,
+    transparent 100%
+  );
+}
+.custom-banner-slider__slide--enter .custom-banner-slider__sweep,
+.custom-banner-slider__slide--enter-back .custom-banner-slider__sweep {
+  opacity: 1;
+  animation: cb-sweep 4000ms var(--cb-ease-master) 400ms both;
 }
 
-.custom-banner-slider__image--active {
-  animation: custom-banner-ken-burns-a 3s linear both;
-}
-
-.custom-banner-slider__image--active-alt {
-  animation: custom-banner-ken-burns-b 3s linear both;
-}
-
-.custom-banner-slider__slide--enter {
-  animation: custom-banner-slide-in 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-.custom-banner-slider__slide--exit {
-  animation: custom-banner-slide-out 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-.custom-banner-slider__caption--active {
-  animation: custom-banner-caption-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
-}
-
-/* Staggered entrance for the catalogue heading, played once on mount. */
-.custom-banner-slider__heading-line {
-  animation: custom-banner-heading-rise 0.5s ease-out both;
-}
-
-.custom-banner-slider__heading-line--1 {
-  animation-delay: 0ms;
-}
-
-.custom-banner-slider__heading-line--2 {
-  animation-delay: 100ms;
-}
-
-.custom-banner-slider__heading-line--3 {
-  animation-delay: 200ms;
-}
+.custom-banner-slider__heading-line--1 { animation: cb-label-rise 700ms var(--cb-ease-master) 300ms both; }
+.custom-banner-slider__heading-line--2 { animation: cb-text-rise 900ms var(--cb-ease-master) 450ms both; }
+.custom-banner-slider__heading-line--3 { animation: cb-text-rise-soft 600ms var(--cb-ease-master) 600ms both; }
 
 .custom-banner-slider__dot-progress {
   transform-origin: left center;
-  animation: custom-banner-dot-progress 3s linear both;
+  animation: cb-dot-progress 5000ms linear both;
+}
+.custom-banner-slider__dot-progress--paused { animation-play-state: paused; }
+
+/* ── Phase 4. Responsive: reduce travel, not layout. */
+@media (max-width: 1023px) {
+  .custom-banner-slider { --cb-drift: 0.6; --cb-text-shift: 0.7; --cb-sweep-peak: 0.1; }
+}
+@media (max-width: 767px) {
+  .custom-banner-slider { --cb-drift: 0.4; --cb-text-shift: 0.5; --cb-sweep-peak: 0.08; }
+  .custom-banner-slider__sweep { display: none; }
 }
 
+/* ── Phase 5. Reduced motion: a plain fade, full functionality retained. */
 @media (prefers-reduced-motion: reduce) {
-  .custom-banner-slider__image--active,
-  .custom-banner-slider__image--active-alt,
-  .custom-banner-slider__slide--enter,
-  .custom-banner-slider__slide--exit,
-  .custom-banner-slider__caption--active,
+  .custom-banner-slider__image--cam-1,
+  .custom-banner-slider__image--cam-2,
+  .custom-banner-slider__image--cam-3,
+  .custom-banner-slider__image--cam-4,
+  .custom-banner-slider__image--cam-5,
   .custom-banner-slider__heading-line,
-  .custom-banner-slider__dot-progress {
+  .custom-banner-slider__dot-progress,
+  .custom-banner-slider__caption--active {
     animation: none;
   }
+  .custom-banner-slider__sweep { display: none; }
+  .custom-banner-slider__slide--enter,
+  .custom-banner-slider__slide--enter-back { animation: cb-fade-in 300ms linear both; }
+  .custom-banner-slider__slide--exit { animation: cb-fade-out 300ms linear both; }
 }
+@keyframes cb-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cb-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
 /* -----------------------------------------------------------------------------
    Catalogue heading overlaid on the promotional slider.
@@ -481,4 +499,14 @@
 
 .custom-banner-slider__heading-text {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+
+/* Retained for the admin-managed caption overlay. */
+@keyframes custom-banner-caption-rise {
+  from { opacity: 0; transform: translate3d(0, 16px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.custom-banner-slider__caption--active {
+  animation: custom-banner-caption-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
 }

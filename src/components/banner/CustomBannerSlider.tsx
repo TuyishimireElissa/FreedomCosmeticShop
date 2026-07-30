@@ -17,8 +17,15 @@ import CustomBannerDots from './CustomBannerDots'
  * class names from src/app/globals.css.
  */
 
-/** Change the rotation speed here (milliseconds). */
-const SLIDE_INTERVAL_MS = 3000
+/**
+ * Motion configuration. Every timing the carousel uses lives here so the
+ * cadence can be retuned without hunting through the component.
+ */
+const SLIDE_INTERVAL_MS = 5000      // slide display time, transition included
+const TRANSITION_MS = 1200          // incoming reveal
+const CLICK_LOCKOUT_MS = 1000       // rejects rapid double-navigation
+const MANUAL_PAUSE_MS = 6000        // autoplay rest after manual navigation
+const HOVER_RESUME_MS = 1500        // grace period after the pointer leaves
 
 /** Add or remove entries here to change how many slides the fallback shows. */
 const SLIDE_SOURCES = [
@@ -60,17 +67,45 @@ export default function CustomBannerSlider() {
    */
   const [cycle, setCycle] = useState(0)
   const [interactionPaused, setInteractionPaused] = useState(false)
+  /** Entry side of the incoming frame: forward enters from the right. */
+  const [direction, setDirection] = useState<'forward' | 'backward'>('forward')
+  /** True while a reveal is playing, so overlapping navigation is rejected. */
+  const [isTransitioning, setIsTransitioning] = useState(false)
   const touchStartX = useRef(0)
+  const lockTimer = useRef<number | null>(null)
+  const resumeTimer = useRef<number | null>(null)
+  const transitioningRef = useRef(false)
 
-  const goTo = useCallback((resolveNext: (value: number) => number) => {
+  /**
+   * Single entry point for every slide change: autoplay, arrows, dots, swipe
+   * and keyboard all route through here, so there is one lock and one
+   * direction source. Rejected clicks are dropped rather than queued, which
+   * avoids the catch-up stutter that queueing produces.
+   */
+  const goTo = useCallback((resolveNext: (value: number) => number, heading: 'forward' | 'backward') => {
+    if (transitioningRef.current) return
     setCurrent((value) => {
       const target = resolveNext(value)
       if (target === value) return value
+      transitioningRef.current = true
+      setIsTransitioning(true)
+      setDirection(heading)
       setPreviousIndex(value)
       setCycle((count) => count + 1)
       return target
     })
   }, [])
+
+  // Release the navigation lock once the reveal has finished.
+  useEffect(() => {
+    if (!isTransitioning) return
+    lockTimer.current = window.setTimeout(() => {
+      transitioningRef.current = false
+      setIsTransitioning(false)
+      setPreviousIndex(-1)
+    }, Math.max(TRANSITION_MS, CLICK_LOCKOUT_MS))
+    return () => { if (lockTimer.current) window.clearTimeout(lockTimer.current) }
+  }, [isTransitioning, cycle])
 
   useEffect(() => {
     let active = true
@@ -86,22 +121,68 @@ export default function CustomBannerSlider() {
   const total = slides.length
 
   const next = useCallback(() => {
-    goTo((value) => (total > 1 ? (value + 1) % total : value))
+    goTo((value) => (total > 1 ? (value + 1) % total : value), 'forward')
   }, [goTo, total])
 
   const previous = useCallback(() => {
-    goTo((value) => (total > 1 ? (value - 1 + total) % total : value))
+    goTo((value) => (total > 1 ? (value - 1 + total) % total : value), 'backward')
   }, [goTo, total])
 
+  /** Manual navigation rests autoplay briefly so the visitor keeps control. */
+  const restAutoplay = useCallback(() => {
+    setInteractionPaused(true)
+    if (resumeTimer.current) window.clearTimeout(resumeTimer.current)
+    resumeTimer.current = window.setTimeout(() => setInteractionPaused(false), MANUAL_PAUSE_MS)
+  }, [])
+
+  const manualNext = useCallback(() => { restAutoplay(); next() }, [next, restAutoplay])
+  const manualPrevious = useCallback(() => { restAutoplay(); previous() }, [previous, restAutoplay])
+
   const selectSlide = useCallback((index: number) => {
-    goTo(() => index)
-  }, [goTo])
+    restAutoplay()
+    setCurrent((value) => {
+      goTo(() => index, index > value ? 'forward' : 'backward')
+      return value
+    })
+  }, [goTo, restAutoplay])
+
+  const pauseOnPointer = useCallback(() => {
+    if (resumeTimer.current) window.clearTimeout(resumeTimer.current)
+    setInteractionPaused(true)
+  }, [])
+
+  const resumeAfterPointer = useCallback(() => {
+    if (resumeTimer.current) window.clearTimeout(resumeTimer.current)
+    resumeTimer.current = window.setTimeout(() => setInteractionPaused(false), HOVER_RESUME_MS)
+  }, [])
 
   useEffect(() => {
     if (prefersReducedMotion || interactionPaused || total < 2) return
     const timer = window.setInterval(next, SLIDE_INTERVAL_MS)
     return () => window.clearInterval(timer)
-  }, [interactionPaused, next, prefersReducedMotion, total])
+  }, [cycle, interactionPaused, next, prefersReducedMotion, total])
+
+  // Page Visibility: a hidden tab must not queue a burst of transitions.
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        setInteractionPaused(true)
+      } else {
+        transitioningRef.current = false
+        setIsTransitioning(false)
+        setPreviousIndex(-1)
+        setInteractionPaused(false)
+      }
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
+
+  // Clear every pending timer if the page navigates away mid-transition.
+  useEffect(() => () => {
+    if (lockTimer.current) window.clearTimeout(lockTimer.current)
+    if (resumeTimer.current) window.clearTimeout(resumeTimer.current)
+  }, [])
 
   useEffect(() => {
     if (current >= total) setCurrent(0)
@@ -121,24 +202,25 @@ export default function CustomBannerSlider() {
 
   return (
     <section
-      aria-label="Promotions"
+      role="region"
+      aria-label="Product catalog banner"
       aria-roledescription="carousel"
       className="custom-banner-slider group relative left-1/2 h-[380px] w-screen -translate-x-1/2 overflow-hidden bg-gray-100 shadow-sm sm:h-[480px] lg:h-[65vh] lg:max-h-[650px] lg:min-h-[500px]"
-      onMouseEnter={() => setInteractionPaused(true)}
-      onMouseLeave={() => setInteractionPaused(false)}
-      onFocusCapture={() => setInteractionPaused(true)}
-      onBlurCapture={() => setInteractionPaused(false)}
+      onMouseEnter={pauseOnPointer}
+      onMouseLeave={resumeAfterPointer}
+      onFocusCapture={pauseOnPointer}
+      onBlurCapture={resumeAfterPointer}
       onTouchStart={(event) => { touchStartX.current = event.touches[0].clientX }}
       onTouchEnd={(event) => {
         const distance = touchStartX.current - event.changedTouches[0].clientX
         if (Math.abs(distance) > SWIPE_THRESHOLD_PX) {
-          if (distance > 0) next()
-          else previous()
+          if (distance > 0) manualNext()
+          else manualPrevious()
         }
       }}
       onKeyDown={(event) => {
-        if (event.key === 'ArrowRight') { event.preventDefault(); next() }
-        if (event.key === 'ArrowLeft') { event.preventDefault(); previous() }
+        if (event.key === 'ArrowRight') { event.preventDefault(); manualNext() }
+        if (event.key === 'ArrowLeft') { event.preventDefault(); manualPrevious() }
       }}
       tabIndex={0}
     >
@@ -152,7 +234,7 @@ export default function CustomBannerSlider() {
           aria-label={`Slide ${index + 1} of ${total}`}
           className={`custom-banner-slider__slide absolute inset-0 will-change-transform ${
             index === current
-              ? 'custom-banner-slider__slide--enter z-10'
+              ? `${direction === 'backward' ? 'custom-banner-slider__slide--enter-back' : 'custom-banner-slider__slide--enter'} z-10`
               : index === previousIndex
                 ? 'custom-banner-slider__slide--exit pointer-events-none z-0'
                 : 'pointer-events-none z-0 opacity-0'
@@ -168,14 +250,12 @@ export default function CustomBannerSlider() {
             alt=""
             loading={index === 0 ? 'eager' : 'lazy'}
             decoding="async"
-            className={`custom-banner-slider__image h-full w-full object-cover will-change-transform ${
-              index === current
-                ? index % 2 === 0
-                  ? 'custom-banner-slider__image--active'
-                  : 'custom-banner-slider__image--active-alt'
-                : ''
+            className={`custom-banner-slider__image h-full w-full object-cover ${
+              index === current ? `custom-banner-slider__image--cam-${(index % 5) + 1} will-change-transform` : ''
             }`}
           />
+
+          <span className="custom-banner-slider__sweep" aria-hidden="true" />
 
           {SLIDE_CAPTIONS[source] && (
             <>
@@ -202,8 +282,8 @@ export default function CustomBannerSlider() {
 
       {total > 1 && (
         <BannerArrows
-          onPrevious={previous}
-          onNext={next}
+          onPrevious={manualPrevious}
+          onNext={manualNext}
           previousLabel="Previous slide"
           nextLabel="Next slide"
         />
@@ -214,10 +294,11 @@ export default function CustomBannerSlider() {
         current={current}
         onSelect={selectSlide}
         cycle={cycle}
+        paused={interactionPaused}
         label={(index) => `Show slide ${index + 1}`}
       />
 
-      <span className="sr-only" aria-live="polite">{`${current + 1} / ${total}`}</span>
+      <span className="sr-only" aria-live="polite">{`Slide ${current + 1} of ${total}`}</span>
     </section>
   )
 }

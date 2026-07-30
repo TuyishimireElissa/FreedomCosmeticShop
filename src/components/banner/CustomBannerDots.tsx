@@ -7,6 +7,8 @@ interface CustomBannerDotsProps {
   label: (index: number) => string
   /** Increments on every slide change so the progress fill restarts. */
   cycle: number
+  /** Freezes the progress fill while autoplay is paused. */
+  paused?: boolean
 }
 
 /**
@@ -18,7 +20,7 @@ interface CustomBannerDotsProps {
  *
  * Keeps the 44px touch target and tab semantics of the original dots.
  */
-export default function CustomBannerDots({ count, current, onSelect, label, cycle }: CustomBannerDotsProps) {
+export default function CustomBannerDots({ count, current, onSelect, label, cycle, paused = false }: CustomBannerDotsProps) {
   if (count < 2) return null
 
   return (
@@ -40,7 +42,7 @@ export default function CustomBannerDots({ count, current, onSelect, label, cycl
         >
           <span
             aria-hidden="true"
-            className={`relative block h-2 overflow-hidden rounded-full shadow-md transition-all duration-[400ms] ease-in-out will-change-transform group-hover/dot:scale-125 motion-reduce:transition-none motion-reduce:group-hover/dot:scale-100 ${
+            className={`relative block h-2 overflow-hidden rounded-full shadow-md transition-all duration-[400ms] ease-in-out will-change-transform group-hover/dot:scale-[1.3] motion-reduce:transition-none motion-reduce:group-hover/dot:scale-100 ${
               index === current
                 ? 'w-[30px] bg-[#B76E79]/40 shadow-[0_0_10px_rgba(183,110,121,0.9)]'
                 : 'w-2 bg-white/70 group-hover/dot:bg-white'
@@ -49,7 +51,7 @@ export default function CustomBannerDots({ count, current, onSelect, label, cycl
             {index === current && (
               <span
                 key={cycle}
-                className="custom-banner-slider__dot-progress absolute inset-0 block rounded-full bg-[#B76E79] will-change-transform"
+                className={`custom-banner-slider__dot-progress absolute inset-0 block rounded-full bg-[#B76E79] will-change-transform ${paused ? 'custom-banner-slider__dot-progress--paused' : ''}`}
               />
             )}
           </span>

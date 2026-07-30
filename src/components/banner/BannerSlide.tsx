@@ -79,7 +79,7 @@ export default function BannerSlide({ banner, index, isActive, priority, ctaLabe
       aria-hidden={!isActive}
       aria-roledescription="slide"
       aria-label={banner.title}
-      className={`absolute inset-0 transition-opacity duration-700 motion-reduce:transition-none ${isActive ? 'z-10 opacity-100' : 'pointer-events-none z-0 opacity-0'}`}
+      className={`absolute inset-0 ${isActive ? 'custom-banner-slider__slide--enter z-10' : 'pointer-events-none z-0 opacity-0'}`}
     >
       <Image
         src={banner.image}
@@ -88,8 +88,10 @@ export default function BannerSlide({ banner, index, isActive, priority, ctaLabe
         sizes="(max-width: 1280px) 100vw, 1280px"
         priority={priority}
         loading={priority ? undefined : 'lazy'}
-        className="object-cover"
+        className={`object-cover ${isActive ? `custom-banner-slider__image--cam-${(index % 5) + 1} will-change-transform` : ''}`}
       />
+
+      <span className="custom-banner-slider__sweep" aria-hidden="true" />
 
       {hasOverlayText && (
         <div
