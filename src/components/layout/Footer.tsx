@@ -2,6 +2,7 @@
 
 import { Mail, MapPin, MessageCircle, Phone, ShieldCheck, Truck, CreditCard, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { BUSINESS, OWNER_TODO } from '@/lib/business-config'
 import { useT } from '@/lib/i18n/LanguageContext'
 
@@ -27,7 +28,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
           <section>
-            <Link href="/" className="inline-block" aria-label={t('nav.home')}><span className="text-lg font-bold tracking-[-0.02em]">{BUSINESS.tradingName}</span><span className="mt-2 block text-[11px] font-medium text-[#AAAAAA]">{BUSINESS.tagline}</span></Link>
+            <Link href="/" className="inline-block" aria-label={t('nav.home')}><Image src="/logo-icon.png" alt={t('nav.logo_alt')} width={40} height={40} className="mb-3 h-10 w-10 rounded-lg object-contain" /><span className="text-lg font-bold tracking-[-0.02em]">{BUSINESS.tradingName}</span><span className="mt-2 block text-[11px] font-medium text-[#AAAAAA]">{BUSINESS.tagline}</span></Link>
             <p className="mt-5 max-w-sm text-sm leading-6 text-[#AAAAAA]">{t('footer.description')}</p>
             <div className="mt-6 flex flex-wrap gap-2 text-xs text-gray-300">{['MTN MoMo', 'Airtel Money', 'Visa', 'Mastercard', 'Cash on Delivery'].map((payment) => <span key={payment} className="rounded-lg border border-white/10 px-2.5 py-1.5">{payment}</span>)}</div>
           </section>

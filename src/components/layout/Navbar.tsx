@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import {
   ChevronDown,
   Globe,
@@ -113,10 +114,26 @@ export default function Navbar() {
               className="h-10 w-auto max-w-[150px] object-contain sm:max-w-[190px]"
             />
           ) : (
-            <span className="text-left">
-              <span className="block text-sm font-bold leading-none tracking-[-0.02em] text-[#1a1a1a] sm:text-base lg:text-lg">{BUSINESS.tradingName}</span>
-              <span className="mt-1 hidden text-[11px] font-medium leading-none text-[#777777] sm:block">{BUSINESS.tagline}</span>
-            </span>
+            <>
+              {/* Icon-only mark on phones, where horizontal space is scarce. */}
+              <Image
+                src="/logo-icon.png"
+                alt={t('nav.logo_alt')}
+                width={40}
+                height={40}
+                priority
+                className="h-9 w-9 object-contain md:hidden"
+              />
+              {/* Full lockup from md: up. */}
+              <Image
+                src="/logo.png"
+                alt={t('nav.logo_alt')}
+                width={800}
+                height={200}
+                priority
+                className="hidden h-10 w-auto object-contain md:block"
+              />
+            </>
           )}
         </button>
 

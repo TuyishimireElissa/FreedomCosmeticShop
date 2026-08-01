@@ -72,7 +72,7 @@ export const SEO_CONFIG = {
     name: BUSINESS.name,
     legalName: isConfigured(BUSINESS.legalName) ? BUSINESS.legalName : undefined,
     url: siteUrl,
-    logo: `${siteUrl}/logo.svg`,
+    logo: `${siteUrl}/logo.png`,
     email: isConfigured(BUSINESS.email) ? BUSINESS.email : undefined,
     phone: isConfigured(BUSINESS.phone) ? BUSINESS.phone : undefined,
     sameAs: verifiedSocialUrls,
@@ -81,7 +81,7 @@ export const SEO_CONFIG = {
   localBusiness: {
     type: 'Store' as const,
     name: BUSINESS.tradingName,
-    image: `${siteUrl}/logo.svg`,
+    image: `${siteUrl}/og-image.png`,
     address: {
       addressLocality: BUSINESS.address.city,
       addressCountry: 'RW',
@@ -95,8 +95,11 @@ export const SEO_CONFIG = {
     currenciesAccepted: 'RWF',
   },
 
-  // The repository currently has a real SVG logo but no verified 1200×630 OG asset.
-  ogImage: `${siteUrl}/logo.svg`,
+  // A real 1200×630 raster banner. Social platforms and Google Images do not
+  // render SVG, so the OG asset must stay a PNG.
+  ogImage: `${siteUrl}/og-image.png`,
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
   twitterHandle: undefined,
 } as const
 
@@ -141,7 +144,7 @@ export function getPageMetadata({
       siteName: SEO_CONFIG.siteName,
       locale: lang === 'rw' ? 'rw_RW' : 'en_RW',
       type: 'website',
-      images: [{ url: socialImage, alt: finalTitle }],
+      images: [{ url: socialImage, width: SEO_CONFIG.ogImageWidth, height: SEO_CONFIG.ogImageHeight, alt: finalTitle }],
     },
     twitter: {
       card: 'summary_large_image',

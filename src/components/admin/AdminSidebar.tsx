@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import {
   BarChart3,
   ChevronLeft,
@@ -116,7 +117,7 @@ export default function AdminSidebar() {
       >
         <div className="flex h-[72px] shrink-0 items-center border-b border-white/10 px-4">
           <button type="button" onClick={() => selectTab('overview')} className={`flex min-w-0 items-center gap-3 ${collapsed ? 'md:mx-auto' : ''}`} aria-label="Admin overview">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-[#c98892] to-[#9e5964] text-base font-black shadow-lg shadow-black/25">F</span>
+            <Image src="/logo-icon.png" alt="FreedomCosmeticShop" width={40} height={40} className="h-10 w-10 shrink-0 rounded-xl bg-white object-contain p-1 shadow-lg shadow-black/25" />
             <span className={`min-w-0 text-left ${collapsed ? 'md:hidden' : ''}`}>
               <span className="block truncate text-sm font-extrabold tracking-tight">FreedomCosmetic</span>
               <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[0.18em] text-[#d999a3]">Admin workspace</span>

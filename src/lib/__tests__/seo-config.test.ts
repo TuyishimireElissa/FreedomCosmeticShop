@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { getPageMetadata, SEO_CONFIG } from '@/lib/seo-config'
 
@@ -22,9 +24,29 @@ describe('central SEO metadata configuration', () => {
   })
 
   it('references an asset that actually exists in the repository', () => {
-    expect(SEO_CONFIG.organization.logo).toBe(`${SEO_CONFIG.siteUrl}/logo.svg`)
-    expect(SEO_CONFIG.ogImage).toBe(`${SEO_CONFIG.siteUrl}/logo.svg`)
+    expect(SEO_CONFIG.organization.logo).toBe(`${SEO_CONFIG.siteUrl}/logo.png`)
+    expect(SEO_CONFIG.ogImage).toBe(`${SEO_CONFIG.siteUrl}/og-image.png`)
     expect(SEO_CONFIG.twitterHandle).toBeUndefined()
+
+    // Assert what the test name actually promises: the referenced files are on
+    // disk. A string comparison alone would still pass after someone deletes
+    // the asset, which is the failure mode this test exists to catch.
+    for (const url of [SEO_CONFIG.organization.logo, SEO_CONFIG.ogImage]) {
+      const publicPath = join(process.cwd(), 'public', url.replace(SEO_CONFIG.siteUrl, ''))
+      expect(existsSync(publicPath), `${publicPath} is missing`).toBe(true)
+    }
+  })
+
+  it('advertises OG image dimensions social platforms can use', () => {
+    // Facebook, WhatsApp and X need explicit width/height plus a raster format;
+    // SVG previews are dropped silently.
+    expect(SEO_CONFIG.ogImage).toMatch(/\.(png|jpg|jpeg)$/)
+    expect(SEO_CONFIG.ogImageWidth).toBe(1200)
+    expect(SEO_CONFIG.ogImageHeight).toBe(630)
+
+    const images = getPageMetadata({ path: '/' }).openGraph?.images
+    const first = Array.isArray(images) ? images[0] : images
+    expect(first).toMatchObject({ width: 1200, height: 630 })
   })
 
   it('creates canonical Kinyarwanda metadata by default', () => {

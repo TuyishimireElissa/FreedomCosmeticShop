@@ -1,0 +1,4 @@
+# Regenerable inputs, kept out of the repo to avoid committing ~3 MB of binaries.
+# `build-brand-assets.py` re-downloads the fonts on demand.
+fonts/
+icon-raw.png

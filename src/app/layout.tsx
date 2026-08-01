@@ -19,6 +19,9 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  // Next 15 renders <meta name="theme-color"> from the viewport export.
+  // Declaring it under `metadata` instead triggers a build-time warning.
+  themeColor: '#B76E79',
 }
 
 export const metadata: Metadata = {
@@ -27,6 +30,26 @@ export const metadata: Metadata = {
   authors: [{ name: BUSINESS.name }],
   creator: BUSINESS.name,
   publisher: BUSINESS.name,
+  applicationName: BUSINESS.tradingName,
+  manifest: '/site.webmanifest',
+  // Next emits the matching <link rel> tags; hand-writing them in <head> as
+  // well would duplicate every icon declaration.
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', type: 'image/png', sizes: '16x16' },
+      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/android-chrome-192x192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/android-chrome-512x512.png', type: 'image/png', sizes: '512x512' },
+    ],
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180' }],
+    shortcut: ['/favicon.ico'],
+  },
+  appleWebApp: {
+    capable: true,
+    title: BUSINESS.tradingName,
+    statusBarStyle: 'default',
+  },
   // Search engines only crawl a site they know exists. Paste the tokens from
   // Google Search Console and Bing Webmaster Tools into these env vars; the
   // tags are omitted entirely when the vars are unset.
