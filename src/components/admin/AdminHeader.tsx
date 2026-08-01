@@ -3,6 +3,7 @@
 import { Bell, Menu } from 'lucide-react'
 import { useAdminShell } from '@/components/admin/AdminShellContext'
 import { useStore } from '@/store/useStore'
+import BrandMark from '@/components/brand/BrandMark'
 
 const tabTitles: Record<string, string> = {
   overview: 'Overview',
@@ -42,8 +43,10 @@ export default function AdminHeader() {
           <Bell className="h-5 w-5" />
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
         </button>
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-[#B76E79] text-xs font-bold text-white">
-          {user?.name?.charAt(0).toUpperCase() || 'A'}
+        <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-[#B76E79] text-xs font-bold text-white">
+          {user?.name
+            ? user.name.charAt(0).toUpperCase()
+            : <BrandMark size={36} alt="FreedomCosmeticShop" className="h-9 w-9 rounded-full bg-white object-contain p-1" />}
         </span>
       </div>
     </header>

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowLeft, Search, Sparkles } from 'lucide-react'
 import { useT } from '@/lib/i18n/LanguageContext'
+import BrandMark from '@/components/brand/BrandMark'
 
 export default function NotFound() {
   const t = useT()
@@ -32,7 +33,7 @@ export default function NotFound() {
     <main className="relative grid min-h-[70vh] place-items-center overflow-hidden bg-gradient-to-br from-white via-rose-50 to-[#fff8e7] px-4 py-16">
       <div className="absolute -right-24 top-10 h-72 w-72 rounded-full bg-[#B76E79]/15 blur-3xl" aria-hidden="true" />
       <div className="relative max-w-xl text-center">
-        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#B76E79] text-2xl font-black text-white shadow-xl" aria-hidden="true">F</span>
+        <BrandMark size={80} className="mx-auto h-20 w-20 rounded-full bg-white object-contain p-2 shadow-xl" />
         <p className="mt-6 text-sm font-black uppercase tracking-[0.25em] text-[#B76E79]">{t('pages.error_404')}</p>
         <h1 className="mt-3 text-4xl font-black tracking-tight text-[#1a1a1a] sm:text-5xl">{t('errors.page_not_found')}</h1>
         <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-gray-500">{t('pages.not_found_hint')}</p>

@@ -8,6 +8,7 @@ import { OTPInput } from '@/components/auth/OTPInput'
 import { isValidRwandaPhone, normalizeRwandaPhone } from '@/lib/phone'
 import { useStore } from '@/store/useStore'
 import { useT } from '@/lib/i18n/LanguageContext'
+import BrandMark from '@/components/brand/BrandMark'
 import FormField from '@/components/a11y/FormField'
 
 const skinTypes = ['OILY', 'DRY', 'COMBINATION', 'SENSITIVE', 'NORMAL', 'NOT_SURE'] as const
@@ -72,7 +73,7 @@ export default function RegisterPage() {
   return (
     <main className="min-h-dvh bg-gradient-to-br from-rose-50 via-white to-[#fff8e7] px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-2xl">
-        <Link href="/" className="mb-7 flex min-h-11 items-center justify-center gap-3"><span className="grid h-12 w-12 place-items-center rounded-full bg-[#B76E79] text-lg font-black text-white">F</span><span><strong className="block text-lg text-[#1a1a1a]">FreedomCosmeticShop</strong><span className="text-xs font-semibold text-[#B76E79]">{t('auth.rwanda_beauty_freedom')}</span></span></Link>
+        <Link href="/" className="mb-7 flex min-h-11 items-center justify-center gap-3"><BrandMark size={48} priority className="h-12 w-12 rounded-full object-contain" /><span><strong className="block text-lg text-[#1a1a1a]">FreedomCosmeticShop</strong><span className="text-xs font-semibold text-[#B76E79]">{t('auth.rwanda_beauty_freedom')}</span></span></Link>
         <div className="overflow-hidden rounded-[2rem] border border-white bg-white shadow-[0_24px_70px_rgba(26,26,26,0.1)]">
           <div className="bg-[#1a1a1a] px-6 py-7 text-center text-white sm:px-9"><span className="mx-auto grid h-11 w-11 place-items-center rounded-2xl bg-[#B76E79]"><Sparkles className="h-5 w-5" /></span><h1 className="mt-4 text-2xl font-black sm:text-3xl">{step === 'form' ? t('auth.register_title') : t('auth.otp_title')}</h1><p className="mt-2 text-sm text-gray-400">{step === 'form' ? t('auth.register_benefits') : t('auth.enter_code_phone', { phone: form.phone })}</p></div>
           <div className="p-5 sm:p-8">

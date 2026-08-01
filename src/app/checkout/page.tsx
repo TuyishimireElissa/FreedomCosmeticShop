@@ -8,6 +8,7 @@ import { formatRWF } from '@/lib/format'
 import { normalizeRwandaPhone } from '@/lib/rwanda-locations'
 import { usePaymentPolling } from '@/hooks/usePaymentPolling'
 import AddressForm, { type CheckoutAddress } from '@/components/checkout/AddressForm'
+import BrandMark from '@/components/brand/BrandMark'
 import PaymentSelector, { type CheckoutPaymentMethod } from '@/components/checkout/PaymentSelector'
 import OrderSummary from '@/components/checkout/OrderSummary'
 import ConfirmationView, { type ConfirmedCheckoutOrder } from '@/components/checkout/ConfirmationView'
@@ -192,7 +193,7 @@ export default function CheckoutPage() {
   return (
     <div className="safe-bottom min-h-screen bg-[#FAFAFA]">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-7 text-center"><span className="text-xs font-bold uppercase tracking-[0.2em] text-[#B76E79]">{t('checkout.secure_rwanda_checkout')}</span><h1 className="mt-2 text-3xl font-bold text-[#1a1a1a]">{t('checkout.title')}</h1>{wholesaleShoppingMode && <p className="mx-auto mt-3 max-w-xl rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">{t('checkout.wholesale_mode_active')}</p>}</div>
+        <div className="mb-7 text-center"><span className="mb-3 inline-flex items-center justify-center gap-2"><BrandMark variant="badge" size={24} className="h-6 w-6 object-contain" /><span className="text-sm font-bold text-[#1a1a1a]">FreedomCosmeticShop</span></span><br /><span className="text-xs font-bold uppercase tracking-[0.2em] text-[#B76E79]">{t('checkout.secure_rwanda_checkout')}</span><h1 className="mt-2 text-3xl font-bold text-[#1a1a1a]">{t('checkout.title')}</h1>{wholesaleShoppingMode && <p className="mx-auto mt-3 max-w-xl rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-900">{t('checkout.wholesale_mode_active')}</p>}</div>
         <div className="mb-6 flex items-center gap-1 lg:hidden" aria-label={t('checkout.title')}>
           {[1, 2, 3].map((number) => <span key={number} className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${number <= step ? 'bg-[#B76E79]' : 'bg-gray-200'}`} />)}
         </div>

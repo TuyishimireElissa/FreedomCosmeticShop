@@ -10,6 +10,7 @@ import { ArrowLeft, FileText, MessageCircle, Printer } from 'lucide-react'
 import { useT } from '@/lib/i18n/LanguageContext'
 import IconButton from '@/components/a11y/IconButton'
 import PaymentStatusBadge from '@/components/a11y/PaymentStatusBadge'
+import BrandMark from '@/components/brand/BrandMark'
 
 type InvoicePaymentStatus = 'PAID' | 'PENDING' | 'FAILED' | 'REFUNDED' | 'OVERDUE'
 
@@ -112,7 +113,7 @@ function InvoiceDetail({ invoice, onBack }: { invoice: InvoiceDetailData; onBack
 
       <article className="rounded-2xl border bg-white p-8 print:border-0 print:p-0">
         <header className="flex items-start justify-between border-b pb-4">
-          <div><h1 className="text-2xl font-bold text-primary">{BUSINESS.tradingName}</h1><p className="text-xs text-muted-foreground">{t('wholesale.order_invoice')}</p></div>
+          <div className="flex items-center gap-2"><BrandMark variant="badge" size={24} className="h-6 w-6 shrink-0 object-contain" /><div><h1 className="text-2xl font-bold text-primary">{BUSINESS.tradingName}</h1><p className="text-xs text-muted-foreground">{t('wholesale.order_invoice')}</p></div></div>
           <div className="text-right"><p className="font-mono text-sm font-bold">{invoice.invoiceNumber}</p><p className="text-xs text-muted-foreground">{new Date(invoice.issuedAt).toLocaleDateString('en-RW', { day: 'numeric', month: 'long', year: 'numeric' })}</p></div>
         </header>
 

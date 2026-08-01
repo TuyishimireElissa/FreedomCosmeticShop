@@ -222,7 +222,7 @@ def build_og(path: Path):
 COMPRESS = {
     "logo.png": 64, "logo-dark.png": 64, "logo-icon.png": 64,
     "apple-touch-icon.png": 64, "android-chrome-192x192.png": 64,
-    "android-chrome-512x512.png": 64, "icon-maskable-512.png": 64,
+    "android-chrome-512x512.png": 64, "icon-maskable-512.png": 64, "logo-badge.png": 64,
     "og-image.png": 128,
 }
 
@@ -261,6 +261,8 @@ def main():
 
     print("Icons:")
     build_icon(PUB / "logo-icon.png", 512, WHITE + (255,))
+    # Badge: read at 24px, so it gets the same closed silhouette as the favicons.
+    build_icon(PUB / "logo-badge.png", 128, WHITE + (255,), scale=0.86, close=0.022)
     build_icon(PUB / "icon-maskable-512.png", 512, WHITE + (255,), scale=0.60)
     build_icon(PUB / "favicon-16x16.png", 16, (0, 0, 0, 0), scale=0.86, close=0.055)
     build_icon(PUB / "favicon-32x32.png", 32, (0, 0, 0, 0), scale=0.84, close=0.030)

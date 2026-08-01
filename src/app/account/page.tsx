@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { Gauge, Gift, Heart, Loader2, Mail, MapPin, Package, Phone, Save, User } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { useT } from '@/lib/i18n/LanguageContext'
+import BrandMark from '@/components/brand/BrandMark'
 
 export default function AccountPage() {
   const t = useT()
@@ -31,7 +32,7 @@ export default function AccountPage() {
   return (
     <main className="min-h-screen bg-[#FAFAFA] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
-        <div className="overflow-hidden rounded-xl bg-[#1a1a1a] p-6 text-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:p-8"><div className="flex flex-col gap-5 sm:flex-row sm:items-center"><span className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-[#B76E79] text-2xl font-bold">{user.name.split(' ').map((part) => part[0]).slice(0,2).join('').toUpperCase()}</span><div className="min-w-0"><span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#FFD700]">{t('auth.my_beauty_account')}</span><h1 className="mt-2 truncate text-3xl font-bold">{user.name}</h1><div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-400"><span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" />{user.phone}</span>{user.email && <span className="flex items-center gap-1"><Mail className="h-3.5 w-3.5" />{user.email}</span>}</div></div></div></div>
+        <div className="overflow-hidden rounded-xl bg-[#1a1a1a] p-6 text-white shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:p-8"><div className="flex flex-col gap-5 sm:flex-row sm:items-center"><span className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-[#B76E79] text-2xl font-bold">{user.name.split(' ').map((part) => part[0]).slice(0,2).join('').toUpperCase()}</span><div className="min-w-0"><span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#FFD700]"><BrandMark variant="badge" size={20} className="h-5 w-5 rounded bg-white/95 object-contain p-0.5" />{t('auth.my_beauty_account')}</span><h1 className="mt-2 truncate text-3xl font-bold">{user.name}</h1><div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-400"><span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" />{user.phone}</span>{user.email && <span className="flex items-center gap-1"><Mail className="h-3.5 w-3.5" />{user.email}</span>}</div></div></div></div>
 
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">{[
           { icon: Package, value: counts.orders, label: t('orders.title'), href: '/account/orders' }, { icon: Heart, value: counts.wishlist, label: t('nav.wishlist'), href: '/account/wishlist' }, { icon: Gift, value: user.loyaltyPoints || 0, label: t('auth.points'), href: '/account' }, { icon: MapPin, value: 'RW', label: t('auth.rwanda'), href: '/account' },

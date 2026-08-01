@@ -87,6 +87,17 @@ export async function sendEmail(opts: EmailOptions): Promise<EmailResult> {
  * Send an order confirmation email.
  * Stub — replace with a proper React Email template.
  */
+
+/**
+ * Email clients cannot resolve relative URLs, so brand assets in email HTML
+ * must be absolute. Falls back to the production origin when the app URL is
+ * unset (e.g. a worker process without NEXT_PUBLIC_APP_URL).
+ */
+function emailAssetUrl(path: string): string {
+  const base = (process.env.NEXT_PUBLIC_APP_URL || 'https://freedom-cosmetic-shop.vercel.app').replace(/\/$/, '')
+  return `${base}${path}`
+}
+
 export async function sendOrderConfirmationEmail(
   to: string,
   orderNumber: string,
@@ -94,6 +105,7 @@ export async function sendOrderConfirmationEmail(
 ): Promise<EmailResult> {
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <img src="${emailAssetUrl('/logo-icon.png')}" width="48" height="48" alt="FreedomCosmeticShop" style="border-radius:8px;display:block;margin-bottom:12px" />
       <h1 style="color: #b76e79;">Thank you for your order!</h1>
       <p>Hi there,</p>
       <p>We've received your order <strong>${orderNumber}</strong> totalling <strong>RWF ${total.toLocaleString()}</strong>.</p>
