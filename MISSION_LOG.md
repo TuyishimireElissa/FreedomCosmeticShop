@@ -198,3 +198,72 @@ Blocking groups: payments (Paypack / Flutterwave) and messaging (SMS / email).
   `tailwind.config.ts`, no theme provider. The brief explicitly allows this:
   "If the project has no dark mode support, just use logo.png for desktop and
   skip the dark variant."
+
+---
+
+## Follow-up run — contact page (commit after `31dfad0`)
+
+### A live customer-facing bug, found by auditing my own work
+
+I shipped `/api/contact` in the previous commit and then checked whether
+anything actually called it. **Nothing did** — the contact page had no form at
+all, only three link cards. I had left a dangling endpoint.
+
+Checking that turned up something worse. The live `/contact` page was printing
+
+```
+[TODO: OWNER_MUST_ADD_THIS_BEFORE_LAUNCH]
+```
+
+**seven times**, in place of the phone number, email address, support hours and
+street address — on the one page a customer opens when they are ready to buy.
+`/contact` was returning HTTP 200, so every automated check I had run to that
+point called it healthy.
+
+The cause was a half-applied guard. `business-config.ts` deliberately ships
+owner placeholders instead of inventing contact details — that is the right
+design — and `getWhatsAppLink()` already guarded the *link*. But the card still
+rendered `{BUSINESS.phoneDisplay}` as visible text, so the marker printed while
+the anchor sat harmlessly disabled.
+
+### Fixed
+
+- **`isPlaceholder()` / `realValue()`** added to `business-config.ts`, beside
+  the existing `hasSocial()` and `getTODOItems()` helpers.
+- **Contact page rewritten**: unconfigured channels are dropped entirely rather
+  than printed. If none are configured, a polite bilingual line replaces them.
+  Support hours and address segments are filtered the same way.
+- **A real contact form** now posts to `/api/contact` — client-side validation
+  with `aria-invalid` / `role="alert"` per field, a disabled sending state, a
+  distinct message for HTTP 429, and 16 new `en` + `rw` translation keys. The
+  endpoint is no longer orphaned.
+- **`InvoicePrinter` fixed too** — the same audit found it interpolating
+  `BUSINESS.phoneDisplay` and `BUSINESS.emailInvoices` unguarded into the
+  printed invoice footer, so customers could receive an invoice with a raw TODO
+  marker on it.
+- **`owner-placeholder-leak.test.ts`** — 5 tests that scan every `.tsx` file for
+  unguarded risky fields, so this class of bug cannot come back. It also asserts
+  `getTODOItems()` still reports outstanding work, because hiding the marker in
+  the UI must not silence the owner's launch checklist.
+
+**One of my own tests was wrong at first.** It flagged a correctly guarded
+`` `mailto:${BUSINESS.email}` `` template string as a leak. The assertion was
+too crude — it now matches only a field rendered directly as an element child
+(`>{BUSINESS.x}<`). I also confirmed the suite genuinely fails by reintroducing
+the leak and watching it go red.
+
+Gates: tsc clean, lint clean, **694 tests passing** (was 689), build 65/65.
+
+### Still outstanding for the owner
+
+Guarding the UI hides the gap; it does not fill it. `getTODOItems()` still
+reports these, and **customers currently have no phone number or email to
+reach you** — only WhatsApp:
+
+- `phone`, `phoneDisplay`, `email`, `emailSupport`, `emailInvoices`
+- `supportHours.weekdays` / `.saturday` / `.sunday`
+- `address.street`, `.sector`, `.district`, `.landmark`
+- `legalName`, `rdbNumber`, `tinNumber` (needed on compliant invoices)
+
+These live in `src/lib/business-config.ts`. Filling them in makes the hidden
+cards reappear automatically — no code change needed.

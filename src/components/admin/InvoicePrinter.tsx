@@ -15,7 +15,7 @@
 
 import { Button } from "@/components/ui/button"
 import { formatRWF, PAYMENT_METHODS, PaymentMethodKey } from "@/lib/format"
-import { BUSINESS } from "@/lib/business-config"
+import { isPlaceholder, realValue, BUSINESS } from "@/lib/business-config"
 import { Printer } from "lucide-react"
 import type { Order } from "@/lib/types"
 
@@ -54,6 +54,18 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
 
     const paymentMethod = order.paymentMethod as PaymentMethodKey
     const paymentLabel = PAYMENT_METHODS[paymentMethod]?.label || order.paymentMethod
+
+    // Only print contact routes the owner has actually configured; a raw
+    // "[TODO: ...]" marker on a customer's invoice looks like a broken shop.
+    const supportPhone = realValue(BUSINESS.phoneDisplay)
+    const supportWhatsApp = realValue(BUSINESS.whatsapp)
+    const supportContactLine = supportPhone && supportWhatsApp
+      ? `For support, call ${supportPhone} or send a WhatsApp message to ${supportWhatsApp}.`
+      : supportPhone
+        ? `For support, call ${supportPhone}.`
+        : supportWhatsApp
+          ? `For support, send a WhatsApp message to ${supportWhatsApp}.`
+          : ''
 
     const html = `
 <!DOCTYPE html>
@@ -258,9 +270,9 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
 
   <div class="footer">
     <p>Thank you for shopping with ${BUSINESS.tradingName}! </p>
-    <p>${BUSINESS.address.full} · ${BUSINESS.phoneDisplay} · ${BUSINESS.emailInvoices}</p>
-    ${BUSINESS.tinNumber.includes('TODO') ? '' : `<p>TIN: ${BUSINESS.tinNumber}</p>`}
-    <p>For support, call ${BUSINESS.phoneDisplay} or send a WhatsApp message to ${BUSINESS.whatsapp}.</p>
+    ${[realValue(BUSINESS.address.full), realValue(BUSINESS.phoneDisplay), realValue(BUSINESS.emailInvoices)].filter(Boolean).join(' · ') ? `<p>${[realValue(BUSINESS.address.full), realValue(BUSINESS.phoneDisplay), realValue(BUSINESS.emailInvoices)].filter(Boolean).join(' · ')}</p>` : ''}
+    ${isPlaceholder(BUSINESS.tinNumber) ? '' : `<p>TIN: ${BUSINESS.tinNumber}</p>`}
+    ${supportContactLine ? `<p>${supportContactLine}</p>` : ''}
   </div>
 
   <div class="no-print" style="text-align: center; margin-top: 24px;">

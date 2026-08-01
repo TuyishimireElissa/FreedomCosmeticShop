@@ -167,6 +167,22 @@ export function getWhatsAppLink(message?: string): string {
   return `https://wa.me/${phone}?text=${text}`
 }
 
+/**
+ * True when a business-config value is still an unfilled owner placeholder.
+ *
+ * The config deliberately refuses to invent contact details, but the raw
+ * marker must never reach a customer's screen. Guard any `BUSINESS.*` string
+ * with this before rendering it.
+ */
+export function isPlaceholder(value: string | null | undefined): boolean {
+  return typeof value === 'string' && value.includes(TODO_MARKER)
+}
+
+/** Return the value only when the owner has actually supplied it. */
+export function realValue(value: string | null | undefined): string | null {
+  return isPlaceholder(value) || !value ? null : value
+}
+
 /** Return true only when the owner has supplied a verified social URL. */
 export function hasSocial(platform: keyof typeof BUSINESS.social): boolean {
   const value = BUSINESS.social[platform]

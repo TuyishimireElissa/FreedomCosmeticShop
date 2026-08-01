@@ -1484,6 +1484,22 @@ export const rw = {
     years_count: 'Imyaka {count}', // verified-rw
   },
   pages: {
+    contact_form_title: 'Twandikire ubutumwa',
+    contact_form_hint: 'Uzuza ifishi maze tuzagusubiza vuba bishoboka.',
+    contact_name: 'Amazina yawe',
+    contact_email: 'Aderesi ya imeyili',
+    contact_phone: 'Nimero ya telefoni (si ngombwa)',
+    contact_message: 'Ubutumwa bwawe',
+    contact_send: 'Ohereza ubutumwa',
+    contact_sending: 'Turimo kohereza...',
+    contact_sent: 'Murakoze! Ubutumwa bwawe bwakiriwe.',
+    contact_error: 'Ubutumwa ntibwashoboye koherezwa. Ongera ugerageze cyangwa ukoreshe WhatsApp.',
+    contact_err_name: 'Andika amazina yawe (nibura inyuguti 2).',
+    contact_err_email: 'Andika aderesi ya imeyili nyayo.',
+    contact_err_phone: 'Andika nimero y\'u Rwanda nyayo, urugero 0788123456.',
+    contact_err_message: 'Andika nibura inyuguti 10.',
+    contact_rate_limited: 'Wohereje ubutumwa bwinshi. Tegereza iminota mike.',
+    contact_details_pending: 'Telefoni na imeyili biracyategurwa. Koresha ifishi cyangwa WhatsApp.',
     last_updated: 'Byaherukaga kuvugururwa: {date}', // verified-rw
     home_no_products: 'Nta bicuruzwa bihari ubu. Subira vuba!', // verified-rw
     home_no_products_cta: 'Reba ibicuruzwa byose', // verified-rw
