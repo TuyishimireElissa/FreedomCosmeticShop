@@ -15,7 +15,7 @@
  * Requires ADMIN role (enforced by /api/admin/products).
  */
 
-import { useEffect, useState, useCallback, type ChangeEvent } from "react"
+import { useEffect, useState, useCallback, type ChangeEvent, type ClipboardEvent } from "react"
 import { Product, Category, Brand } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -68,6 +68,7 @@ import { optimizedImageUrl } from "@/lib/cloudinary-images"
 import { useStore } from '@/store/useStore'
 import { canAdminPermission } from '@/lib/admin-roles'
 import { isWholeNumber, parseProductBrief } from '@/lib/product-brief'
+import { cleanLatexPaste } from '@/lib/latex-paste'
 
 interface AdminProductManagerProps {
   onStatsUpdate?: () => void
@@ -385,6 +386,27 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
     } finally {
       setUploadingPhotos(false)
     }
+  }
+
+  /**
+   * Strips LaTeX/maths markup out of pasted text.
+   *
+   * Briefs copied from ChatGPT or a PDF arrive as "$120\\text{ ml}$"; this
+   * writes "120 ml" instead. Text without markup is left to paste natively so
+   * the browser's own undo stack is preserved.
+   */
+  const handleLatexPaste = (event: ClipboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const raw = event.clipboardData.getData('text/plain')
+    if (!raw) return
+    const cleaned = cleanLatexPaste(raw)
+    if (cleaned === raw) return
+    event.preventDefault()
+    const field = event.currentTarget
+    const start = field.selectionStart ?? field.value.length
+    const end = field.selectionEnd ?? field.value.length
+    field.setRangeText(cleaned, start, end, 'end')
+    // React tracks its own value, so tell it the field changed.
+    field.dispatchEvent(new Event('input', { bubbles: true }))
   }
 
   const handlePhotoUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -957,7 +979,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
             {!form.id && <details className="rounded-xl border border-blue-200 bg-blue-50/40 p-4">
               <summary className="cursor-pointer font-semibold text-blue-950">Paste a product brief from ChatGPT or Gemini</summary>
               <p className="mt-2 text-xs leading-5 text-blue-800">Paste the complete structured brief. Recognized sections are copied into the correct fields. Price ranges are never guessed—you must enter one exact RWF amount.</p>
-              <Textarea value={productBrief} onChange={(event) => setProductBrief(event.target.value)} rows={10} maxLength={15000} className="mt-3 bg-white" placeholder="Product name
+              <Textarea value={productBrief} onChange={(event) => setProductBrief(event.target.value)} onPaste={handleLatexPaste} rows={10} maxLength={15000} className="mt-3 bg-white" placeholder="Product name
 
 Short Description
 ...
@@ -974,6 +996,7 @@ Retail Price (Rwanda)
               <Label htmlFor="p-name">Name *</Label>
               <Input
                 id="p-name"
+                onPaste={handleLatexPaste}
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="e.g. Vitamin C Brightening Serum"
@@ -987,6 +1010,7 @@ Retail Price (Rwanda)
               <Label htmlFor="p-short">Short description (for cards)</Label>
               <Textarea
                 id="p-short"
+                onPaste={handleLatexPaste}
                 value={form.shortDescription}
                 onChange={(e) =>
                   setForm({ ...form, shortDescription: e.target.value })
@@ -1003,6 +1027,7 @@ Retail Price (Rwanda)
               <Label htmlFor="p-desc">Description</Label>
               <Textarea
                 id="p-desc"
+                onPaste={handleLatexPaste}
                 value={form.description}
                 onChange={(e) =>
                   setForm({ ...form, description: e.target.value })
@@ -1063,7 +1088,7 @@ Retail Price (Rwanda)
               </div>
               <div>
                 <Label htmlFor="p-volume">Volume / size</Label>
-                <Input id="p-volume" maxLength={100} value={form.volume} onChange={(e) => setForm({ ...form, volume: e.target.value })} placeholder="50 ml" />
+                <Input id="p-volume" maxLength={100} value={form.volume} onChange={(e) => setForm({ ...form, volume: e.target.value })} placeholder="50 ml" onPaste={handleLatexPaste} />
               </div>
             </div>
             <p className="text-xs leading-5 text-muted-foreground">Enter one exact whole-number RWF amount, for example <strong>7000</strong>. Do not enter “RWF 7,000”, percentages, or ranges such as “5,500–8,500”.</p>
@@ -1075,8 +1100,8 @@ Retail Price (Rwanda)
                 <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <div><Label htmlFor="p-cost">Cost price (RWF)</Label><Input id="p-cost" type="number" min="0" step="1" inputMode="numeric" value={form.costPrice} onChange={(e) => setForm({ ...form, costPrice: e.target.value })} /></div>
                 <div><Label htmlFor="p-threshold">Low-stock threshold</Label><Input id="p-threshold" type="number" min="0" step="1" inputMode="numeric" value={form.lowStockThreshold} onChange={(e) => setForm({ ...form, lowStockThreshold: e.target.value })} /></div>
-                <div><Label htmlFor="p-sku">SKU (auto-generated if blank)</Label><Input id="p-sku" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="FCS-A1B2C3" /></div>
-                <div><Label htmlFor="p-real-sku">Distributor SKU</Label><Input id="p-real-sku" value={form.realSku} onChange={(e) => setForm({ ...form, realSku: e.target.value })} /></div>
+                <div><Label htmlFor="p-sku">SKU (auto-generated if blank)</Label><Input id="p-sku" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="FCS-A1B2C3" onPaste={handleLatexPaste} /></div>
+                <div><Label htmlFor="p-real-sku">Distributor SKU</Label><Input id="p-real-sku" value={form.realSku} onChange={(e) => setForm({ ...form, realSku: e.target.value })} onPaste={handleLatexPaste} /></div>
                 <div><div className="flex items-center justify-between"><Label>Supplier</Label><button type="button" onClick={() => setShowSupplierForm(true)} className="text-xs font-medium text-primary">New supplier</button></div><Select value={form.supplierId} onValueChange={(value) => setForm({ ...form, supplierId: value })}><SelectTrigger><SelectValue placeholder="No supplier" /></SelectTrigger><SelectContent><SelectItem value="none">No supplier</SelectItem>{suppliers.map((supplier) => <SelectItem key={supplier.id} value={supplier.id}>{supplier.name}</SelectItem>)}</SelectContent></Select></div>
                 <div><Label htmlFor="p-batch">Current batch number</Label><Input id="p-batch" value={form.batchNumber} onChange={(e) => setForm({ ...form, batchNumber: e.target.value })} /></div>
                 <div><Label htmlFor="p-manufactured">Manufactured date</Label><Input id="p-manufactured" type="date" value={form.manufacturedDate} onChange={(e) => setForm({ ...form, manufacturedDate: e.target.value })} /></div>
@@ -1192,6 +1217,7 @@ Retail Price (Rwanda)
               <div className="mt-1 flex gap-2">
                 <Input
                   value={form.newShade}
+                  onPaste={handleLatexPaste}
                   maxLength={100}
                   onChange={(e) => setForm({ ...form, newShade: e.target.value })}
                   placeholder="e.g. Deep"
@@ -1243,6 +1269,7 @@ Retail Price (Rwanda)
               <div className="mt-1 flex gap-2">
                 <Input
                   value={form.newIngredient}
+                  onPaste={handleLatexPaste}
                   maxLength={200}
                   onChange={(e) =>
                     setForm({ ...form, newIngredient: e.target.value })
@@ -1297,6 +1324,7 @@ Retail Price (Rwanda)
               <Label htmlFor="p-size">Size</Label>
               <Input
                 id="p-size"
+                onPaste={handleLatexPaste}
                 value={form.size}
                 onChange={(e) => setForm({ ...form, size: e.target.value })}
                 placeholder="e.g. 30ml"
@@ -1307,6 +1335,7 @@ Retail Price (Rwanda)
               <Label htmlFor="p-usage">How to use</Label>
               <Textarea
                 id="p-usage"
+                onPaste={handleLatexPaste}
                 value={form.usageInstructions}
                 onChange={(e) =>
                   setForm({ ...form, usageInstructions: e.target.value })
@@ -1320,6 +1349,7 @@ Retail Price (Rwanda)
               <Label htmlFor="p-warnings">Warnings / cautions</Label>
               <Textarea
                 id="p-warnings"
+                onPaste={handleLatexPaste}
                 value={form.warnings}
                 onChange={(e) => setForm({ ...form, warnings: e.target.value })}
                 rows={5}
