@@ -1,6 +1,30 @@
 # Mission log — brand identity
 
-Date: 2026-08-01 · Base commit: `57e1759` · **Not deployed** (per instruction 7)
+Date: 2026-08-01 · Base commit: `57e1759` · Shipped as `4443fc1`
+
+## Deployment — DONE
+
+Law 7 ("do not deploy") was lifted by a follow-up instruction to push and
+deploy. Executed:
+
+- Pushed `57e1759..4443fc1` to `origin/main` — clean fast-forward, remote was
+  exactly at my base commit, so nothing was overwritten.
+- Vercel auto-deployed `4443fc1` to production. `BUILDING` → **`READY`** in
+  ~2 minutes.
+
+Verified against the live domain, not just the deploy status:
+
+- All **12 brand assets return 200** with correct content types.
+- Every icon `<link>`, the manifest, `theme-color: #B76E79`, and
+  `og:image` + `og:image:width/height` render in the served HTML.
+- The live `og-image.png` was downloaded and visually confirmed to be the real
+  branded banner — social link previews now work.
+- **Zero regressions:** `/`, `/products`, `/about`, `/cart`, `/login`, `/blog`,
+  `/wholesale`, `/contact` all 200; `/api/products`, `/api/categories`,
+  `/sitemap.xml`, `/robots.txt` and the Google verification file all 200;
+  the products API still returns real catalogue data.
+- Googlebot receives both logo variants.
+- The git remote was re-added without writing the token into `.git/config`.
 
 ---
 
