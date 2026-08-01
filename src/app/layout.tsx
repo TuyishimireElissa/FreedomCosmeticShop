@@ -27,6 +27,17 @@ export const metadata: Metadata = {
   authors: [{ name: BUSINESS.name }],
   creator: BUSINESS.name,
   publisher: BUSINESS.name,
+  // Search engines only crawl a site they know exists. Paste the tokens from
+  // Google Search Console and Bing Webmaster Tools into these env vars; the
+  // tags are omitted entirely when the vars are unset.
+  verification: {
+    ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+      ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+      : {}),
+    ...(process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { other: { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION } }
+      : {}),
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

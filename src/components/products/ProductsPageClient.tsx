@@ -52,7 +52,7 @@ function ProductsContent() {
   const user = useStore((state) => state.user)
   const isWholesale = user?.wholesaleStatus === 'APPROVED'
   const { isLowData } = useLowData()
-  const { filters, setFilter, buildApiQuery } = useProductFilters()
+  const { filters, setFilter, buildApiQuery, clearAllFilters, activeFilterCount } = useProductFilters()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
@@ -204,7 +204,7 @@ function ProductsContent() {
           <FilterSidebar availableCategories={categories} availableBrands={brands} className={filtersLoading ? 'animate-pulse opacity-60' : ''} />
           <main className="min-w-0 flex-1">
             <div id="product-results">
-              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} />
+              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} onClearFilters={clearAllFilters} hasActiveFilters={activeFilterCount > 0 || Boolean(filters.search)} />
             </div>
             {error && products.length > 0 && <p role="alert" className="mt-4 text-center text-sm text-red-700">{error}</p>}
             {!error && products.length > 0 && (

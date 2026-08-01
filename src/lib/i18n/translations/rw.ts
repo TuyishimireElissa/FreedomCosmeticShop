@@ -1485,6 +1485,26 @@ export const rw = {
   },
   pages: {
     last_updated: 'Byaherukaga kuvugururwa: {date}', // verified-rw
+    home_no_products: 'Nta bicuruzwa bihari ubu. Subira vuba!', // verified-rw
+    home_no_products_cta: 'Reba ibicuruzwa byose', // verified-rw
+    about_eyebrow: 'Inkuru yacu', // verified-rw
+    about_title: 'Abo turi bo muri FreedomCosmeticShop', // verified-rw
+    about_intro: '{business} ni iduka ry’u Rwanda rigurisha ibicuruzwa by’ubwiza by’umwimerere 100%: kwita ku ruhu, kwisiga, kwita ku musatsi n’imibavu, bikagezwa mu turere twose 30 tw’{country}.', // verified-rw
+    about_who_we_are: 'Abo turi bo', // verified-rw
+    about_who_we_are_text: 'Turi iduka ry’ubwiza rikorera i Kigali rigafasha abakiriya mu Rwanda hose. Buri gicuruzwa dushyira ku rubuga kiva ku bacuruzi bemewe, bityo icyo watumije ni cyo uhabwa.', // verified-rw
+    about_authenticity: 'Impamvu umwimerere ari ingenzi', // verified-rw
+    about_authenticity_text: 'Ibicuruzwa by’ubwiza by’impimbano birahari cyane muri aka karere kandi bishobora kwangiza uruhu. Tugura mu nzira zizewe kandi tubika inyandiko z’amabati y’ibicuruzwa dugurisha.', // verified-rw
+    about_what_we_sell: 'Ibyo tugurisha', // verified-rw
+    about_sell_skincare: 'Ibyo kwita ku ruhu bya buri bwoko bw’uruhu, harimo n’ibikorewe uruhu rwirabura', // verified-rw
+    about_sell_makeup: 'Ibikoresho byo kwisiga bifite amabara yahitiwemo abakiriya b’u Rwanda', // verified-rw
+    about_sell_haircare: 'Ibyo kwita ku musatsi: usanzwe, wagoritswe cyangwa uvuwe', // verified-rw
+    about_sell_fragrance: 'Imibavu n’ibyo kwita ku mubiri byo gukoresha buri munsi no gutanga impano', // verified-rw
+    about_delivery: 'Kubigeza mu Rwanda hose', // verified-rw
+    about_delivery_text: 'Tugeza ibicuruzwa mu turere twose 30. Muri Kigali bishobora kugera ku munsi umwe, mu ntara bikagera mu minsi mike y’akazi. Ikiguzi n’igihe biri ku ipaji yo kubigeza.', // verified-rw
+    about_wholesale: 'Kurangura', // verified-rw
+    about_wholesale_text: 'Aba salon, amaduka n’abacuruza bashobora gusaba konti yo kurangura kugira ngo babone ibiciro bya buri gicuruzwa. Ibyo barangura bikorwa hamwe n’itsinda ryacu kuri WhatsApp.', // verified-rw
+    about_contact_us: 'Tuvugishe', // verified-rw
+    about_contact_us_text: 'Ibibazo ku gicuruzwa, ku byo watumije cyangwa ku gusubiza bisubizwa kuri WhatsApp no ku ipaji yo kutwandikira.', // verified-rw
     questions_contact: 'Ufite ikibazo? Vugana na {business} ukoresheje uburyo bwa WhatsApp bwashyizweho bwo gufasha abakiriya.', // verified-rw
     back_to_store: 'Subira mu iduka', // verified-rw
     acceptable_use: 'Imikoreshereze yemewe', // verified-rw

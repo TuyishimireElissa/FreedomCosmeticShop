@@ -19,10 +19,10 @@ describe('dynamic sitemap and robots policy', () => {
   })
 
   it('includes only real static public routes and omits private flows', () => {
-    for (const route of ['/products', '/bundles', '/wholesale', '/quiz', '/shipping', '/returns', '/contact', '/faq', '/support/whatsapp', '/privacy', '/terms']) {
+    for (const route of ['/products', '/bundles', '/wholesale', '/quiz', '/about', '/shipping', '/returns', '/contact', '/faq', '/support/whatsapp', '/privacy', '/terms']) {
       expect(sitemapSource).toContain(`\${baseUrl}${route}`)
     }
-    for (const route of ['/about', '/blog`', '/account', '/cart', '/checkout', '/admin']) {
+    for (const route of ['/blog`', '/account', '/cart', '/checkout', '/admin']) {
       expect(sitemapSource).not.toContain(`\${baseUrl}${route}`)
     }
   })
