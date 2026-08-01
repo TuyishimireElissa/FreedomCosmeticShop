@@ -9,6 +9,36 @@
 export const OWNER_TODO = '[TODO: OWNER_MUST_ADD_THIS_BEFORE_LAUNCH]' as const
 const TODO_MARKER = 'TODO: OWNER_MUST_ADD_THIS_BEFORE_LAUNCH'
 
+/**
+ * Owner-confirmed WhatsApp ordering numbers, in the order customers see them.
+ *
+ * These are real, verified numbers, so they live in code rather than behind an
+ * owner TODO. An env var may still override a slot (useful for rotating a line
+ * without a deploy), but only when it parses as a genuine Rwandan mobile
+ * number — otherwise a stale or placeholder value would silently publish a
+ * dead ordering line, which is exactly what `+250780000000` did in production.
+ */
+function resolveWhatsApp(candidate: string | undefined, confirmed: string): string {
+  const digits = (candidate || '').replace(/\D/g, '')
+  if (!/^2507[2389]\d{7}$/.test(digits)) return confirmed
+  // Reject obvious filler (e.g. +250780000000) rather than publishing it.
+  if (/^2507\d0{6,}$/.test(digits)) return confirmed
+  return `+${digits}`
+}
+
+export const WHATSAPP_ORDERING_NUMBERS: readonly string[] = [
+  resolveWhatsApp(process.env.NEXT_PUBLIC_WHATSAPP, '+250790215965'),
+  resolveWhatsApp(process.env.NEXT_PUBLIC_WHATSAPP_ALT, '+250785361796'),
+]
+
+/** `+250790215965` → `+250 790 215 965`, for display only. */
+export function formatWhatsAppDisplay(value: string): string {
+  const digits = value.replace(/\D/g, '')
+  if (!/^250\d{9}$/.test(digits)) return value
+  return `+${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6, 9)} ${digits.slice(9)}`
+}
+
+
 export const BUSINESS = {
   // ═══════════════════════════════════
   // BUSINESS IDENTITY
@@ -29,8 +59,10 @@ export const BUSINESS = {
   // ═══════════════════════════════════
   phone: OWNER_TODO,
   phoneDisplay: OWNER_TODO,
-  // Configured at deployment time; no source-code contact is assumed to be real.
-  whatsapp: process.env.NEXT_PUBLIC_WHATSAPP || OWNER_TODO,
+  // Primary ordering line. Every existing single-number call site keeps
+  // working; the full list lives in WHATSAPP_ORDERING_NUMBERS above.
+  whatsapp: WHATSAPP_ORDERING_NUMBERS[0]!,
+  whatsappAlt: WHATSAPP_ORDERING_NUMBERS[1]!,
   whatsappMessage: 'Hello FreedomCosmeticShop! I need help with my order.',
   email: OWNER_TODO,
   emailSupport: OWNER_TODO,
@@ -158,11 +190,12 @@ export const BUSINESS = {
 } as const
 
 /** Build the website WhatsApp URL without exposing an unconfigured placeholder. */
-export function getWhatsAppLink(message?: string): string {
-  if (BUSINESS.whatsapp.includes(TODO_MARKER)) {
+export function getWhatsAppLink(message?: string, number?: string): string {
+  const target = number || BUSINESS.whatsapp
+  if (target.includes(TODO_MARKER)) {
     return '#owner-must-add-whatsapp-before-launch'
   }
-  const phone = BUSINESS.whatsapp.replace(/\D/g, '')
+  const phone = target.replace(/\D/g, '')
   const text = encodeURIComponent(message || BUSINESS.whatsappMessage)
   return `https://wa.me/${phone}?text=${text}`
 }

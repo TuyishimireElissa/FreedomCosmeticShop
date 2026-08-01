@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, type FormEvent } from 'react'
 import { CheckCircle2, Loader2, Mail, MapPin, MessageCircle, Phone, Send } from 'lucide-react'
-import { BUSINESS, getWhatsAppLink, isPlaceholder, realValue } from '@/lib/business-config'
+import { BUSINESS, WHATSAPP_ORDERING_NUMBERS, formatWhatsAppDisplay, getWhatsAppLink, isPlaceholder, realValue } from '@/lib/business-config'
 import { useT } from '@/lib/i18n/LanguageContext'
 
 type FieldErrors = Partial<Record<'name' | 'email' | 'phone' | 'message', string>>
@@ -19,12 +19,13 @@ export default function ContactPageClient() {
   // The business config deliberately ships owner placeholders rather than
   // inventing contact details. Never render an unfilled one to a customer.
   const channels = [
-    {
+    ...WHATSAPP_ORDERING_NUMBERS.map((number, index) => ({
       icon: MessageCircle,
-      title: 'WhatsApp',
-      value: realValue(BUSINESS.whatsapp),
-      href: isPlaceholder(BUSINESS.whatsapp) ? undefined : getWhatsAppLink(),
-    },
+      // Both lines take orders; number them so customers know either works.
+      title: index === 0 ? 'WhatsApp' : `WhatsApp ${index + 1}`,
+      value: realValue(number) && formatWhatsAppDisplay(number),
+      href: isPlaceholder(number) ? undefined : getWhatsAppLink(undefined, number),
+    })),
     {
       icon: Phone,
       title: t('pages.call_us'),

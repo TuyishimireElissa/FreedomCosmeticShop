@@ -14,8 +14,13 @@ const en = readFileSync(resolve(process.cwd(), 'src/lib/i18n/translations/en.ts'
 const rw = readFileSync(resolve(process.cwd(), 'src/lib/i18n/translations/rw.ts'), 'utf8')
 
 describe('honest WhatsApp assisted-selling messages', () => {
-  it('fails closed without a deployment-configured number and invents no staff or hours', () => {
-    expect(WA_CONFIG.number).toBeNull()
+  it('uses the owner-confirmed ordering number and still invents no staff or hours', () => {
+    // The two ordering lines are owner-confirmed, so the number resolves.
+    expect(WA_CONFIG.number).toBe('250790215965')
+    expect(WA_CONFIG.isNumberConfigured).toBe(true)
+
+    // Everything the owner has NOT confirmed must still fail closed: a real
+    // number is no licence to invent an agent name or support hours.
     expect(WA_CONFIG.agentName).toBeNull()
     expect(WA_CONFIG.responseHours.weekdays).toBeNull()
     expect(WA_CONFIG.responseHours.responseTime).toBeNull()
@@ -47,8 +52,11 @@ describe('honest WhatsApp assisted-selling messages', () => {
     expect(() => buildCartOrderMessage({ ...base, totalRWF: 11000 })).toThrow('total does not match')
   })
 
-  it('refuses unconfigured URLs and keeps quick replies accurate when hours are missing', () => {
-    expect(() => buildWhatsAppUrl('Muraho!')).toThrow('Verified WhatsApp number is not configured')
+  it('builds a real deep link and keeps quick replies accurate when hours are missing', () => {
+    const url = buildWhatsAppUrl('Muraho!')
+    expect(url).toContain('250790215965')
+    expect(url).toContain('Muraho')
+    // Hours are still unpublished, so the copy must not imply availability.
     expect(QUICK_REPLIES.hours.en).toContain('have not yet been published')
     expect(QUICK_REPLIES.authenticity.en).toContain('only when verification is recorded')
     expect(QUICK_REPLIES.payment.en).toContain('PIN only on your own phone')

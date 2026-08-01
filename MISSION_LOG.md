@@ -267,3 +267,54 @@ reach you** — only WhatsApp:
 
 These live in `src/lib/business-config.ts`. Filling them in makes the hidden
 cards reappear automatically — no code change needed.
+
+---
+
+## WhatsApp ordering numbers (owner-supplied)
+
+Added the two real ordering lines:
+
+- **+250 790 215 965** (primary)
+- **+250 785 361 796** (second line)
+
+### A dead ordering line was live in production
+
+Before touching the code I checked what production was actually serving.
+`NEXT_PUBLIC_WHATSAPP` in Vercel was set to **`+250780000000`** — a placeholder.
+It passed the app's `^2507[2389]\d{7}$` validation, so every guard treated it as
+genuine and every "Order on WhatsApp" button opened a chat with a number nobody
+owns. Because the env var overrides the config file, hardcoding the real number
+alone would **not** have fixed it.
+
+### Changes
+
+- `WHATSAPP_ORDERING_NUMBERS` in `business-config.ts` holds both owner-confirmed
+  numbers. They are real, so they live in code rather than behind an owner TODO.
+- An env var can still override a slot (handy for rotating a line without a
+  deploy) but only when it parses as a real Rwandan mobile number **and** is not
+  obvious filler — `resolveWhatsApp()` rejects trailing-zero runs like
+  `+250780000000` and falls back to the confirmed number.
+- `BUSINESS.whatsapp` now resolves to the primary line, so all ~20 existing
+  call sites (floating button, cart, checkout, wholesale, invoices, support
+  page) keep working unchanged. `BUSINESS.whatsappAlt` exposes the second.
+- `getWhatsAppLink(message, number)` gained an optional second argument;
+  the existing one-argument signature is untouched.
+- The contact page lists **both** lines, formatted `+250 790 215 965`, each with
+  its own `wa.me` deep link.
+- Fixed the Vercel env vars themselves: `NEXT_PUBLIC_WHATSAPP` →
+  `+250790215965`, and added `NEXT_PUBLIC_WHATSAPP_ALT` → `+250785361796`.
+
+### Two existing tests updated, deliberately
+
+`whatsapp-service.test.ts` asserted `WA_CONFIG.number` was **null** and that
+`buildWhatsAppUrl()` **threw** — they encoded "no number is configured" as the
+expected state. That premise is now obsolete. Rather than delete them I kept
+what still matters: the number resolves and builds a real deep link, while
+`agentName` and support hours **still fail closed**, because a real phone number
+is no licence to invent staff names or opening hours the owner never confirmed.
+
+Verified: both numbers render with working links; `250780000000` appears **zero**
+times across `/`, `/contact`, `/support/whatsapp`, `/wholesale` and `/cart`;
+a legitimate env override still wins, and the fake one is still rejected.
+
+Gates: tsc clean, lint clean, **701 tests passing** (was 694), build 65/65.
