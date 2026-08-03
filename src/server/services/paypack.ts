@@ -83,7 +83,15 @@ export interface PaypackWebhookEvent {
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const PAYPACK_BASE_URL = "https://api.paypack.co.rw/api"
+// Verified against https://docs.paypack.rw/quickstart/api-reference — the host
+// is payments.paypack.rw. The previous value (api.paypack.co.rw) does not
+// resolve in DNS, so every call failed before it left the server.
+const PAYPACK_BASE_URL = "https://payments.paypack.rw/api"
+// PayPack routes webhooks by mode: a transaction sent in one mode is never
+// delivered to a webhook registered in the other. Must match the Mode field on
+// the webhook in the PayPack dashboard.
+// https://docs.paypack.rw/quickstart/webhooks#troubleshooting
+const PAYPACK_WEBHOOK_MODE = env.PAYPACK_ENVIRONMENT === "production" ? "production" : "development"
 const TOKEN_TTL_MS = 50 * 60 * 1000 // 50 minutes (PayPack tokens last 1 hour — refresh early)
 const MAX_RETRIES = 3
 const RETRY_DELAYS = [1000, 2000, 4000] // Exponential backoff
@@ -103,6 +111,25 @@ export class PaypackError extends Error {
     this.code = code
     this.statusCode = statusCode
   }
+}
+
+// ─── Status helpers ──────────────────────────────────────────────────────────
+
+/**
+ * PayPack reports terminal states as "successful" / "failed" in webhooks and
+ * transaction records, while the cashin response returns "pending". Both the
+ * short and long spellings are accepted so a wording change on their side
+ * cannot silently mark a paid order unpaid.
+ * https://docs.paypack.rw/quickstart/webhooks#webhook-events
+ */
+export function isPaypackSuccess(status: string | undefined): boolean {
+  const value = (status || "").toLowerCase()
+  return value === "successful" || value === "success"
+}
+
+export function isPaypackFailure(status: string | undefined): boolean {
+  const value = (status || "").toLowerCase()
+  return value === "failed" || value === "failure"
 }
 
 // ─── Phone validation ────────────────────────────────────────────────────────
@@ -197,9 +224,11 @@ export async function getPaypackToken(): Promise<string> {
   }
 
   return withRetry(async () => {
-    const res = await fetch(`${PAYPACK_BASE_URL}/auth/clients/credentials`, {
+    // https://docs.paypack.rw/quickstart/authentication — the documented path
+    // is /auth/agents/authorize. /auth/clients/credentials returns 404.
+    const res = await fetch(`${PAYPACK_BASE_URL}/auth/agents/authorize`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({
         client_id: env.PAYPACK_CLIENT_ID,
         client_secret: env.PAYPACK_CLIENT_SECRET,
@@ -270,11 +299,17 @@ export async function cashin(params: PaypackCashinParams): Promise<PaypackPaymen
   return withRetry(async () => {
     const token = await getPaypackToken()
 
-    const res = await fetch(`${PAYPACK_BASE_URL}/transactions/cash`, {
+    // https://docs.paypack.rw/quickstart/api-reference — the path is
+    // /transactions/cashin ("/transactions/cash" 404s).
+    const res = await fetch(`${PAYPACK_BASE_URL}/transactions/cashin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
         Authorization: `Bearer ${token}`,
+        "X-Webhook-Mode": PAYPACK_WEBHOOK_MODE,
+        // Guards against a retry double-charging the customer.
+        "Idempotency-Key": params.reference.slice(0, 32),
       },
       body: JSON.stringify({
         amount: params.amount,
@@ -293,9 +328,12 @@ export async function cashin(params: PaypackCashinParams): Promise<PaypackPaymen
 
     return {
       success: true,
-      transactionId: data.id,
+      // The documented cashin response carries `ref` only — there is no `id`
+      // field. Falling back to `ref` keeps providerTransactionId populated so
+      // the webhook can still match this payment.
+      transactionId: data.id || data.ref,
       reference: data.ref || params.reference,
-      status: data.status === "success" ? "success" : data.status === "failed" ? "failed" : "pending",
+      status: isPaypackSuccess(data.status) ? "success" : isPaypackFailure(data.status) ? "failed" : "pending",
       message: "Payment prompt sent to customer's phone. Awaiting approval.",
       simulated: false,
     }
@@ -338,7 +376,9 @@ export async function cashout(params: PaypackCashoutParams): Promise<PaypackPaym
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Accept: "application/json",
         Authorization: `Bearer ${token}`,
+        "X-Webhook-Mode": PAYPACK_WEBHOOK_MODE,
       },
       body: JSON.stringify({
         amount: params.amount,
@@ -360,9 +400,9 @@ export async function cashout(params: PaypackCashoutParams): Promise<PaypackPaym
 
     return {
       success: true,
-      transactionId: data.id,
+      transactionId: data.id || data.ref,
       reference: data.ref || params.reference,
-      status: data.status === "success" ? "success" : "pending",
+      status: isPaypackSuccess(data.status) ? "success" : "pending",
       message: "Refund sent to customer's phone.",
       simulated: false,
     }
@@ -436,23 +476,81 @@ export function verifyWebhookEvent(body: string, signature?: string): PaypackWeb
     console.error('[PayPack Webhook] Signing secret or signature missing')
     return null
   }
-  const supplied = signature.trim().replace(/^sha256=/i, '').toLowerCase()
-  const expected = createHmac('sha256', secret).update(body, 'utf8').digest('hex')
-  if (!/^[a-f0-9]{64}$/.test(supplied)) return null
-  const suppliedBuffer = Buffer.from(supplied, 'hex')
-  const expectedBuffer = Buffer.from(expected, 'hex')
+  // PayPack sends a base64 HMAC-SHA256 of the raw body, not hex.
+  // https://docs.paypack.rw/quickstart/webhooks#signature-verification
+  const supplied = signature.trim().replace(/^sha256=/i, '')
+  const expected = createHmac('sha256', secret).update(body, 'utf8').digest('base64')
+  let suppliedBuffer: Buffer
+  try {
+    suppliedBuffer = Buffer.from(supplied, 'base64')
+  } catch {
+    return null
+  }
+  const expectedBuffer = Buffer.from(expected, 'base64')
   if (suppliedBuffer.length !== expectedBuffer.length || !timingSafeEqual(suppliedBuffer, expectedBuffer)) return null
   try {
-    const event = JSON.parse(body) as PaypackWebhookEvent
-    if (!event.id || !event.ref || !['success', 'failed'].includes(event.status) || !Number.isFinite(event.amount) || event.amount <= 0 || typeof (event.phone || event.number) !== 'string') {
-      console.error('[PayPack Webhook] Invalid event structure')
-      return null
-    }
-    return event
+    const parsed = JSON.parse(body) as unknown
+    return normalizeWebhookEvent(parsed)
   } catch {
     console.error('[PayPack Webhook] Failed to parse body')
     return null
   }
+}
+
+/**
+ * Flatten PayPack's `transaction:processed` envelope into the shape the rest of
+ * this codebase already consumes.
+ *
+ * PayPack sends the transaction nested under `data`, with no top-level id and
+ * the customer number in `client`:
+ *   { event_id, kind: "transaction:processed", data: { ref, amount, status,
+ *     client, provider, ... } }
+ * https://docs.paypack.rw/quickstart/webhooks#webhook-events
+ *
+ * A flat legacy payload is still accepted so existing callers and any older
+ * queued deliveries keep working.
+ */
+export function normalizeWebhookEvent(parsed: unknown): PaypackWebhookEvent | null {
+  if (!parsed || typeof parsed !== 'object') return null
+  const envelope = parsed as Record<string, unknown>
+  const nested = envelope.data
+  const source = (nested && typeof nested === 'object' ? nested : envelope) as Record<string, unknown>
+
+  const ref = typeof source.ref === 'string' ? source.ref : ''
+  // No id is issued for a cashin, so fall back to ref — that is what was stored
+  // as providerTransactionId when the payment was initiated.
+  const id = typeof source.id === 'string' && source.id
+    ? source.id
+    : typeof envelope.event_id === 'string' && !nested
+      ? envelope.event_id
+      : ref
+  const rawStatus = typeof source.status === 'string' ? source.status : ''
+  const amount = typeof source.amount === 'number' ? source.amount : Number(source.amount)
+  const phone = typeof source.client === 'string'
+    ? source.client
+    : typeof source.phone === 'string'
+      ? source.phone
+      : typeof source.number === 'string'
+        ? source.number
+        : undefined
+  const network = typeof source.provider === 'string'
+    ? source.provider.toUpperCase()
+    : typeof source.network === 'string'
+      ? source.network
+      : ''
+
+  const status: PaypackWebhookEvent['status'] | null = isPaypackSuccess(rawStatus)
+    ? 'success'
+    : isPaypackFailure(rawStatus)
+      ? 'failed'
+      : null
+
+  if (!id || !ref || !status || !Number.isFinite(amount) || amount <= 0 || typeof phone !== 'string') {
+    console.error('[PayPack Webhook] Invalid event structure')
+    return null
+  }
+
+  return { id, ref, status, amount, phone, number: phone, network }
 }
 
 // ─── Health check ────────────────────────────────────────────────────────────

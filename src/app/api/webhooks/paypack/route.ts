@@ -105,3 +105,20 @@ export async function GET() {
     timestamp: new Date().toISOString(),
   })
 }
+
+/**
+ * HEAD /api/webhooks/paypack
+ *
+ * PayPack pings the webhook URL with HEAD before delivering a payload and
+ * withholds the event entirely if that ping fails:
+ *
+ *   "before we send the webhook payload to your webhook URL, we first ping
+ *    your webhook URL with HEAD to make sure that it is accessible... If the
+ *    ping fails, we will not send the webhook payload"
+ *   https://docs.paypack.rw/quickstart/webhooks#webhook-events
+ *
+ * Must stay unauthenticated and body-less — the ping carries no signature.
+ */
+export async function HEAD() {
+  return new Response(null, { status: 200 })
+}

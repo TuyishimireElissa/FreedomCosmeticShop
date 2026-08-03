@@ -13,7 +13,10 @@ const env = read('src/lib/env.ts')
 describe('durable payment webhook security', () => {
   it('requires timing-safe PayPack HMAC verification and fails closed', () => {
     expect(env).toContain('PAYPACK_WEBHOOK_SECRET: z.string().optional()')
-    expect(paypackService).toContain("createHmac('sha256', secret).update(body, 'utf8').digest('hex')")
+    // PayPack base64-encodes the HMAC digest. This assertion previously pinned
+    // 'hex', which locked in a defect that rejected every genuine webhook.
+    // https://docs.paypack.rw/quickstart/webhooks#signature-verification
+    expect(paypackService).toContain("createHmac('sha256', secret).update(body, 'utf8').digest('base64')")
     expect(paypackService).toContain('timingSafeEqual(suppliedBuffer, expectedBuffer)')
     expect(paypackService).toContain('if (!secret || !signature)')
     expect(paypackService).not.toContain('In production, verify the signature here')
