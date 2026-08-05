@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, Heart, Minus, Plus, RefreshCw, ShieldCheck, ShoppingBag, Star } from 'lucide-react'
 import type { Product } from '@/lib/types'
@@ -28,6 +28,11 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const { toast } = useToast()
   const { trackProductView } = useAnalytics()
   const [data, setData] = useState<ProductResponse | null>(null)
+  // Drives the mobile sticky buy bar: it appears only once the real
+  // add-to-cart button has scrolled out of view, so there is never a moment
+  // where two identical buttons are on screen at once.
+  const addToCartRef = useRef<HTMLDivElement | null>(null)
+  const [showStickyBuy, setShowStickyBuy] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [request, setRequest] = useState(0)
@@ -57,6 +62,18 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   useEffect(() => {
     if (user?.wholesaleStatus === 'APPROVED' && data?.product && quantity === 1) setQuantity(Math.min(12, Math.max(1, data.product.stock)))
   }, [data?.product, quantity, user?.wholesaleStatus])
+
+  // Must sit above the early returns so hook order stays stable across renders.
+  const observeAddToCart = useCallback((node: HTMLDivElement | null) => {
+    addToCartRef.current = node
+    if (!node || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyBuy(Boolean(entry && !entry.isIntersecting)),
+      { rootMargin: '0px 0px -40px 0px' },
+    )
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
 
   if (loading) return <DetailSkeleton />
   if (error || !data) return <div className="mx-auto grid min-h-[60vh] max-w-3xl place-items-center px-4 py-16 text-center"><div><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-rose-50 text-[#B76E79]"><ShoppingBag className="h-7 w-7" /></div><h1 className="mt-5 text-2xl font-bold text-[#1a1a1a]">{error || t('product.product_not_found')}</h1><p className="mt-2 text-sm text-gray-500">{t('product.unavailable_hint')}</p><div className="mt-6 flex justify-center gap-3"><button type="button" onClick={() => router.push('/products')} className="rounded-full bg-[#1a1a1a] px-5 py-2.5 text-sm font-bold text-white">{t('product.browse_products')}</button><button type="button" onClick={() => setRequest((value) => value + 1)} className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-5 py-2.5 text-sm font-bold"><RefreshCw className="h-4 w-4" />{t('common.retry')}</button></div></div></div>
@@ -95,7 +112,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
             {product.shades && product.shades.length > 0 && <div className="mt-6"><p className="text-xs font-bold uppercase tracking-wider text-gray-500">{t('product.select_shade')} <span className="ml-1 normal-case text-[#B76E79]">{shade}</span></p><div className="mt-2 flex flex-wrap gap-2">{product.shades.map((value) => <button key={value} type="button" onClick={() => setShade(value)} className={`rounded-xl border-2 px-3 py-2 text-sm font-bold ${shade === value ? 'border-[#B76E79] bg-rose-50 text-[#B76E79]' : 'border-gray-200 text-gray-600'}`}>{value}</button>)}</div></div>}
 
-            <div className="mt-7 flex flex-wrap gap-3"><div className="flex h-12 items-center overflow-hidden rounded-xl border border-gray-200"><IconButton label={t('product.decrease_quantity')} icon={<Minus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1} variant="ghost" className="h-full rounded-none" /><span className="grid h-full min-w-11 place-items-center border-x border-gray-200 text-sm font-bold">{quantity}</span><IconButton label={t('product.increase_quantity')} icon={<Plus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.min(product.stock, value + 1))} disabled={quantity >= product.stock} variant="ghost" className="h-full rounded-none" /></div><button type="button" onClick={add} disabled={outOfStock} className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 text-sm font-bold text-white hover:bg-[#9B5A64] disabled:bg-gray-300"><ShoppingBag className="h-5 w-5" />{outOfStock ? t('common.sold_out') : `${t('product.add_to_cart')} · ${formatRWF(displayPrice * quantity)}`}</button><IconButton label={wishlisted ? t('product.remove_from_wishlist') : t('product.add_to_wishlist')} icon={<Heart className={`h-5 w-5 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} />} aria-pressed={wishlisted} onClick={() => setWishlisted((value) => !value)} size="lg" className="rounded-xl border border-gray-200" /></div>
+            <div ref={observeAddToCart} className="mt-7 flex flex-wrap gap-3"><div className="flex h-12 items-center overflow-hidden rounded-xl border border-gray-200"><IconButton label={t('product.decrease_quantity')} icon={<Minus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1} variant="ghost" className="h-full rounded-none" /><span className="grid h-full min-w-11 place-items-center border-x border-gray-200 text-sm font-bold">{quantity}</span><IconButton label={t('product.increase_quantity')} icon={<Plus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.min(product.stock, value + 1))} disabled={quantity >= product.stock} variant="ghost" className="h-full rounded-none" /></div><button type="button" onClick={add} disabled={outOfStock} className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 text-sm font-bold text-white hover:bg-[#9B5A64] disabled:bg-gray-300"><ShoppingBag className="h-5 w-5" />{outOfStock ? t('common.sold_out') : `${t('product.add_to_cart')} · ${formatRWF(displayPrice * quantity)}`}</button><IconButton label={wishlisted ? t('product.remove_from_wishlist') : t('product.add_to_wishlist')} icon={<Heart className={`h-5 w-5 ${wishlisted ? 'fill-red-500 text-red-500' : 'text-gray-500'}`} />} aria-pressed={wishlisted} onClick={() => setWishlisted((value) => !value)} size="lg" className="rounded-xl border border-gray-200" /></div>
 
             {isWholesale && user?.assignedManagerName && <div className="mt-4 rounded-xl border bg-gray-50 p-3 text-sm"><p className="font-semibold">Your account manager: {user.assignedManagerName}</p><div className="mt-2 flex gap-3">{user.assignedManagerWhatsApp && <a className="font-semibold text-emerald-700" href={`https://wa.me/${user.assignedManagerWhatsApp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>}{user.assignedManagerPhone && <a className="font-semibold text-[#B76E79]" href={`tel:${user.assignedManagerPhone}`}>Call</a>}</div></div>}
             {!isWholesale && <><div className="my-4 flex items-center gap-3"><span className="h-px flex-1 bg-gray-100" /><span className="text-xs text-gray-400">{t('common.or')}</span><span className="h-px flex-1 bg-gray-100" /></div><OrderViaWhatsApp product={{ id: product.id, name: product.name, slug: product.slug, price: product.price, stock: product.stock }} selectedShade={shade || undefined} selectedSize={product.volume || product.size || undefined} quantity={quantity} variant="compact" className="w-full" /></>}
@@ -107,6 +124,34 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         <div id="product-details"><ProductTabs product={product} /></div>
 
         <section className="mt-14 sm:mt-16"><div className="mb-6"><span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#B76E79]">{t('product.complete_routine')}</span><h2 className="mt-2 text-2xl font-bold text-[#1a1a1a] sm:text-3xl">{t('product.related')}</h2></div><ProductGrid products={related || []} /></section>
+      </div>
+
+      {/* Mobile sticky buy bar. At 360px the real add-to-cart button sits
+          550-700px down the page, behind a full-screen image gallery, so a
+          first-time shopper never sees it. Hidden from md: up, where the
+          two-column layout already keeps the button in view. Sits above the
+          64px BottomNav and respects the iOS safe area. */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur-md transition-transform duration-300 ease-out motion-reduce:transition-none md:hidden ${showStickyBuy ? 'translate-y-0' : 'translate-y-full'}`}
+        style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
+        aria-hidden={!showStickyBuy}
+      >
+        <div className="flex items-center gap-3 px-4 py-2.5">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-semibold leading-tight text-gray-900">{product.name}</p>
+            <p className="text-base font-extrabold leading-tight text-[#B76E79]">{formatRWF(displayPrice * quantity)}</p>
+          </div>
+          <button
+            type="button"
+            onClick={add}
+            disabled={outOfStock}
+            tabIndex={showStickyBuy ? 0 : -1}
+            className="flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-6 text-sm font-bold text-white active:scale-[0.98] disabled:bg-gray-300"
+          >
+            <ShoppingBag className="h-5 w-5" aria-hidden="true" />
+            {outOfStock ? t('common.sold_out') : t('product.add_to_cart')}
+          </button>
+        </div>
       </div>
     </div>
   )

@@ -27,7 +27,9 @@ describe('premium shared product card redesign', () => {
       'rounded-2xl',
       'hover:-translate-y-1',
       'hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)]',
-      'line-clamp-2 min-h-10',
+      // min-h-11, not min-h-10: two lines of the 15px name need 41.2px
+      // (15 x 1.375 x 2), so a 40px reserve clipped the second line.
+      'line-clamp-2 min-h-11',
       'text-base font-extrabold',
       'product.reviewsCount > 0',
       '[1, 2, 3, 4, 5].map',

@@ -172,7 +172,9 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
       <div className="flex flex-1 flex-col p-3 md:p-4">
         <p className="mb-1 truncate text-[11px] font-medium uppercase tracking-widest text-gray-400">{product.brand?.name || product.category?.name || ''}</p>
         <Link href={`/products/${product.slug}`} prefetch={true} className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-          <h2 className="mb-1.5 line-clamp-2 min-h-10 text-[13px] font-semibold leading-tight text-gray-900 transition-colors duration-200 group-hover:text-[#B76E79] md:text-sm">{product.name}</h2>
+          {/* 15px minimum: 13px was unreadable for low-literacy shoppers on a
+              small Android screen, which is most of this catalogue's traffic. */}
+          <h2 className="mb-1.5 line-clamp-2 min-h-11 text-[15px] font-semibold leading-snug text-gray-900 transition-colors duration-200 group-hover:text-[#B76E79] md:text-sm">{product.name}</h2>
         </Link>
 
         {product.reviewsCount > 0 && (

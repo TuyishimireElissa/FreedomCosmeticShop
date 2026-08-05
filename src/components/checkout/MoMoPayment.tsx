@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertCircle, Check, Edit2, Lock, Smartphone } from 'lucide-react'
+import { AlertCircle, Check, Edit2, Info, Lock, Smartphone } from 'lucide-react'
 import MoMoWaiting from '@/components/checkout/MoMoWaiting'
 import { BUSINESS } from '@/lib/business-config'
 import { formatRwandaPhone, isAirtelNumber, isMTNNumber, normalizeRwandaPhone } from '@/lib/rwanda-locations'
@@ -32,6 +32,19 @@ export default function MoMoPayment({ network, phone, onPhoneChange, status = 'i
       <p className="text-xs text-gray-500">{mtn ? t('checkout.mtn_prefix_hint') : t('checkout.airtel_prefix_hint')}</p>
       {phone.trim().length > 5 && !valid && <p className="rounded-xl bg-red-50 p-3 text-xs font-bold text-red-700">{t('checkout.invalid_network_phone', { network })}</p>}
       {valid && <div className="rounded-2xl border bg-white p-4"><div className="flex items-center justify-between gap-3"><span className="text-sm text-gray-500">{t('checkout.amount_to_approve')}</span><strong className="text-xl text-[#B76E79]">{total}</strong></div><div className="mt-3 flex items-center justify-between gap-3"><span className="text-sm text-gray-500">{t('checkout.charging_phone')}</span><span className="flex items-center gap-2"><strong className="text-sm">{normalizeRwandaPhone(phone)}</strong><button type="button" onClick={() => onPhoneChange('+250 ')} aria-label={t('checkout.change_phone')} className="grid h-11 w-11 place-items-center rounded-full text-[#B76E79]"><Edit2 className="h-4 w-4" /></button></span></div><div className="mt-2 flex justify-between gap-3 text-sm"><span className="text-gray-500">{t('checkout.merchant')}</span><strong>{BUSINESS.name}</strong></div></div>}
+      {/* First-time buyers do not know a USSD prompt will take over their
+          screen. Telling them beforehand is the difference between approving
+          the payment and panicking out of it. */}
+      <ol className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-sky-900">
+        <li className="mb-2 flex items-center gap-2 text-sm font-black"><Info className="h-4 w-4 shrink-0" aria-hidden="true" />{t('checkout.ussd_title')}</li>
+        {[t('checkout.ussd_step1'), t('checkout.ussd_step2'), t('checkout.ussd_step3'), t('checkout.ussd_step4')].map((line, index) => (
+          <li key={line} className="mt-1.5 flex gap-2.5 text-xs leading-5">
+            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-sky-600 text-[11px] font-black text-white" aria-hidden="true">{index + 1}</span>
+            <span>{line}</span>
+          </li>
+        ))}
+        <li className="mt-2.5 text-[11px] font-semibold text-sky-700">{t('checkout.ussd_wait')}</li>
+      </ol>
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-3"><p className="flex items-center gap-2 text-sm font-black text-amber-900"><Lock className="h-4 w-4" />{t('checkout.pin_on_phone')}</p><p className="mt-1 text-xs leading-5 text-amber-800">{t('checkout.pin_warning')}</p></div>
     </div>
   </div>
