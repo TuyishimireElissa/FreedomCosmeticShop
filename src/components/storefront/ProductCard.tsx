@@ -184,12 +184,16 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
           </div>
         )}
 
-        <p className="mb-2 min-h-[1rem] text-[11px] text-fcs-text-muted">{size || ''}</p>
         <div className="flex-1" />
 
         <div className="mb-3">
           <div className="flex flex-wrap items-baseline gap-2">
             <span className="text-base font-extrabold tracking-tight text-fcs-brand-text md:text-lg">{formatRWF(displayPrice)}</span>
+            {/* Size sits beside the price, not adrift above the title. Several
+             * products ship in 200/300/500 ml variants at different prices;
+             * at 11px in the metadata row the size was invisible, so three
+             * legitimate sizes read as three prices for the same thing. */}
+            {size && <span className="text-[13px] font-medium text-fcs-text-muted">{size}</span>}
             {comparePrice && <span className="text-xs font-medium text-fcs-text-muted line-through">{formatRWF(comparePrice)}</span>}
           </div>
           {isWholesale && savings > 0 && <p className="mt-0.5 text-[11px] font-semibold text-emerald-600">You save {formatRWF(savings)}</p>}
