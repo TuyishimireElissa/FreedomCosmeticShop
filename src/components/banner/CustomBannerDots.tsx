@@ -51,7 +51,7 @@ export default function CustomBannerDots({ count, current, onSelect, label, cycl
             {index === current && (
               <span
                 key={cycle}
-                className={`custom-banner-slider__dot-progress absolute inset-0 block rounded-full bg-[#B76E79] will-change-transform ${paused ? 'custom-banner-slider__dot-progress--paused' : ''}`}
+                className={`custom-banner-slider__dot-progress absolute inset-0 block rounded-full bg-fcs-brand will-change-transform ${paused ? 'custom-banner-slider__dot-progress--paused' : ''}`}
               />
             )}
           </span>

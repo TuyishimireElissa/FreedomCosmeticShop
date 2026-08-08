@@ -128,7 +128,7 @@ export function OTPInput({
           disabled={disabled}
           aria-label={t('auth.digit_of_length', { digit: i + 1, length })}
           data-filled={value[i] ? 'true' : 'false'}
-          className="h-14 w-11 rounded-xl border-2 border-gray-200 p-0 text-center text-2xl font-bold text-gray-900 transition-all duration-150 focus:border-[#B76E79] focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20 data-[filled=true]:border-[#B76E79] data-[filled=true]:bg-[#B76E79]/5 sm:h-16 sm:w-12"
+          className="h-14 w-11 rounded-xl border-2 border-gray-200 p-0 text-center text-2xl font-bold text-gray-900 transition-all duration-150 focus:border-fcs-brand focus:outline-none focus:ring-2 focus:ring-[#B76E79]/20 data-[filled=true]:border-fcs-brand data-[filled=true]:bg-[#B76E79]/5 sm:h-16 sm:w-12"
         />
       ))}
     </div>

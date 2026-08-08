@@ -34,7 +34,7 @@ export default function AdminHeader() {
         </button>
         <div className="min-w-0">
           <p className="truncate text-sm font-bold text-[#1a1a1a]">{tabTitles[activeTab] || 'Admin'}</p>
-          <p className="truncate text-[10px] font-medium uppercase tracking-wider text-gray-400">FCS Admin Workspace</p>
+          <p className="truncate text-[10px] font-medium uppercase tracking-wider text-fcs-text-muted">FCS Admin Workspace</p>
         </div>
       </div>
 
@@ -43,7 +43,7 @@ export default function AdminHeader() {
           <Bell className="h-5 w-5" />
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
         </button>
-        <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-[#B76E79] text-xs font-bold text-white">
+        <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-fcs-brand text-xs font-bold text-white">
           {user?.name
             ? user.name.charAt(0).toUpperCase()
             : <BrandMark size={36} alt="FreedomCosmeticShop" className="h-9 w-9 rounded-full bg-white object-contain p-1" />}

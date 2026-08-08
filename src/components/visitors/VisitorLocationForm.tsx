@@ -19,7 +19,7 @@ import { getVisitorSessionId } from './VisitorTracker'
 interface ProvinceMap { [province: string]: string[] }
 
 const SELECT_CLASS =
-  'custom-visitor-location__select mt-1 min-h-11 w-full rounded-xl border-2 border-gray-200 bg-white px-3 text-base focus:border-[#B76E79] focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400'
+  'custom-visitor-location__select mt-1 min-h-11 w-full rounded-xl border-2 border-gray-200 bg-white px-3 text-base focus:border-fcs-brand focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-fcs-text-muted'
 
 export default function VisitorLocationForm() {
   const { toast } = useToast()
@@ -129,7 +129,7 @@ export default function VisitorLocationForm() {
   return (
     <section className="custom-visitor-location rounded-2xl border border-gray-200 bg-white p-5" aria-labelledby="visitor-location-heading">
       <div className="flex items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-rose-50 text-[#B76E79]">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-rose-50 text-fcs-brand-text">
           <MapPin className="h-5 w-5" aria-hidden="true" />
         </span>
         <div className="min-w-0">
@@ -164,7 +164,7 @@ export default function VisitorLocationForm() {
           </div>
 
           <div>
-            <label htmlFor="visitor-sector" className="text-sm font-semibold text-gray-700">Sector <span className="font-normal text-gray-400">(optional)</span></label>
+            <label htmlFor="visitor-sector" className="text-sm font-semibold text-gray-700">Sector <span className="font-normal text-fcs-text-muted">(optional)</span></label>
             <select id="visitor-sector" className={SELECT_CLASS} value={sector} disabled={!district} onChange={(event) => void onSector(event.target.value)}>
               <option value="">Select sector</option>
               {sectors.map((name) => <option key={name} value={name}>{name}</option>)}
@@ -172,7 +172,7 @@ export default function VisitorLocationForm() {
           </div>
 
           <div>
-            <label htmlFor="visitor-cell" className="text-sm font-semibold text-gray-700">Cell <span className="font-normal text-gray-400">(optional)</span></label>
+            <label htmlFor="visitor-cell" className="text-sm font-semibold text-gray-700">Cell <span className="font-normal text-fcs-text-muted">(optional)</span></label>
             <select id="visitor-cell" className={SELECT_CLASS} value={cell} disabled={!sector} onChange={(event) => void onCell(event.target.value)}>
               <option value="">Select cell</option>
               {cells.map((name) => <option key={name} value={name}>{name}</option>)}
@@ -180,7 +180,7 @@ export default function VisitorLocationForm() {
           </div>
 
           <div className="sm:col-span-2">
-            <label htmlFor="visitor-village" className="text-sm font-semibold text-gray-700">Village <span className="font-normal text-gray-400">(optional)</span></label>
+            <label htmlFor="visitor-village" className="text-sm font-semibold text-gray-700">Village <span className="font-normal text-fcs-text-muted">(optional)</span></label>
             <select id="visitor-village" className={SELECT_CLASS} value={village} disabled={!cell} onChange={(event) => { setVillage(event.target.value); setSaved(false) }}>
               <option value="">Select village</option>
               {villages.map((name) => <option key={name} value={name}>{name}</option>)}
@@ -193,7 +193,7 @@ export default function VisitorLocationForm() {
         type="button"
         onClick={() => void submit()}
         disabled={saving || loading || !district}
-        className="mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[#B76E79] px-5 text-sm font-bold text-white transition-colors hover:bg-[#9B5A64] disabled:cursor-not-allowed disabled:bg-gray-300"
+        className="mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-fcs-brand px-5 text-sm font-bold text-white transition-colors hover:bg-[#9B5A64] disabled:cursor-not-allowed disabled:bg-gray-300"
       >
         {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
         {saved ? 'Saved — update' : 'Save my location'}

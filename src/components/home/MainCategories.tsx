@@ -50,8 +50,8 @@ export default function MainCategories({ categories, loading = false, error }: M
     <section className="bg-white px-4 py-10 md:py-16">
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 flex items-end justify-between gap-4">
-          <div><p className="text-xs font-medium uppercase tracking-[0.18em] text-[#B76E79]">{t('nav.categories')}</p><h2 className="mt-2 text-2xl font-bold tracking-tight text-[#1a1a1a] md:text-3xl">{t('home.shop_category')}</h2></div>
-          <Link href="/products" className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#B76E79] transition-colors hover:text-[#9B5A64]">{t('home.view_all')}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
+          <div><p className="text-xs font-medium uppercase tracking-[0.18em] text-fcs-brand-text">{t('nav.categories')}</p><h2 className="mt-2 font-display text-3xl font-normal tracking-tight text-[#1a1a1a] md:text-3xl">{t('home.shop_category')}</h2></div>
+          <Link href="/products" className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-fcs-brand-text transition-colors hover:text-[#9B5A64]">{t('home.view_all')}<ArrowRight className="h-4 w-4" aria-hidden="true" /></Link>
         </div>
         {loading ? (
           <div className="grid grid-cols-3 gap-3 md:gap-6">{[0, 1, 2].map((item) => <div key={item} className="aspect-[3/4] animate-pulse rounded-xl bg-[#F3F3F3] motion-reduce:animate-none md:aspect-[4/3]" />)}</div>

@@ -128,10 +128,10 @@ export default function AdminSidebar() {
 
         <div className={`border-b border-white/10 px-4 py-3 ${collapsed ? 'md:hidden' : ''}`}>
           <div className="flex items-center gap-3 rounded-xl bg-white/[0.06] px-3 py-2.5">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#B76E79] text-xs font-bold">{user?.name?.charAt(0).toUpperCase() || 'A'}</span>
+            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-fcs-brand text-xs font-bold">{user?.name?.charAt(0).toUpperCase() || 'A'}</span>
             <span className="min-w-0">
               <span className="block truncate text-xs font-semibold">{user?.name || 'Administrator'}</span>
-              <span className="mt-0.5 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-gray-400"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{user?.role || 'ADMIN'}</span>
+              <span className="mt-0.5 flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-fcs-text-muted"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />{user?.role || 'ADMIN'}</span>
             </span>
           </div>
         </div>
@@ -154,8 +154,8 @@ export default function AdminSidebar() {
                       onClick={() => { if (item.href) { router.push(item.href); setMobileOpen(false) } else selectTab(item.tab) }}
                       className={`group relative flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-all ${
                         active
-                          ? 'bg-[#B76E79] font-semibold text-white shadow-lg shadow-[#B76E79]/15'
-                          : 'text-gray-400 hover:bg-white/[0.07] hover:text-white'
+                          ? 'bg-fcs-brand font-semibold text-white shadow-lg shadow-[#B76E79]/15'
+                          : 'text-fcs-text-muted hover:bg-white/[0.07] hover:text-white'
                       } ${collapsed ? 'md:justify-center md:px-2' : ''}`}
                       title={collapsed ? label : undefined}
                       aria-current={active ? 'page' : undefined}
@@ -172,7 +172,7 @@ export default function AdminSidebar() {
         </nav>
 
         <div className="shrink-0 border-t border-white/10 p-2.5">
-          <button type="button" onClick={handleLogout} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-gray-400 transition-colors hover:bg-red-500/15 hover:text-red-300 ${collapsed ? 'md:justify-center md:px-2' : ''}`} title={collapsed ? 'Sign out' : undefined}>
+          <button type="button" onClick={handleLogout} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-fcs-text-muted transition-colors hover:bg-red-500/15 hover:text-red-300 ${collapsed ? 'md:justify-center md:px-2' : ''}`} title={collapsed ? 'Sign out' : undefined}>
             <LogOut className="h-[18px] w-[18px] shrink-0" /><span className={collapsed ? 'md:hidden' : ''}>Sign out</span>
           </button>
           <button type="button" onClick={() => setCollapsed((value) => !value)} className="mt-1 hidden w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs text-gray-500 transition-colors hover:bg-white/[0.06] hover:text-gray-300 md:flex" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}>

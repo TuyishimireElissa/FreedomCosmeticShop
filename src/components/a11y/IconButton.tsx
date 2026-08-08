@@ -27,7 +27,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconB
   }
   const variantClasses = {
     default: 'text-gray-700 hover:bg-gray-100 active:bg-gray-200',
-    primary: 'bg-[#B76E79] text-white hover:bg-[#a55d68] active:bg-[#8f4f59]',
+    primary: 'bg-fcs-brand text-white hover:bg-fcs-brand-hover active:bg-[#8f4f59]',
     danger: 'text-red-700 hover:bg-red-50 active:bg-red-100',
     ghost: 'text-gray-600 hover:bg-gray-50 hover:text-gray-950 active:bg-gray-100',
   }

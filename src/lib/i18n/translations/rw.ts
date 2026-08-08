@@ -151,6 +151,8 @@ export const rw = {
     shop: 'Guhaha', help: 'Ubufasha', track_order: 'Kurikirana ibyo watumije', delivery_kigali: 'Kubigeza muri Kigali: iminsi 1–3', delivery_provinces: 'Mu ntara: iminsi 3–5', shipping_policy: 'Politiki yo kugeza ibicuruzwa', returns_refunds: 'Gusubiza ibicuruzwa n’amafaranga', faq: 'Ibibazo bikunze kubazwa', privacy_policy: 'Politiki y’amakuru bwite', terms_conditions: 'Amabwiriza n’amategeko', contact: 'Twandikire', whatsapp_chat: 'Ganira natwe kuri WhatsApp', we_accept: 'Uburyo bwo kwishyura twemera', made_in_rwanda: 'Byakozwe n’urukundo mu Rwanda ', all_rights_reserved: 'Uburenganzira bwose burubahirizwa.', wholesale_beauty: 'Kurangura ibicuruzwa by’ubwiza', genuine: '100% Umwimerere', genuine_products: 'Ibicuruzwa by’umwimerere', fast_delivery: 'Kubigeza vuba', all_districts: 'Uturere 30 twose', simple_payment: 'Kwishyura mu buryo bworoshye', local_support: 'Ubufasha bwo mu Rwanda', here_to_help: 'Twiteguye kugufasha', returns_days: 'Gusubiza mu minsi {days}', admin_dashboard: 'Urubuga rw’ubuyobozi', safe_pay: 'Kwishyura bitekanye', secured_by: 'Birinze na {provider}', mobile_money_accepted: 'Twemera Mobile Money', whatsapp_support: 'Ubufasha kuri WhatsApp', // verified-rw
   },
   home: {
+    concierge_eyebrow: 'Umujyanama w’ubwiza', // verified-rw
+    concierge_cta: 'Vugana n’umujyanama w’ubwiza', // verified-rw
     apply_wholesale: 'Saba konti yo kurangura', // verified-rw
     apply_wholesale_account: 'Saba konti yo kurangura', // verified-rw
     authentic_percent: 'Ibicuruzwa by’umwimerere 100%', // verified-rw
@@ -303,8 +305,8 @@ export const rw = {
     section_reviews: 'Ibitekerezo by’abakiriya', // verified-rw
     verified_reviews_count: 'Ubuguzi {count} bwemejwe', // verified-rw
 
-    whatsapp_title: 'Ukeneye ubufasha?', // verified-rw
-    whatsapp_subtitle: 'Ohereza ubutumwa kuri WhatsApp kugira ngo abagufasha bagufashe.', // verified-rw
+    whatsapp_title: 'Ntuzi icyakubera?', // verified-rw
+    whatsapp_subtitle: 'Bwira itsinda ryacu ry’ubwiza icyo ushaka, rikuyobore ku gicuruzwa gikubereye.', // verified-rw
     whatsapp_hours: 'Amasaha y’ubufasha: {hours}', // verified-rw
     quiz_title: 'Shakisha gahunda mu bicuruzwa biriho ubu', // verified-rw
     quiz_subtitle: 'Subiza ibibazo bitandatu urebe ibicuruzwa bihuye n’icyiciro, ikibazo, amafaranga n’ibyo ukunda.', // verified-rw

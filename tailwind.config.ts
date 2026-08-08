@@ -10,6 +10,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // ─── Warm Editorial semantic tokens ────────────────────────
+        // These read the CSS variables in globals.css so colour has a
+        // single source of truth. Prefer these over raw hex.
+        fcs: {
+          bg: 'var(--fcs-bg)',
+          surface: 'var(--fcs-surface)',
+          'surface-secondary': 'var(--fcs-surface-secondary)',
+          text: 'var(--fcs-text)',
+          'text-muted': 'var(--fcs-text-muted)',
+          border: 'var(--fcs-border)',
+          brand: 'var(--fcs-brand)',
+          'brand-text': 'var(--fcs-brand-text)',
+          'brand-hover': 'var(--fcs-brand-hover)',
+          accent: 'var(--fcs-accent)',
+          success: 'var(--fcs-success)',
+          warning: 'var(--fcs-warning)',
+          error: 'var(--fcs-error)',
+          whatsapp: 'var(--fcs-whatsapp)',
+          'whatsapp-hover': 'var(--fcs-whatsapp-hover)',
+        },
         primary: {
           DEFAULT: '#B76E79',
           50: '#fdf4f5',
@@ -53,6 +73,9 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
+        // Editorial voice. Georgia ships on every Android/iOS device, so
+        // this costs 0 KB and cannot cause FOIT on a slow connection.
+        display: ['Georgia', 'Times New Roman', 'serif'],
       },
       fontSize: {
         'xs-accessible': ['12px', { lineHeight: '1.5' }],

@@ -118,7 +118,7 @@ export default function BannerSlide({ banner, index, isActive, priority, ctaLabe
               prefetch={false}
               tabIndex={isActive ? 0 : -1}
               {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-              className="mt-1 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#B76E79] px-5 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-[#9B5A64] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
+              className="mt-1 inline-flex min-h-11 items-center gap-2 rounded-full bg-fcs-brand px-5 text-sm font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-[#9B5A64] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
             >
               {ctaLabel}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />

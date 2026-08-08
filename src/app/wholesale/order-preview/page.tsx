@@ -115,18 +115,18 @@ export default function WholesaleOrderPreview() {
   }
 
   if (authLoading) return <main className="mx-auto grid min-h-[60vh] max-w-3xl place-items-center px-4"><p className="text-sm text-gray-500">Loading order preview…</p></main>
-  if (!isWholesale) return <main className="mx-auto grid min-h-[60vh] max-w-xl place-items-center px-4 text-center"><div><h1 className="text-2xl font-bold">Wholesale approval required</h1><p className="mt-2 text-sm text-gray-500">This invoice preview is available to approved wholesale customers.</p><Link href="/wholesale" className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-[#B76E79] px-6 font-bold text-white">Wholesale information</Link></div></main>
-  if (cart.items.length === 0) return <main className="mx-auto grid min-h-[60vh] max-w-xl place-items-center px-4 text-center"><div><h1 className="text-2xl font-bold">Your cart is empty</h1><p className="mt-2 text-sm text-gray-500">Add wholesale products before creating an invoice preview.</p><Link href="/products" className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-[#B76E79] px-6 font-bold text-white">Browse products</Link></div></main>
+  if (!isWholesale) return <main className="mx-auto grid min-h-[60vh] max-w-xl place-items-center px-4 text-center"><div><h1 className="text-2xl font-bold">Wholesale approval required</h1><p className="mt-2 text-sm text-gray-500">This invoice preview is available to approved wholesale customers.</p><Link href="/wholesale" className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-fcs-brand px-6 font-bold text-white">Wholesale information</Link></div></main>
+  if (cart.items.length === 0) return <main className="mx-auto grid min-h-[60vh] max-w-xl place-items-center px-4 text-center"><div><h1 className="text-2xl font-bold">Your cart is empty</h1><p className="mt-2 text-sm text-gray-500">Add wholesale products before creating an invoice preview.</p><Link href="/products" className="mt-6 inline-flex min-h-12 items-center rounded-xl bg-fcs-brand px-6 font-bold text-white">Browse products</Link></div></main>
 
   return <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-    <header className="mb-6"><p className="text-xs font-bold uppercase tracking-[0.2em] text-[#B76E79]">FreedomCosmeticShop Wholesale</p><h1 className="mt-2 text-3xl font-black text-gray-950">Professional order invoice</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">Confirm the delivery address, review every amount, then share the invoice image or send the order details through WhatsApp.</p></header>
+    <header className="mb-6"><p className="text-xs font-bold uppercase tracking-[0.2em] text-fcs-brand-text">FreedomCosmeticShop Wholesale</p><h1 className="mt-2 text-3xl font-black text-gray-950">Professional order invoice</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">Confirm the delivery address, review every amount, then share the invoice image or send the order details through WhatsApp.</p></header>
 
     <section className="mb-6 rounded-2xl border border-gray-200 bg-gray-50 p-5" aria-labelledby="delivery-heading">
-      <h2 id="delivery-heading" className="flex items-center gap-2 text-lg font-bold"><MapPin className="h-5 w-5 text-[#B76E79]" />Where should we deliver?</h2>
+      <h2 id="delivery-heading" className="flex items-center gap-2 text-lg font-bold"><MapPin className="h-5 w-5 text-fcs-brand-text" />Where should we deliver?</h2>
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         <label className="text-sm font-semibold text-gray-700">District<span className="text-red-600"> *</span><select value={district} onChange={(event) => { setDistrict(event.target.value); cart.setDistrict(event.target.value); setNotice('') }} className="mt-1 min-h-12 w-full rounded-xl border border-gray-300 bg-white px-3 text-base"><option value="">Select District</option>{provinces.map((group) => <optgroup key={group.province} label={group.province}>{group.districts.map((value) => <option key={value} value={value}>{value}</option>)}</optgroup>)}</select></label>
         <label className="text-sm font-semibold text-gray-700">Sector<span className="text-red-600"> *</span><input value={sector} onChange={(event) => setSector(event.target.value)} placeholder="e.g. Kimironko" className="mt-1 min-h-12 w-full rounded-xl border border-gray-300 bg-white px-3 text-base" /></label>
-        <label className="text-sm font-semibold text-gray-700">Landmark <span className="font-normal text-gray-400">(optional)</span><input value={landmark} onChange={(event) => setLandmark(event.target.value)} placeholder="e.g. Near the market" className="mt-1 min-h-12 w-full rounded-xl border border-gray-300 bg-white px-3 text-base" /></label>
+        <label className="text-sm font-semibold text-gray-700">Landmark <span className="font-normal text-fcs-text-muted">(optional)</span><input value={landmark} onChange={(event) => setLandmark(event.target.value)} placeholder="e.g. Near the market" className="mt-1 min-h-12 w-full rounded-xl border border-gray-300 bg-white px-3 text-base" /></label>
       </div>
       {deliveryLoading && <p role="status" className="mt-3 text-sm text-gray-500">Calculating the real delivery fee…</p>}
       {delivery && <p className="mt-3 text-sm font-semibold text-emerald-700">Delivery quote: {formatRWF(deliveryFee)} · {delivery.deliveryTime}</p>}
@@ -134,15 +134,15 @@ export default function WholesaleOrderPreview() {
 
     <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-gray-100 p-2 sm:p-4">
       <div ref={invoiceRef} className="mx-auto w-[760px] bg-white p-10 text-gray-900 shadow-sm">
-        <div className="flex items-start justify-between border-b-2 border-gray-900 pb-6"><div><p className="text-2xl font-black tracking-tight">FreedomCosmeticShop</p><p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#B76E79]">Wholesale Order Invoice</p></div><div className="text-right text-xs text-gray-500"><p>ORDER PREVIEW</p><p className="mt-1">{new Date().toLocaleDateString('en-RW', { year: 'numeric', month: 'long', day: 'numeric' })}</p></div></div>
+        <div className="flex items-start justify-between border-b-2 border-gray-900 pb-6"><div><p className="text-2xl font-black tracking-tight">FreedomCosmeticShop</p><p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-fcs-brand-text">Wholesale Order Invoice</p></div><div className="text-right text-xs text-gray-500"><p>ORDER PREVIEW</p><p className="mt-1">{new Date().toLocaleDateString('en-RW', { year: 'numeric', month: 'long', day: 'numeric' })}</p></div></div>
 
         <div className="mt-8 grid grid-cols-2 gap-12">
           <InvoiceAddress title="Bill To"><p className="font-bold uppercase text-gray-950">{user?.name || 'Customer'}</p>{user?.businessName && <p>{user.businessName}</p>}<p>{user?.phone || ''}</p><p>{user?.email || ''}</p></InvoiceAddress>
-          <InvoiceAddress title="Deliver To">{sector && <p>{sector}</p>}{landmark && <p>(Landmark: {landmark})</p>}{district && <p>{district}</p>}{province && <p>{province}</p>}{!district && <p className="italic text-gray-400">Select a delivery address above</p>}</InvoiceAddress>
+          <InvoiceAddress title="Deliver To">{sector && <p>{sector}</p>}{landmark && <p>(Landmark: {landmark})</p>}{district && <p>{district}</p>}{province && <p>{province}</p>}{!district && <p className="italic text-fcs-text-muted">Select a delivery address above</p>}</InvoiceAddress>
         </div>
 
         <div className="mt-10">
-          <div className="grid grid-cols-12 gap-2 border-y-2 border-[#B76E79] py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500"><div className="col-span-6">Item</div><div className="col-span-1 text-center">Qty</div><div className="col-span-2 text-right">Price</div><div className="col-span-3 text-right">Total</div></div>
+          <div className="grid grid-cols-12 gap-2 border-y-2 border-fcs-brand py-3 text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500"><div className="col-span-6">Item</div><div className="col-span-1 text-center">Qty</div><div className="col-span-2 text-right">Price</div><div className="col-span-3 text-right">Total</div></div>
           {cart.items.map((item) => <div key={item.productId} className="grid min-h-16 grid-cols-12 items-center gap-2 border-b border-gray-100 py-4 text-sm"><div className="col-span-6"><p className="font-semibold">{item.name}</p>{item.volume && <p className="mt-0.5 text-xs text-gray-500">{item.volume}</p>}</div><div className="col-span-1 text-center">{item.quantity}</div><div className="col-span-2 text-right">{formatRWF(item.price)}</div><div className="col-span-3 text-right font-semibold">{formatRWF(item.price * item.quantity)}</div></div>)}
         </div>
 
@@ -157,15 +157,15 @@ export default function WholesaleOrderPreview() {
     <div className="mt-6 grid gap-3 sm:grid-cols-2">
       <button type="button" onClick={shareInvoiceImage} disabled={exporting || !district || !sector.trim() || !delivery} className="flex min-h-[52px] items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 font-bold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-300"><Share2 className="h-5 w-5" />{exporting ? 'Preparing invoice…' : 'Share Invoice Image'}</button>
       <button type="button" onClick={openWhatsApp} disabled={!district || !sector.trim() || !delivery} className="flex min-h-[52px] items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 font-bold text-white hover:bg-[#20bd5a] disabled:cursor-not-allowed disabled:bg-gray-300"><MessageCircle className="h-5 w-5" />{district ? 'Send Order via WhatsApp' : 'Select district first'}</button>
-      <button type="button" onClick={downloadPng} disabled={exporting} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 font-bold text-gray-700 hover:border-[#B76E79]"><Download className="h-5 w-5" />Download Invoice PNG</button>
-      <button type="button" onClick={() => window.print()} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 font-bold text-gray-700 hover:border-[#B76E79]"><FileText className="h-5 w-5" />Print / Save PDF</button>
+      <button type="button" onClick={downloadPng} disabled={exporting} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 font-bold text-gray-700 hover:border-fcs-brand"><Download className="h-5 w-5" />Download Invoice PNG</button>
+      <button type="button" onClick={() => window.print()} className="flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 font-bold text-gray-700 hover:border-fcs-brand"><FileText className="h-5 w-5" />Print / Save PDF</button>
     </div>
-    <Link href="/products" className="mt-3 flex min-h-12 items-center justify-center rounded-xl text-sm font-bold text-[#B76E79]">Continue Shopping</Link>
+    <Link href="/products" className="mt-3 flex min-h-12 items-center justify-center rounded-xl text-sm font-bold text-fcs-brand-text">Continue Shopping</Link>
   </main>
 }
 
 function InvoiceAddress({ title, children }: { title: string; children: React.ReactNode }) {
-  return <section><h2 className="border-b border-[#B76E79] pb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">{title}</h2><div className="mt-3 space-y-1 text-sm leading-5 text-gray-600">{children}</div></section>
+  return <section><h2 className="border-b border-fcs-brand pb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-gray-500">{title}</h2><div className="mt-3 space-y-1 text-sm leading-5 text-gray-600">{children}</div></section>
 }
 
 function InvoiceTotal({ label, value, strong }: { label: string; value: string; strong?: boolean }) {

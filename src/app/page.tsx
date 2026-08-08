@@ -97,42 +97,48 @@ function Homepage() {
 
   return (
     <div className="flex flex-col overflow-hidden bg-white">
-      {/* 1. Hero — immediate */}
+      {/* Narrative order: discovery -> desire -> confidence -> assistance.
+       * Each section earns its place; none exists because "shops have one".
+       *   Hero        editorial statement
+       *   Search      intent shortcut
+       *   Trust       confidence, before we ask for anything
+       *   Categories  browse by department
+       *   Featured    proven products
+       *   Concierge   human help at the point of hesitation
+       *   Delivery    transparent cost and timing
+       *   New         discovery
+       *   Quiz        guided discovery
+       *   Reviews     social proof (self-hides until real reviews exist)
+       */}
       <Hero banners={banners.data?.banners || []} loading={banners.loading} error={banners.error} />
 
-      {/* 2. Search — immediate */}
       <HomeSearch />
 
-      {/* 3. Three real database categories — immediate */}
+      {/* Trust moved directly under the fold: a first-time buyer decides
+       * whether this shop is real long before they reach the footer. */}
+      <TrustSection />
+
       <MainCategories categories={categories.data?.categories || []} loading={categories.loading} error={categories.error} />
 
-      {/* 4. Four real featured products — lazy */}
       <FeaturedProducts type="featured" limit={4} />
 
-      {/* 5. On-demand account recommendations; hidden without eligible signals */}
       <LazySection label={t('personalized_recommendations.section_label')}>
         <PersonalizedRecommendations />
       </LazySection>
 
-      {/* 6. Real delivery settings and active coupon only — lazy */}
       <DeliveryPromo />
 
-      {/* 7. Four real new arrivals — lazy */}
       <FeaturedProducts type="new-arrivals" limit={4} />
 
-      {/* 8. Configured trust information only — lazy */}
-      <TrustSection />
+      <QuizBanner />
 
-      {/* 9. Hidden unless at least three real approved reviews exist — explicit in low-data mode */}
+      {/* Beauty Concierge — human guidance framed as a service, not support. */}
+      <WhatsAppCTA />
+
+
       <LazySection label={t('home.section_reviews')}>
         <ReviewsSection />
       </LazySection>
-
-      {/* 10. Optional recommendation entry point — no product claims */}
-      <QuizBanner />
-
-      {/* 11. Hidden until a real WhatsApp number is configured — lazy */}
-      <WhatsAppCTA />
 
       {/* 12. Footer is connected through SiteChrome */}
     </div>

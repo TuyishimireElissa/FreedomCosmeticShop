@@ -128,7 +128,7 @@ export default function AdminProductImageManager({ productId, productName, onCha
   return (
     <div className="space-y-5">
       <div className="rounded-xl border border-dashed border-rose-200 bg-rose-50/30 p-4">
-        <h3 className="flex items-center gap-2 font-semibold"><ImagePlus className="h-4 w-4 text-[#B76E79]" />Upload to Cloudinary</h3>
+        <h3 className="flex items-center gap-2 font-semibold"><ImagePlus className="h-4 w-4 text-fcs-brand-text" />Upload to Cloudinary</h3>
         <p className="mt-1 text-xs text-muted-foreground">JPEG, PNG, or WebP · maximum 10 MB · saved in freedomcosmeticshop/products</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <div className="sm:col-span-2"><Label htmlFor={`product-image-file-${productId}`}>Image files *</Label><Input id={`product-image-file-${productId}`} type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={(event) => setFiles(Array.from(event.target.files || []).slice(0, Math.max(0, 20 - images.length)))} /></div>

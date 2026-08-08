@@ -14,12 +14,12 @@ export default function AccountSettingsPage() {
   return (
     <main className="min-h-screen bg-[#FAFAFA] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
-        <Link href="/account" className="inline-flex min-h-11 items-center gap-2 rounded-xl px-2 text-sm font-semibold text-[#8a4b55]">
+        <Link href="/account" className="inline-flex min-h-11 items-center gap-2 rounded-xl px-2 text-sm font-semibold text-fcs-brand-text">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           {t('orders.account_home')}
         </Link>
         <header className="mt-4">
-          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[#8a4b55]">
+          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-fcs-brand-text">
             <Gauge className="h-4 w-4" aria-hidden="true" />
             {t('low_data.account_settings')}
           </span>

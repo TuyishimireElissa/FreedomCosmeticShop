@@ -76,7 +76,7 @@ export default function TrustSection() {
     <section className="bg-[#FAFAFA] px-4 py-10 md:py-16">
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 text-center md:mb-8">
-          <h2 className="mb-2 text-2xl font-bold text-[#1a1a1a] md:text-3xl">{t('home.trust_title')}</h2>
+          <h2 className="mb-2 font-display text-3xl font-normal text-[#1a1a1a] md:text-3xl">{t('home.trust_title')}</h2>
           <p className="mx-auto max-w-md text-sm text-gray-500">{t('home.trust_subtitle')}</p>
         </div>
 

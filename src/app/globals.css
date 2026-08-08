@@ -14,17 +14,39 @@
     --input: 0 0% 93%;
     --ring: 351 32% 57%;
     --radius: 0.75rem;
-    --fcs-primary: #B76E79;
-    --fcs-primary-hover: #9B5A64;
-    --fcs-secondary: #1a1a1a;
-    --fcs-accent: #C4956A;
-    --fcs-surface: #FAFAFA;
-    --fcs-border: #EEEEEE;
-    --fcs-muted: #777777;
-    --fcs-light: #AAAAAA;
+    /* ─── Warm Editorial design tokens ──────────────────────────────
+     * Single source of truth for colour. Contrast ratios against
+     * #FFFFFF are recorded so the next person does not have to guess.
+     *
+     *   --fcs-brand       3.80:1  BACKGROUNDS ONLY — fails AA as text
+     *   --fcs-brand-text  5.49:1  the same identity, safe as text
+     *   --fcs-text-muted  4.83:1  replaces #9CA3AF (2.54:1, failed AA)
+     */
+    --fcs-bg: #FFFFFF;
+    --fcs-surface: #FAF8F6;           /* warm ivory, not cold grey */
+    --fcs-surface-secondary: #F5F1EE;
+    --fcs-text: #1a1a1a;
+    --fcs-text-muted: #6B7280;
+    --fcs-border: #EDE7E3;
+    --fcs-brand: #B76E79;
+    --fcs-brand-text: #9B545F;
+    --fcs-brand-hover: #9B5A64;
+    --fcs-accent: #C4956A;            /* champagne, used sparingly */
     --fcs-success: #2D8A4E;
-    --fcs-error: #D64045;
     --fcs-warning: #E8A838;
+    --fcs-error: #D64045;
+    --fcs-whatsapp: #25D366;
+    --fcs-whatsapp-hover: #128C7E;
+
+    /* Editorial type. Georgia ships with every Android and iOS device,
+     * so the serif voice costs 0 KB and cannot cause FOIT on 3G. */
+    --fcs-font-display: Georgia, 'Times New Roman', serif;
+
+    /* Motion — reuse the existing master easing. */
+    --fcs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --fcs-fast: 150ms;
+    --fcs-medium: 300ms;
+    --fcs-slow: 600ms;
   }
 
   * {

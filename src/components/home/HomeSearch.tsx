@@ -38,12 +38,12 @@ export default function HomeSearch() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('search.placeholder')}
-            className="min-h-[52px] w-full rounded-2xl border-2 border-gray-200 bg-white pl-5 pr-16 text-base text-gray-900 shadow-sm transition-colors placeholder:text-gray-400 focus:border-[#B76E79] focus:outline-none"
+            className="min-h-[52px] w-full rounded-2xl border-2 border-gray-200 bg-white pl-5 pr-16 text-base text-gray-900 shadow-sm transition-colors placeholder:text-fcs-text-muted focus:border-fcs-brand focus:outline-none"
             aria-label={t('search.placeholder')}
           />
           <button
             type="submit"
-            className="absolute right-1.5 top-1/2 flex h-11 w-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-xl bg-[#B76E79] text-white transition-colors hover:bg-[#a55d68]"
+            className="absolute right-1.5 top-1/2 flex h-11 w-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-xl bg-fcs-brand text-white transition-colors hover:bg-fcs-brand-hover"
             aria-label={t('common.search')}
           >
             <Search className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -59,7 +59,7 @@ export default function HomeSearch() {
               key={item.query}
               type="button"
               onClick={() => handleSearch(item.query)}
-              className="min-h-11 touch-manipulation rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-[#B76E79]/10 hover:text-[#B76E79]"
+              className="min-h-11 touch-manipulation rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-700 transition-colors hover:bg-[#B76E79]/10 hover:text-fcs-brand-text"
             >
               {item.label}
             </button>

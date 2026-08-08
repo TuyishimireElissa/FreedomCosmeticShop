@@ -35,13 +35,13 @@ export default function FilterChips() {
   return (
     <div className="flex flex-wrap items-center gap-2 py-2" aria-label={t('search.filters_active', { count: activeFilterCount })}>
       {chips.map((chip) => (
-        <span key={chip.key} className="inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-full bg-rose-50 pl-3 pr-1.5 text-sm font-semibold text-[#9e5964]">
+        <span key={chip.key} className="inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-full bg-rose-50 pl-3 pr-1.5 text-sm font-semibold text-fcs-brand-text">
           <span className="max-w-48 truncate">{chip.label}</span>
           <button type="button" onClick={() => clearFilter(chip.key)} className="grid h-8 w-8 place-items-center rounded-full hover:bg-rose-100" aria-label={t('search.remove_filter', { filter: chip.label })}><X className="h-3.5 w-3.5" /></button>
         </span>
       ))}
       {chips.length > 1 && <button type="button" onClick={clearAllFilters} className="inline-flex min-h-9 items-center gap-1 rounded-full bg-gray-100 px-3 text-sm font-semibold text-gray-600 hover:bg-gray-200">{t('search.clear_all_filters')}<X className="h-3.5 w-3.5" /></button>}
-      <span className="ml-auto text-xs text-gray-400">{t('search.filters_active', { count: activeFilterCount })}</span>
+      <span className="ml-auto text-xs text-fcs-text-muted">{t('search.filters_active', { count: activeFilterCount })}</span>
     </div>
   )
 }

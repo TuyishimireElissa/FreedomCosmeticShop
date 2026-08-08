@@ -18,7 +18,13 @@ const emoji = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B00}-\u
 
 describe('premium cosmetics design system', () => {
   it('defines the approved palette and restrained surfaces', () => {
-    for (const value of ['#B76E79', '#9B5A64', '#1a1a1a', '#C4956A', '#FAFAFA', '#EEEEEE', '#777777', '#AAAAAA', '#2D8A4E', '#D64045', '#E8A838']) expect(css).toContain(value)
+    // Warm Editorial token set. #FAFAFA/#EEEEEE/#777777/#AAAAAA were retired:
+    // the cold greys became warm ivory (#FAF8F6/#EDE7E3) and the muted grey
+    // moved to #6B7280, which passes AA at 4.83:1 where #9CA3AF failed at 2.54:1.
+    for (const value of ['#B76E79', '#9B5A64', '#1a1a1a', '#C4956A', '#2D8A4E', '#D64045', '#E8A838']) expect(css).toContain(value)
+    for (const value of ['--fcs-brand-text: #9B545F', '--fcs-text-muted: #6B7280', '--fcs-surface: #FAF8F6', '--fcs-whatsapp: #25D366']) expect(css).toContain(value)
+    // Brand rose must never be the raw text colour: 3.80:1 fails AA.
+    expect(css).toContain('--fcs-brand: #B76E79')
     expect(css).toContain("font-family: 'Inter', system-ui, sans-serif")
   })
 

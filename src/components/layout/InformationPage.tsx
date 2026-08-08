@@ -36,13 +36,13 @@ export default function InformationPage({
             <section key={section.title}>
               <h2 className="text-xl font-black text-[#1a1a1a]">{section.title}</h2>
               {section.paragraphs?.map((paragraph) => <p key={paragraph} className="mt-3 text-sm leading-7 text-gray-600">{paragraph}</p>)}
-              {section.bullets && <ul className="mt-3 space-y-2 text-sm leading-6 text-gray-600">{section.bullets.map((item) => <li key={item} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#B76E79]" />{item}</li>)}</ul>}
+              {section.bullets && <ul className="mt-3 space-y-2 text-sm leading-6 text-gray-600">{section.bullets.map((item) => <li key={item} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-fcs-brand" />{item}</li>)}</ul>}
             </section>
           ))}
           <div className="border-t border-gray-100 pt-6 text-sm text-gray-500">
             {t('pages.questions_contact', { business: BUSINESS.tradingName })}
           </div>
-          <Link href="/" className="inline-flex min-h-11 items-center rounded-full bg-[#B76E79] px-5 py-2.5 text-sm font-black text-white">{t('pages.back_to_store')}</Link>
+          <Link href="/" className="inline-flex min-h-11 items-center rounded-full bg-fcs-brand px-5 py-2.5 text-sm font-black text-white">{t('pages.back_to_store')}</Link>
         </div>
       </article>
     </main>

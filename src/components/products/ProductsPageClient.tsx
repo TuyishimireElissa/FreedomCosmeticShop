@@ -197,7 +197,7 @@ function ProductsContent() {
 
         <div className="scrollbar-hide mb-5 flex items-center gap-2 overflow-x-auto pb-1">
           <span className="shrink-0 text-xs font-semibold text-gray-500">{t('search.sort_by')}:</span>
-          {sortOptions.map((option) => <button key={option.value} type="button" onClick={() => setFilter('sort', option.value)} className={cn('min-h-9 shrink-0 rounded-full px-3 text-xs font-bold transition-colors', filters.sort === option.value ? 'bg-[#B76E79] text-white' : 'bg-white text-gray-700 hover:bg-gray-100')}>{option.label}</button>)}
+          {sortOptions.map((option) => <button key={option.value} type="button" onClick={() => setFilter('sort', option.value)} className={cn('min-h-9 shrink-0 rounded-full px-3 text-xs font-bold transition-colors', filters.sort === option.value ? 'bg-fcs-brand text-white' : 'bg-white text-gray-700 hover:bg-gray-100')}>{option.label}</button>)}
         </div>
 
         <div className="flex items-start gap-5 lg:gap-6">
@@ -218,7 +218,7 @@ function ProductsContent() {
                     onClick={() => setFilter('page', String(page + 1))}
                     disabled={loading}
                     aria-controls="product-results"
-                    className="min-h-12 rounded-xl bg-[#B76E79] px-6 text-sm font-bold text-white transition-colors hover:bg-[#a55d68] disabled:cursor-wait disabled:opacity-60"
+                    className="min-h-12 rounded-xl bg-fcs-brand px-6 text-sm font-bold text-white transition-colors hover:bg-fcs-brand-hover disabled:cursor-wait disabled:opacity-60"
                   >
                     {loading ? t('search.loading_more_products') : t('search.load_more_products')}
                   </button>

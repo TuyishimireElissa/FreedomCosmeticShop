@@ -153,7 +153,7 @@ export function CartDrawer() {
                     >
                       {item.name}
                     </button>
-                    <p className="text-muted-foreground text-xs">{formatRWF(item.price)} each</p>{isWholesale && item.retailPrice && item.retailPrice > item.price && <><p className="text-[11px] text-gray-400 line-through">Retail: {formatRWF(item.retailPrice)}</p><p className="text-[11px] font-semibold text-emerald-700">Save {formatRWF(item.retailPrice - item.price)} per unit</p></>}
+                    <p className="text-muted-foreground text-xs">{formatRWF(item.price)} each</p>{isWholesale && item.retailPrice && item.retailPrice > item.price && <><p className="text-[11px] text-fcs-text-muted line-through">Retail: {formatRWF(item.retailPrice)}</p><p className="text-[11px] font-semibold text-emerald-700">Save {formatRWF(item.retailPrice - item.price)} per unit</p></>}
                     <div className="mt-auto flex items-center justify-between pt-1">
                       <div className="flex items-center rounded-md border">
                         <IconButton label={`${t('product.decrease_quantity')}: ${item.name}`} icon={<Minus className="h-3 w-3" />} onClick={() => updateQuantity(item.productId, item.quantity - 1)} disabled={item.quantity <= 1} variant="ghost" className="rounded-r-none" />

@@ -108,7 +108,7 @@ export default function CommunicationPreferences() {
   return (
     <section className="rounded-2xl border border-gray-200 bg-white p-5 sm:p-6" aria-labelledby={headingId}>
       <div className="flex items-start gap-3">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-rose-50 text-[#8a4b55]"><BellRing className="h-5 w-5" aria-hidden="true" /></span>
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-rose-50 text-fcs-brand-text"><BellRing className="h-5 w-5" aria-hidden="true" /></span>
         <div>
           <h2 id={headingId} className="text-xl font-black text-gray-950">{t('communication_preferences.title')}</h2>
           <p className="mt-1 text-sm leading-6 text-gray-600">{t('communication_preferences.description')}</p>
@@ -126,7 +126,7 @@ export default function CommunicationPreferences() {
               <label key={item.field} className={`flex min-h-16 items-center gap-3 rounded-xl border p-3 ${available ? 'cursor-pointer border-gray-200' : 'cursor-not-allowed border-gray-100 bg-gray-50'}`}>
                 <Icon className="h-5 w-5 shrink-0 text-gray-500" aria-hidden="true" />
                 <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-gray-900">{t(item.label)}</span><span className="block text-xs leading-5 text-gray-500">{t(item.description)}</span>{!available && <span className="mt-1 block text-xs font-bold text-amber-800">{t('communication_preferences.unavailable')}</span>}</span>
-                <input type="checkbox" role="switch" checked={preferences[item.field]} disabled={!available || Boolean(pending)} onChange={(event) => void save({ [item.field]: event.target.checked }, item.field)} aria-describedby={statusId} className="h-6 w-6 shrink-0 rounded border-gray-300 text-[#B76E79] focus:ring-2 focus:ring-[#B76E79] focus:ring-offset-2 disabled:opacity-50" />
+                <input type="checkbox" role="switch" checked={preferences[item.field]} disabled={!available || Boolean(pending)} onChange={(event) => void save({ [item.field]: event.target.checked }, item.field)} aria-describedby={statusId} className="h-6 w-6 shrink-0 rounded border-gray-300 text-fcs-brand-text focus:ring-2 focus:ring-fcs-brand focus:ring-offset-2 disabled:opacity-50" />
               </label>
             )
           })}
@@ -140,7 +140,7 @@ export default function CommunicationPreferences() {
           {purposes.map((item) => (
             <label key={item.field} className="flex min-h-[68px] cursor-pointer items-center gap-3 p-3">
               <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-gray-900">{t(item.label)}</span><span className="block text-xs leading-5 text-gray-500">{t(item.description)}</span></span>
-              <input type="checkbox" role="switch" checked={preferences[item.field]} disabled={Boolean(pending)} onChange={(event) => void save({ [item.field]: event.target.checked }, item.field)} aria-describedby={statusId} className="h-6 w-6 shrink-0 rounded border-gray-300 text-[#B76E79] focus:ring-2 focus:ring-[#B76E79] focus:ring-offset-2 disabled:opacity-50" />
+              <input type="checkbox" role="switch" checked={preferences[item.field]} disabled={Boolean(pending)} onChange={(event) => void save({ [item.field]: event.target.checked }, item.field)} aria-describedby={statusId} className="h-6 w-6 shrink-0 rounded border-gray-300 text-fcs-brand-text focus:ring-2 focus:ring-fcs-brand focus:ring-offset-2 disabled:opacity-50" />
             </label>
           ))}
         </div>
@@ -152,7 +152,7 @@ export default function CommunicationPreferences() {
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {(['rw', 'en'] as const).map((option) => (
             <label key={option} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm font-bold text-gray-900">
-              <input type="radio" name="retention-language" value={option} checked={preferences.language === option} disabled={Boolean(pending)} onChange={() => void save({ language: option }, `language-${option}`)} className="h-5 w-5 border-gray-300 text-[#B76E79] focus:ring-[#B76E79]" />
+              <input type="radio" name="retention-language" value={option} checked={preferences.language === option} disabled={Boolean(pending)} onChange={() => void save({ language: option }, `language-${option}`)} className="h-5 w-5 border-gray-300 text-fcs-brand-text focus:ring-fcs-brand" />
               {t(option === 'rw' ? 'communication_preferences.kinyarwanda' : 'communication_preferences.english')}
             </label>
           ))}

@@ -28,7 +28,7 @@ export default function Breadcrumbs({ items, className }: BreadcrumbsProps) {
           <Link
             href="/"
             aria-label={t('nav.home')}
-            className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-rose-50 hover:text-[#B76E79]"
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-lg text-gray-600 transition-colors hover:bg-rose-50 hover:text-fcs-brand-text"
           >
             <Home className="h-4 w-4" aria-hidden="true" />
             <span className="sr-only">{t('nav.home')}</span>
@@ -39,7 +39,7 @@ export default function Breadcrumbs({ items, className }: BreadcrumbsProps) {
           const isCurrent = index === visibleItems.length - 1
           return (
             <li key={`${item.url}-${index}`} className="flex min-w-0 items-center gap-1">
-              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-gray-400" aria-hidden="true" />
+              <ChevronRight className="h-3.5 w-3.5 shrink-0 text-fcs-text-muted" aria-hidden="true" />
               {isCurrent ? (
                 <span
                   aria-current="page"
@@ -50,7 +50,7 @@ export default function Breadcrumbs({ items, className }: BreadcrumbsProps) {
               ) : (
                 <Link
                   href={item.url}
-                  className="flex min-h-11 max-w-[min(40vw,14rem)] items-center truncate rounded-lg px-2 text-gray-600 transition-colors hover:bg-rose-50 hover:text-[#B76E79]"
+                  className="flex min-h-11 max-w-[min(40vw,14rem)] items-center truncate rounded-lg px-2 text-gray-600 transition-colors hover:bg-rose-50 hover:text-fcs-brand-text"
                 >
                   {item.name}
                 </Link>

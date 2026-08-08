@@ -26,7 +26,7 @@ export default function BannerDots({ count, current, onSelect, label }: BannerDo
         >
           <span
             aria-hidden="true"
-            className={`h-2 rounded-full shadow-sm transition-all duration-300 ${index === current ? 'w-7 bg-[#B76E79]' : 'w-2 bg-white/70'}`}
+            className={`h-2 rounded-full shadow-sm transition-all duration-300 ${index === current ? 'w-7 bg-fcs-brand' : 'w-2 bg-white/70'}`}
           />
         </button>
       ))}

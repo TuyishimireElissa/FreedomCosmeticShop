@@ -94,7 +94,7 @@ export default function ProductImageGallery({
           decoding="async"
           onError={() => setFailedUrl(activeImage.url)}
           className={`h-full w-full object-contain p-8 transition-transform duration-200 ${isZoomed ? 'scale-150' : 'scale-100'} ${outOfStock ? 'opacity-60' : ''}`}
-        /> : <span role="img" aria-label={altText(activeImage)} className="flex h-full w-full items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-6 text-center text-sm text-gray-400">{t('product.no_image_available')}</span>}
+        /> : <span role="img" aria-label={altText(activeImage)} className="flex h-full w-full items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-6 text-center text-sm text-fcs-text-muted">{t('product.no_image_available')}</span>}
 
         {activeImage.imageType !== 'PRODUCT' && typeLabel(activeImage.imageType) && (
           <span className="absolute left-3 top-3 rounded-full bg-black/70 px-2.5 py-1 text-xs font-medium text-white">{typeLabel(activeImage.imageType)}</span>
@@ -113,7 +113,7 @@ export default function ProductImageGallery({
             <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-0.5 rounded-full bg-white/80 px-1 backdrop-blur">
               {gallery.map((image, index) => (
                 <button key={`${image.publicId || image.url}-${index}`} type="button" onClick={(event) => { event.stopPropagation(); setActiveIndex(index); setIsZoomed(false) }} className="flex h-11 w-7 items-center justify-center" aria-label={t('product.show_image', { number: index + 1 })} aria-pressed={index === activeIndex}>
-                  <span className={`block h-1.5 rounded-full transition-all ${index === activeIndex ? 'w-5 bg-[#B76E79]' : 'w-1.5 bg-gray-400'}`} />
+                  <span className={`block h-1.5 rounded-full transition-all ${index === activeIndex ? 'w-5 bg-fcs-brand' : 'w-1.5 bg-gray-400'}`} />
                 </button>
               ))}
             </div>
@@ -124,14 +124,14 @@ export default function ProductImageGallery({
       {gallery.length > 1 && (
         <div className="scrollbar-hide scroll-smooth-ios flex gap-2 overflow-x-auto pb-1">
           {gallery.map((image, index) => (
-            <button key={`${image.publicId || image.url}-thumb-${index}`} type="button" onClick={() => { setActiveIndex(index); setIsZoomed(false) }} className={`relative h-16 w-16 flex-none overflow-hidden rounded-xl border-2 bg-[#FAFAFA] transition-opacity sm:h-20 sm:w-20 ${index === activeIndex ? 'border-[#B76E79]' : 'border-gray-200 opacity-70 hover:opacity-100'}`} aria-label={altText(image)} aria-pressed={index === activeIndex}>
+            <button key={`${image.publicId || image.url}-thumb-${index}`} type="button" onClick={() => { setActiveIndex(index); setIsZoomed(false) }} className={`relative h-16 w-16 flex-none overflow-hidden rounded-xl border-2 bg-[#FAFAFA] transition-opacity sm:h-20 sm:w-20 ${index === activeIndex ? 'border-fcs-brand' : 'border-gray-200 opacity-70 hover:opacity-100'}`} aria-label={altText(image)} aria-pressed={index === activeIndex}>
               <img src={optimizedImageUrl(image.url, 80)} alt={altText(image)} loading="lazy" decoding="async" className="h-full w-full object-contain p-1" />
               {image.imageType !== 'PRODUCT' && typeLabel(image.imageType) && <span className="absolute inset-x-0 bottom-0 truncate bg-black/70 px-1 py-0.5 text-xs leading-none text-white">{typeLabel(image.imageType)}</span>}
             </button>
           ))}
           {videoUrl && (
             <a href={videoUrl} target="_blank" rel="noreferrer" className="relative flex h-16 w-16 flex-none items-center justify-center rounded-xl border-2 border-gray-200 bg-gray-100 sm:h-20 sm:w-20" aria-label={t('product.play_video')}>
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#B76E79] text-white"><Play className="ml-0.5 h-4 w-4 fill-current" aria-hidden="true" /></span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-fcs-brand text-white"><Play className="ml-0.5 h-4 w-4 fill-current" aria-hidden="true" /></span>
               <span className="absolute inset-x-0 bottom-0 bg-black/70 py-0.5 text-center text-xs leading-none text-white">{t('product.video')}</span>
             </a>
           )}

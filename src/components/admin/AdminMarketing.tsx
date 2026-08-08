@@ -1444,7 +1444,7 @@ function BannersTab() {
                 placeholder="https://..."
               />
               <div className="mt-2 flex items-center gap-2">
-                <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3 text-sm font-medium text-gray-600 hover:border-[#B76E79] hover:text-[#B76E79]">
+                <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border border-dashed border-gray-300 px-3 text-sm font-medium text-gray-600 hover:border-fcs-brand hover:text-fcs-brand-text">
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp"
@@ -1459,7 +1459,7 @@ function BannersTab() {
                   {uploadingImage ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                   {uploadingImage ? 'Uploading…' : 'Upload image'}
                 </label>
-                <span className="text-xs text-gray-400">JPG, PNG, WebP · Max 10 MB · Recommended 1920×600</span>
+                <span className="text-xs text-fcs-text-muted">JPG, PNG, WebP · Max 10 MB · Recommended 1920×600</span>
               </div>
               {form.image && (
                 <div className="mt-2 h-24 overflow-hidden rounded-lg border">

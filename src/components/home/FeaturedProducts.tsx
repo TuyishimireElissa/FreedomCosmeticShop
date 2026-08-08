@@ -76,7 +76,7 @@ export default function FeaturedProducts({ type = 'featured', limit = 4 }: Featu
         <div className="mx-auto max-w-7xl rounded-3xl border border-dashed border-gray-200 bg-[#f8f9fa] px-5 py-12 text-center">
           <PackageX className="mx-auto h-10 w-10 text-gray-300" aria-hidden="true" />
           <p className="mt-4 font-bold text-gray-700">{t('pages.home_no_products')}</p>
-          <Link href="/products" className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[#B76E79] px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9B5A64]">
+          <Link href="/products" className="mt-5 inline-flex min-h-11 items-center rounded-full bg-fcs-brand px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9B5A64]">
             {t('pages.home_no_products_cta')}
           </Link>
         </div>
@@ -88,8 +88,8 @@ export default function FeaturedProducts({ type = 'featured', limit = 4 }: Featu
     <section className="px-4 py-6 md:py-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-bold text-gray-900 md:text-xl">{sectionTitle}</h2>
-          <Link href={viewAllHref} className="flex min-h-11 shrink-0 items-center px-2 text-sm font-medium text-[#B76E79] transition-colors hover:text-[#9B5A64]">
+          <h2 className="font-display text-2xl font-normal text-fcs-text md:text-3xl">{sectionTitle}</h2>
+          <Link href={viewAllHref} className="flex min-h-11 shrink-0 items-center px-2 text-sm font-medium text-fcs-brand-text transition-colors hover:text-[#9B5A64]">
             {t('home.view_all')}
           </Link>
         </div>
@@ -98,7 +98,7 @@ export default function FeaturedProducts({ type = 'featured', limit = 4 }: Featu
           {products.map((product) => <ProductCard key={product.id} product={product} />)}
         </div>
 
-        <Link href={viewAllHref} className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-700 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
+        <Link href={viewAllHref} className="mt-5 flex min-h-12 w-full items-center justify-center rounded-xl border-2 border-gray-200 text-sm font-semibold text-gray-700 transition-colors hover:border-fcs-brand hover:text-fcs-brand-text">
           {t('home.view_all')}
         </Link>
       </div>

@@ -34,14 +34,14 @@ export default function NotFound() {
       <div className="absolute -right-24 top-10 h-72 w-72 rounded-full bg-[#B76E79]/15 blur-3xl" aria-hidden="true" />
       <div className="relative max-w-xl text-center">
         <BrandMark size={80} className="mx-auto h-20 w-20 rounded-full bg-white object-contain p-2 shadow-xl" />
-        <p className="mt-6 text-sm font-black uppercase tracking-[0.25em] text-[#B76E79]">{t('pages.error_404')}</p>
+        <p className="mt-6 text-sm font-black uppercase tracking-[0.25em] text-fcs-brand-text">{t('pages.error_404')}</p>
         <h1 className="mt-3 text-4xl font-black tracking-tight text-[#1a1a1a] sm:text-5xl">{t('errors.page_not_found')}</h1>
         <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-gray-500">{t('pages.not_found_hint')}</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Link href="/" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1a1a1a] px-6 text-sm font-black text-white">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />{t('pages.back_home')}
           </Link>
-          <Link href="/products" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#B76E79] px-6 text-sm font-black text-white">
+          <Link href="/products" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-brand px-6 text-sm font-black text-white">
             <Search className="h-4 w-4" aria-hidden="true" />{t('cart.browse_products')}
           </Link>
         </div>

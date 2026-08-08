@@ -54,7 +54,7 @@ export default function BlogPostContent({ post }: BlogPostContentProps) {
             <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" aria-hidden="true" />{date.toLocaleDateString(useKinyarwanda ? 'rw-RW' : 'en-RW', { dateStyle: 'medium' })}</span>
             <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" aria-hidden="true" />{t('blog.views', { count: post.viewCount })}</span>
           </div>
-          {excerpt && <p className="mt-6 border-l-4 border-[#B76E79] pl-4 text-lg leading-8 text-gray-700">{excerpt}</p>}
+          {excerpt && <p className="mt-6 border-l-4 border-fcs-brand pl-4 text-lg leading-8 text-gray-700">{excerpt}</p>}
           <div className="prose prose-sm mt-8 max-w-none whitespace-pre-line leading-7 text-gray-800">{content}</div>
         </div>
       </article>

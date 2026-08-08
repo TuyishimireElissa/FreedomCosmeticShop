@@ -59,7 +59,7 @@ export function ReviewsSection() {
       <div className="mx-auto max-w-7xl">
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="mb-2 text-xl font-bold text-gray-900 md:text-2xl">{t('home.section_reviews')}</h2>
+            <h2 className="mb-2 font-display text-2xl font-normal text-gray-900 md:text-2xl">{t('home.section_reviews')}</h2>
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex" aria-label={t('home.rating_stars', { rating: stats.averageRating })}>
                 {[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= Math.round(stats.averageRating) ? 'fill-yellow-400 text-yellow-400' : 'fill-gray-200 text-gray-200'}`} aria-hidden="true" />)}
@@ -85,7 +85,7 @@ export function ReviewsSection() {
 
                 <div className="flex items-center justify-between gap-3 border-t border-gray-100 pt-3">
                   <div className="flex min-w-0 items-center gap-2">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#B76E79]/20 text-xs font-bold text-[#B76E79]">{displayName.charAt(0).toUpperCase()}</span>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#B76E79]/20 text-xs font-bold text-fcs-brand-text">{displayName.charAt(0).toUpperCase()}</span>
                     <div className="min-w-0">
                       <p className="truncate text-xs font-semibold text-gray-900">{displayName}</p>
                       {review.skinType && KNOWN_SKIN_TYPES.has(review.skinType) && <p className="text-xs text-gray-500">{t(`skin_types.${review.skinType}`)}</p>}

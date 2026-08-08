@@ -113,12 +113,12 @@ export default function DeliveryPromo() {
   return (
     <section className="bg-gray-50 px-4 py-6 md:py-8">
       <div className="mx-auto max-w-7xl">
-        <h2 className="mb-4 text-lg font-bold text-gray-900 md:text-xl">{t('delivery.title')}</h2>
+        <h2 className="mb-4 font-display text-2xl font-normal text-fcs-text md:text-3xl">{t('delivery.title')}</h2>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center gap-2 text-base font-bold text-gray-900">
-              <Truck className="h-5 w-5 text-[#B76E79]" aria-hidden="true" />
+              <Truck className="h-5 w-5 text-fcs-brand-text" aria-hidden="true" />
               {t('delivery.title')}
             </div>
 
@@ -126,11 +126,11 @@ export default function DeliveryPromo() {
               {zones.slice(0, 5).map((zone) => (
                 <div key={zone.code} className={`flex items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm ${zone.isSameDay ? 'border border-[#B76E79]/20 bg-[#B76E79]/10' : 'bg-gray-50'}`}>
                   <div className="flex min-w-0 items-center gap-2">
-                    <MapPin className={`h-3.5 w-3.5 shrink-0 ${zone.isSameDay ? 'text-[#B76E79]' : 'text-gray-500'}`} aria-hidden="true" />
+                    <MapPin className={`h-3.5 w-3.5 shrink-0 ${zone.isSameDay ? 'text-fcs-brand-text' : 'text-gray-500'}`} aria-hidden="true" />
                     <span className="font-medium text-gray-900">{t(ZONE_KEYS[zone.code] || 'delivery.zone_other')}</span>
                   </div>
                   <div className="shrink-0 text-right">
-                    <span className="block font-bold text-[#B76E79]">{formatRWF(zone.fee)}</span>
+                    <span className="block font-bold text-fcs-brand-text">{formatRWF(zone.fee)}</span>
                     <span className="block text-xs text-gray-500">
                       {zone.isSameDay ? t('delivery.kigali_same_day') : t('delivery.business_days', { days: zone.estimatedDays })}
                     </span>
@@ -154,13 +154,13 @@ export default function DeliveryPromo() {
           ) : activeCoupon ? (
             <div className="rounded-2xl border-2 border-[#B76E79]/30 bg-white p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-2 text-base font-bold text-gray-900">
-                <Tag className="h-5 w-5 text-[#B76E79]" aria-hidden="true" />
+                <Tag className="h-5 w-5 text-fcs-brand-text" aria-hidden="true" />
                 {t('cart.coupon')}
               </div>
 
               <div className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-[#B76E79]/10 p-4">
-                <span className="min-w-0 truncate font-mono text-2xl font-black tracking-wider text-[#B76E79]">{activeCoupon.code}</span>
-                <button type="button" onClick={copyCoupon} className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-[#B76E79]/30 px-3 text-xs font-medium text-[#B76E79] transition-colors hover:bg-[#B76E79] hover:text-white" aria-label={t('home.copy_coupon', { code: activeCoupon.code })}>
+                <span className="min-w-0 truncate font-mono text-2xl font-black tracking-wider text-fcs-brand-text">{activeCoupon.code}</span>
+                <button type="button" onClick={copyCoupon} className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-[#B76E79]/30 px-3 text-xs font-medium text-fcs-brand-text transition-colors hover:bg-fcs-brand hover:text-white" aria-label={t('home.copy_coupon', { code: activeCoupon.code })}>
                   {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
                   {copied ? t('home.code_copied') : t('home.copy_code')}
                 </button>
@@ -175,14 +175,14 @@ export default function DeliveryPromo() {
                 {activeCoupon.validUntil && <li>• {t('home.coupon_valid_until', { date: new Date(activeCoupon.validUntil).toLocaleDateString(language === 'rw' ? 'rw-RW' : 'en-RW', { day: 'numeric', month: 'long', year: 'numeric' }) })}</li>}
               </ul>
 
-              <Link href="/products" className="mt-4 flex min-h-12 w-full items-center justify-center rounded-xl bg-[#B76E79] text-base font-semibold text-white transition-colors hover:bg-[#a55d68]">
+              <Link href="/products" className="mt-4 flex min-h-12 w-full items-center justify-center rounded-xl bg-fcs-brand text-base font-semibold text-white transition-colors hover:bg-fcs-brand-hover">
                 {t('home.hero_cta_primary')}
               </Link>
             </div>
           ) : (
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
               <div className="mb-4 flex items-center gap-2 text-base font-bold text-gray-900">
-                <ShieldCheck className="h-5 w-5 text-[#B76E79]" aria-hidden="true" />
+                <ShieldCheck className="h-5 w-5 text-fcs-brand-text" aria-hidden="true" />
                 {t('nav.payment_methods')}
               </div>
               <div className="space-y-3">

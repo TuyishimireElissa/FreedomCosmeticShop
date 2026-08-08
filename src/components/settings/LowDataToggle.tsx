@@ -71,7 +71,7 @@ export default function LowDataToggle({ variant = 'full' }: { variant?: 'compact
                   className={cn(
                     'min-h-[64px] rounded-xl border-2 p-2 text-center transition-colors',
                     userPreference === option.value
-                      ? 'border-[#B76E79] bg-rose-50 text-[#8a4b55]'
+                      ? 'border-fcs-brand bg-rose-50 text-fcs-brand-text'
                       : 'border-gray-200 text-gray-800 hover:border-gray-400',
                   )}
                 >

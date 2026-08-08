@@ -101,13 +101,13 @@ export default function AdminLiveVisitors() {
           <button
             type="button"
             onClick={() => void load()}
-            className="flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 hover:border-[#B76E79] hover:text-[#B76E79]"
+            className="flex min-h-11 items-center gap-2 rounded-xl border border-gray-200 px-4 text-sm font-semibold text-gray-700 hover:border-fcs-brand hover:text-fcs-brand-text"
           >
             <RefreshCw className="h-4 w-4" aria-hidden="true" /> Refresh
           </button>
           <a
             href={`/api/admin/visitors/export?range=${range}`}
-            className="flex min-h-11 items-center gap-2 rounded-xl bg-[#B76E79] px-4 text-sm font-bold text-white hover:bg-[#9B5A64]"
+            className="flex min-h-11 items-center gap-2 rounded-xl bg-fcs-brand px-4 text-sm font-bold text-white hover:bg-[#9B5A64]"
           >
             <Download className="h-4 w-4" aria-hidden="true" /> Export CSV
           </a>
@@ -130,7 +130,7 @@ export default function AdminLiveVisitors() {
         </article>
         {([['Today', data?.counts.today], ['This week', data?.counts.week], ['This month', data?.counts.month]] as const).map(([label, value]) => (
           <article key={label} className="rounded-2xl border border-gray-200 bg-white p-5">
-            <p className="text-xs font-black uppercase tracking-wider text-gray-400">{label}</p>
+            <p className="text-xs font-black uppercase tracking-wider text-fcs-text-muted">{label}</p>
             <p className="mt-2 text-4xl font-black text-gray-950">{value ?? '—'}</p>
             <p className="mt-1 text-xs text-gray-500">Unique sessions</p>
           </article>
@@ -145,7 +145,7 @@ export default function AdminLiveVisitors() {
             onClick={() => setRange(option.value)}
             aria-pressed={range === option.value}
             className={`min-h-11 rounded-xl px-4 text-sm font-semibold transition-colors ${
-              range === option.value ? 'bg-[#B76E79] text-white' : 'border border-gray-200 bg-white text-gray-700 hover:border-[#B76E79]'
+              range === option.value ? 'bg-fcs-brand text-white' : 'border border-gray-200 bg-white text-gray-700 hover:border-fcs-brand'
             }`}
           >
             {option.label}
@@ -155,7 +155,7 @@ export default function AdminLiveVisitors() {
 
       <section className="rounded-2xl border border-gray-200 bg-white p-5">
         <h2 className="flex items-center gap-2 font-black text-gray-950">
-          <MapPin className="h-4 w-4 text-[#B76E79]" aria-hidden="true" /> Districts this month
+          <MapPin className="h-4 w-4 text-fcs-brand-text" aria-hidden="true" /> Districts this month
         </h2>
         <p className="mt-1 text-xs text-gray-500">Estimated from network location, so treat as approximate.</p>
         {data?.districts.length ? (
@@ -165,7 +165,7 @@ export default function AdminLiveVisitors() {
                 <span className="w-28 shrink-0 truncate text-sm font-semibold text-gray-700">{entry.district}</span>
                 <span className="h-2.5 flex-1 overflow-hidden rounded-full bg-gray-100">
                   <span
-                    className="block h-full rounded-full bg-[#B76E79]"
+                    className="block h-full rounded-full bg-fcs-brand"
                     style={{ width: `${Math.max(4, (entry.visitors / maxDistrict) * 100)}%` }}
                   />
                 </span>
@@ -180,7 +180,7 @@ export default function AdminLiveVisitors() {
 
       <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
         <div className="flex items-center gap-2 border-b border-gray-100 p-5">
-          <Users className="h-4 w-4 text-[#B76E79]" aria-hidden="true" />
+          <Users className="h-4 w-4 text-fcs-brand-text" aria-hidden="true" />
           <h2 className="font-black text-gray-950">Sessions</h2>
           {loading && <Loader2 className="h-4 w-4 animate-spin text-gray-400" aria-hidden="true" />}
         </div>
@@ -212,9 +212,9 @@ export default function AdminLiveVisitors() {
                       </span>
                     )}
                   </td>
-                  <td className={`px-3 py-3 ${row.sector ? 'text-gray-700' : 'text-gray-400'}`}>{row.sector || NOT_PROVIDED}</td>
-                  <td className={`px-3 py-3 ${row.cell ? 'text-gray-700' : 'text-gray-400'}`}>{row.cell || NOT_PROVIDED}</td>
-                  <td className={`px-3 py-3 ${row.village ? 'text-gray-700' : 'text-gray-400'}`}>{row.village || NOT_PROVIDED}</td>
+                  <td className={`px-3 py-3 ${row.sector ? 'text-gray-700' : 'text-fcs-text-muted'}`}>{row.sector || NOT_PROVIDED}</td>
+                  <td className={`px-3 py-3 ${row.cell ? 'text-gray-700' : 'text-fcs-text-muted'}`}>{row.cell || NOT_PROVIDED}</td>
+                  <td className={`px-3 py-3 ${row.village ? 'text-gray-700' : 'text-fcs-text-muted'}`}>{row.village || NOT_PROVIDED}</td>
                   <td className="px-3 py-3 capitalize text-gray-700">{row.device || NOT_PROVIDED}</td>
                   <td className="max-w-[180px] truncate px-3 py-3 text-gray-600" title={row.currentPath || ''}>{row.currentPath || NOT_PROVIDED}</td>
                   <td className="px-3 py-3 text-gray-700">{duration(row.secondsOnSite)}</td>

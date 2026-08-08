@@ -74,7 +74,7 @@ export default function ProductGrid({ products, loading = false, error, onRetry,
   }
 
   if (error) {
-    return <div className="rounded-3xl border border-dashed border-rose-200 bg-rose-50/40 px-5 py-16 text-center"><PackageOpen className="mx-auto h-10 w-10 text-[#B76E79]" /><h2 className="mt-4 font-bold text-gray-800">{t('errors.products_load_failed')}</h2><p className="mt-1 text-sm text-gray-500">{t('search.products_load_failed_hint')}</p>{onRetry && <button type="button" onClick={onRetry} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#1a1a1a] px-5 py-2.5 text-xs font-bold text-white"><RefreshCw className="h-4 w-4" />{t('common.retry')}</button>}</div>
+    return <div className="rounded-3xl border border-dashed border-rose-200 bg-rose-50/40 px-5 py-16 text-center"><PackageOpen className="mx-auto h-10 w-10 text-fcs-brand-text" /><h2 className="mt-4 font-bold text-gray-800">{t('errors.products_load_failed')}</h2><p className="mt-1 text-sm text-gray-500">{t('search.products_load_failed_hint')}</p>{onRetry && <button type="button" onClick={onRetry} className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#1a1a1a] px-5 py-2.5 text-xs font-bold text-white"><RefreshCw className="h-4 w-4" />{t('common.retry')}</button>}</div>
   }
 
   if (products.length === 0) {
@@ -85,11 +85,11 @@ export default function ProductGrid({ products, loading = false, error, onRetry,
         <p className="mt-1 text-sm text-gray-500">{t('search.broaden_search')}</p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           {hasActiveFilters && onClearFilters && (
-            <button type="button" onClick={onClearFilters} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#B76E79] px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9B5A64]">
+            <button type="button" onClick={onClearFilters} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-fcs-brand px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9B5A64]">
               <RefreshCw className="h-4 w-4" aria-hidden="true" />{t('search.clear_all_filters')}
             </button>
           )}
-          <Link href="/products" className="inline-flex min-h-11 items-center rounded-full border border-gray-300 px-5 py-2.5 text-xs font-bold text-gray-700 transition-colors hover:border-[#B76E79] hover:text-[#B76E79]">
+          <Link href="/products" className="inline-flex min-h-11 items-center rounded-full border border-gray-300 px-5 py-2.5 text-xs font-bold text-gray-700 transition-colors hover:border-fcs-brand hover:text-fcs-brand-text">
             {t('nav.products')}
           </Link>
         </div>

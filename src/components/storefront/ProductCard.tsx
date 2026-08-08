@@ -131,7 +131,7 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
     <>
     <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
       <div className={`relative aspect-[4/5] overflow-hidden bg-gradient-to-b from-gray-50 to-white ${imageUrl && !imageLoaded && !imageFailed ? 'animate-pulse motion-reduce:animate-none' : ''}`}>
-        <Link href={`/products/${product.slug}`} prefetch={true} className="block h-full w-full rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#B76E79]" aria-label={t('product.view_product', { product: product.name })}>
+        <Link href={`/products/${product.slug}`} prefetch={true} className="block h-full w-full rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fcs-brand" aria-label={t('product.view_product', { product: product.name })}>
           {imageUrl && !imageFailed ? (
             <img
               src={optimizedImageUrl(imageUrl, 500)}
@@ -146,7 +146,7 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
             />
           ) : (
             <span role="img" aria-label={product.name} className="flex h-full w-full items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4 text-center">
-              <span><ImageIcon className="mx-auto h-12 w-12 text-gray-300" strokeWidth={1.25} aria-hidden="true" /><span className="mt-2 line-clamp-2 text-xs text-gray-400">{product.name}</span></span>
+              <span><ImageIcon className="mx-auto h-12 w-12 text-gray-300" strokeWidth={1.25} aria-hidden="true" /><span className="mt-2 line-clamp-2 text-xs text-fcs-text-muted">{product.name}</span></span>
             </span>
           )}
         </Link>
@@ -156,41 +156,41 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
           type="button"
           onClick={() => void toggleWishlist()}
           disabled={wishlistBusy}
-          className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/90 text-gray-600 opacity-100 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79] disabled:cursor-wait md:right-3 md:top-3 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+          className="absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full bg-white/90 text-gray-600 opacity-100 shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white hover:text-red-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand disabled:cursor-wait md:right-3 md:top-3 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
           aria-label={`${activeWishlisted ? t('product.remove_from_wishlist') : t('product.add_to_wishlist')}: ${product.name}`}
           aria-pressed={activeWishlisted}
         >
           <Heart className={`h-4 w-4 ${activeWishlisted ? 'fill-red-500 text-red-500' : ''}`} aria-hidden="true" />
         </button>
         <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/10 md:flex md:group-hover:pointer-events-auto md:group-focus-within:pointer-events-auto">
-          <button type="button" onClick={() => setQuickViewOpen(true)} className="pointer-events-auto translate-y-3 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 opacity-0 shadow-lg transition-all duration-300 hover:bg-[#B76E79] hover:text-white focus:translate-y-0 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79] focus-visible:ring-offset-2 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100" aria-label={`Quick View: ${product.name}`}><Eye className="mr-2 inline h-4 w-4" aria-hidden="true" />Quick View</button>
+          <button type="button" onClick={() => setQuickViewOpen(true)} className="pointer-events-auto translate-y-3 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 opacity-0 shadow-lg transition-all duration-300 hover:bg-fcs-brand hover:text-white focus:translate-y-0 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand focus-visible:ring-offset-2 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100" aria-label={`Quick View: ${product.name}`}><Eye className="mr-2 inline h-4 w-4" aria-hidden="true" />Quick View</button>
         </div>
-        <button type="button" onClick={() => setQuickViewOpen(true)} className="absolute bottom-2 right-2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-600 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79] md:hidden" aria-label={`Quick View: ${product.name}`}><Eye className="h-4 w-4" aria-hidden="true" /></button>
+        <button type="button" onClick={() => setQuickViewOpen(true)} className="absolute bottom-2 right-2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-600 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand md:hidden" aria-label={`Quick View: ${product.name}`}><Eye className="h-4 w-4" aria-hidden="true" /></button>
         <span className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden h-16 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block" aria-hidden="true" />
       </div>
 
       <div className="flex flex-1 flex-col p-3 md:p-4">
-        <p className="mb-1 truncate text-[11px] font-medium uppercase tracking-widest text-gray-400">{product.brand?.name || product.category?.name || ''}</p>
-        <Link href={`/products/${product.slug}`} prefetch={true} className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
+        <p className="mb-1 truncate text-[11px] font-medium uppercase tracking-widest text-fcs-text-muted">{product.brand?.name || product.category?.name || ''}</p>
+        <Link href={`/products/${product.slug}`} prefetch={true} className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand">
           {/* 15px minimum: 13px was unreadable for low-literacy shoppers on a
               small Android screen, which is most of this catalogue's traffic. */}
-          <h2 className="mb-1.5 line-clamp-2 min-h-11 text-[15px] font-semibold leading-snug text-gray-900 transition-colors duration-200 group-hover:text-[#B76E79] md:text-sm">{product.name}</h2>
+          <h2 className="mb-1.5 line-clamp-2 min-h-11 text-[15px] font-semibold leading-snug text-gray-900 transition-colors duration-200 group-hover:text-fcs-brand-text md:text-sm">{product.name}</h2>
         </Link>
 
         {product.reviewsCount > 0 && (
           <div className="mb-1.5 flex items-center gap-1.5" aria-label={t('product.rating_label', { rating: product.rating, count: product.reviewsCount })}>
             <span className="flex gap-0.5" aria-hidden="true">{[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-3 w-3 ${star <= Math.round(product.rating) ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'}`} />)}</span>
-            <span className="text-[11px] text-gray-400">({product.reviewsCount})</span>
+            <span className="text-[11px] text-fcs-text-muted">({product.reviewsCount})</span>
           </div>
         )}
 
-        <p className="mb-2 min-h-[1rem] text-[11px] text-gray-400">{size || ''}</p>
+        <p className="mb-2 min-h-[1rem] text-[11px] text-fcs-text-muted">{size || ''}</p>
         <div className="flex-1" />
 
         <div className="mb-3">
           <div className="flex flex-wrap items-baseline gap-2">
-            <span className="text-base font-extrabold tracking-tight text-[#B76E79] md:text-lg">{formatRWF(displayPrice)}</span>
-            {comparePrice && <span className="text-xs font-medium text-gray-400 line-through">{formatRWF(comparePrice)}</span>}
+            <span className="text-base font-extrabold tracking-tight text-fcs-brand-text md:text-lg">{formatRWF(displayPrice)}</span>
+            {comparePrice && <span className="text-xs font-medium text-fcs-text-muted line-through">{formatRWF(comparePrice)}</span>}
           </div>
           {isWholesale && savings > 0 && <p className="mt-0.5 text-[11px] font-semibold text-emerald-600">You save {formatRWF(savings)}</p>}
         </div>
@@ -199,7 +199,7 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
           type="button"
           onClick={addProduct}
           disabled={outOfStock}
-          className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-2 text-[13px] font-semibold text-white transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:bg-gray-300 ${isWholesale ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-[#B76E79] hover:bg-[#9B5A64]'}`}
+          className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-2 text-[13px] font-semibold text-white transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:bg-gray-300 ${isWholesale ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-fcs-brand hover:bg-[#9B5A64]'}`}
         >
           {added ? <Check className="h-4 w-4" aria-hidden="true" /> : <ShoppingCart className="h-4 w-4" aria-hidden="true" />}
           {outOfStock ? t('common.sold_out') : added ? t('product.added') : t('product.add_to_cart')}

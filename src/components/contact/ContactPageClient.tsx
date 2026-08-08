@@ -94,13 +94,13 @@ export default function ContactPageClient() {
   }
 
   const inputClass =
-    'mt-1 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-[#1a1a1a] outline-none transition-colors focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20'
+    'mt-1 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-[#1a1a1a] outline-none transition-colors focus:border-fcs-brand focus:ring-2 focus:ring-[#B76E79]/20'
 
   return (
     <main className="min-h-screen bg-[#f8f9fa] px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <header className="text-center">
-          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#B76E79]">{t('pages.customer_care')}</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-fcs-brand-text">{t('pages.customer_care')}</p>
           <h1 className="mt-3 text-4xl font-black text-[#1a1a1a]">{t('pages.contact_business', { business: BUSINESS.tradingName })}</h1>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-gray-500">{t('pages.contact_intro')}</p>
         </header>
@@ -115,7 +115,7 @@ export default function ContactPageClient() {
                 rel="noreferrer"
                 className="rounded-3xl border border-gray-100 bg-white p-6 text-center shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
               >
-                <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-rose-50 text-[#B76E79]"><Icon className="h-5 w-5" /></span>
+                <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-rose-50 text-fcs-brand-text"><Icon className="h-5 w-5" /></span>
                 <h2 className="mt-4 font-black">{title}</h2>
                 <p className="mt-1 break-all text-sm text-gray-500">{value}</p>
               </a>
@@ -202,7 +202,7 @@ export default function ContactPageClient() {
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#B76E79] px-6 text-sm font-black text-white transition-opacity disabled:opacity-50"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-brand px-6 text-sm font-black text-white transition-opacity disabled:opacity-50"
               >
                 {status === 'sending' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 {status === 'sending' ? t('pages.contact_sending') : t('pages.contact_send')}
@@ -216,7 +216,7 @@ export default function ContactPageClient() {
             <MapPin className="mt-1 h-5 w-5 shrink-0 text-[#FFD700]" />
             <div>
               <h2 className="text-xl font-black">{addressLine}, {BUSINESS.address.country}</h2>
-              <p className="mt-2 text-sm leading-6 text-gray-400">{t('pages.contact_orders_notice')}</p>
+              <p className="mt-2 text-sm leading-6 text-fcs-text-muted">{t('pages.contact_orders_notice')}</p>
               {supportHours && (
                 <p className="mt-4 text-xs text-gray-500">
                   {t('pages.support_hours', {
@@ -232,7 +232,7 @@ export default function ContactPageClient() {
         </section>
 
         <div className="mt-7 text-center">
-          <Link href="/faq" className="font-bold text-[#B76E79]">{t('pages.read_faq')} →</Link>
+          <Link href="/faq" className="font-bold text-fcs-brand-text">{t('pages.read_faq')} →</Link>
         </div>
       </div>
     </main>

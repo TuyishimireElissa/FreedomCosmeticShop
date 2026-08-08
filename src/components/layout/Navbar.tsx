@@ -104,7 +104,7 @@ export default function Navbar() {
         <button
           type="button"
           onClick={() => navigate(() => router.push('/'))}
-          className="flex min-w-0 shrink-0 items-center gap-2 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]"
+          className="flex min-w-0 shrink-0 items-center gap-2 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand"
           aria-label={`${BUSINESS.tradingName} home`}
         >
           {settings?.logoUrl ? (
@@ -154,7 +154,7 @@ export default function Navbar() {
 
           <LanguageSelector variant="navbar" className="hidden md:block" />
 
-          <button type="button" onClick={() => router.push('/quiz')} className="hidden min-h-10 items-center gap-1.5 rounded-xl bg-rose-50 px-3 text-xs font-bold text-[#B76E79] transition-colors hover:bg-[#B76E79] hover:text-white lg:flex">
+          <button type="button" onClick={() => router.push('/quiz')} className="hidden min-h-10 items-center gap-1.5 rounded-xl bg-rose-50 px-3 text-xs font-bold text-fcs-brand-text transition-colors hover:bg-fcs-brand hover:text-white lg:flex">
             {t('nav.quiz')}
           </button>
 
@@ -169,7 +169,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={handleWishlist}
-            className="hidden h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-[#B76E79] md:grid"
+            className="hidden h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-fcs-brand-text md:grid"
             aria-label={t('nav.wishlist')}
           >
             <Heart className="h-5 w-5" />
@@ -178,12 +178,12 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => router.push('/cart')}
-            className="relative grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-[#B76E79]"
+            className="relative grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-fcs-brand-text"
             aria-label={`${t('nav.cart')}: ${count}`}
           >
             <ShoppingCart className="h-5 w-5" />
             {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-[#B76E79] px-1 text-xs font-bold text-white ring-2 ring-white">
+              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-fcs-brand px-1 text-xs font-bold text-white ring-2 ring-white">
                 {count > 99 ? '99+' : count}
               </span>
             )}
@@ -200,7 +200,7 @@ export default function Navbar() {
                 aria-label={t('nav.account_menu')}
                 aria-expanded={accountOpen}
               >
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-[#B76E79] text-xs font-bold text-white">
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-fcs-brand text-xs font-bold text-white">
                   {user.name.charAt(0).toUpperCase()}
                 </span>
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform ${accountOpen ? 'rotate-180' : ''}`} />
@@ -218,7 +218,7 @@ export default function Navbar() {
                     <Package className="h-4 w-4" /> {t('cart.continue_shopping')}
                   </button>
                   {user.role === 'ADMIN' && (
-                    <button type="button" onClick={() => navigate(() => router.push('/admin'))} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm text-[#B76E79] hover:bg-rose-50">
+                    <button type="button" onClick={() => navigate(() => router.push('/admin'))} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm text-fcs-brand-text hover:bg-rose-50">
                       <Shield className="h-4 w-4" /> {t('nav.admin')}
                     </button>
                   )}
@@ -232,7 +232,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => router.push('/login')}
-              className="hidden rounded-full bg-[#B76E79] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#a55d68] hover:shadow-md md:block"
+              className="hidden rounded-full bg-fcs-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-fcs-brand-hover hover:shadow-md md:block"
             >
               {t('nav.login')}
             </button>
@@ -252,18 +252,18 @@ export default function Navbar() {
 
       <div className="hidden border-t border-[#EEEEEE] md:block">
         <nav className="scrollbar-hide mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-6 lg:px-8" aria-label={t('nav.product_categories')}>
-          <button type="button" onClick={() => router.push('/products')} className="shrink-0 border-b-2 border-transparent py-3 text-[13px] font-medium text-[#777777] transition-colors hover:border-[#B76E79] hover:text-[#1a1a1a]">
+          <button type="button" onClick={() => router.push('/products')} className="shrink-0 border-b-2 border-transparent py-3 text-[13px] font-medium text-[#777777] transition-colors hover:border-fcs-brand hover:text-[#1a1a1a]">
             {t('categories.all')}
           </button>
           {categories.map((category) => (
-            <button key={category.slug} type="button" onClick={() => router.push(`/products?category=${category.slug}`)} className="shrink-0 border-b-2 border-transparent py-3 text-[13px] font-medium text-[#777777] transition-colors hover:border-[#B76E79] hover:text-[#1a1a1a]">
+            <button key={category.slug} type="button" onClick={() => router.push(`/products?category=${category.slug}`)} className="shrink-0 border-b-2 border-transparent py-3 text-[13px] font-medium text-[#777777] transition-colors hover:border-fcs-brand hover:text-[#1a1a1a]">
               {t(category.translationKey)}
             </button>
           ))}
-          <button type="button" onClick={() => router.push('/bundles')} className="ml-auto flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-[#B76E79] transition-colors hover:border-[#B76E79] hover:text-[#9e5964]">
+          <button type="button" onClick={() => router.push('/bundles')} className="ml-auto flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-fcs-brand-text transition-colors hover:border-fcs-brand hover:text-fcs-brand-text">
             {t('nav.bundles')}
           </button>
-          <button type="button" onClick={() => router.push('/wholesale')} className="shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-[#B76E79] transition-colors hover:border-[#B76E79] hover:text-[#9e5964]">
+          <button type="button" onClick={() => router.push('/wholesale')} className="shrink-0 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-fcs-brand-text transition-colors hover:border-fcs-brand hover:text-fcs-brand-text">
             {t('nav.wholesale')}
           </button>
         </nav>
@@ -281,7 +281,7 @@ export default function Navbar() {
         <div className="absolute inset-x-0 top-full z-50 max-h-[calc(100dvh-7rem)] overflow-y-auto border-t border-gray-100 bg-white shadow-2xl md:hidden">
           <nav className="mx-auto max-w-lg px-4 py-5" aria-label={t('nav.mobile_navigation')}>
             <div className="mb-5 flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-gray-400">{t('nav.categories')}</p>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-fcs-text-muted">{t('nav.categories')}</p>
               <button type="button" onClick={() => setMobileOpen(false)} className="rounded-full bg-gray-100 p-2" aria-label={t('common.close')}><X className="h-4 w-4" /></button>
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -296,15 +296,15 @@ export default function Navbar() {
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => navigate(() => router.push('/quiz'))} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-rose-50 px-3 text-sm font-bold text-[#B76E79]">{t('nav.quiz')}</button>
-              <button type="button" onClick={() => navigate(() => router.push('/bundles'))} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-rose-50 px-3 text-sm font-bold text-[#B76E79]">{t('nav.bundles')}</button>
+              <button type="button" onClick={() => navigate(() => router.push('/quiz'))} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-rose-50 px-3 text-sm font-bold text-fcs-brand-text">{t('nav.quiz')}</button>
+              <button type="button" onClick={() => navigate(() => router.push('/bundles'))} className="flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-rose-50 px-3 text-sm font-bold text-fcs-brand-text">{t('nav.bundles')}</button>
             </div>
-            <button type="button" onClick={() => navigate(() => router.push('/wholesale'))} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#fff8e7] px-4 py-3 font-bold text-[#9e5964] ring-1 ring-[#FFD700]/30">
+            <button type="button" onClick={() => navigate(() => router.push('/wholesale'))} className="mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#fff8e7] px-4 py-3 font-bold text-fcs-brand-text ring-1 ring-[#FFD700]/30">
               {t('nav.wholesale_offer')}
             </button>
 
             <div className="mt-5 border-t border-gray-100 pt-4">
-              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">{t('nav.language')}</p>
+              <p className="mb-2 text-xs font-bold uppercase tracking-wider text-fcs-text-muted">{t('nav.language')}</p>
               <LanguageSelector variant="mobile" />
             </div>
 
@@ -316,13 +316,13 @@ export default function Navbar() {
               {user ? (
                 <>
                   <button type="button" onClick={() => navigate(() => router.push('/account'))} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-medium hover:bg-gray-50"><User className="h-5 w-5" /> {t('nav.account')}</button>
-                  {user.role === 'ADMIN' && <button type="button" onClick={() => navigate(() => router.push('/admin'))} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-medium text-[#B76E79] hover:bg-rose-50"><Shield className="h-5 w-5" /> {t('nav.admin')}</button>}
+                  {user.role === 'ADMIN' && <button type="button" onClick={() => navigate(() => router.push('/admin'))} className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left font-medium text-fcs-brand-text hover:bg-rose-50"><Shield className="h-5 w-5" /> {t('nav.admin')}</button>}
                   <button type="button" onClick={handleLogout} className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-red-100 py-3 font-semibold text-red-600"><LogOut className="h-4 w-4" /> {t('nav.logout')}</button>
                 </>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
-                  <button type="button" onClick={() => navigate(() => router.push('/login'))} className="rounded-full bg-[#B76E79] py-3 font-semibold text-white">{t('nav.login')}</button>
-                  <button type="button" onClick={() => navigate(() => router.push('/register'))} className="rounded-full border-2 border-[#B76E79] py-3 font-semibold text-[#B76E79]">{t('nav.register')}</button>
+                  <button type="button" onClick={() => navigate(() => router.push('/login'))} className="rounded-full bg-fcs-brand py-3 font-semibold text-white">{t('nav.login')}</button>
+                  <button type="button" onClick={() => navigate(() => router.push('/register'))} className="rounded-full border-2 border-fcs-brand py-3 font-semibold text-fcs-brand-text">{t('nav.register')}</button>
                 </div>
               )}
             </div>

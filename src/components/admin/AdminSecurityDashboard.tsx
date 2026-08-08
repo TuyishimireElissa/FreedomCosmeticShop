@@ -186,7 +186,7 @@ export function AdminSecurityDashboard() {
         <div>
           <div className="flex items-center gap-2 text-[#e2aab2]"><ShieldCheck className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.18em]">Live security telemetry</span></div>
           <h2 className="mt-2 text-2xl font-black">Admin Security Dashboard</h2>
-          <p className="mt-1 text-xs text-gray-400">Generated {formatDate(data.generatedAt)} · refreshes every 60 seconds</p>
+          <p className="mt-1 text-xs text-fcs-text-muted">Generated {formatDate(data.generatedAt)} · refreshes every 60 seconds</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/admin/security/mfa" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/15 px-4 text-sm font-bold hover:bg-white/10"><KeyRound className="h-4 w-4" />MFA settings</Link>
@@ -214,7 +214,7 @@ export function AdminSecurityDashboard() {
             {data.alerts.length === 0 ? <div className="p-8 text-center text-sm text-gray-500"><CheckCircle2 className="mx-auto mb-2 h-9 w-9 text-emerald-500" />No unresolved alerts</div> : data.alerts.map((alert) => (
               <div key={alert.id} className="p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${severityClass(alert.severity)}`}>{alert.severity}</span><span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{alert.type}</span></div><p className="mt-2 font-bold text-gray-900">{alert.title}</p><p className="mt-1 text-sm leading-6 text-gray-600">{alert.message}</p><p className="mt-2 text-xs text-gray-400">{formatDate(alert.createdAt)}{alert.ipAddress ? ` · IP ${alert.ipAddress}` : ''}</p></div>
+                  <div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className={`rounded-full px-2 py-0.5 text-[10px] font-black ${severityClass(alert.severity)}`}>{alert.severity}</span><span className="text-[10px] font-bold uppercase tracking-wider text-fcs-text-muted">{alert.type}</span></div><p className="mt-2 font-bold text-gray-900">{alert.title}</p><p className="mt-1 text-sm leading-6 text-gray-600">{alert.message}</p><p className="mt-2 text-xs text-fcs-text-muted">{formatDate(alert.createdAt)}{alert.ipAddress ? ` · IP ${alert.ipAddress}` : ''}</p></div>
                   <Button size="sm" variant="outline" disabled={resolvingId === alert.id} onClick={() => void resolveAlert(alert)}>{resolvingId === alert.id ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="mr-2 h-3.5 w-3.5" />}Resolve</Button>
                 </div>
               </div>

@@ -28,7 +28,7 @@ export default function AdminAuthGuard({ children }: { children: React.ReactNode
     return (
       <div className="grid min-h-dvh place-items-center bg-[#f8f9fa] px-4">
         <div className="text-center" role="status" aria-live="polite">
-          <div className="mx-auto mb-4 h-14 w-14 animate-spin rounded-full border-4 border-[#B76E79]/20 border-t-[#B76E79]" />
+          <div className="mx-auto mb-4 h-14 w-14 animate-spin rounded-full border-4 border-[#B76E79]/20 border-t-fcs-brand" />
           <p className="text-sm font-semibold text-[#1a1a1a]">Loading admin workspace</p>
           <p className="mt-1 text-xs text-gray-500">Verifying secure access…</p>
         </div>

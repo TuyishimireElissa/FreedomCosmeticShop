@@ -145,6 +145,8 @@ export const en = {
     shop: 'Shop', help: 'Help', track_order: 'Track your order', delivery_kigali: 'Delivery: 1–3 days in Kigali', delivery_provinces: 'Provinces: 3–5 days', shipping_policy: 'Shipping policy', returns_refunds: 'Returns & refunds', faq: 'FAQ', privacy_policy: 'Privacy policy', terms_conditions: 'Terms & conditions', contact: 'Contact Us', whatsapp_chat: 'WhatsApp Chat', we_accept: 'We accept', made_in_rwanda: 'Made with love in Rwanda ', all_rights_reserved: 'All rights reserved.', wholesale_beauty: 'Wholesale beauty', genuine: '100% Authentic', genuine_products: 'Genuine products', fast_delivery: 'Fast Delivery', all_districts: 'All 30 districts', simple_payment: 'Simple local payment', local_support: 'Local Support', here_to_help: 'Here when you need us', returns_days: 'Returns within {days} days', admin_dashboard: 'Admin Dashboard', safe_pay: 'Safe Pay', secured_by: 'Secured by {provider}', mobile_money_accepted: 'Mobile Money accepted', whatsapp_support: 'WhatsApp Support',
   },
   home: {
+    concierge_eyebrow: 'Beauty concierge',
+    concierge_cta: 'Chat with a beauty advisor',
     apply_wholesale: 'Apply for wholesale',
     apply_wholesale_account: 'Apply for Wholesale Account',
     authentic_percent: '100% authentic',
@@ -297,8 +299,8 @@ export const en = {
     section_reviews: 'Customer Reviews',
     verified_reviews_count: '{count} verified purchases',
 
-    whatsapp_title: 'Need Help?',
-    whatsapp_subtitle: 'Send our customer support team a message on WhatsApp.',
+    whatsapp_title: 'Not sure what to choose?',
+    whatsapp_subtitle: 'Tell our beauty team what you are looking for and they will help you find the right product.',
     whatsapp_hours: 'Support hours: {hours}',
     quiz_title: 'Find a routine from the current catalogue',
     quiz_subtitle: 'Answer six questions to see products that match your category, concern, budget, and preferences.',

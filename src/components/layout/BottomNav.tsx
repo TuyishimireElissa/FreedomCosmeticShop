@@ -102,7 +102,7 @@ export default function BottomNav() {
                 }}
                 className={cn(
                   'flex min-h-11 min-w-0 flex-1 touch-manipulation flex-col items-center justify-center gap-0.5 px-1 py-2 transition-colors duration-150 active:bg-gray-50',
-                  active ? 'text-[#B76E79]' : 'text-gray-500 hover:text-gray-700',
+                  active ? 'text-fcs-brand-text' : 'text-gray-500 hover:text-gray-700',
                 )}
                 aria-current={active ? 'page' : undefined}
               >
@@ -110,7 +110,7 @@ export default function BottomNav() {
                   <Icon size={22} strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
                   {item.badge !== undefined && item.badge > 0 && (
                     <span
-                      className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#B76E79] px-0.5 text-[10px] font-bold leading-none text-white"
+                      className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-fcs-brand px-0.5 text-[10px] font-bold leading-none text-white"
                       aria-label={t('cart.items', { count: item.badge })}
                     >
                       {item.badge > 99 ? '99+' : item.badge}

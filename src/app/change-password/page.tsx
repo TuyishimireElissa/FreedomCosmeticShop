@@ -47,7 +47,7 @@ export default function ChangePasswordPage() {
   return (
     <main className="grid min-h-dvh place-items-center bg-gradient-to-br from-[#1a1a1a] via-[#2d2426] to-[#6f4249] px-4 py-10">
       <div className="w-full max-w-md rounded-[2rem] bg-white p-6 shadow-2xl sm:p-8">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-rose-50 text-[#B76E79]"><ShieldCheck className="h-7 w-7" aria-hidden="true" /></span>
+        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-rose-50 text-fcs-brand-text"><ShieldCheck className="h-7 w-7" aria-hidden="true" /></span>
         <h1 className="mt-5 text-center text-2xl font-black">{t('auth.change_password_title')}</h1>
         <p className="mt-2 text-center text-sm leading-6 text-gray-500">{t(user?.mustChangePassword ? 'auth.temporary_password_replace' : 'auth.unique_password_advice')}</p>
         {error && <p className="mt-4 rounded-xl bg-red-50 p-3 text-center text-sm font-semibold text-red-700" role="alert" aria-live="assertive">{error}</p>}
@@ -60,7 +60,7 @@ export default function ChangePasswordPage() {
             {t(visible ? 'auth.hide_passwords' : 'auth.show_passwords')}
           </button>
           <div className="rounded-xl bg-gray-50 p-3 text-xs leading-5 text-gray-600">{t('auth.strong_password_requirement')}</div>
-          <button type="submit" disabled={loading || !currentPassword || !newPassword || !confirm} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#B76E79] text-sm font-black text-white disabled:opacity-50">
+          <button type="submit" disabled={loading || !currentPassword || !newPassword || !confirm} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-fcs-brand text-sm font-black text-white disabled:opacity-50">
             {loading ? <><Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />{t('auth.updating_password')}</> : t('auth.change_password_button')}
           </button>
         </form>
