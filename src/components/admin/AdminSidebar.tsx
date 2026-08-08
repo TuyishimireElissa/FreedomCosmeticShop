@@ -154,7 +154,7 @@ export default function AdminSidebar() {
                       onClick={() => { if (item.href) { router.push(item.href); setMobileOpen(false) } else selectTab(item.tab) }}
                       className={`group relative flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-all ${
                         active
-                          ? 'bg-fcs-brand font-semibold text-white shadow-lg shadow-[#B76E79]/15'
+                          ? 'bg-fcs-brand-strong font-semibold text-white shadow-lg shadow-[#B76E79]/15'
                           : 'text-fcs-text-muted hover:bg-white/[0.07] hover:text-white'
                       } ${collapsed ? 'md:justify-center md:px-2' : ''}`}
                       title={collapsed ? label : undefined}

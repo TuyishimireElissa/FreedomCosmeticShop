@@ -50,7 +50,7 @@ export function AnalyticsConsentBanner() {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         <button type="button" onClick={() => choose(false)} className="min-h-12 rounded-xl border border-gray-300 px-4 text-sm font-bold text-gray-800">{t('analytics_consent.decline')}</button>
-        <button type="button" onClick={() => choose(true)} className="min-h-12 rounded-xl bg-fcs-brand px-4 text-sm font-bold text-white">{t('analytics_consent.accept')}</button>
+        <button type="button" onClick={() => choose(true)} className="min-h-12 rounded-xl bg-fcs-brand-strong px-4 text-sm font-bold text-white">{t('analytics_consent.accept')}</button>
       </div>
     </aside>
   )

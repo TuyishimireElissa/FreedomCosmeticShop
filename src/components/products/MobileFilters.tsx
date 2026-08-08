@@ -65,7 +65,7 @@ export default function MobileFilters({ availableCategories, availableBrands }: 
       <SheetTrigger asChild>
         <button type="button" className="relative flex min-h-11 items-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 text-sm font-bold text-gray-700 lg:hidden" aria-label={t('search.filters')}>
           <Filter className="h-4 w-4" />{t('search.filters')}
-          {activeFilterCount > 0 && <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-fcs-brand px-1 text-xs text-white">{activeFilterCount}</span>}
+          {activeFilterCount > 0 && <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-fcs-brand-strong px-1 text-xs text-white">{activeFilterCount}</span>}
         </button>
       </SheetTrigger>
       <SheetContent
@@ -117,7 +117,7 @@ export default function MobileFilters({ availableCategories, availableBrands }: 
         </div>
 
         <SheetFooter className="sticky bottom-0 border-t border-gray-100 bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <button type="button" onClick={apply} className="min-h-[52px] w-full rounded-2xl bg-fcs-brand text-base font-black text-white">{t('common.apply')}{localActiveCount > 0 ? ` (${localActiveCount})` : ''}</button>
+          <button type="button" onClick={apply} className="min-h-[52px] w-full rounded-2xl bg-fcs-brand-strong text-base font-black text-white">{t('common.apply')}{localActiveCount > 0 ? ` (${localActiveCount})` : ''}</button>
           <SheetClose asChild><button type="button" className="min-h-11 w-full rounded-xl text-sm font-semibold text-gray-600"><X className="mr-1 inline h-4 w-4" />{t('common.close')}</button></SheetClose>
         </SheetFooter>
       </SheetContent>

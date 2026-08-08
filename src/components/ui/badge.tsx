@@ -15,6 +15,10 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline: "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+        // Umweto: brand promise badge. Static, no per-product data required.
+        'fcs-african': 'border-transparent bg-fcs-sage/15 text-fcs-umber',
+        'fcs-verified': 'border-transparent bg-fcs-brand-strong/10 text-fcs-brand-text',
+        'fcs-sale': 'border-transparent bg-fcs-brand-strong text-white',
       },
     },
     defaultVariants: {

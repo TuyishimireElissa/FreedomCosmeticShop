@@ -85,7 +85,7 @@ export default function ProductGrid({ products, loading = false, error, onRetry,
         <p className="mt-1 text-sm text-gray-500">{t('search.broaden_search')}</p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           {hasActiveFilters && onClearFilters && (
-            <button type="button" onClick={onClearFilters} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-fcs-brand px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9B5A64]">
+            <button type="button" onClick={onClearFilters} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-fcs-brand-strong px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9B5A64]">
               <RefreshCw className="h-4 w-4" aria-hidden="true" />{t('search.clear_all_filters')}
             </button>
           )}

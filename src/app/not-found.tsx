@@ -41,7 +41,7 @@ export default function NotFound() {
           <Link href="/" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#1a1a1a] px-6 text-sm font-black text-white">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />{t('pages.back_home')}
           </Link>
-          <Link href="/products" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-brand px-6 text-sm font-black text-white">
+          <Link href="/products" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-brand-strong px-6 text-sm font-black text-white">
             <Search className="h-4 w-4" aria-hidden="true" />{t('cart.browse_products')}
           </Link>
         </div>

@@ -160,7 +160,7 @@ export default function DeliveryPromo() {
 
               <div className="mb-4 flex items-center justify-between gap-3 rounded-xl bg-[#B76E79]/10 p-4">
                 <span className="min-w-0 truncate font-mono text-2xl font-black tracking-wider text-fcs-brand-text">{activeCoupon.code}</span>
-                <button type="button" onClick={copyCoupon} className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-[#B76E79]/30 px-3 text-xs font-medium text-fcs-brand-text transition-colors hover:bg-fcs-brand hover:text-white" aria-label={t('home.copy_coupon', { code: activeCoupon.code })}>
+                <button type="button" onClick={copyCoupon} className="flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-[#B76E79]/30 px-3 text-xs font-medium text-fcs-brand-text transition-colors hover:bg-fcs-brand-strong hover:text-white" aria-label={t('home.copy_coupon', { code: activeCoupon.code })}>
                   {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
                   {copied ? t('home.code_copied') : t('home.copy_code')}
                 </button>
@@ -175,7 +175,7 @@ export default function DeliveryPromo() {
                 {activeCoupon.validUntil && <li>• {t('home.coupon_valid_until', { date: new Date(activeCoupon.validUntil).toLocaleDateString(language === 'rw' ? 'rw-RW' : 'en-RW', { day: 'numeric', month: 'long', year: 'numeric' }) })}</li>}
               </ul>
 
-              <Link href="/products" className="mt-4 flex min-h-12 w-full items-center justify-center rounded-xl bg-fcs-brand text-base font-semibold text-white transition-colors hover:bg-fcs-brand-hover">
+              <Link href="/products" className="mt-4 flex min-h-12 w-full items-center justify-center rounded-xl bg-fcs-brand-strong text-base font-semibold text-white transition-colors hover:bg-fcs-brand-strong-hover">
                 {t('home.hero_cta_primary')}
               </Link>
             </div>

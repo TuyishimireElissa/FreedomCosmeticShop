@@ -163,7 +163,7 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
           <Heart className={`h-4 w-4 ${activeWishlisted ? 'fill-red-500 text-red-500' : ''}`} aria-hidden="true" />
         </button>
         <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/10 md:flex md:group-hover:pointer-events-auto md:group-focus-within:pointer-events-auto">
-          <button type="button" onClick={() => setQuickViewOpen(true)} className="pointer-events-auto translate-y-3 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 opacity-0 shadow-lg transition-all duration-300 hover:bg-fcs-brand hover:text-white focus:translate-y-0 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand focus-visible:ring-offset-2 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100" aria-label={`Quick View: ${product.name}`}><Eye className="mr-2 inline h-4 w-4" aria-hidden="true" />Quick View</button>
+          <button type="button" onClick={() => setQuickViewOpen(true)} className="pointer-events-auto translate-y-3 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 opacity-0 shadow-lg transition-all duration-300 hover:bg-fcs-brand-strong hover:text-white focus:translate-y-0 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand focus-visible:ring-offset-2 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100" aria-label={`Quick View: ${product.name}`}><Eye className="mr-2 inline h-4 w-4" aria-hidden="true" />Quick View</button>
         </div>
         <button type="button" onClick={() => setQuickViewOpen(true)} className="absolute bottom-2 right-2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-600 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand md:hidden" aria-label={`Quick View: ${product.name}`}><Eye className="h-4 w-4" aria-hidden="true" /></button>
         <span className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden h-16 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block" aria-hidden="true" />
@@ -203,7 +203,7 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
           type="button"
           onClick={addProduct}
           disabled={outOfStock}
-          className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-2 text-[13px] font-semibold text-white transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:bg-gray-300 ${isWholesale ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-fcs-brand hover:bg-[#9B5A64]'}`}
+          className={`flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-2 text-[13px] font-semibold text-white transition-all duration-150 active:scale-[0.97] disabled:cursor-not-allowed disabled:bg-gray-300 ${isWholesale ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-fcs-brand-strong hover:bg-[#9B5A64]'}`}
         >
           {added ? <Check className="h-4 w-4" aria-hidden="true" /> : <ShoppingCart className="h-4 w-4" aria-hidden="true" />}
           {outOfStock ? t('common.sold_out') : added ? t('product.added') : t('product.add_to_cart')}

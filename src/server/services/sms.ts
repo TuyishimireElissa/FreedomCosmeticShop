@@ -1,4 +1,9 @@
 /**
+ * FEATURE-FLAGGED: Currently disabled. Business decision: WhatsApp-only
+ * ordering with payment collected on delivery. This integration is preserved
+ * and working — see /api/config/features to re-enable.
+ */
+/**
  * SMS Service — Complete Rwanda SMS integration with Africa's Talking + Pindo.
  *
  * Features:

@@ -218,7 +218,7 @@ function ProductsContent() {
                     onClick={() => setFilter('page', String(page + 1))}
                     disabled={loading}
                     aria-controls="product-results"
-                    className="min-h-12 rounded-xl bg-fcs-brand px-6 text-sm font-bold text-white transition-colors hover:bg-fcs-brand-hover disabled:cursor-wait disabled:opacity-60"
+                    className="min-h-12 rounded-xl bg-fcs-brand-strong px-6 text-sm font-bold text-white transition-colors hover:bg-fcs-brand-strong-hover disabled:cursor-wait disabled:opacity-60"
                   >
                     {loading ? t('search.loading_more_products') : t('search.load_more_products')}
                   </button>

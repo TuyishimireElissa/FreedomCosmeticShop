@@ -76,7 +76,7 @@ export default function FeaturedProducts({ type = 'featured', limit = 4 }: Featu
         <div className="mx-auto max-w-7xl rounded-3xl border border-dashed border-gray-200 bg-[#f8f9fa] px-5 py-12 text-center">
           <PackageX className="mx-auto h-10 w-10 text-gray-300" aria-hidden="true" />
           <p className="mt-4 font-bold text-gray-700">{t('pages.home_no_products')}</p>
-          <Link href="/products" className="mt-5 inline-flex min-h-11 items-center rounded-full bg-fcs-brand px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9B5A64]">
+          <Link href="/products" className="mt-5 inline-flex min-h-11 items-center rounded-full bg-fcs-brand-strong px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9B5A64]">
             {t('pages.home_no_products_cta')}
           </Link>
         </div>

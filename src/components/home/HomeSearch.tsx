@@ -43,7 +43,7 @@ export default function HomeSearch() {
           />
           <button
             type="submit"
-            className="absolute right-1.5 top-1/2 flex h-11 w-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-xl bg-fcs-brand text-white transition-colors hover:bg-fcs-brand-hover"
+            className="absolute right-1.5 top-1/2 flex h-11 w-11 -translate-y-1/2 touch-manipulation items-center justify-center rounded-xl bg-fcs-brand-strong text-white transition-colors hover:bg-fcs-brand-strong-hover"
             aria-label={t('common.search')}
           >
             <Search className="h-[18px] w-[18px]" aria-hidden="true" />

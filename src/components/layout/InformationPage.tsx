@@ -42,7 +42,7 @@ export default function InformationPage({
           <div className="border-t border-gray-100 pt-6 text-sm text-gray-500">
             {t('pages.questions_contact', { business: BUSINESS.tradingName })}
           </div>
-          <Link href="/" className="inline-flex min-h-11 items-center rounded-full bg-fcs-brand px-5 py-2.5 text-sm font-black text-white">{t('pages.back_to_store')}</Link>
+          <Link href="/" className="inline-flex min-h-11 items-center rounded-full bg-fcs-brand-strong px-5 py-2.5 text-sm font-black text-white">{t('pages.back_to_store')}</Link>
         </div>
       </article>
     </main>

@@ -110,7 +110,7 @@ export default function BottomNav() {
                   <Icon size={22} strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
                   {item.badge !== undefined && item.badge > 0 && (
                     <span
-                      className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-fcs-brand px-0.5 text-[10px] font-bold leading-none text-white"
+                      className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-fcs-brand-strong px-0.5 text-[10px] font-bold leading-none text-white"
                       aria-label={t('cart.items', { count: item.badge })}
                     >
                       {item.badge > 99 ? '99+' : item.badge}

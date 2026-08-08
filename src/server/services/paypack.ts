@@ -1,4 +1,9 @@
 /**
+ * FEATURE-FLAGGED: Currently disabled. Business decision: WhatsApp-only
+ * ordering with payment collected on delivery. This integration is preserved
+ * and working — see /api/config/features to re-enable.
+ */
+/**
  * PayPack Service — Complete MTN MoMo + Airtel Money integration for Rwanda.
  *
  * PayPack is a Rwandan payment aggregator that supports both MTN Mobile Money

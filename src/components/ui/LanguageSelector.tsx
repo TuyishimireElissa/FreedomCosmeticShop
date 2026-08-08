@@ -49,7 +49,7 @@ export default function LanguageSelector({
     return (
       <div className={`flex items-center gap-1 rounded-full bg-gray-100 p-1 ${className}`} role="group" aria-label="Choose language">
         {AVAILABLE_LANGUAGES.map((item) => (
-          <button key={item.code} type="button" onClick={() => choose(item.code)} aria-pressed={language === item.code} className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${language === item.code ? 'bg-fcs-brand text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'}`} title={item.nativeName}>
+          <button key={item.code} type="button" onClick={() => choose(item.code)} aria-pressed={language === item.code} className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${language === item.code ? 'bg-fcs-brand-strong text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'}`} title={item.nativeName}>
             {item.code.toUpperCase()}
           </button>
         ))}

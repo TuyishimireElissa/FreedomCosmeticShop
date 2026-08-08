@@ -131,7 +131,7 @@ export default function ProductImageGallery({
           ))}
           {videoUrl && (
             <a href={videoUrl} target="_blank" rel="noreferrer" className="relative flex h-16 w-16 flex-none items-center justify-center rounded-xl border-2 border-gray-200 bg-gray-100 sm:h-20 sm:w-20" aria-label={t('product.play_video')}>
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-fcs-brand text-white"><Play className="ml-0.5 h-4 w-4 fill-current" aria-hidden="true" /></span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-fcs-brand-strong text-white"><Play className="ml-0.5 h-4 w-4 fill-current" aria-hidden="true" /></span>
               <span className="absolute inset-x-0 bottom-0 bg-black/70 py-0.5 text-center text-xs leading-none text-white">{t('product.video')}</span>
             </a>
           )}

@@ -154,7 +154,7 @@ export default function Navbar() {
 
           <LanguageSelector variant="navbar" className="hidden md:block" />
 
-          <button type="button" onClick={() => router.push('/quiz')} className="hidden min-h-10 items-center gap-1.5 rounded-xl bg-rose-50 px-3 text-xs font-bold text-fcs-brand-text transition-colors hover:bg-fcs-brand hover:text-white lg:flex">
+          <button type="button" onClick={() => router.push('/quiz')} className="hidden min-h-10 items-center gap-1.5 rounded-xl bg-rose-50 px-3 text-xs font-bold text-fcs-brand-text transition-colors hover:bg-fcs-brand-strong hover:text-white lg:flex">
             {t('nav.quiz')}
           </button>
 
@@ -183,7 +183,7 @@ export default function Navbar() {
           >
             <ShoppingCart className="h-5 w-5" />
             {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-fcs-brand px-1 text-xs font-bold text-white ring-2 ring-white">
+              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-fcs-brand-strong px-1 text-xs font-bold text-white ring-2 ring-white">
                 {count > 99 ? '99+' : count}
               </span>
             )}
@@ -200,7 +200,7 @@ export default function Navbar() {
                 aria-label={t('nav.account_menu')}
                 aria-expanded={accountOpen}
               >
-                <span className="grid h-7 w-7 place-items-center rounded-full bg-fcs-brand text-xs font-bold text-white">
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-fcs-brand-strong text-xs font-bold text-white">
                   {user.name.charAt(0).toUpperCase()}
                 </span>
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform ${accountOpen ? 'rotate-180' : ''}`} />
@@ -232,7 +232,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => router.push('/login')}
-              className="hidden rounded-full bg-fcs-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-fcs-brand-hover hover:shadow-md md:block"
+              className="hidden rounded-full bg-fcs-brand-strong px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-fcs-brand-strong-hover hover:shadow-md md:block"
             >
               {t('nav.login')}
             </button>
@@ -321,7 +321,7 @@ export default function Navbar() {
                 </>
               ) : (
                 <div className="grid grid-cols-2 gap-2">
-                  <button type="button" onClick={() => navigate(() => router.push('/login'))} className="rounded-full bg-fcs-brand py-3 font-semibold text-white">{t('nav.login')}</button>
+                  <button type="button" onClick={() => navigate(() => router.push('/login'))} className="rounded-full bg-fcs-brand-strong py-3 font-semibold text-white">{t('nav.login')}</button>
                   <button type="button" onClick={() => navigate(() => router.push('/register'))} className="rounded-full border-2 border-fcs-brand py-3 font-semibold text-fcs-brand-text">{t('nav.register')}</button>
                 </div>
               )}

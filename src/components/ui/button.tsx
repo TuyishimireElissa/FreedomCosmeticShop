@@ -15,8 +15,15 @@ const buttonVariants = cva(
         secondary: "bg-[#1a1a1a] text-white hover:bg-black",
         ghost: "text-[#666666] hover:bg-[#F5F5F5] hover:text-[#1a1a1a]",
         link: "text-primary underline-offset-4 hover:underline",
+        // Umweto: filled brand button. brand-strong because white text on the
+        // lighter brand rose is only 3.80:1 and fails AA for normal text.
+        'fcs-primary': 'bg-fcs-brand-strong text-white shadow-fcs-2 hover:bg-fcs-brand-strong-hover',
+        // Umweto: WhatsApp action. Breathing pulse is opt-out under reduced motion.
+        'fcs-whatsapp': 'bg-fcs-whatsapp text-white shadow-fcs-glow-wa hover:bg-fcs-whatsapp-hover motion-safe:animate-[fcs-breathe_3.2s_ease-in-out_infinite]',
       },
       size: {
+        // Umweto: 56px primary action target for mobile-first tapping.
+        'fcs-xl': 'min-h-14 rounded-full px-8 text-base font-semibold',
         default: "h-11 px-5 py-2 has-[>svg]:px-4",
         sm: "h-10 gap-1.5 px-4 text-[13px] has-[>svg]:px-3",
         lg: "h-12 px-6 has-[>svg]:px-5",

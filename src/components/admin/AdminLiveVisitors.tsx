@@ -107,7 +107,7 @@ export default function AdminLiveVisitors() {
           </button>
           <a
             href={`/api/admin/visitors/export?range=${range}`}
-            className="flex min-h-11 items-center gap-2 rounded-xl bg-fcs-brand px-4 text-sm font-bold text-white hover:bg-[#9B5A64]"
+            className="flex min-h-11 items-center gap-2 rounded-xl bg-fcs-brand-strong px-4 text-sm font-bold text-white hover:bg-[#9B5A64]"
           >
             <Download className="h-4 w-4" aria-hidden="true" /> Export CSV
           </a>
@@ -145,7 +145,7 @@ export default function AdminLiveVisitors() {
             onClick={() => setRange(option.value)}
             aria-pressed={range === option.value}
             className={`min-h-11 rounded-xl px-4 text-sm font-semibold transition-colors ${
-              range === option.value ? 'bg-fcs-brand text-white' : 'border border-gray-200 bg-white text-gray-700 hover:border-fcs-brand'
+              range === option.value ? 'bg-fcs-brand-strong text-white' : 'border border-gray-200 bg-white text-gray-700 hover:border-fcs-brand'
             }`}
           >
             {option.label}

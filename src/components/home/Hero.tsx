@@ -95,7 +95,7 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href="/products"
-              className="inline-flex min-h-12 items-center justify-center rounded-[10px] bg-fcs-brand px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#9B5A64] active:scale-[0.98]"
+              className="inline-flex min-h-12 items-center justify-center rounded-[10px] bg-fcs-brand-strong px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#9B5A64] active:scale-[0.98]"
             >
               {t('home.hero_cta_primary')}
             </Link>

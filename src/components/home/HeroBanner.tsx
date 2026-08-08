@@ -102,7 +102,7 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
           <h1 className="mt-4 text-2xl font-black leading-tight md:text-4xl lg:text-5xl">{t('home.hero_title')}</h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">{t('home.hero_subtitle')}</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <button type="button" onClick={() => router.push('/products')} className="inline-flex items-center gap-2 rounded-full bg-fcs-brand px-6 py-3 text-sm font-bold text-white shadow-xl hover:bg-fcs-brand-hover">{t('home.shop_collection')} <ArrowRight className="h-4 w-4" /></button>
+            <button type="button" onClick={() => router.push('/products')} className="inline-flex items-center gap-2 rounded-full bg-fcs-brand-strong px-6 py-3 text-sm font-bold text-white shadow-xl hover:bg-fcs-brand-strong-hover">{t('home.shop_collection')} <ArrowRight className="h-4 w-4" /></button>
             {onRetry && <button type="button" onClick={onRetry} className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-semibold backdrop-blur hover:bg-white/15"><RefreshCw className="h-4 w-4" />{t('home.retry_banners')}</button>}
           </div>
         </div>
@@ -173,7 +173,7 @@ export function HeroBanner({ banners, loading = false, error, onRetry }: HeroBan
                   <h1 className="mt-3 max-w-xl text-2xl font-black leading-tight tracking-tight md:mt-5 md:text-4xl lg:text-5xl">{banner.title}</h1>
                   {banner.subtitle && <p className="mt-2 line-clamp-2 max-w-xl text-sm leading-5 text-white/80 md:mt-4 md:line-clamp-none md:text-base md:leading-6 lg:text-lg">{banner.subtitle}</p>}
                   <div className="mt-4 flex flex-wrap gap-2 md:mt-7 md:gap-3">
-                    <button type="button" onClick={() => followBanner(banner)} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-fcs-brand px-6 text-sm font-bold text-white shadow-xl shadow-black/20 transition-all hover:-translate-y-0.5 hover:bg-fcs-brand-hover">{t('home.shop_now')} <ArrowRight className="h-4 w-4" /></button>
+                    <button type="button" onClick={() => followBanner(banner)} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-fcs-brand-strong px-6 text-sm font-bold text-white shadow-xl shadow-black/20 transition-all hover:-translate-y-0.5 hover:bg-fcs-brand-strong-hover">{t('home.shop_now')} <ArrowRight className="h-4 w-4" /></button>
                     <button type="button" onClick={() => router.push('/products')} className="inline-flex min-h-12 items-center rounded-full border border-white/30 bg-white/10 px-6 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20">{t('home.explore_best_sellers')}</button>
                   </div>
                   <div className="mt-4 hidden flex-wrap gap-x-5 gap-y-2 sm:flex md:mt-7 text-xs font-medium text-white/80 sm:text-xs">

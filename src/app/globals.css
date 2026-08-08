@@ -38,6 +38,53 @@
     --fcs-whatsapp: #25D366;
     --fcs-whatsapp-hover: #128C7E;
 
+    /* ─── Umweto extension ──────────────────────────────────────────
+     * Added to the existing fcs-* layer rather than a parallel um-*
+     * namespace, so the design system stays singular. Every ratio below
+     * was computed, not assumed.
+     *
+     * fcs-brand-strong — filled buttons. White text on it is 4.74:1,
+     * which passes AA for normal text. The original --fcs-brand is
+     * 3.80:1 with white and only passes for large text, so it must not
+     * back a white-text button.
+     */
+    --fcs-brand-strong: #A85D68;
+    --fcs-brand-strong-hover: #8F4A55;
+
+    /* Umweto extension — botanical/earth surfaces.
+     * BACKGROUND ONLY. Contrast vs white: sage 2.95:1, wheat 1.95:1,
+     * sky 1.90:1 — all fail AA as text. Pair with --fcs-text. */
+    --fcs-sage: #7A9F82;
+    --fcs-wheat: #E8B04B;
+    --fcs-sky: #A8BFD1;
+
+    /* Umweto extension — grounding accent. 6.69:1 vs white, safe as text. */
+    --fcs-umber: #8B4A3B;
+
+    /* Umweto extension — editorial gradients for hero and success states. */
+    --fcs-gradient-sunrise: linear-gradient(135deg, #F9F3EA 0%, #F6DFC8 55%, #E8B04B 100%);
+    --fcs-gradient-sunset: linear-gradient(135deg, #B76E79 0%, #E8A48C 50%, #F9F3EA 100%);
+    --fcs-gradient-botanical: linear-gradient(135deg, #F9F3EA 0%, #DCE8DC 55%, #7A9F82 100%);
+
+    /* Umweto extension — warm-tinted elevation, never pure black. */
+    --fcs-shadow-1: 0 1px 2px rgba(31, 25, 24, 0.06);
+    --fcs-shadow-2: 0 4px 12px rgba(31, 25, 24, 0.08);
+    --fcs-shadow-3: 0 10px 30px rgba(31, 25, 24, 0.10);
+    --fcs-shadow-4: 0 20px 50px rgba(31, 25, 24, 0.12);
+    --fcs-glow-rose: 0 8px 28px rgba(168, 93, 104, 0.22);
+    --fcs-glow-wa: 0 8px 28px rgba(37, 211, 102, 0.28);
+
+    /* Umweto extension — radius scale. */
+    --fcs-radius-sm: 6px;
+    --fcs-radius-md: 12px;
+    --fcs-radius-lg: 20px;
+    --fcs-radius-xl: 32px;
+
+    /* Umweto extension — motion. Master easing already exists as
+     * --cb-ease-master; these are the additional curves. */
+    --fcs-ease-silk: cubic-bezier(0.16, 1, 0.3, 1);
+    --fcs-ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
     /* Editorial type. Georgia ships with every Android and iOS device,
      * so the serif voice costs 0 KB and cannot cause FOIT on 3G. */
     --fcs-font-display: Georgia, 'Times New Roman', serif;
@@ -531,4 +578,16 @@
 }
 .custom-banner-slider__caption--active {
   animation: custom-banner-caption-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+
+/* Umweto: WhatsApp button breathing pulse. Applied via motion-safe: so it is
+ * absent entirely for users who ask for reduced motion. */
+@keyframes fcs-breathe {
+  0%, 100% { transform: scale(1); box-shadow: var(--fcs-glow-wa); }
+  50%      { transform: scale(1.015); box-shadow: 0 10px 34px rgba(37, 211, 102, 0.38); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[fcs-breathe_3\.2s_ease-in-out_infinite\] { animation: none !important; }
 }

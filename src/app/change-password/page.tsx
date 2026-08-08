@@ -60,7 +60,7 @@ export default function ChangePasswordPage() {
             {t(visible ? 'auth.hide_passwords' : 'auth.show_passwords')}
           </button>
           <div className="rounded-xl bg-gray-50 p-3 text-xs leading-5 text-gray-600">{t('auth.strong_password_requirement')}</div>
-          <button type="submit" disabled={loading || !currentPassword || !newPassword || !confirm} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-fcs-brand text-sm font-black text-white disabled:opacity-50">
+          <button type="submit" disabled={loading || !currentPassword || !newPassword || !confirm} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-fcs-brand-strong text-sm font-black text-white disabled:opacity-50">
             {loading ? <><Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />{t('auth.updating_password')}</> : t('auth.change_password_button')}
           </button>
         </form>

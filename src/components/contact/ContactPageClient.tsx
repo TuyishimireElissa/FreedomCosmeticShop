@@ -202,7 +202,7 @@ export default function ContactPageClient() {
               <button
                 type="submit"
                 disabled={status === 'sending'}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-brand px-6 text-sm font-black text-white transition-opacity disabled:opacity-50"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-brand-strong px-6 text-sm font-black text-white transition-opacity disabled:opacity-50"
               >
                 {status === 'sending' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 {status === 'sending' ? t('pages.contact_sending') : t('pages.contact_send')}

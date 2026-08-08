@@ -29,6 +29,15 @@ const config: Config = {
           error: 'var(--fcs-error)',
           whatsapp: 'var(--fcs-whatsapp)',
           'whatsapp-hover': 'var(--fcs-whatsapp-hover)',
+          // Umweto extension. brand-strong backs filled buttons: white on it
+          // is 4.74:1 (AA), where plain brand is only 3.80:1.
+          'brand-strong': 'var(--fcs-brand-strong)',
+          'brand-strong-hover': 'var(--fcs-brand-strong-hover)',
+          // BACKGROUND ONLY — these fail AA as text (2.95 / 1.95 / 1.90).
+          sage: 'var(--fcs-sage)',
+          wheat: 'var(--fcs-wheat)',
+          sky: 'var(--fcs-sky)',
+          umber: 'var(--fcs-umber)',
         },
         primary: {
           DEFAULT: '#B76E79',
@@ -77,6 +86,19 @@ const config: Config = {
         // this costs 0 KB and cannot cause FOIT on a slow connection.
         display: ['Georgia', 'Times New Roman', 'serif'],
       },
+      backgroundImage: {
+        'fcs-sunrise': 'var(--fcs-gradient-sunrise)',
+        'fcs-sunset': 'var(--fcs-gradient-sunset)',
+        'fcs-botanical': 'var(--fcs-gradient-botanical)',
+      },
+      boxShadow: {
+        'fcs-1': 'var(--fcs-shadow-1)',
+        'fcs-2': 'var(--fcs-shadow-2)',
+        'fcs-3': 'var(--fcs-shadow-3)',
+        'fcs-4': 'var(--fcs-shadow-4)',
+        'fcs-glow-rose': 'var(--fcs-glow-rose)',
+        'fcs-glow-wa': 'var(--fcs-glow-wa)',
+      },
       fontSize: {
         'xs-accessible': ['12px', { lineHeight: '1.5' }],
         'sm-accessible': ['14px', { lineHeight: '1.5' }],
@@ -108,6 +130,10 @@ const config: Config = {
         },
       },
       borderRadius: {
+        'fcs-sm': 'var(--fcs-radius-sm)',
+        'fcs-md': 'var(--fcs-radius-md)',
+        'fcs-lg': 'var(--fcs-radius-lg)',
+        'fcs-xl': 'var(--fcs-radius-xl)',
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',

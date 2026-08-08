@@ -193,7 +193,7 @@ export default function VisitorLocationForm() {
         type="button"
         onClick={() => void submit()}
         disabled={saving || loading || !district}
-        className="mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-fcs-brand px-5 text-sm font-bold text-white transition-colors hover:bg-[#9B5A64] disabled:cursor-not-allowed disabled:bg-gray-300"
+        className="mt-4 flex min-h-11 items-center justify-center gap-2 rounded-xl bg-fcs-brand-strong px-5 text-sm font-bold text-white transition-colors hover:bg-[#9B5A64] disabled:cursor-not-allowed disabled:bg-gray-300"
       >
         {saving && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
         {saved ? 'Saved — update' : 'Save my location'}
