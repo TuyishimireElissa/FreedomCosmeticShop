@@ -533,6 +533,32 @@ export const rw = {
     notification_payment_review: 'Twakiriye ubundi bwishyu bwa komande {order}. Ntukongere kwishyura; tuzabugenzura kandi tukuvugishe.', // verified-rw
   },
   checkout: {
+    wa_step_title: 'Rangiza order yawe', // verified-rw
+    wa_card_title: 'Rangiza order kuri WhatsApp', // verified-rw
+    wa_benefit1: 'Ubufasha bwihariye mu Kinyarwanda', // verified-rw
+    wa_benefit2: 'Ishyura MoMo, Airtel cyangwa amafaranga mu kugezwaho', // verified-rw
+    wa_benefit3: 'Twemeza mu masaha y’akazi', // verified-rw
+    wa_benefit4: 'Kugezwa aho uri hose mu Rwanda', // verified-rw
+    wa_benefit5: 'Nta kwishyura mbere yo kwakira ibicuruzwa', // verified-rw
+    wa_button: 'Ohereza order kuri WhatsApp', // verified-rw
+    wa_trust: 'Amakuru yawe afite umutekano', // verified-rw
+    wa_footnote: 'Nukanda, twakira order yawe yose maze tuyemeze kuri WhatsApp.', // verified-rw
+    wa_hours: 'Amasaha y’akazi: Kuwa Mbere-Gatandatu 8AM-8PM, Cyumweru 10AM-6PM', // verified-rw
+    wa_sending: 'Turimo kubika order yawe...', // verified-rw
+    wa_error: 'Ntitwashoboye kubika order yawe. Ongera ugerageze.', // verified-rw
+    wa_success_title: 'Order yoherejwe kuri WhatsApp', // verified-rw
+    wa_next1: 'Twemeza order yawe', // verified-rw
+    wa_next2: 'Turaguhamagara cyangwa tukwandikire', // verified-rw
+    wa_next3: 'Dutegura kukugezaho', // verified-rw
+    wa_next4: 'Wishyura mu kugezwaho', // verified-rw
+    wa_copy_ref: 'Fata numero ya order', // verified-rw
+    wa_copied: 'Byafashwe', // verified-rw
+    wa_send_again: 'Ongera wohereze', // verified-rw
+    wa_open_web: 'Fungura WhatsApp Web', // verified-rw
+    wa_copy_message: 'Fata ubutumwa', // verified-rw
+    wa_call_us: 'Duhamagare', // verified-rw
+    wa_email_us: 'Twandikire imeyili', // verified-rw
+    wa_fallback_title: 'WhatsApp ntiyafunguwe', // verified-rw
     ussd_title: 'Ibizakurikira', // verified-rw
     ussd_step1: 'Ukanda buto yo kwishyura hano hepfo.', // verified-rw
     ussd_step2: 'Ubutumwa buzigaragaza ku cyapa cya telefoni yawe bwonyine.', // verified-rw

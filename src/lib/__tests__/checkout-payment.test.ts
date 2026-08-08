@@ -32,7 +32,11 @@ describe('honest mobile-first checkout payment flow', () => {
     expect(waiting).toContain("t('checkout.retry_payment')")
     expect(waiting).toContain("t('checkout.get_whatsapp_help')")
     expect(waiting).not.toContain('No money was charged')
-    expect(checkout).toContain('remaining={polling.remaining}')
+    // The payment step is feature-flagged off (WhatsApp-only ordering), so the
+    // polling wiring now lives in PaymentSelector rather than the checkout page.
+    // Asserting it there keeps the guarantee that MoMo polling stays intact and
+    // re-enablable, without pinning UI the business has deliberately hidden.
+    expect(selector).toContain('remaining={remaining}')
     expect(checkout).toContain('if (pendingOrder) { await initiatePayment(pendingOrder); return }')
   })
 

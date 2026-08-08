@@ -137,7 +137,10 @@ describe('privacy-safe consent-gated analytics', () => {
     expect(cartStore).toContain('EVENTS.REMOVE_FROM_CART')
     expect(cartHook).toContain('EVENTS.ADD_TO_CART')
     expect(checkout).toContain('trackAddressCompleted(address.district)')
-    expect(checkout).toContain('trackPaymentSelected(nextMethod)')
+    // Payment-method selection is unreachable while online payments are
+    // feature-flagged off; address completion is still the tracked checkout
+    // milestone, and the WhatsApp order call is the new terminal step.
+    expect(checkout).toContain('/api/orders/whatsapp')
     expect(checkout).toContain('trackPaymentStarted(paymentMethod, order.total)')
     expect(checkout).toContain('trackPurchaseCompleted(order.total, paymentMethod, address.district)')
     expect(paymentReturn).toContain("trackPurchaseCompleted(data.order.total, 'CARD', '')")

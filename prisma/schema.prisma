@@ -653,8 +653,16 @@ model Order {
   // Loyalty points earned from this order
   loyaltyPointsEarned Int @default(0)
 
-  // Status: PENDING | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED | RETURNED
+  // Status: PENDING | PENDING_WHATSAPP | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED | RETURNED
   status String @default("PENDING")
+
+  // ─── WhatsApp-first ordering (additive, all nullable) ─────────────
+  // status is a String, not an enum, so PENDING_WHATSAPP needs no migration.
+  whatsappSentAt      DateTime?
+  whatsappConfirmedAt DateTime?
+  paymentReceivedAt   DateTime?
+  paymentMethod       String? // MOMO | AIRTEL | CASH | PENDING
+  adminNotes          String? @db.Text
 
   // ─── Section 1: Wholesale order fields ────────────────────────────
   orderType     String    @default("RETAIL") // RETAIL | WHOLESALE
@@ -682,6 +690,7 @@ model Order {
   @@index([createdAt])
   @@index([couponId])
   @@index([orderType])
+  @@index([whatsappSentAt])
 }
 
 // =============================================================================

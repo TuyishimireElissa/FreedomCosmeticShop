@@ -10,6 +10,8 @@ import { usePaymentPolling } from '@/hooks/usePaymentPolling'
 import AddressForm, { type CheckoutAddress } from '@/components/checkout/AddressForm'
 import BrandMark from '@/components/brand/BrandMark'
 import PaymentSelector, { type CheckoutPaymentMethod } from '@/components/checkout/PaymentSelector'
+import WhatsAppCompleteOrder from '@/components/checkout/WhatsAppCompleteOrder'
+import type { WhatsAppOrderData } from '@/lib/whatsapp/buildOrderMessage'
 import OrderSummary from '@/components/checkout/OrderSummary'
 import ConfirmationView, { type ConfirmedCheckoutOrder } from '@/components/checkout/ConfirmationView'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
@@ -147,6 +149,66 @@ export default function CheckoutPage() {
     }
   }
 
+  // WhatsApp-first ordering. Saves the order server-side (prices recomputed
+  // there, never trusted from the client) and returns the persisted reference
+  // so the message can carry it. PaymentSelector and placeOrder below are
+  // retained but unreachable while payments are feature-flagged off.
+  const createWhatsAppOrder = async (): Promise<WhatsAppOrderData | null> => {
+    try {
+      const response = await fetch('/api/orders/whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: address.fullName,
+          customerPhone: address.phone,
+          customerEmail: address.email || undefined,
+          province: address.province,
+          district: address.district,
+          sector: address.sector,
+          cell: address.cell || undefined,
+          village: address.village || undefined,
+          landmark: address.landmark || undefined,
+          notes: address.address || undefined,
+          couponCode: appliedCoupon?.code || undefined,
+          language: language === 'en' ? 'en' : 'rw',
+          items: items.map((item) => ({ productId: item.productId, quantity: item.quantity })),
+        }),
+      })
+      const payload = await response.json().catch(() => null)
+      if (!response.ok || !payload?.success) return null
+
+      const data = payload.data
+      setStep(3)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return {
+        orderReference: data.orderReference,
+        customer: { name: address.fullName, phone: address.phone, email: address.email || undefined },
+        delivery: {
+          province: address.province,
+          district: address.district,
+          sector: address.sector,
+          cell: address.cell || undefined,
+          village: address.village || undefined,
+          landmark: address.landmark || undefined,
+          notes: address.address || undefined,
+        },
+        items: data.items,
+        pricing: data.pricing,
+        timestamp: new Date(),
+        language: language === 'en' ? 'en' : 'rw',
+      }
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * FEATURE-FLAGGED: the online payment path (PaymentSelector, placeOrder,
+   * polling, placing/checkoutError state) is intentionally retained but
+   * unreachable while payments are disabled in /api/config/features.
+   * Deleting it would mean rebuilding checkout to re-enable MoMo/card later.
+   * ESLint reports these as unused — that is expected and correct.
+   */
   const placeOrder = async () => {
     if (!addressValid || !methodAvailable || !momoValid || items.length === 0) return
     setPlacing(true); setCheckoutError(null)
@@ -201,7 +263,7 @@ export default function CheckoutPage() {
 
         {step === 3 && completedOrder ? <ConfirmationView order={completedOrder} address={address} paymentMethod={paymentMethod} /> : <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
           <main className="rounded-xl border border-[#EEEEEE] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:p-7">
-            {step === 1 ? <><div className="mb-6"><h2 className="flex items-center gap-2 text-xl font-bold"><Truck className="h-5 w-5 text-fcs-brand-text" />{t('checkout.step_address')}</h2><p className="mt-1 text-sm text-gray-500">{t('checkout.delivery_intro')}</p></div><AddressForm value={address} onChange={setAddress} errors={addressErrors} /><div className="mt-5 flex items-center justify-between rounded-xl bg-rose-50 p-4"><span><strong className="block text-sm text-gray-800">{t('checkout.delivery_to', { place: address.district })}</strong><span className="text-xs text-gray-500">{deliveryLoading ? t('checkout.calculating') : address.province}</span></span><strong className="text-fcs-brand-text">{deliveryLoading ? '—' : formatRWF(finalDelivery)}</strong></div><button type="button" onClick={() => { if (addressValid) { trackAddressCompleted(address.district); setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) } }} disabled={!addressValid} className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-[10px] bg-fcs-brand-strong text-base font-bold text-white disabled:opacity-40">{t('checkout.step_payment')} <ChevronRight className="h-4 w-4" /></button></> : <><div className="mb-6"><h2 className="text-xl font-bold">{t('checkout.choose_payment')}</h2><p className="mt-1 text-sm text-gray-500">{t('checkout.mtn_fastest')}</p></div><PaymentSelector method={paymentMethod} onMethodChange={(nextMethod) => { if (nextMethod !== paymentMethod) { trackPaymentSelected(nextMethod); setPendingOrder(null); polling.reset(); setCheckoutError(null) } setPaymentMethod(nextMethod) }} phone={paymentPhone} onPhoneChange={setPaymentPhone} isKigali={address.province === 'Kigali City'} paymentStatus={placing ? 'initiating' : polling.status} total={formatRWF(total)} remaining={polling.remaining} onRetry={() => { polling.reset(); setCheckoutError(null) }} onCancel={() => { polling.reset(); setCheckoutError(null) }} availability={paymentAvailability} />{!momoValid && <p className="mt-3 flex items-center gap-1.5 text-xs font-bold text-red-700" role="alert"><AlertCircle className="h-4 w-4 shrink-0" aria-hidden="true" />{paymentMethod === 'CARD' ? t('checkout.card_email_required') : t('checkout.valid_network_number', { network: paymentMethod === 'MTN_MOMO' ? 'MTN (078/079)' : 'Airtel (072/073)' })}</p>}{checkoutError && <p className="mt-4 flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700" role="alert" aria-live="assertive"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />{checkoutError}</p>}<div className="mt-6 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={() => setStep(1)} disabled={placing || polling.status === 'polling'} className="min-h-12 flex-1 rounded-xl border border-gray-200 text-base font-bold">{t('common.back')}</button><button type="button" onClick={placeOrder} disabled={placing || polling.status === 'polling' || !methodAvailable || !momoValid} className={`min-h-12 flex-[2] rounded-xl px-4 text-base font-bold shadow-lg disabled:opacity-50 ${paymentMethod === 'MTN_MOMO' ? 'bg-[#FFD200] text-[#1a1a1a] shadow-yellow-200' : 'bg-fcs-brand-strong text-white shadow-rose-100'}`}>{placing || polling.status === 'polling' ? <span className="flex items-center justify-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />{polling.status === 'polling' ? t('checkout.approve_on_phone') : t('checkout.creating_order')}</span> : paymentMethod === 'COD' ? t('checkout.place_order_amount', { amount: formatRWF(total) }) : t('checkout.pay_amount', { amount: formatRWF(total) })}</button></div><p className="mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold text-gray-500"><ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />{t('checkout.rwanda_payment_security')}</p></>}
+            {step === 1 ? <><div className="mb-6"><h2 className="flex items-center gap-2 text-xl font-bold"><Truck className="h-5 w-5 text-fcs-brand-text" />{t('checkout.step_address')}</h2><p className="mt-1 text-sm text-gray-500">{t('checkout.delivery_intro')}</p></div><AddressForm value={address} onChange={setAddress} errors={addressErrors} /><div className="mt-5 flex items-center justify-between rounded-xl bg-rose-50 p-4"><span><strong className="block text-sm text-gray-800">{t('checkout.delivery_to', { place: address.district })}</strong><span className="text-xs text-gray-500">{deliveryLoading ? t('checkout.calculating') : address.province}</span></span><strong className="text-fcs-brand-text">{deliveryLoading ? '—' : formatRWF(finalDelivery)}</strong></div><button type="button" onClick={() => { if (addressValid) { trackAddressCompleted(address.district); setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) } }} disabled={!addressValid} className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-[10px] bg-fcs-brand-strong text-base font-bold text-white disabled:opacity-40">{t('checkout.step_payment')} <ChevronRight className="h-4 w-4" /></button></> : <><div className="mb-6"><h2 className="font-display text-2xl font-normal text-fcs-text">{t('checkout.wa_step_title')}</h2></div>{checkoutError && <p role="alert" aria-live="assertive" className="mb-4 flex items-center gap-2 rounded-fcs-md bg-red-50 p-3 text-sm font-semibold text-red-700"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />{checkoutError}</p>}<WhatsAppCompleteOrder onCreateOrder={createWhatsAppOrder} /><button type="button" onClick={() => setStep(1)} className="mt-4 min-h-12 w-full rounded-fcs-md border border-fcs-border text-base font-bold text-fcs-text">{t('common.back')}</button></>}
           </main>
           <details className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm lg:hidden">
             <summary className="flex min-h-[52px] cursor-pointer list-none items-center justify-between gap-3 p-4 text-sm font-semibold text-gray-800">
