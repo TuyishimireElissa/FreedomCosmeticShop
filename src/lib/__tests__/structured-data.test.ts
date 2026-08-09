@@ -16,13 +16,17 @@ import { SEO_CONFIG } from '@/lib/seo-config'
 const component = readFileSync(resolve(process.cwd(), 'src/components/seo/StructuredData.tsx'), 'utf8')
 
 describe('honest Rwanda structured data', () => {
-  it('omits unconfigured organization contact, legal, and social values', () => {
+  it('publishes confirmed contact points and omits unconfigured legal or social values', () => {
     const schema = getOrganizationSchema()
     expect(schema['@context']).toBe('https://schema.org')
     expect(schema['@type']).toBe('Organization')
+
+    // Owner-confirmed 2026-08-09, so these are safe to publish.
+    expect(schema).toHaveProperty('telephone', '+250790215965')
+    expect(schema).toHaveProperty('email', 'freedomcosmeticshop@gmail.com')
+
+    // Still unverified — must never be invented for schema.org.
     expect(schema).not.toHaveProperty('legalName')
-    expect(schema).not.toHaveProperty('telephone')
-    expect(schema).not.toHaveProperty('email')
     expect(schema).not.toHaveProperty('sameAs')
     expect(JSON.stringify(schema)).not.toContain('OWNER_MUST_ADD_THIS_BEFORE_LAUNCH')
   })

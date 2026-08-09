@@ -12,15 +12,23 @@ describe('central SEO metadata configuration', () => {
     expect(SEO_CONFIG.defaultDescription.en).not.toMatch(/#1|best|guaranteed/i)
   })
 
-  it('omits owner-unconfirmed organization and local-business facts', () => {
+  it('publishes owner-confirmed contact facts and omits the rest', () => {
+    // The owner supplied phone and email on 2026-08-09, so search engines may
+    // now be told them. Everything still unverified must stay absent — an
+    // invented legalName or geo pin is worse than no answer.
+    expect(SEO_CONFIG.organization.email).toBe('freedomcosmeticshop@gmail.com')
+    expect(SEO_CONFIG.organization.phone).toBe('+250790215965')
+
     expect(SEO_CONFIG.organization.legalName).toBeUndefined()
-    expect(SEO_CONFIG.organization.email).toBeUndefined()
-    expect(SEO_CONFIG.organization.phone).toBeUndefined()
     expect(SEO_CONFIG.organization.sameAs).toEqual([])
     expect(SEO_CONFIG.localBusiness.geo).toBeUndefined()
     expect(SEO_CONFIG.localBusiness.openingHours).toBeUndefined()
     expect(SEO_CONFIG.localBusiness.address.addressLocality).toBe('Kigali')
     expect(SEO_CONFIG.localBusiness.currenciesAccepted).toBe('RWF')
+  })
+
+  it('never emits a raw owner placeholder to search engines', () => {
+    expect(JSON.stringify(SEO_CONFIG)).not.toContain('OWNER_MUST_ADD_THIS_BEFORE_LAUNCH')
   })
 
   it('references an asset that actually exists in the repository', () => {

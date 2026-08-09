@@ -31,6 +31,15 @@ export const WHATSAPP_ORDERING_NUMBERS: readonly string[] = [
   resolveWhatsApp(process.env.NEXT_PUBLIC_WHATSAPP_ALT, '+250785361796'),
 ]
 
+/**
+ * Join address parts, dropping unfilled owner placeholders and collapsing
+ * consecutive duplicates (a sector and its district often share a name).
+ */
+function joinAddressParts(parts: readonly (string | undefined)[]): string {
+  const kept = parts.filter((part): part is string => Boolean(part) && !part!.includes(TODO_MARKER))
+  return kept.filter((part, index) => index === 0 || part !== kept[index - 1]).join(', ')
+}
+
 /** `+250790215965` → `+250 790 215 965`, for display only. */
 export function formatWhatsAppDisplay(value: string): string {
   const digits = value.replace(/\D/g, '')
@@ -57,25 +66,31 @@ export const BUSINESS = {
   // ═══════════════════════════════════
   // CONTACT INFORMATION
   // ═══════════════════════════════════
-  phone: OWNER_TODO,
-  phoneDisplay: OWNER_TODO,
+  // Owner-confirmed 2026-08-09. Same line as the primary WhatsApp number.
+  phone: WHATSAPP_ORDERING_NUMBERS[0]!,
+  phoneDisplay: formatWhatsAppDisplay(WHATSAPP_ORDERING_NUMBERS[0]!),
   // Primary ordering line. Every existing single-number call site keeps
   // working; the full list lives in WHATSAPP_ORDERING_NUMBERS above.
   whatsapp: WHATSAPP_ORDERING_NUMBERS[0]!,
   whatsappAlt: WHATSAPP_ORDERING_NUMBERS[1]!,
   whatsappMessage: 'Hello FreedomCosmeticShop! I need help with my order.',
-  email: OWNER_TODO,
-  emailSupport: OWNER_TODO,
-  emailInvoices: OWNER_TODO,
+  // One monitored inbox serves all three roles today. Kept as separate fields
+  // so a dedicated support or billing address can be split out later without
+  // touching call sites.
+  email: 'freedomcosmeticshop@gmail.com',
+  emailSupport: 'freedomcosmeticshop@gmail.com',
+  emailInvoices: 'freedomcosmeticshop@gmail.com',
+  // Gmail-hosted, so there is no custom mail domain to advertise.
   emailDomain: OWNER_TODO,
 
   // ═══════════════════════════════════
   // SUPPORT HOURS
   // ═══════════════════════════════════
   supportHours: {
-    weekdays: OWNER_TODO,
-    saturday: OWNER_TODO,
-    sunday: OWNER_TODO,
+    // Owner-confirmed 2026-08-09: Mon–Sat 8AM–8PM, Sun 10AM–6PM.
+    weekdays: 'Monday - Saturday: 8:00 AM - 8:00 PM',
+    saturday: 'Saturday: 8:00 AM - 8:00 PM',
+    sunday: 'Sunday: 10:00 AM - 6:00 PM',
     timezone: 'Africa/Kigali (CAT - UTC+2)',
     emergency: 'WhatsApp only outside business hours',
   },
@@ -84,19 +99,30 @@ export const BUSINESS = {
   // PHYSICAL ADDRESS
   // ═══════════════════════════════════
   address: {
+    // Owner-confirmed 2026-08-09: Nyarugenge sector, Kigali. Street address,
+    // landmark and Maps pin were not supplied, so they stay as placeholders
+    // rather than being invented — the getters below simply omit them.
     street: OWNER_TODO,
-    sector: OWNER_TODO,
-    district: OWNER_TODO,
+    sector: 'Nyarugenge',
+    district: 'Nyarugenge',
     city: 'Kigali',
     country: 'Rwanda',
     landmark: OWNER_TODO,
 
+    // Placeholder parts are dropped instead of poisoning the whole string.
+    // Previously a single unfilled field made `full` fail isPlaceholder(),
+    // which hid the entire address everywhere it is guarded — so a
+    // partially-known address rendered as nothing at all.
+    //
+    // Consecutive duplicates are collapsed too: Nyarugenge is both a sector
+    // and the district containing it, and "Nyarugenge, Nyarugenge, Kigali"
+    // reads like a mistake to a Rwandan customer.
     get full() {
-      return `${this.street}, ${this.sector}, ${this.district}, ${this.city}, ${this.country}`
+      return joinAddressParts([this.street, this.sector, this.district, this.city, this.country])
     },
 
     get short() {
-      return `${this.sector}, ${this.district}, ${this.city}`
+      return joinAddressParts([this.sector, this.district, this.city])
     },
 
     googleMapsLink: OWNER_TODO,
@@ -108,8 +134,8 @@ export const BUSINESS = {
   returnAddress: {
     sameAsPhysical: true,
     street: OWNER_TODO,
-    sector: OWNER_TODO,
-    district: OWNER_TODO,
+    sector: 'Nyarugenge',
+    district: 'Nyarugenge',
     city: 'Kigali',
     country: 'Rwanda',
     instructions: 'Call before returning any item.',

@@ -23,21 +23,55 @@ function walk(dir: string): string[] {
 
 describe('owner placeholder guards', () => {
   it('detects an unfilled placeholder', () => {
-    expect(isPlaceholder(BUSINESS.phoneDisplay)).toBe(true)
+    // Contact details were supplied by the owner on 2026-08-09, so this now
+    // exercises a field that is still genuinely unfilled. Using a real field
+    // rather than a literal keeps the test honest about production state.
+    expect(isPlaceholder(BUSINESS.legalName)).toBe(true)
+    expect(isPlaceholder(BUSINESS.phoneDisplay)).toBe(false)
     expect(isPlaceholder('+250788123456')).toBe(false)
     expect(isPlaceholder(undefined)).toBe(false)
   })
 
   it('realValue hides placeholders and passes real values through', () => {
-    expect(realValue(BUSINESS.phoneDisplay)).toBeNull()
+    expect(realValue(BUSINESS.legalName)).toBeNull()
+    expect(realValue(BUSINESS.phoneDisplay)).toBe('+250 790 215 965')
     expect(realValue('+250788123456')).toBe('+250788123456')
     expect(realValue('')).toBeNull()
   })
 
   it('still reports outstanding owner TODOs for the launch checklist', () => {
     // Guarding the UI must not silence the checklist the owner works from.
-    expect(getTODOItems().length).toBeGreaterThan(0)
-    expect(getTODOItems()).toContain('phoneDisplay')
+    // Contact fields are done; registration, banking and socials are not.
+    const todos = getTODOItems()
+    expect(todos.length).toBeGreaterThan(0)
+    expect(todos).toContain('rdbNumber')
+    expect(todos).toContain('tinNumber')
+    expect(todos).not.toContain('phoneDisplay')
+    expect(todos).not.toContain('email')
+  })
+
+  it('publishes the owner-confirmed contact details', () => {
+    // These are the values customers actually reach the shop on. If one of
+    // them silently reverts to a placeholder, the shop becomes uncontactable
+    // and every guarded surface hides itself without any error.
+    expect(BUSINESS.phone).toBe('+250790215965')
+    expect(BUSINESS.phoneDisplay).toBe('+250 790 215 965')
+    expect(BUSINESS.email).toBe('freedomcosmeticshop@gmail.com')
+    expect(BUSINESS.whatsapp).toBe('+250790215965')
+    expect(BUSINESS.supportHours.weekdays).toContain('8:00 AM - 8:00 PM')
+    expect(BUSINESS.supportHours.sunday).toContain('10:00 AM - 6:00 PM')
+  })
+
+  it('renders a partial address without dangling separators or repetition', () => {
+    // Street and landmark are still unknown. A naive join produced
+    // "[TODO...], Nyarugenge, ..." and a duplicated sector/district name.
+    expect(BUSINESS.address.short).toBe('Nyarugenge, Kigali')
+    expect(BUSINESS.address.full).toBe('Nyarugenge, Kigali, Rwanda')
+    for (const value of [BUSINESS.address.short, BUSINESS.address.full]) {
+      expect(value).not.toContain('TODO')
+      expect(value).not.toMatch(/,\s*,/)
+      expect(value).not.toMatch(/^,|,$/)
+    }
   })
 
   it('renders no unguarded BUSINESS contact field in any component', () => {
