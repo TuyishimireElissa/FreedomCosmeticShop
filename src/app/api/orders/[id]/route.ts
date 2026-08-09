@@ -69,6 +69,13 @@ const PatchSchema = z.object({
   paymentStatus: z.enum(VALID_PAYMENT_STATUSES).optional(),
 })
 
+/** Raised inside the stock transaction to roll it back and answer 409. */
+class StockShortfallError extends Error {
+  constructor(public readonly items: Array<{ productId: string; name: string; needed: number; available: number }>) {
+    super('INSUFFICIENT_STOCK')
+  }
+}
+
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -168,12 +175,107 @@ export async function PATCH(
       return NextResponse.json({ error: 'Use the protected refund action to refund a payment.' }, { status: 409 })
     }
 
+    // ─── Stock decrement for WhatsApp orders ──────────────────────────
+    //
+    // Gated on the SOURCE status, not the target. Every other path already
+    // takes its own stock and would be double-decremented by a `* -> CONFIRMED`
+    // rule:
+    //   - COD retail      is born CONFIRMED with stock taken at creation
+    //   - online retail   is decremented by the payment webhook, which writes
+    //                     CONFIRMED directly and never calls this route
+    //   - wholesale/CREDIT is created PENDING with stock ALREADY taken, so an
+    //                     admin moving it PENDING -> CONFIRMED would take it twice
+    // PENDING_WHATSAPP is reachable only from /api/orders/whatsapp, which
+    // verifies stock but never decrements it. That makes this branch the one
+    // place the units actually come off, and double-decrement structurally
+    // impossible rather than merely unlikely.
+    const takesStockNow = oldStatus === 'PENDING_WHATSAPP' && parsed.data.status === 'CONFIRMED'
+    if (takesStockNow) {
+      try {
+        await db.$transaction(async (tx) => {
+          const lines = await tx.orderItem.findMany({
+            where: { orderId: existing.id, productId: { not: null } },
+            select: { productId: true, name: true, quantity: true },
+          })
+
+          // Merge duplicate lines so a product ordered twice is checked once
+          // against the total it actually needs.
+          const required = new Map<string, { name: string; quantity: number }>()
+          for (const line of lines) {
+            const current = required.get(line.productId!)
+            required.set(line.productId!, {
+              name: line.name,
+              quantity: (current?.quantity || 0) + line.quantity,
+            })
+          }
+
+          // Deterministic lock order prevents deadlock when two admins confirm
+          // overlapping orders at the same moment.
+          for (const productId of [...required.keys()].sort()) {
+            await tx.$queryRaw`SELECT id FROM "Product" WHERE id = ${productId} FOR UPDATE`
+          }
+
+          const products = await tx.product.findMany({
+            where: { id: { in: [...required.keys()] } },
+            select: { id: true, name: true, stock: true, isActive: true, isDeleted: true },
+          })
+
+          const shortfall = [...required.entries()].flatMap(([productId, needed]) => {
+            const product = products.find((entry) => entry.id === productId)
+            return !product || !product.isActive || product.isDeleted || product.stock < needed.quantity
+              ? [{ productId, name: product?.name || needed.name, needed: needed.quantity, available: product?.stock ?? 0 }]
+              : []
+          })
+          if (shortfall.length > 0) throw new StockShortfallError(shortfall)
+
+          for (const [productId, needed] of required) {
+            const updated = await tx.product.updateMany({
+              where: { id: productId, stock: { gte: needed.quantity }, isActive: true, isDeleted: false },
+              data: { stock: { decrement: needed.quantity } },
+            })
+            // Optimistic lock: someone changed stock between read and write.
+            if (updated.count !== 1) throw new StockShortfallError([{ productId, name: needed.name, needed: needed.quantity, available: 0 }])
+          }
+
+          // Status moves inside the same transaction, so stock and status can
+          // never disagree — both commit or neither does.
+          await tx.order.update({ where: { id: existing.id }, data: { status: 'CONFIRMED' } })
+
+          const depleted = products.filter((product) => {
+            const needed = required.get(product.id)
+            return needed ? product.stock - needed.quantity <= 0 : false
+          })
+          if (depleted.length > 0) {
+            await tx.securityAlert.create({
+              data: {
+                type: 'INSUFFICIENT_STOCK',
+                severity: 'HIGH',
+                title: 'Product out of stock after WhatsApp order',
+                message: `Confirming order ${existing.orderNumber} took the last units of ${depleted.length} product(s).`,
+                metadata: { orderId: existing.id, orderNumber: existing.orderNumber, products: depleted.map((p) => p.id) },
+              },
+            })
+          }
+        })
+      } catch (stockError) {
+        if (stockError instanceof StockShortfallError) {
+          return NextResponse.json(
+            { error: 'Insufficient stock to confirm this order.', code: 'INSUFFICIENT_STOCK', items: stockError.items },
+            { status: 409 },
+          )
+        }
+        throw stockError
+      }
+    }
+
     // Update order status if provided
-    if (parsed.data.status) {
+    if (parsed.data.status && !takesStockNow) {
       await db.order.update({
         where: { id: existing.id },
         data: { status: parsed.data.status },
       })
+    }
+    if (parsed.data.status) {
       if (parsed.data.status === 'CANCELLED') {
         await Promise.all([
           db.payment.updateMany({

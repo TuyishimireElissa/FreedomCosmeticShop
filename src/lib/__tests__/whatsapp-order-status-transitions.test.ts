@@ -22,16 +22,29 @@ const state = vi.hoisted(() => ({
 
 vi.mock('@/lib/db', () => {
   const findOrder = async () => state.order
+  const updateOrder = async ({ data }: { data: Record<string, unknown> }) => {
+    state.updates.push(data)
+    state.order = { ...(state.order as object), ...data }
+    return state.order
+  }
+  // PENDING_WHATSAPP -> CONFIRMED now runs the stock decrement inside a
+  // transaction (Defect 3). These orders carry no items in this suite, so the
+  // decrement is a no-op — but the surface has to exist or the route 500s.
+  // Stock behaviour itself is covered in whatsapp-stock-decrement.test.ts.
+  const tx = {
+    $queryRaw: async () => [],
+    orderItem: { findMany: async () => [] },
+    product: { findMany: async () => [], updateMany: async () => ({ count: 0 }) },
+    order: { update: updateOrder },
+    securityAlert: { create: async () => ({}) },
+  }
   return {
     db: {
+      $transaction: async (fn: (t: typeof tx) => unknown) => fn(tx),
       order: {
         findFirst: findOrder,
         findUnique: findOrder,
-        update: async ({ data }: { data: Record<string, unknown> }) => {
-          state.updates.push(data)
-          state.order = { ...(state.order as object), ...data }
-          return state.order
-        },
+        update: updateOrder,
       },
       payment: { update: async () => ({}), updateMany: async () => ({ count: 0 }) },
       delivery: { update: async () => ({}), updateMany: async () => ({ count: 0 }) },
