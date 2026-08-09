@@ -28,6 +28,11 @@ import { refreshWholesaleRetentionMetric } from '@/server/services/wholesale-ret
 
 const VALID_STATUSES = [
   "PENDING",
+  // Accepted as a transition *source* via ALLOWED_STATUS_TRANSITIONS. Listed
+  // here so the Zod schema does not reject a payload that names it, but no
+  // admin action moves an order *into* this state — only the WhatsApp
+  // checkout route sets it, at creation.
+  "PENDING_WHATSAPP",
   "CONFIRMED",
   "PROCESSING",
   "SHIPPED",
@@ -44,6 +49,11 @@ const VALID_PAYMENT_STATUSES = [
 ] as const
 
 const ALLOWED_STATUS_TRANSITIONS: Record<string, readonly string[]> = {
+  // WhatsApp orders are saved before the customer sends the message, so they
+  // start at PENDING_WHATSAPP. Without this row the lookup below falls back to
+  // [] and every transition is refused, freezing the order permanently.
+  // They rejoin the normal chain at CONFIRMED.
+  PENDING_WHATSAPP: ['CONFIRMED', 'CANCELLED'],
   PENDING: ['CONFIRMED', 'CANCELLED'],
   CONFIRMED: ['PROCESSING', 'CANCELLED'],
   PROCESSING: ['SHIPPED', 'CANCELLED'],
