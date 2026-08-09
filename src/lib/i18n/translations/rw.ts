@@ -1189,6 +1189,77 @@ export const rw = {
     guide_usage_pin: 'Ntuzigere usaba umukiriya PIN ya Mobile Money cyangwa amakuru yose y’ikarita.', // verified-rw
     admin_analytics: 'Isesengura rya WhatsApp', // verified-rw
     admin_guide: 'Amabwiriza ya WhatsApp', // verified-rw
+    admin_orders: 'Ibicuruzwa bya WhatsApp', // verified-rw
+    time_just_now: 'nonaha', // verified-rw
+    time_minutes: 'hashize iminota {count}', // verified-rw
+    time_hours: 'hashize amasaha {count}', // verified-rw
+    time_days: 'hashize iminsi {count}', // verified-rw
+    orders_title: 'Ibyatumijwe kuri WhatsApp', // verified-rw
+    orders_subtitle: 'Ibyatumijwe binyuze kuri WhatsApp.', // verified-rw
+    orders_search: 'Shakisha ukoresheje nimero ya order cyangwa telefoni', // verified-rw
+    orders_search_label: 'Shakisha ibyatumijwe kuri WhatsApp', // verified-rw
+    orders_filter_status: 'Shungura ukurikije uko bihagaze', // verified-rw
+    orders_filter_payment: 'Shungura ukurikije ubwishyu', // verified-rw
+    orders_all: 'Byose', // verified-rw
+    orders_paid: 'Byishyuwe', // verified-rw
+    orders_unpaid: 'Bitarishyurwa', // verified-rw
+    orders_reference: 'Nimero ya order', // verified-rw
+    orders_customer: 'Umukiriya', // verified-rw
+    orders_phone: 'Telefoni', // verified-rw
+    orders_status: 'Uko bihagaze', // verified-rw
+    orders_total: 'Igiteranyo', // verified-rw
+    orders_date: 'Itariki', // verified-rw
+    orders_actions: 'Ibikorwa', // verified-rw
+    orders_view: 'Reba', // verified-rw
+    orders_chat: 'Fungura ikiganiro kuri WhatsApp', // verified-rw
+    orders_copy: 'Koporora ubutumwa bwa order', // verified-rw
+    orders_copied: 'Ubutumwa bwakoporowe', // verified-rw
+    orders_copy_failed: 'Ntibyakunze gukoporora. Hitamo wongere ukoporore wenyine.', // verified-rw
+    orders_count: 'Ibyatumijwe {count}', // verified-rw
+    orders_load_failed: 'Ibyatumijwe ntibyashoboye gufunguka.', // verified-rw
+    orders_retry: 'Ongera ugerageze', // verified-rw
+    orders_loading: 'Turimo gufungura ibyatumijwe', // verified-rw
+    orders_empty_title: 'Nta byatumijwe kuri WhatsApp birabaho', // verified-rw
+    orders_empty_body: 'Igihe abakiriya batumiza banyuze kuri WhatsApp, bizagaragara hano.', // verified-rw
+    orders_empty_shop: 'Jya mu iduka', // verified-rw
+    orders_nomatch_title: 'Nta byatumijwe bihuye n’ibyo washakishije', // verified-rw
+    orders_nomatch_body: 'Gerageza indi nimero ya order, indi telefoni, cyangwa ubundi buryo bihagaze.', // verified-rw
+    orders_clear: 'Kuraho ishungura', // verified-rw
+    detail_title: 'Order {reference}', // verified-rw
+    detail_customer: 'Umukiriya', // verified-rw
+    detail_delivery: 'Aho bigezwa', // verified-rw
+    detail_items: 'Ibicuruzwa', // verified-rw
+    detail_qty: 'Umubare', // verified-rw
+    detail_unit: 'Igiciro', // verified-rw
+    detail_subtotal: 'Igiteranyo cy’ibicuruzwa', // verified-rw
+    detail_delivery_fee: 'Ubuherezo', // verified-rw
+    detail_discount: 'Igabanyirizwa', // verified-rw
+    detail_grand_total: 'Igiteranyo cyose', // verified-rw
+    detail_timeline: 'Amateka', // verified-rw
+    detail_timeline_empty: 'Nta mateka arabikwa kuri iyi order.', // verified-rw
+    detail_timeline_partial: 'Amateka abikwa guhera igihe igitabo cy’ibikorwa cyatangiriye.', // verified-rw
+    detail_notes: 'Inyandiko z’umuyobozi', // verified-rw
+    detail_status_change: 'Hindura uko bihagaze', // verified-rw
+    detail_status_none: 'Nta yandi mahinduka ashoboka.', // verified-rw
+    detail_payment: 'Andika ubwishyu bwakiriwe', // verified-rw
+    detail_payment_method: 'Uburyo', // verified-rw
+    detail_payment_amount: 'Amafaranga yakiriwe (RWF)', // verified-rw
+    detail_payment_reference: 'Nimero y’ubwishyu (ntibitegetswe)', // verified-rw
+    detail_payment_notes: 'Inyandiko (ntibitegetswe)', // verified-rw
+    detail_payment_submit: 'Andika ubwishyu', // verified-rw
+    detail_payment_recorded: 'Ubwishyu bwanditswe', // verified-rw
+    detail_payment_existing: 'Ubwishyu bwanditswe', // verified-rw
+    detail_payment_none: 'Nta bwishyu buranditswe.', // verified-rw
+    detail_payment_mismatch: 'Amafaranga agomba kungana n’igiteranyo cya {total}.', // verified-rw
+    detail_close: 'Funga', // verified-rw
+    status_PENDING_WHATSAPP: 'Bitegereje kwemezwa', // verified-rw
+    status_CONFIRMED: 'Byemejwe', // verified-rw
+    status_PROCESSING: 'Biratunganywa', // verified-rw
+    status_SHIPPED: 'Byoherejwe', // verified-rw
+    status_DELIVERED: 'Byagejejwe', // verified-rw
+    status_CANCELLED: 'Byahagaritswe', // verified-rw
+    status_RETURNED: 'Byasubijwe', // verified-rw
+    action_failed: 'Icyo gikorwa nticyakunze. Nta cyahindutse.', // verified-rw
   },
   blog: {
     label: 'Inama z’ubwiza', // verified-rw

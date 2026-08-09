@@ -50,6 +50,10 @@ const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
     group: 'Commerce',
     items: [
       { label: 'Orders', tab: 'orders', icon: ShoppingCart, permission: 'orders.read' },
+      // href-based, like Reviews and Live Visitors: navigates to its own page
+      // rather than switching an AdminView tab. `tab` here only drives icon
+      // grouping, so `key` must come from href to stay unique.
+      { label: 'WhatsApp Orders', tab: 'orders', icon: MessageCircle, permission: 'orders.read', href: '/admin/whatsapp-orders', translationKey: 'whatsapp.admin_orders' },
       { label: 'Products', tab: 'products', icon: Package, permission: 'products.read' },
       { label: 'Bundles', tab: 'bundles', icon: Package, permission: 'products.read' },
       { label: 'Customers', tab: 'customers', icon: Users, permission: 'customers.read' },
@@ -149,7 +153,7 @@ export default function AdminSidebar() {
                   const label = item.translationKey ? t(item.translationKey) : item.tab === 'bundles' ? t('nav.bundles') : item.label
                   return (
                     <button
-                      key={item.tab}
+                      key={item.href || item.tab}
                       type="button"
                       onClick={() => { if (item.href) { router.push(item.href); setMobileOpen(false) } else selectTab(item.tab) }}
                       className={`group relative flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-all ${
