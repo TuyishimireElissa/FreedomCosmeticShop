@@ -3,6 +3,15 @@
 Date: 2026-08-10. Audited every page, layout and shared component in `src/`,
 plus every generated asset in `public/`, plus the live production site.
 
+**Status: all fixes in sections 2, 3 and 4 are deployed** in commit `bd4bd2a`
+and verified against live production, not against the build:
+
+- `/logo.svg` now serves the monogram. Zero `Z`-template markers, traced F
+  present, gold present.
+- The traced F appears **5×** on privacy, terms, shipping, returns, about,
+  contact and track-order, against a **4×** baseline on pages that only have
+  the header and footer — one new instance each, exactly as intended.
+
 The mark itself is done and approved. This document is only about **coverage**:
 which surfaces show it, which show something else, and which show nothing.
 
@@ -36,7 +45,7 @@ both rose and gold pixels, so none of them silently reverted to the old lotus.
 
 ---
 
-## 2. DEFECT — a stale "Z" logo is live on the domain
+## 2. DEFECT — a stale "Z" logo was live on the domain (FIXED)
 
 `public/logo.svg` is **not** the FreedomCosmeticShop mark. It is a leftover
 starter-template logo: a dark charcoal rounded square with a white letter **Z**.
@@ -56,19 +65,29 @@ and it is the kind of thing that only gets noticed at the worst moment.
 
 Fixing the asset fixes the payment modal without touching any payment code.
 
+**Fix applied.** `brand-src/render-mark.mjs` now generates `public/logo.svg`
+from the same traced geometry as every other asset, so it cannot drift again.
+No payment code was touched.
+
 ---
 
-## 3. Surfaces showing a generic icon where the mark belongs
+## 3. Surfaces showing a generic icon where the mark belongs (FIXED)
 
-These are not empty — they render a placeholder from the icon library, which
+These were not empty — they rendered a placeholder from the icon library, which
 reads as "unbranded template" rather than "this shop".
 
-| Surface | Shows today | Why it matters |
+| Surface | Showed before | Why it matters |
 |---|---|---|
-| `AdminLoginScreen.tsx:236` | `Sparkles` in a circle | The door to the shop's admin panel |
-| `AdminView.tsx:481` | `Shield` in a circle | Header fallback when no logo uploaded |
-| `LogoUploader.tsx:167` | the plain text `FreedomCosmeticShop` | Tells the owner there is no logo when a default mark exists |
-| `InvoicePrinter.tsx:192` | brand name as text only | A printed invoice is a customer-facing document |
+| `AdminLoginScreen.tsx` | `Sparkles` in a circle | The door to the shop's admin panel |
+| `AdminView.tsx` | `Shield` in a circle | Header fallback when no logo uploaded |
+| `LogoUploader.tsx` | the plain text `FreedomCosmeticShop` | Tells the owner there is no logo when a default mark exists |
+| `InvoicePrinter.tsx` | brand name as text only | A printed invoice is a customer-facing document |
+
+All four now render the monogram. The invoice needed a new helper,
+`src/lib/brand-logo-svg.ts`, because it builds an HTML string and cannot use a
+React component — the helper reads the same path module rather than keeping a
+second copy of the geometry. It sets `print-color-adjust: exact` so "save ink"
+mode does not print the logo as a white silhouette.
 
 `LogoUploader` is the most misleading of the four. Its "Current Logo" box shows
 bare text when nothing is uploaded, so the owner is told the shop has no logo —
@@ -76,16 +95,22 @@ when in fact the FC monogram is the default everywhere.
 
 ---
 
-## 4. Surfaces with no mark, where adding one is a judgement call
+## 4. Surfaces with no mark — three added, empty states left alone
 
 The navbar and footer already carry the mark on every one of these pages, so
-adding another is reinforcement, not a fix. Listed for the owner to choose.
+adding another is reinforcement rather than a fix.
+
+**Added:**
 
 - `InformationPage.tsx` dark header band — covers **about, privacy, terms,
   shipping, returns** in a single edit
-- `/contact` page header
-- `/track-order` header (currently a generic `Package` icon)
-- Empty states: empty bag, empty wishlist, no orders yet
+- `/contact` page header — where a first-time buyer checks the shop is real
+- `/track-order` header — was a generic `Package` icon, and this page is often
+  the first thing someone sees, because it is reachable from a WhatsApp link
+
+**Not added, owner's call:** the empty states (empty bag, empty wishlist, no
+orders yet). A logo in an empty box is decoration; those screens need a clear
+next action more than they need branding. Say the word and I will add it.
 
 Contrast is not a blocker on the dark band. Measured against `#1a1a1a`:
 rose `#CA7370` 5.14:1, `#D07E7A` 5.76:1, `#DFA6A0` 8.37:1;
@@ -107,7 +132,25 @@ Recording these so the decision is not silently revisited:
 
 ---
 
-## 6. Structural issue found while auditing (not a logo problem)
+## 6. Architecture change made along the way
+
+The traced paths used to be constants inside `src/components/ui/logo.tsx`.
+They now live in `src/lib/brand-logo-paths.ts`, a plain data module.
+
+Two reasons. Three consumers need the geometry and only one renders JSX — the
+component, the invoice generator, and the PNG build. And Vitest runs with
+`jsx: "preserve"`, so it cannot import a `.tsx` at all; the old tests scraped
+the paths back out of the component with a regex, which meant a rename could
+make the scrape return an empty string and **every bounds assertion would have
+passed vacuously**. The tests now import the real values.
+
+`vectorise-logo.py` and `render-mark.mjs` were repointed. I verified a full
+round-trip rewrites the data module byte-identically and that both PNG masters
+regenerate byte-identically, so the pipeline itself is unchanged.
+
+---
+
+## 7. Structural issue found while auditing (not a logo problem)
 
 `/admin` renders **two stacked headers**. `admin/layout.tsx` renders
 `AdminHeader`, and `admin/page.tsx` renders `<AdminView embedded />` whose own
