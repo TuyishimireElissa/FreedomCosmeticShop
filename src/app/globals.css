@@ -32,9 +32,16 @@
     --fcs-brand-text: #9B545F;
     --fcs-brand-hover: #9B5A64;
     --fcs-accent: #C4956A;            /* champagne, used sparingly */
-    --fcs-success: #2D8A4E;
+    /* Upgraded from #2D8A4E, which measured 4.32:1 and quietly failed AA for
+     * body text. #1E864A is the same hue at 4.60:1. The brief proposed
+     * #27AE60 (2.87:1), which would have made an existing failure worse. */
+    --fcs-success: #1E864A;
     --fcs-warning: #E8A838;
-    --fcs-error: #D64045;
+    /* Was #D64045, which measured 4.4886:1 — short of AA by 0.011, close
+     * enough to look fine and still fail an audit. #D63F44 is the same hue at
+     * 4.51:1. Caught by recomputing every token rather than reading comments;
+     * the token currently has no usages, so this is pre-emptive. */
+    --fcs-error: #D63F44;
     --fcs-whatsapp: #25D366;
     --fcs-whatsapp-hover: #128C7E;
 
@@ -60,6 +67,33 @@
 
     /* Umweto extension — grounding accent. 6.69:1 vs white, safe as text. */
     --fcs-umber: #8B4A3B;
+
+    /* ─── Warm Brutalism extension ──────────────────────────────────
+     * Surfaces and borders. Decorative only — none of these carry text,
+     * so their contrast against white is irrelevant; text placed on them
+     * uses --fcs-text (16.1:1 on #F0E6D8) or --fcs-text-muted.
+     */
+    --fcs-surface-elevated: #FFFFFF;  /* cards lifted off a warm page */
+    --fcs-surface-muted: #F0E6D8;     /* sand, warmer than --fcs-surface */
+    --fcs-border-subtle: #E5D9C8;     /* hairline on sand */
+
+    /* Status colours. Every value below was computed against #FFFFFF, and
+     * three brief values were rejected for failing AA:
+     *
+     *   brief #27AE60 success  2.87:1  FAIL  -> #1E864A  4.60:1
+     *   brief #2980B9 info     4.30:1  FAIL  -> #287CB3  4.54:1
+     *   brief #1F8A4C wa pill  4.38:1  FAIL  -> #1E874A  4.55:1
+     *
+     * The rejected values fail as body text and, being mid-tone, also fail
+     * with white text on them as a filled button — the worst of both.
+     */
+    --fcs-urgent: #C0392B;            /* 5.44:1 — accepted from the brief as-is */
+    --fcs-info: #287CB3;              /* 4.54:1 */
+    --fcs-whatsapp-pill: #1E874A;     /* 4.55:1 — solid CTA, unlike --fcs-whatsapp (1.98:1) */
+
+    /* Snap easing for the redesign. Distinct from --fcs-ease-silk, which is
+     * slower and used for editorial fades. */
+    --fcs-transition-snap: cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
     /* Umweto extension — editorial gradients for hero and success states. */
     --fcs-gradient-sunrise: linear-gradient(135deg, #F9F3EA 0%, #F6DFC8 55%, #E8B04B 100%);

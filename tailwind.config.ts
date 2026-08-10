@@ -38,6 +38,13 @@ const config: Config = {
           wheat: 'var(--fcs-wheat)',
           sky: 'var(--fcs-sky)',
           umber: 'var(--fcs-umber)',
+          // Warm Brutalism extension
+          'surface-elevated': 'var(--fcs-surface-elevated)',
+          'surface-muted': 'var(--fcs-surface-muted)',
+          'border-subtle': 'var(--fcs-border-subtle)',
+          urgent: 'var(--fcs-urgent)',
+          info: 'var(--fcs-info)',
+          'whatsapp-pill': 'var(--fcs-whatsapp-pill)',
         },
         primary: {
           DEFAULT: '#B76E79',
@@ -128,6 +135,11 @@ const config: Config = {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
+      },
+      transitionTimingFunction: {
+        // Warm Brutalism: snappier than --fcs-ease-silk, used for controls
+        // that should feel mechanical rather than editorial.
+        'fcs-snap': 'var(--fcs-transition-snap)',
       },
       borderRadius: {
         'fcs-sm': 'var(--fcs-radius-sm)',

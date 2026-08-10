@@ -21,6 +21,7 @@ import {
 import { SearchWithSuggestions } from '@/components/storefront/SearchWithSuggestions'
 import LanguageSelector from '@/components/ui/LanguageSelector'
 import { useT } from '@/lib/i18n/LanguageContext'
+import { useScrolled } from '@/hooks/use-scrolled'
 import { useSettings } from '@/hooks/use-settings'
 import { useToast } from '@/hooks/use-toast'
 import { useStore } from '@/store/useStore'
@@ -73,6 +74,7 @@ export default function Navbar() {
   }, [mobileOpen])
 
   const count = mounted ? cartCount() : 0
+  const scrolled = useScrolled()
 
   const navigate = (action: () => void) => {
     action()
@@ -99,7 +101,14 @@ export default function Navbar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#EEEEEE] bg-white/95 backdrop-blur-md">
+    // Flat at rest, elevated once content passes beneath it. The border and
+    // shadow are what change — not the background, which stays opaque so text
+    // scrolling underneath can never show through and fail contrast.
+    <header
+      className={`sticky top-0 z-50 border-b bg-white/95 backdrop-blur-md transition-[border-color,box-shadow] duration-200 ease-fcs-snap motion-reduce:transition-none ${
+        scrolled ? 'border-fcs-border-subtle shadow-fcs-2' : 'border-transparent shadow-none'
+      }`}
+    >
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-4 md:h-16 md:gap-6 md:px-6 lg:px-8">
         <button
           type="button"
