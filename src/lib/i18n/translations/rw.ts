@@ -199,7 +199,7 @@ export const rw = {
     hero_title: 'Ubwisanzure mu bwiza bw’u Rwanda ', // verified-rw
     hero_description: 'Ibicuruzwa by’umwimerere 100%. Ishyura na MTN MoMo. Tukabikugezaho vuba mu Rwanda hose.', // verified-rw
     hero_cta_primary: 'Haha nonaha', // verified-rw
-    hero_cta_secondary: 'Ibiciro byo kurangura', // verified-rw
+    hero_cta_secondary: 'Gura kuri WhatsApp', // verified-rw
     hero_alt: 'Ibicuruzwa by’ubwiza bya FreedomCosmeticShop mu Rwanda', // verified-rw
     join_wholesale_program: 'Saba kubona ibiciro byo kurangura byashyizweho kuri buri gicuruzwa.', // verified-rw
     just_arrived: 'Bimaze kuhagera', // verified-rw
@@ -291,15 +291,15 @@ export const rw = {
     trust_title: 'Kuki wahaha natwe', // verified-rw
     trust_subtitle: 'Amakuru asobanutse ku kugeza ibicuruzwa, kwishyura, kubisubiza n’ubucuruzi bwacu.', // verified-rw
     trust_note: 'Twerekana gusa amakuru y’ubucuruzi yemejwe na politiki z’iduka ziriho ubu.', // verified-rw
-    trust_kigali_delivery: '1,000 RWF · Kubigeza uwo munsi aho bishoboka iyo watumije mbere y’isaha yatangajwe.', // verified-rw
+    trust_kigali_delivery: 'Tugeza mu turere twose 30 tw’u Rwanda. I Kigali guhera kuri 1,000 RWF.', // verified-rw
     trust_district_delivery: 'Tugeza ibicuruzwa mu turere 30 twose. Ikiguzi nyacyo kigaragara mu gihe cyo kwishyura.', // verified-rw
     trust_returns: 'Gusubiza mu minsi {days} ku bicuruzwa byujuje ibisabwa kandi bidafunguye.', // verified-rw
-    trust_payment_providers: 'MTN MoMo · Airtel Money · Visa · Mastercard', // verified-rw
+    trust_payment_providers: 'MTN MoMo · Airtel Money · Amafaranga afatika iyo ugejejweho', // verified-rw
     trust_authentic_detail: 'Aho ibicuruzwa byavuye n’amakuru y’ibirango bigaragara ku rupapuro rw’igicuruzwa.', // verified-rw
     trust_registered_business: 'Ubucuruzi bwanditswe', // verified-rw
     trust_rdb_number: 'RDB: {number}', // verified-rw
     trust_location: 'Aho ubucuruzi bukorera', // verified-rw
-    trust_location_detail: '{sector}, {district}, Kigali', // verified-rw
+    trust_location_detail: '{sector}, Kigali', // verified-rw
     trust_support_hours: 'Ubufasha kuri WhatsApp: {hours}', // verified-rw
 
     section_reviews: 'Ibitekerezo by’abakiriya', // verified-rw
@@ -312,6 +312,17 @@ export const rw = {
     quiz_subtitle: 'Subiza ibibazo bitandatu urebe ibicuruzwa bihuye n’icyiciro, ikibazo, amafaranga n’ibyo ukunda.', // verified-rw
     quiz_cta: 'Tangira ibibazo', // verified-rw
     quiz_time: 'Ibibazo bitandatu · kugura si ngombwa', // verified-rw
+    how_title: 'Uko watumiza', // verified-rw
+    how_subtitle: 'Intambwe eshatu, uhereye ku ntangiriro ukageza ku musozo.', // verified-rw
+    how_step1_title: 'Shakisha ushyire mu gitebo', // verified-rw
+    how_step1_body: 'Shakisha ibyo ushaka ubishyire mu gitebo cyawe.', // verified-rw
+    how_step2_title: 'Twohereze igitebo cyawe kuri WhatsApp', // verified-rw
+    how_step2_body: 'Kanda “Gura kuri WhatsApp” maze igitebo cyawe kitwoherezweho nk’ubutumwa.', // verified-rw
+    how_step3_title: 'Turagutwarira, ukishyura', // verified-rw
+    how_step3_body: 'Wishyura ukoresheje MTN MoMo, Airtel Money cyangwa amafaranga afatika igihe ubigejejweho.', // verified-rw
+    reviews_empty_title: 'Ba uwa mbere utanga igitekerezo', // verified-rw
+    reviews_empty_body: 'Nta muntu urarangiza gutanga igitekerezo. Niba waraguze aho, tubwire uko byagenze.', // verified-rw
+    reviews_empty_cta: 'Sangiza ubunararibonye bwawe', // verified-rw
   },
   categories: {
     all: 'Ibicuruzwa byose', skincare: 'Kwita ku ruhu', makeup: 'Ibikoresho byo kwisiga', haircare: 'Kwita ku musatsi', fragrance: 'Imibavu', body_care: 'Kwita ku mubiri', mens: "Ibikoresho by'abagabo", natural: 'Ibikomoka ku bidukikije', gifts: 'Impano', new_arrivals: 'Ibicuruzwa bishya', best_sellers: 'Ibicuruzwa bikunzwe cyane', on_sale: 'Ibyagabanyijwe', //  REVIEW // verified-rw

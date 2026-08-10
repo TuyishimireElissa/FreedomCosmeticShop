@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Star } from 'lucide-react'
+import { MessageCircle, Star } from 'lucide-react'
 import { useT } from '@/lib/i18n/LanguageContext'
+import { BUSINESS, getWhatsAppLink, isPlaceholder } from '@/lib/business-config'
 
 interface HomepageReview {
   id: string
@@ -29,6 +30,7 @@ export function ReviewsSection() {
   const [reviews, setReviews] = useState<HomepageReview[]>([])
   const [stats, setStats] = useState<ReviewStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const whatsappHref = isPlaceholder(BUSINESS.whatsapp) ? null : getWhatsAppLink(t('home.reviews_empty_cta'))
 
   useEffect(() => {
     const controller = new AbortController()
@@ -52,7 +54,38 @@ export function ReviewsSection() {
     return () => controller.abort()
   }, [])
 
-  if (loading || !stats || reviews.length < 3 || stats.totalReviews < 3) return null
+  // Still fetching, or the request failed: render nothing rather than flash an
+  // invitation that may be replaced by real reviews a moment later.
+  if (loading || !stats) return null
+
+  // Fewer than three real reviews is not enough to carry a social-proof rail,
+  // so invite the first one instead of rendering an empty shelf. No fake
+  // testimonials, and no claim about how many customers there are.
+  if (reviews.length < 3 || stats.totalReviews < 3) {
+    if (!whatsappHref) return null
+    return (
+      <section className="bg-fcs-surface px-4 py-10 md:py-14" aria-labelledby="reviews-empty-title">
+        <div className="mx-auto max-w-xl text-center">
+          <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-fcs-brand/10" aria-hidden="true">
+            <Star className="h-6 w-6 text-fcs-brand-text" />
+          </span>
+          <h2 id="reviews-empty-title" className="mt-4 font-display text-2xl font-normal text-fcs-text">
+            {t('home.reviews_empty_title')}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-fcs-text-muted">{t('home.reviews_empty_body')}</p>
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-whatsapp px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-fcs-whatsapp-hover motion-reduce:transition-none"
+          >
+            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+            {t('home.reviews_empty_cta')}
+          </a>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="bg-gray-50 px-4 py-8 md:py-12">

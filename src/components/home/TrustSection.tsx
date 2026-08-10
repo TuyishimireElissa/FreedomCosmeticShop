@@ -59,7 +59,9 @@ export default function TrustSection() {
       icon: Building2,
       color: 'bg-orange-50 text-orange-700',
       title: t('home.trust_location'),
-      detail: t('home.trust_location_detail', { sector: BUSINESS.address.sector, district: BUSINESS.address.district }),
+      // Nyarugenge is both the sector and the district containing it, so
+      // interpolating both produced "Nyarugenge, Nyarugenge, Kigali".
+      detail: t('home.trust_location_detail', { sector: BUSINESS.address.sector }),
     })
   }
 

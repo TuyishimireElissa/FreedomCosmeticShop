@@ -68,6 +68,13 @@ export default function FeaturedProducts({ type = 'featured', limit = 4 }: Featu
     )
   }
 
+  // "Featured" is a curated subset. Zero featured products means the owner has
+  // not picked any yet — it does NOT mean the shop is empty. Claiming "no
+  // products available" while 101 are listed would be false, and the visitor
+  // has MainCategories and the full catalogue immediately below. So the
+  // section hides itself instead.
+  if (!error && products.length === 0 && type === 'featured') return null
+
   // An empty catalogue should still invite the visitor forward rather than
   // collapsing the section to nothing.
   if (error || products.length === 0) {

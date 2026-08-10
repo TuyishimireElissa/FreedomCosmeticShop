@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ShieldCheck } from 'lucide-react'
+import { MessageCircle, ShieldCheck } from 'lucide-react'
 import type { HomeBanner } from '@/components/home/HeroBanner'
 import { useT } from '@/lib/i18n/LanguageContext'
+import { BUSINESS, getWhatsAppLink, isPlaceholder } from '@/lib/business-config'
 import { useLowData } from '@/contexts/LowDataContext'
 import { IMAGE_QUALITY, IMAGE_SIZES, optimizeCloudinaryUrl } from '@/lib/cloudinary-images'
 
@@ -22,6 +23,11 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
   const { isLowData } = useLowData()
   const [imageError, setImageError] = useState(false)
   const banner = banners[0]
+  // Reuse the config helper rather than hard-coding wa.me — it already refuses
+  // to publish an unconfigured placeholder number.
+  const whatsappHref = isPlaceholder(BUSINESS.whatsapp)
+    ? null
+    : getWhatsAppLink(t('whatsapp.general_help'))
   const desktopImage = banner?.image
   const mobileImage = banner?.mobileImage || desktopImage
   const lowDataImage = mobileImage
@@ -99,12 +105,21 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
             >
               {t('home.hero_cta_primary')}
             </Link>
-            <Link
-              href="/wholesale"
-              className="inline-flex min-h-12 items-center justify-center rounded-[10px] border-2 border-white/70 bg-transparent px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-white/25"
-            >
-              {t('home.hero_cta_secondary')}
-            </Link>
+            {/* WhatsApp is the only working order path, so it belongs above the
+              * fold. This replaced a "Wholesale Deals" link that sent first-time
+              * retail buyers to a wholesale application form. Wholesale keeps
+              * its nav entry and its page. */}
+            {whatsappHref && (
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[10px] bg-fcs-whatsapp px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-fcs-whatsapp-hover active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                {t('home.hero_cta_secondary')}
+              </a>
+            )}
           </div>
 
           <p className="mt-4 flex items-center gap-1.5 text-xs font-medium text-white/80">

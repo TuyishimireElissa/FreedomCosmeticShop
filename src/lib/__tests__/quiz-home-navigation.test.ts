@@ -8,10 +8,18 @@ const banner = read('src/components/home/QuizBanner.tsx')
 const nav = read('src/components/layout/Navbar.tsx')
 
 describe('quiz and bundle entry points', () => {
-  it('adds the quiz banner without replacing existing trust, reviews, or WhatsApp sections', () => {
-    for (const component of ['<TrustSection />', '<ReviewsSection />', '<QuizBanner />', '<WhatsAppCTA />']) expect(home).toContain(component)
-    expect(home.indexOf('<QuizBanner />')).toBeGreaterThan(home.indexOf('<TrustSection />'))
-    expect(home.indexOf('<QuizBanner />')).toBeLessThan(home.indexOf('<WhatsAppCTA />'))
+  it('keeps the trust, reviews and WhatsApp sections on the homepage', () => {
+    for (const component of ['<TrustSection />', '<ReviewsSection />', '<WhatsAppCTA />']) expect(home).toContain(component)
+    expect(home.indexOf('<TrustSection />')).toBeLessThan(home.indexOf('<WhatsAppCTA />'))
+  })
+
+  it('does not render the quiz banner while the quiz cannot return results', () => {
+    // The quiz filters on `ingredients` (1 of 101 products) and `skinType`
+    // (22 of 101), so it answers most inputs with nothing. Inviting customers
+    // into that from the homepage reads as a broken shop. The component and
+    // the /quiz route are deliberately left intact for when content exists.
+    expect(home).not.toMatch(/^\s*<QuizBanner \/>/m)
+    expect(home).toContain('QuizBanner intentionally not rendered')
   })
   it('uses translated, non-urgent quiz banner copy', () => {
     for (const key of ['home.quiz_title', 'home.quiz_subtitle', 'home.quiz_cta', 'home.quiz_time']) expect(banner).toContain(`t('${key}')`)

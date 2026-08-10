@@ -35,8 +35,8 @@ const ReviewsSection = dynamic(
   () => import('@/components/home/ReviewsSection').then((module) => module.ReviewsSection),
   { loading: () => null },
 )
-const QuizBanner = dynamic(
-  () => import('@/components/home/QuizBanner'),
+const HowToOrder = dynamic(
+  () => import('@/components/home/HowToOrder'),
   { loading: () => null },
 )
 const WhatsAppCTA = dynamic(
@@ -118,6 +118,10 @@ function Homepage() {
        * whether this shop is real long before they reach the footer. */}
       <TrustSection />
 
+      {/* WhatsApp ordering is unfamiliar to a first-time visitor. Explain it
+        * immediately after trust and before asking them to browse. */}
+      <HowToOrder />
+
       <MainCategories categories={categories.data?.categories || []} loading={categories.loading} error={categories.error} />
 
       <FeaturedProducts type="featured" limit={4} />
@@ -130,7 +134,11 @@ function Homepage() {
 
       <FeaturedProducts type="new-arrivals" limit={4} />
 
-      <QuizBanner />
+      {/* QuizBanner intentionally not rendered: the beauty quiz filters on
+        * `ingredients` (1 of 101 products) and `skinType` (22 of 101), so it
+        * returns nothing for most answers. Restore it once product content is
+        * filled in — the component and its route are untouched.
+        */}
 
       {/* Beauty Concierge — human guidance framed as a service, not support. */}
       <WhatsAppCTA />
