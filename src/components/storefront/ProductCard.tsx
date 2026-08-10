@@ -10,6 +10,7 @@ import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
 import dynamic from 'next/dynamic'
 import { optimizedImageSrcSet, optimizedImageUrl } from '@/lib/cloudinary-images'
+import LogoRef from '@/components/brand/LogoRef'
 
 const QuickView = dynamic(() => import('@/components/products/QuickView'), { ssr: false })
 
@@ -167,6 +168,18 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
         </div>
         <button type="button" onClick={() => setQuickViewOpen(true)} className="absolute bottom-2 right-2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-600 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand md:hidden" aria-label={`Quick View: ${product.name}`}><Eye className="h-4 w-4" aria-hidden="true" /></button>
         <span className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden h-16 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block" aria-hidden="true" />
+        {/* Owner-requested brand mark.
+          * Bottom-left is the only free corner: the discount badge takes
+          * top-left, the wishlist button top-right, and Quick View
+          * bottom-right. pointer-events-none so it can never intercept a tap
+          * meant for the product link underneath.
+          * Decorative — the product name is the accessible content here, and
+          * a label would make a screen reader announce the brand once per
+          * card on a 48-product page. */}
+        <LogoRef
+          height={14}
+          className="pointer-events-none absolute bottom-2 left-2 z-10 opacity-70 md:bottom-3 md:left-3"
+        />
       </div>
 
       <div className="flex flex-1 flex-col p-3 md:p-4">

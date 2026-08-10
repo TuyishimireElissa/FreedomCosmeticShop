@@ -7,6 +7,7 @@ import { Grid3X3, Home, Search, ShoppingCart, User } from 'lucide-react'
 import { useT } from '@/lib/i18n/LanguageContext'
 import { useStore } from '@/store/useStore'
 import { cn } from '@/lib/utils'
+import LogoRef from '@/components/brand/LogoRef'
 
 interface NavItem {
   href: string
@@ -107,7 +108,17 @@ export default function BottomNav() {
                 aria-current={active ? 'page' : undefined}
               >
                 <span className="relative">
-                  <Icon size={22} strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
+                  {/* Owner-requested brand mark. It replaces the generic house
+                    * glyph on the Home tab rather than adding a sixth item, so
+                    * all five tap targets keep their width (72px at 360px).
+                    * Dimmed when inactive to match the grey of its siblings —
+                    * a full-colour mark beside four grey icons reads as the
+                    * selected tab even when it is not. */}
+                  {item.kind === 'home' ? (
+                    <LogoRef height={22} className={active ? '' : 'opacity-55'} />
+                  ) : (
+                    <Icon size={22} strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
+                  )}
                   {item.badge !== undefined && item.badge > 0 && (
                     <span
                       className="absolute -right-2 -top-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-fcs-brand-strong px-0.5 text-[10px] font-bold leading-none text-white"

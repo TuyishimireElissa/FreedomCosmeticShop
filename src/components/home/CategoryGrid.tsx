@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import type { Category } from '@/lib/types'
 import { useT } from '@/lib/i18n/LanguageContext'
+import LogoRef from '@/components/brand/LogoRef'
 
 interface CategoryGridProps {
   categories: Category[]
@@ -112,6 +113,29 @@ export default function CategoryGrid({ categories, loading = false, error }: Cat
                         {/* Scrim so white text keeps its contrast over any photo. */}
                         <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" aria-hidden="true" />
                       </>
+                    )}
+                    {/* Owner-requested brand mark, top-left of each tile.
+                      *
+                      * On photo tiles it needs a white chip. The tile's scrim
+                      * is a bottom-up gradient protecting the caption, so the
+                      * top-left corner shows the raw photo — and against a
+                      * beige or skin-tone image the mark measures 1.54:1 and
+                      * effectively vanishes (computed, not assumed). The chip
+                      * restores the white ground the logo was drawn for.
+                      *
+                      * Colour tiles are already pale and flat, so the mark
+                      * sits directly on them, dialled back slightly.
+                      *
+                      * Decorative: the category name below is the content. */}
+                    {hasImage ? (
+                      <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-fcs-sm bg-white/90 px-1.5 py-1 shadow-sm">
+                        <LogoRef height={14} />
+                      </span>
+                    ) : (
+                      <LogoRef
+                        height={16}
+                        className="pointer-events-none absolute left-3 top-3 z-10 opacity-75"
+                      />
                     )}
                     <span className="relative">
                       <span className={`block font-display text-lg leading-tight md:text-xl ${hasImage ? 'text-white' : 'text-fcs-text'}`}>
