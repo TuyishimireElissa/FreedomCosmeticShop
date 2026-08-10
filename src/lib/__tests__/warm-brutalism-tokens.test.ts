@@ -95,7 +95,9 @@ describe('every text-bearing token meets WCAG AA', () => {
     // all mid-tone, so they fail as text AND as a fill under white text.
     // They may appear in comments explaining the rejection; what matters is
     // that no token is *assigned* one of them.
-    const declarations = css.match(/--fcs-[a-z-]+:\s*[^;]+;/g) ?? []
+    // Annotated because `String.match` returns RegExpMatchArray | null, and
+    // the ?? [] fallback narrows the empty case to never[] without it.
+    const declarations: string[] = css.match(/--fcs-[a-z-]+:\s*[^;]+;/g) ?? []
     for (const rejected of ['#27AE60', '#2980B9', '#1F8A4C']) {
       expect(contrast(rejected, WHITE)).toBeLessThan(4.5)
       const adopted = declarations.filter((line) => line.toUpperCase().includes(rejected))
