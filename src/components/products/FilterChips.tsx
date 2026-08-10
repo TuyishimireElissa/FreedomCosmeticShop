@@ -33,9 +33,16 @@ export default function FilterChips() {
   if (filters.minRating) chips.push({ key: 'minRating', label: t('search.stars_up', { rating: filters.minRating }) })
 
   return (
-    <div className="flex flex-wrap items-center gap-2 py-2" aria-label={t('search.filters_active', { count: activeFilterCount })}>
+    // Sticky under the header so active filters stay visible while scrolling a
+    // long result list — on a phone they otherwise disappear after one swipe
+    // and the shopper forgets what is narrowing their results. Scrolls
+    // horizontally rather than wrapping, which would push the grid down.
+    <div
+      className="scrollbar-hide sticky top-14 z-30 -mx-4 flex snap-x items-center gap-2 overflow-x-auto border-b border-fcs-border-subtle bg-fcs-bg/95 px-4 py-2 backdrop-blur-md md:top-16"
+      aria-label={t('search.filters_active', { count: activeFilterCount })}
+    >
       {chips.map((chip) => (
-        <span key={chip.key} className="inline-flex min-h-9 max-w-full items-center gap-1.5 rounded-full bg-rose-50 pl-3 pr-1.5 text-sm font-semibold text-fcs-brand-text">
+        <span key={chip.key} className="inline-flex min-h-9 max-w-full flex-none snap-start items-center gap-1.5 rounded-full bg-fcs-surface-muted pl-3 pr-1.5 text-sm font-semibold text-fcs-brand-text">
           <span className="max-w-48 truncate">{chip.label}</span>
           <button type="button" onClick={() => clearFilter(chip.key)} className="grid h-8 w-8 place-items-center rounded-full hover:bg-rose-100" aria-label={t('search.remove_filter', { filter: chip.label })}><X className="h-3.5 w-3.5" /></button>
         </span>

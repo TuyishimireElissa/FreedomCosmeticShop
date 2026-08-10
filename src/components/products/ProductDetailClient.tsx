@@ -9,9 +9,9 @@ import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
 import ProductImageGallery from '@/components/products/ProductImageGallery'
 import ProductTabs from '@/components/products/ProductTabs'
+import RoutineRail from '@/components/products/RoutineRail'
 import DeliveryEstimator from '@/components/products/DeliveryEstimator'
 import OrderViaWhatsApp from '@/components/products/OrderViaWhatsApp'
-import ProductGrid from '@/components/products/ProductGrid'
 import { useT } from '@/lib/i18n/LanguageContext'
 import IconButton from '@/components/a11y/IconButton'
 import StockStatus from '@/components/a11y/StockStatus'
@@ -123,7 +123,7 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
         <div id="product-details"><ProductTabs product={product} /></div>
 
-        <section className="mt-14 sm:mt-16"><div className="mb-6"><span className="text-[10px] font-bold uppercase tracking-[0.2em] text-fcs-brand-text">{t('product.complete_routine')}</span><h2 className="mt-2 text-2xl font-bold text-[#1a1a1a] sm:text-3xl">{t('product.related')}</h2></div><ProductGrid products={related || []} /></section>
+        <RoutineRail products={related || []} />
       </div>
 
       {/* Mobile sticky buy bar. At 360px the real add-to-cart button sits

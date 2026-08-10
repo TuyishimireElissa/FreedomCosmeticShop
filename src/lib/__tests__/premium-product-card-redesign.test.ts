@@ -62,7 +62,11 @@ describe('premium shared product card redesign', () => {
 
   it('uses the shared card for catalogue, category/search, homepage, and related products', () => {
     expect(products).toContain('<ProductGrid products={products}')
-    expect(detail).toContain('<ProductGrid products={related || []}')
+    // Related products moved from ProductGrid to RoutineRail (horizontal rail
+    // on phones). Both render the shared ProductCard, which is the guarantee
+    // this test exists to protect — assert that rather than the container.
+    expect(detail).toContain('<RoutineRail products={related || []}')
+    expect(read('src/components/products/RoutineRail.tsx')).toContain("from '@/components/storefront/ProductCard'")
     expect(featured).toContain('<ProductCard')
     expect(personalized).toContain('<ProductCard')
     expect(grid).toContain('<ProductCard')
