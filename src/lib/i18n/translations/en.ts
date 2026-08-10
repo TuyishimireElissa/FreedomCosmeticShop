@@ -317,6 +317,13 @@ export const en = {
     reviews_empty_body: 'No one has reviewed us yet. If you have bought from us, tell us how it went.',
     reviews_empty_cta: 'Share your experience',
     quiz_time: 'Six questions · no purchase required',
+    proof_label: 'Why shop with us',
+    proof_districts: 'Delivery to all 30 districts',
+    proof_payment: 'MoMo, Airtel or cash',
+    proof_authentic: 'Authentic products',
+    category_count: '{count} products',
+    featured_eyebrow: 'Hand-picked',
+    featured_loading: 'Loading featured products',
   },
   categories: {
     all: 'All Products', skincare: 'Skincare', makeup: 'Makeup', haircare: 'Hair Care', fragrance: 'Fragrance', body_care: 'Body Care', mens: "Men's Grooming", natural: 'Natural & Organic', gifts: 'Gift Sets', new_arrivals: 'New Arrivals', best_sellers: 'Best Sellers', on_sale: 'On Sale',

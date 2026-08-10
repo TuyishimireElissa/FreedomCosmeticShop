@@ -323,6 +323,13 @@ export const rw = {
     reviews_empty_title: 'Ba uwa mbere utanga igitekerezo', // verified-rw
     reviews_empty_body: 'Nta muntu urarangiza gutanga igitekerezo. Niba waraguze aho, tubwire uko byagenze.', // verified-rw
     reviews_empty_cta: 'Sangiza ubunararibonye bwawe', // verified-rw
+    proof_label: 'Impamvu wagura hano', // verified-rw
+    proof_districts: 'Tugeza mu turere twose 30', // verified-rw
+    proof_payment: 'MoMo, Airtel cyangwa amafaranga afatika', // verified-rw
+    proof_authentic: 'Ibicuruzwa by’umwimerere', // verified-rw
+    category_count: 'Ibicuruzwa {count}', // verified-rw
+    featured_eyebrow: 'Byatoranyijwe', // verified-rw
+    featured_loading: 'Ibicuruzwa byatoranyijwe birimo gufunguka', // verified-rw
   },
   categories: {
     all: 'Ibicuruzwa byose', skincare: 'Kwita ku ruhu', makeup: 'Ibikoresho byo kwisiga', haircare: 'Kwita ku musatsi', fragrance: 'Imibavu', body_care: 'Kwita ku mubiri', mens: "Ibikoresho by'abagabo", natural: 'Ibikomoka ku bidukikije', gifts: 'Impano', new_arrivals: 'Ibicuruzwa bishya', best_sellers: 'Ibicuruzwa bikunzwe cyane', on_sale: 'Ibyagabanyijwe', //  REVIEW // verified-rw

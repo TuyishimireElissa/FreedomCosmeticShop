@@ -10,7 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-fcs-brand text-white hover:bg-[#9B5A64]",
-        destructive: "bg-[#D64045] text-white hover:bg-[#BC3035] focus-visible:ring-[#D64045]/20",
+        destructive: "bg-fcs-error text-white hover:bg-[#BC3035] focus-visible:ring-fcs-error/20",
         outline: "border-2 border-fcs-brand bg-transparent text-fcs-brand-text hover:bg-fcs-brand hover:text-white",
         secondary: "bg-[#1a1a1a] text-white hover:bg-black",
         ghost: "text-[#666666] hover:bg-[#F5F5F5] hover:text-[#1a1a1a]",

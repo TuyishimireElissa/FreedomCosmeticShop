@@ -86,7 +86,9 @@ describe('how to order', () => {
   it('is rendered between trust and the catalogue', () => {
     expect(home).toContain('<HowToOrder />')
     expect(home.indexOf('<HowToOrder />')).toBeGreaterThan(home.indexOf('<TrustSection />'))
-    expect(home.indexOf('<HowToOrder />')).toBeLessThan(home.indexOf('<MainCategories'))
+    // MainCategories was replaced by CategoryGrid in the Warm Brutalism
+    // phase; the ordering constraint is unchanged.
+    expect(home.indexOf('<HowToOrder />')).toBeLessThan(home.indexOf('<CategoryGrid'))
   })
 
   it('uses an ordered list so the sequence survives without CSS', () => {

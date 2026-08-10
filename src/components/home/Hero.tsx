@@ -91,7 +91,9 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
 
       <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 md:px-12 lg:px-20">
         <div className="max-w-sm md:max-w-lg">
-          <h1 className="mb-3 text-4xl font-bold leading-[1.1] tracking-[-0.03em] text-white md:text-5xl lg:text-[56px]">
+          {/* Serif for the hero statement — Georgia ships on every Android and
+            * iOS device, so this costs 0 KB. UI chrome below stays sans. */}
+          <h1 className="mb-3 font-display text-4xl font-normal leading-[1.08] tracking-[-0.01em] text-white md:text-5xl lg:text-[56px]">
             {t('home.hero_title')}
           </h1>
           <p className="mb-5 text-sm leading-relaxed text-white/90 md:text-base lg:text-lg">
@@ -101,7 +103,7 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href="/products"
-              className="inline-flex min-h-12 items-center justify-center rounded-[10px] bg-fcs-brand-strong px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-[#9B5A64] active:scale-[0.98]"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-fcs-brand-strong px-7 text-sm font-semibold text-white transition-colors duration-150 ease-fcs-snap hover:bg-fcs-brand-strong-hover active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
             >
               {t('home.hero_cta_primary')}
             </Link>
@@ -114,7 +116,7 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[10px] bg-fcs-whatsapp px-6 text-sm font-semibold text-white transition-colors duration-150 hover:bg-fcs-whatsapp-hover active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-whatsapp-pill px-7 text-sm font-semibold text-white transition-colors duration-150 ease-fcs-snap hover:bg-fcs-whatsapp-hover active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 {t('home.hero_cta_secondary')}

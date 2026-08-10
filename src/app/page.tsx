@@ -6,7 +6,7 @@ import type { Category } from "@/lib/types"
 import type { HomeBanner } from "@/components/home/HeroBanner"
 import Hero from "@/components/home/Hero"
 import HomeSearch from "@/components/home/HomeSearch"
-import MainCategories from "@/components/home/MainCategories"
+import CategoryGrid from "@/components/home/CategoryGrid"
 import LazySection from '@/components/ui/LazySection'
 import { useT } from '@/lib/i18n/LanguageContext'
 import {
@@ -33,6 +33,14 @@ const TrustSection = dynamic(
 )
 const ReviewsSection = dynamic(
   () => import('@/components/home/ReviewsSection').then((module) => module.ReviewsSection),
+  { loading: () => null },
+)
+const SocialProofBar = dynamic(
+  () => import('@/components/home/SocialProofBar'),
+  { loading: () => null },
+)
+const FeaturedBento = dynamic(
+  () => import('@/components/home/FeaturedBento'),
   { loading: () => null },
 )
 const HowToOrder = dynamic(
@@ -114,6 +122,9 @@ function Homepage() {
 
       <HomeSearch />
 
+      {/* Three verifiable facts, immediately under the fold. */}
+      <SocialProofBar />
+
       {/* Trust moved directly under the fold: a first-time buyer decides
        * whether this shop is real long before they reach the footer. */}
       <TrustSection />
@@ -122,9 +133,9 @@ function Homepage() {
         * immediately after trust and before asking them to browse. */}
       <HowToOrder />
 
-      <MainCategories categories={categories.data?.categories || []} loading={categories.loading} error={categories.error} />
+      <CategoryGrid categories={categories.data?.categories || []} loading={categories.loading} error={categories.error} />
 
-      <FeaturedProducts type="featured" limit={4} />
+      <FeaturedBento limit={3} />
 
       <LazySection label={t('personalized_recommendations.section_label')}>
         <PersonalizedRecommendations />
