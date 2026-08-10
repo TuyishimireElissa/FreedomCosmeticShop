@@ -177,8 +177,8 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
           * a label would make a screen reader announce the brand once per
           * card on a 48-product page. */}
         <LogoRef
-          height={14}
-          className="pointer-events-none absolute bottom-2 left-2 z-10 opacity-70 md:bottom-3 md:left-3"
+          height={18}
+          className="pointer-events-none absolute bottom-2 left-2 z-10 opacity-80 md:bottom-3 md:left-3"
         />
       </div>
 

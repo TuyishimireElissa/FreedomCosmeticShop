@@ -111,11 +111,19 @@ export default function BottomNav() {
                   {/* Owner-requested brand mark. It replaces the generic house
                     * glyph on the Home tab rather than adding a sixth item, so
                     * all five tap targets keep their width (72px at 360px).
+                    *
+                    * 26px, not the 22px its neighbours use. The lucide icons
+                    * are 2px outline strokes; the mark is a filled letterform
+                    * with fine serifs, so at matched height it reads thinner
+                    * and lighter than everything beside it. 26px balances the
+                    * row visually and still fits: 26 + 2 gap + 15 label = 43px
+                    * inside the 48px the bar allows.
+                    *
                     * Dimmed when inactive to match the grey of its siblings —
                     * a full-colour mark beside four grey icons reads as the
                     * selected tab even when it is not. */}
                   {item.kind === 'home' ? (
-                    <LogoRef height={22} className={active ? '' : 'opacity-55'} />
+                    <LogoRef height={26} className={active ? '' : 'opacity-55'} />
                   ) : (
                     <Icon size={22} strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
                   )}

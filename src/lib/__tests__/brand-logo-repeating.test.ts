@@ -154,6 +154,30 @@ describe('the mark does not break the surfaces it sits on', () => {
   })
 })
 
+describe('sizes are tuned per surface, not copy-pasted', () => {
+  it('the nav mark is larger than the stroke icons beside it', () => {
+    // The lucide icons are 2px outline strokes. The mark is a filled
+    // letterform with fine serifs, so at matched height it reads thinner and
+    // lighter than its neighbours. Verified visually at 360px before fixing.
+    const markHeight = Number(bottomNav.match(/<LogoRef height=\{(\d+)\}/)?.[1])
+    const iconSize = Number(bottomNav.match(/<Icon size=\{(\d+)\}/)?.[1])
+    expect(markHeight).toBeGreaterThan(iconSize)
+
+    // Must still fit the bar: h-16 (64px) less py-2 (16px) = 48px, shared
+    // with the ~15px label and a 2px gap.
+    expect(markHeight + 2 + 15).toBeLessThanOrEqual(48)
+  })
+
+  it('the product card mark is big enough to be seen', () => {
+    // 14px on a 158px card at 70% opacity was effectively invisible.
+    const height = Number(productCard.match(/<LogoRef\s+height=\{(\d+)\}/)?.[1])
+    expect(height).toBeGreaterThanOrEqual(16)
+    // But small enough that it stays a mark, not a badge competing with the
+    // product photo.
+    expect(height).toBeLessThanOrEqual(24)
+  })
+})
+
 describe('these marks are decorative', () => {
   it('LogoRef defaults to no accessible name', () => {
     // One label per card would make a screen reader announce the brand 48
