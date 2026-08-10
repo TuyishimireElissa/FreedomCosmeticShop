@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import {
   ChevronDown,
   Globe,
@@ -20,6 +19,7 @@ import {
 } from 'lucide-react'
 import { SearchWithSuggestions } from '@/components/storefront/SearchWithSuggestions'
 import LanguageSelector from '@/components/ui/LanguageSelector'
+import Logo from '@/components/ui/logo'
 import { useT } from '@/lib/i18n/LanguageContext'
 import { useScrolled } from '@/hooks/use-scrolled'
 import { useSettings } from '@/hooks/use-settings'
@@ -124,24 +124,11 @@ export default function Navbar() {
             />
           ) : (
             <>
-              {/* Icon-only mark on phones, where horizontal space is scarce. */}
-              <Image
-                src="/logo-icon.png"
-                alt={t('nav.logo_alt')}
-                width={40}
-                height={40}
-                priority
-                className="h-9 w-9 object-contain md:hidden"
-              />
-              {/* Full lockup from md: up. */}
-              <Image
-                src="/logo.png"
-                alt={t('nav.logo_alt')}
-                width={800}
-                height={200}
-                priority
-                className="hidden h-10 w-auto object-contain md:block"
-              />
+              {/* Simplified monogram on phones, where the leaf branch and
+                * facial profile would be unreadable and space is scarce. */}
+              <Logo size="md" label={t('nav.logo_alt')} className="md:hidden" />
+              {/* Full mark from md: up. */}
+              <Logo size="lg" label={t('nav.logo_alt')} className="hidden md:block" />
             </>
           )}
         </button>
