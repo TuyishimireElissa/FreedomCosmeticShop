@@ -5,7 +5,8 @@ edit this pipeline and re-run it, otherwise the next regeneration silently
 overwrites the change.
 
 ```bash
-python3 brand-src/build-brand-assets.py
+node   brand-src/render-mark.mjs        # SVG component -> PNG masters
+python3 brand-src/build-brand-assets.py # masters -> every /public asset
 ```
 
 ## What it produces
@@ -24,14 +25,20 @@ python3 brand-src/build-brand-assets.py
 
 ## Colours
 
-- Rose gold `#B76E79` — the mark, accents
+- Rose `#DFA6A0` → `#CA7370` — the F and the profile, as a gradient
+- Gold `#D9B26A` → `#A8752D` — the C and the leaf branch
+- Cream `#FEF9F6` — apple-touch tile ground
 - Charcoal `#1a1a1a` — "Freedom" wordmark
 - Grey `#777777` — "COSMETIC SHOP" line (matches the Navbar tagline grey)
 
 ## Inputs
 
-- `icon-mark.png` — the flower mark: transparent, flattened to exactly `#B76E79`.
-  Committed, because it is the one asset that is not deterministically reproducible.
+- `mark-full.png` / `mark-simple.png` — the FC monogram, rendered from
+  `src/components/ui/logo.tsx` by `render-mark.mjs`. **The React component is
+  the source of truth**: the site renders that SVG inline, and these PNGs exist
+  only because favicons and OpenGraph cannot consume SVG. Never hand-edit them.
+- `icon-mark.png` — the retired lotus mark. Kept so the previous brand can be
+  regenerated if needed.
 - `fonts/` — Playfair Display + Inter, fetched on first run (SIL Open Font
   Licence). Gitignored; ~3 MB of reproducible binaries do not belong in the repo.
 - `icon-raw.png` — original generated art before background removal. Gitignored.
@@ -41,9 +48,16 @@ python3 brand-src/build-brand-assets.py
 - **Wordmarks are rendered from real font files, not from an image model.**
   Image models misspell "FreedomCosmeticShop" and drift off the brand hex.
   Typesetting them here makes spelling and colour exact and repeatable.
-- **The tiny favicons use a dilated silhouette.** The petal filigree is lovely
-  at 180px and turns to mush at 16px, so `solidify()` grows the alpha for the
-  small sizes. Do not "fix" this by reusing the detailed 512px art.
+- **The tiny favicons use the simplified F+C art, not dilation.** `solidify()`
+  floods every pixel to flat rose, which was right for the single-colour lotus
+  and would erase the gold C. Sizes at or below 32px pass `simple=True`
+  instead, which drops the leaf branch and facial profile — unreadable at
+  16px — while keeping both brand colours. `solidify()` is retained but is no
+  longer called by any icon.
+- **The OG wordmark is measured, not fixed.** The FC monogram is 1.35:1 where
+  the lotus was square, so it takes ~250px more of the 1200px canvas; the old
+  fixed font size pushed "Shop" off the right edge. `build_og()` now shrinks
+  the wordmark until the lockup fits the safe width.
 - **Alpha is dilated only after the colour channels are flooded.** Fully
   transparent pixels carry RGB `0,0,0`; dilating alpha first fringes the mark
   with a black halo.

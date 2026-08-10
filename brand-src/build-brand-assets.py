@@ -23,6 +23,7 @@ ROSE = (183, 110, 121)        # #B76E79
 CHARCOAL = (26, 26, 26)       # #1a1a1a
 WHITE = (255, 255, 255)
 MUTED = (119, 119, 119)       # #777777, the tagline grey already used in the Navbar
+CREAM = (254, 249, 246)       # #FEF9F6, the ground the FC monogram was designed on
 
 SS = 4  # supersample factor for crisp text
 
@@ -58,12 +59,25 @@ def font(name: str, size: int, weight: int | None = None) -> ImageFont.FreeTypeF
     return f
 
 
-def load_mark() -> Image.Image:
-    return Image.open(SRC / "icon-mark.png").convert("RGBA")
+def load_mark(simple: bool = False) -> Image.Image:
+    """The FC monogram, rasterised from the inline SVG in ui/logo.tsx.
+
+    `mark-full.png` and `mark-simple.png` are rendered from `logo-full.svg` /
+    `logo-simple.svg` by `brand-src/render-mark.mjs`, which extracts the paths
+    straight out of the React component. The component is the single source of
+    truth: the site renders the SVG inline, and these PNGs exist only because
+    favicons and OpenGraph cannot consume SVG.
+
+    `simple=True` returns the F+C monogram without the leaf branch or the
+    facial profile. Those details are unreadable below ~32px — the same reason
+    the previous lotus mark needed a separate dilated silhouette.
+    """
+    name = "mark-simple.png" if simple else "mark-full.png"
+    return Image.open(SRC / name).convert("RGBA")
 
 
-def fit_mark(height: int) -> Image.Image:
-    m = load_mark()
+def fit_mark(height: int, simple: bool = False) -> Image.Image:
+    m = load_mark(simple)
     w = round(m.width * height / m.height)
     return m.resize((w, height), Image.LANCZOS)
 
@@ -123,9 +137,12 @@ def build_wordmark(path: Path, w: int, h: int, bg, primary, secondary, tagline_c
 def solidify(mark: Image.Image, strength: float) -> Image.Image:
     """Close the hairline negative space inside the mark.
 
-    The petal filigree is beautiful at 180px+ and turns to mush at 16px. For
-    tiny favicons we grow the alpha so the lotus reads as a confident
-    silhouette instead of a pink smudge.
+    NOTE: this floods every pixel to flat ROSE, which was correct for the
+    single-colour lotus and is destructive for the two-colour FC monogram —
+    it would erase the gold C. It is retained only for the legacy path and is
+    no longer called by any icon; the small sizes now use the simplified F+C
+    art (`simple=True`) instead, which keeps both colours and needs no
+    dilation because it has no hairline detail to lose.
     """
     radius = max(3, int(mark.height * strength) | 1)  # MaxFilter needs an odd radius
     a = mark.split()[3].filter(ImageFilter.MaxFilter(radius))
@@ -136,9 +153,9 @@ def solidify(mark: Image.Image, strength: float) -> Image.Image:
     return solid
 
 
-def build_icon(path: Path, size: int, bg, scale: float = 0.76, close: float = 0.0):
+def build_icon(path: Path, size: int, bg, scale: float = 0.76, close: float = 0.0, simple: bool = False):
     canvas = Image.new("RGBA", (size * SS, size * SS), bg)
-    mark = fit_mark(int(size * SS * scale))
+    mark = fit_mark(int(size * SS * scale), simple=simple)
     if close:
         mark = solidify(mark, close)
     canvas.alpha_composite(mark, ((canvas.width - mark.width) // 2, (canvas.height - mark.height) // 2))
@@ -185,6 +202,19 @@ def build_og(path: Path):
     mark = fit_mark(int(H * 0.40))
     f_name = font("playfair.ttf", int(H * 0.130), 600)
     f_tag = font("inter.ttf", int(H * 0.050), 500)
+
+    # Shrink the wordmark until the whole lockup fits inside the safe width.
+    # The FC monogram is 1.35:1 where the old lotus was square, so it eats
+    # ~250px more of the 1200px canvas and the previous fixed size pushed
+    # "Shop" off the right edge. Measuring beats guessing a smaller constant:
+    # this stays correct if the mark, the copy or the canvas changes again.
+    _probe = ImageDraw.Draw(canvas)
+    _safe = int(W * 0.90) - mark.width - int(W * 0.045)
+    while f_name.size > int(H * 0.06):
+        _w = _probe.textbbox((0, 0), "FreedomCosmeticShop", font=f_name)[2]
+        if _w <= _safe:
+            break
+        f_name = font("playfair.ttf", int(f_name.size * 0.94), 600)
 
     name = "FreedomCosmeticShop"
     tag = "100% Umwimerere"
@@ -262,11 +292,13 @@ def main():
     print("Icons:")
     build_icon(PUB / "logo-icon.png", 512, WHITE + (255,))
     # Badge: read at 24px, so it gets the same closed silhouette as the favicons.
-    build_icon(PUB / "logo-badge.png", 128, WHITE + (255,), scale=0.86, close=0.022)
+    build_icon(PUB / "logo-badge.png", 128, WHITE + (255,), scale=0.86, simple=True)
     build_icon(PUB / "icon-maskable-512.png", 512, WHITE + (255,), scale=0.60)
-    build_icon(PUB / "favicon-16x16.png", 16, (0, 0, 0, 0), scale=0.86, close=0.055)
-    build_icon(PUB / "favicon-32x32.png", 32, (0, 0, 0, 0), scale=0.84, close=0.030)
-    build_icon(PUB / "apple-touch-icon.png", 180, WHITE + (255,))
+    build_icon(PUB / "favicon-16x16.png", 16, (0, 0, 0, 0), scale=0.92, simple=True)
+    build_icon(PUB / "favicon-32x32.png", 32, (0, 0, 0, 0), scale=0.90, simple=True)
+    # Cream rather than white: the mark was designed on #FEF9F6 and iOS shows
+    # this tile against arbitrary wallpaper, so the warm ground reads better.
+    build_icon(PUB / "apple-touch-icon.png", 180, CREAM + (255,), scale=0.72)
     build_icon(PUB / "android-chrome-192x192.png", 192, WHITE + (255,))
     build_icon(PUB / "android-chrome-512x512.png", 512, WHITE + (255,))
 
@@ -277,10 +309,11 @@ def main():
     ico_sizes = [16, 32, 48]
     frames = []
     for s in ico_sizes:
-        # Same treatment as the PNG favicons: dilate more the smaller we go.
-        close = {16: 0.055, 32: 0.030, 48: 0.022}[s]
+        # Simplified F+C at every .ico size. The full mark's leaf branch and
+        # facial profile are illegible at 16px, and solidify() would flatten
+        # the gold C into rose.
         c = Image.new("RGBA", (s * SS, s * SS), (0, 0, 0, 0))
-        m = solidify(fit_mark(int(s * SS * 0.86)), close)
+        m = fit_mark(int(s * SS * 0.92), simple=True)
         c.alpha_composite(m, ((c.width - m.width) // 2, (c.height - m.height) // 2))
         frames.append(c.resize((s, s), Image.LANCZOS))
     frames[-1].save(PUB / "favicon.ico", format="ICO", sizes=[(s, s) for s in ico_sizes])
