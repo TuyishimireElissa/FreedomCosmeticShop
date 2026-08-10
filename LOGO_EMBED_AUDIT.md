@@ -118,15 +118,38 @@ gold `#A8752D` 4.35:1, `#C99B54` 6.88:1, `#D9B26A` 8.72:1. All pass AA.
 
 ---
 
-## 5. Deliberately NOT adding the mark
+## 5. Repeating surfaces — I argued against these and was wrong (NOW ADDED)
 
-Recording these so the decision is not silently revisited:
+I originally declined to put the mark on product cards, category tiles and the
+bottom nav. The owner overruled me and was right to. Recording my errors:
 
-- **Product cards, category tiles, search results.** Repeating a logo beside
-  every product is watermarking. It competes with the product photo, which is
-  the thing that actually sells.
-- **The bottom navigation bar.** Five tap targets on a 360px screen. A logo
-  would either shrink the targets below 44px or replace a navigation item.
+- **"A sixth nav item makes tap targets too small."** **False.** I never did
+  the arithmetic. Six items at 320px, the narrowest common phone, is 53px
+  each — above the 44px guideline. Not a real constraint.
+- **"Watermarking fights the product photo."** A taste opinion presented as an
+  engineering objection. The owner's call to make, not mine.
+
+**The one real constraint, found by measuring:** the mark is ~2,950 characters
+of path data simplified, ~6,500 full. A 48-product listing with an inline copy
+per card is **~138 KB of extra DOM**. So the geometry is emitted once per page
+as an SVG sprite (`LogoSprite`, mounted by `SiteChrome`) and each placement
+renders a ~40 byte `<use>` reference (`LogoRef`). Verified live: the shipped
+bundles contain **0** inlined copies of the path data.
+
+Placements: product cards bottom-left (only free corner — discount top-left,
+wishlist top-right, Quick View bottom-right), category tiles top-left, and the
+bottom nav Home tab, where the mark **replaces** the house glyph rather than
+adding a sixth item.
+
+**Contrast bug caught before shipping:** photo category tiles carry a
+bottom-up scrim protecting the caption, so the top-left corner shows the raw
+photo. Against a beige or skin-tone image the rose measures **1.54:1** and the
+mark vanishes. Photo tiles now get a white chip; flat colour tiles do not need
+one. Product cards need no chip either — `object-contain` with padding on a
+white-to-grey gradient keeps that corner near-white.
+
+## 5b. Still deliberately NOT adding the mark
+
 - **Blog posts and FAQ body copy.** The chrome already brands the page.
 - **`site.webmanifest` / theme colour.** Already correct at `#B76E79`.
 
