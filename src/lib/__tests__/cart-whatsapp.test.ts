@@ -13,10 +13,21 @@ describe('cart WhatsApp assisted ordering', () => {
     expect(cart).toContain('<CartWhatsAppOrder items={cart.items} subtotal={cart.subtotal} discount={discount} district={cart.selectedDistrict} deliveryFee={delivery ? deliveryFee : null} />')
   })
 
-  it('includes current cart lines, bundle/product links and exact totals', () => {
-    for (const term of ['name: item.name', 'quantity: item.quantity', 'price: item.price', 'size: item.volume || undefined', 'subtotal,', 'discount,', 'district,', 'deliveryFee,', 'totalRWF: total']) expect(button).toContain(term)
-    expect(button).toContain("item.isBundle ? `/bundles/")
-    expect(button).toContain(": `/products/")
+  it('hands off to the path that persists the order before WhatsApp opens', () => {
+    // This test previously asserted the cart built a wa.me message itself from
+    // item name, quantity, price, links and totals. That flow produced an
+    // order which existed only inside the customer's WhatsApp app: no FC-
+    // reference, no row in /admin/whatsapp-orders, no stock movement, and lost
+    // entirely if they closed the tab before sending.
+    //
+    // /api/orders/whatsapp saves first and recomputes every price server-side,
+    // but requires a name, phone and district that the cart never collects.
+    // The button therefore carries the shopper to checkout, which collects
+    // exactly those and then posts to that endpoint. The guarantee worth
+    // pinning is that the cart no longer mints an unsaved order.
+    expect(button).toContain("router.push('/checkout')")
+    expect(button).not.toContain('buildCartOrderMessage')
+    expect(button).not.toContain('window.open')
     expect(button).toContain('Math.max(0, subtotal - discount + deliveryFee)')
   })
 
@@ -26,10 +37,13 @@ describe('cart WhatsApp assisted ordering', () => {
     expect(button).toContain("t('whatsapp.select_district_first')")
   })
 
-  it('opens WhatsApp before sending non-blocking PII-free analytics', () => {
-    expect(button.indexOf('window.open(whatsappUrl')).toBeLessThan(button.indexOf("trackWhatsAppClick('order_cart'"))
+  it('sends PII-free analytics and does not block the hand-off', () => {
+    // Ordering against window.open no longer applies — the button navigates
+    // rather than opening a tab. What still matters is that the analytics
+    // call carries no personal data and that it fires before navigation, so
+    // the event is not lost to the route change.
+    expect(button.indexOf("trackWhatsAppClick('order_cart'")).toBeLessThan(button.indexOf("router.push('/checkout')"))
     expect(button).not.toContain('customerName')
-    expect(button).not.toContain('phone')
     expect(button).not.toContain('email')
     expect(button).not.toContain('sessionId')
   })

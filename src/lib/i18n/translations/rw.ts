@@ -1075,6 +1075,8 @@ export const rw = {
     tracking_code: 'Kode yo gukurikirana', // verified-rw
     tracking_empty_hint: 'Uzabona uko komande ikurikirana, ibicuruzwa n’amakuru yo kuyigeza.', // verified-rw
     tracking_value: 'Kode yo gukurikirana: {code}', // verified-rw
+    ask_question: 'Baza ku byo watumije', // verified-rw
+    ask_question_message: 'Muraho! Mfite ikibazo ku byo natumije {order}.', // verified-rw
   },
   delivery: {
     title: 'Amakuru yo kugeza ibicuruzwa', estimate: 'Reba ikiguzi cyo kukugezaho', select_district: 'Hitamo akarere kawe', kigali_same_day: 'Kubigeza uwo munsi', kigali_fee: '1,000 RWF', kigali_time: 'Uyu munsi mbere ya saa kumi n’ebyiri (utumije mbere ya saa munani)', province_fee_north: '3,000 RWF', province_fee_south: '3,000 RWF', province_fee_east: '3,500 RWF', province_fee_west: '4,000 RWF', province_time: 'Iminsi 2-3 y’akazi', west_time: 'Iminsi 3-4 y’akazi', free_above: 'Kubigezwaho ku buntu ku komande irenze 50,000 RWF', free_delivery: 'Kubigezwaho ku buntu! ', spend_more: 'Ongeraho {amount} RWF ubone kubigezwaho ku buntu', cutoff: 'Tumiza mbere ya saa munani ubigezweho uwo munsi', sms_updates: 'Uzajya ubona ubutumwa bwa SMS kuri buri ntambwe', instructions: { title: 'Amabwiriza yo kukugezaho', include_landmark: 'Andika ikimenyetso kiri hafi y’aho uri', be_available: 'Ba uhari cyangwa usige umuntu wakira ibicuruzwa', call_rider: 'Umumotari azaguhamagara mbere yo kuhagera', kigali_areas: 'Muri Kigali: bigerayo uwo munsi iyo utumije mbere ya saa munani', province_areas: 'Mu ntara: iminsi 2-4 y’akazi' }, districts_load_failed: 'Uturere ntitwashoboye gufunguka', estimate_unavailable: 'Ikigereranyo cyo kukugezaho ntikiboneka', //  REVIEW // verified-rw

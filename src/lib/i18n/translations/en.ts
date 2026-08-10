@@ -1007,6 +1007,8 @@ export const en = {
     tracking_code: 'Tracking code',
     tracking_empty_hint: 'You\'ll see the full status timeline, items, and delivery info.',
     tracking_value: 'Tracking: {code}',
+    ask_question: 'Ask about this order',
+    ask_question_message: 'Hello! I have a question about my order {order}.',
   },
   delivery: {
     title: 'Delivery Information', estimate: 'Estimate Delivery Cost', select_district: 'Select your district', kigali_same_day: 'Same Day Delivery', kigali_fee: '1,000 RWF', kigali_time: 'Today by 6 PM (order before 2 PM)', province_fee_north: '3,000 RWF', province_fee_south: '3,000 RWF', province_fee_east: '3,500 RWF', province_fee_west: '4,000 RWF', province_time: '2-3 business days', west_time: '3-4 business days', free_above: 'FREE delivery on orders above 50,000 RWF', free_delivery: 'FREE Delivery! ', spend_more: 'Spend {amount} RWF more for FREE delivery', cutoff: 'Order before 2:00 PM for same-day delivery', sms_updates: 'You will receive SMS updates at every step', instructions: { title: 'Delivery Instructions', include_landmark: 'Include a landmark near your location', be_available: 'Be available or have someone receive your order', call_rider: 'The rider will call you before arriving', kigali_areas: 'Kigali deliveries: same day if ordered before 2 PM', province_areas: 'Province deliveries: 2-4 business days' }, districts_load_failed: 'Districts could not be loaded', estimate_unavailable: 'Delivery estimate unavailable',

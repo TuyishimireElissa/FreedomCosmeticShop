@@ -22,6 +22,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { buildWhatsAppShareUrl, trackWhatsAppClick } from '@/lib/whatsapp-service'
 import { useOrderUpdates, useDeliveryUpdates } from "@/hooks/use-realtime"
+import { getWhatsAppLink } from '@/lib/business-config'
 import OrderStatusBadge from '@/components/a11y/OrderStatusBadge'
 import PaymentStatusBadge from '@/components/a11y/PaymentStatusBadge'
 import {
@@ -36,6 +37,7 @@ import {
   Share2,
   ArrowLeft,
   AlertCircle,
+  MessageCircle,
 } from "lucide-react"
 
 interface TrackedOrder {
@@ -449,6 +451,21 @@ export function TrackOrderView() {
               </span>
             </p>
           </div>
+
+          {/* Ask about this order. Distinct from Share: this opens a chat with
+              the shop, with the reference already filled in, so the customer
+              never has to retype FC-20260809-1234 from memory. Built through
+              getWhatsAppLink so an unconfigured number can never ship. */}
+          <a
+            href={getWhatsAppLink(t('orders.ask_question_message', { order: order.orderNumber }))}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackWhatsAppClick('track_order', { language: language === 'en' ? 'en' : 'rw', pagePath: '/track-order' })}
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-fcs-whatsapp-pill px-6 text-sm font-semibold text-white transition-colors duration-150 ease-fcs-snap hover:bg-fcs-whatsapp-hover motion-reduce:transition-none"
+          >
+            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+            {t('orders.ask_question')}
+          </a>
 
           {/* Share */}
           <Button variant="outline" className="w-full" onClick={handleShare}>
