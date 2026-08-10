@@ -173,13 +173,33 @@ regenerate byte-identically, so the pipeline itself is unchanged.
 
 ---
 
-## 7. Structural issue found while auditing (not a logo problem)
+## 7. Structural issues found while auditing (FIXED)
 
-`/admin` renders **two stacked headers**. `admin/layout.tsx` renders
-`AdminHeader`, and `admin/page.tsx` renders `<AdminView embedded />` whose own
-sticky header at `AdminView.tsx:472` is **not** gated by the `embedded` prop —
-only its tab strip is, at line 711.
+Both pre-existing and unrelated to branding, fixed under the owner's
+instruction to use my own judgement.
 
-This is pre-existing and unrelated to branding. I have not touched it. Flagging
-it because I found it and it will cost the owner vertical space on every admin
-screen. It should be fixed on its own, with its own tests.
+**Two stacked admin headers on phones.** `admin/layout.tsx` renders
+`AdminHeader` (`md:hidden`); `admin/page.tsx` renders `<AdminView embedded />`
+whose own sticky header had no breakpoint gate. Below `md` both painted —
+128px of chrome before any content.
+
+They are not duplicates, so they are now split by width rather than one being
+deleted. `AdminHeader` owns mobile: it carries the hamburger that opens the
+off-canvas sidebar, which is the only way to navigate the admin on a phone.
+`AdminView`'s bar owns `md` and up: global search, theme toggle, keyboard
+shortcuts, live tickers — all of which were already `hidden`/`sm:`/`lg:` gated,
+so nothing visible was lost.
+
+*The trap:* the mobile mini-panel's **only** toggle lived in the bar being
+hidden, which would have made a mobile-optimised panel unreachable on mobile.
+`mobilePanel` moved into `AdminShellContext` and `AdminHeader` now renders the
+toggle, following the existing `activeTab` pattern so standalone `AdminView`
+still works.
+
+**Floating WhatsApp button covering the homepage search button.** At 360px the
+FAB sits at x288–344 and the search submit at x282–326 — a 38px overlap, green
+bubble on top. Moving it down is impossible (the bottom nav pins the floor);
+moving it left puts it over product content. It is now hidden on the homepage
+**on phones only**, where the hero CTA and the concierge section already offer
+WhatsApp more prominently. A test asserts both of those still exist, since
+that is the only thing making this safe.
