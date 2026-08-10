@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { ACCEPTED_PAYMENTS_SCHEMA } from '@/lib/accepted-payments'
 import { BUSINESS, hasSocial } from './business-config'
 
 export type SEOLanguage = 'en' | 'rw'
@@ -91,7 +92,10 @@ export const SEO_CONFIG = {
     // Exact coordinates and opening hours remain absent until owner-confirmed.
     geo: undefined,
     openingHours: undefined,
-    paymentAccepted: ['MTN Mobile Money', 'Airtel Money', 'Visa', 'Mastercard', 'Cash on Delivery'],
+    // Sourced from the shared list so Google is never told the shop accepts
+    // a method it cannot process. Card entries return when payments.enabled
+    // becomes true.
+    paymentAccepted: [...ACCEPTED_PAYMENTS_SCHEMA],
     currenciesAccepted: 'RWF',
   },
 

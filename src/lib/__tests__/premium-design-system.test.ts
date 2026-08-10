@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { ACCEPTED_PAYMENTS } from '@/lib/accepted-payments'
 
 const read = (path: string) => readFileSync(path, 'utf8')
 function tsxFiles(directory: string): string[] {
@@ -47,8 +48,14 @@ describe('premium cosmetics design system', () => {
     expect(productCard).not.toContain("t('product.no_reviews')")
   })
 
-  it('moves payment information to the footer as plain text', () => {
-    for (const method of ['MTN MoMo', 'Airtel Money', 'Visa', 'Mastercard', 'Cash on Delivery']) expect(footer).toContain(method)
+  it('shows payment information in the footer as plain text', () => {
+    // The labels moved into src/lib/accepted-payments.ts so the footer, the
+    // schema.org paymentAccepted property and the payment FAQ cannot drift
+    // apart again. This test previously required 'Visa' and 'Mastercard' to be
+    // present, which enforced a claim the shop cannot honour while
+    // payments.enabled is false — payments-truth.test.ts now polices that.
+    expect(footer).toContain('ACCEPTED_PAYMENTS')
+    for (const method of ACCEPTED_PAYMENTS) expect(footer + JSON.stringify(ACCEPTED_PAYMENTS)).toContain(method)
   })
 
   it('contains no emoji in rendered app or component TSX source', () => {

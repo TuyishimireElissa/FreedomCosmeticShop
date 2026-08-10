@@ -1614,7 +1614,7 @@ export const en = {
     faq_delivery_time_a: 'Kigali is generally same day or 1–2 business days. Other provinces generally take 2–4 business days depending on district and road access.',
     faq_delivery_time_q: 'How long does delivery take?',
     faq_intro: 'Everything you need to shop confidently with FreedomCosmeticShop.',
-    faq_payment_a: 'MTN MoMo is recommended. Airtel Money, Visa/Mastercard, and Kigali cash on delivery may also be available at checkout. Never share your Mobile Money PIN.',
+    faq_payment_a: 'We accept MTN MoMo, Airtel Money, and cash on delivery. You confirm your order on WhatsApp and pay when it reaches you. Never share your Mobile Money PIN with anyone.',
     faq_payment_q: 'How can I pay?',
     faq_returns_a: 'Unopened, unused products may be eligible within 7 days. Opened personal-care items cannot normally be returned for hygiene reasons unless defective or incorrect.',
     faq_returns_q: 'Can I return cosmetics?',

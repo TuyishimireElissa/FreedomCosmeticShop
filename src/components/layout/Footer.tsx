@@ -4,6 +4,7 @@ import { Mail, MapPin, MessageCircle, Phone, ShieldCheck, Truck, CreditCard, Rot
 import Link from 'next/link'
 import Image from 'next/image'
 import { BUSINESS, OWNER_TODO } from '@/lib/business-config'
+import { ACCEPTED_PAYMENTS } from '@/lib/accepted-payments'
 import { useT } from '@/lib/i18n/LanguageContext'
 
 const shopLinks = [
@@ -30,7 +31,11 @@ export default function Footer() {
           <section>
             <Link href="/" className="inline-block" aria-label={t('nav.home')}><Image src="/logo-icon.png" alt={t('nav.logo_alt')} width={40} height={40} className="mb-3 h-10 w-10 rounded-lg object-contain" /><span className="text-lg font-bold tracking-[-0.02em]">{BUSINESS.tradingName}</span><span className="mt-2 block text-[11px] font-medium text-[#AAAAAA]">{BUSINESS.tagline}</span></Link>
             <p className="mt-5 max-w-sm text-sm leading-6 text-[#AAAAAA]">{t('footer.description')}</p>
-            <div className="mt-6 flex flex-wrap gap-2 text-xs text-gray-300">{['MTN MoMo', 'Airtel Money', 'Visa', 'Mastercard', 'Cash on Delivery'].map((payment) => <span key={payment} className="rounded-lg border border-white/10 px-2.5 py-1.5">{payment}</span>)}</div>
+            {/* Only methods the shop can actually accept today. Visa and
+              * Mastercard were listed here on every page while
+              * payments.enabled is false, promising a checkout path that does
+              * not exist. Restore them when card payment genuinely works. */}
+            <div className="mt-6 flex flex-wrap gap-2 text-xs text-gray-300">{ACCEPTED_PAYMENTS.map((payment) => <span key={payment} className="rounded-lg border border-white/10 px-2.5 py-1.5">{payment}</span>)}</div>
           </section>
 
           <section><h2 className="text-xs font-semibold uppercase tracking-[0.16em]">{t('footer.shop')}</h2><ul className="mt-4 space-y-1">{shopLinks.map((item) => <li key={item.key}><Link href={item.slug ? `/products?category=${item.slug}` : '/products'} className="flex min-h-11 items-center text-sm text-[#AAAAAA] hover:text-white">{t(item.translationKey)}</Link></li>)}<li><Link href="/wholesale" className="flex min-h-11 items-center text-sm text-[#C4956A] hover:text-white">{t('footer.wholesale_beauty')}</Link></li></ul></section>

@@ -1682,7 +1682,7 @@ export const rw = {
     faq_delivery_time_a: 'Muri Kigali akenshi ni uwo munsi cyangwa iminsi 1–2 y’akazi. Mu zindi ntara akenshi ni iminsi 2–4 y’akazi bitewe n’akarere n’imihanda.', // verified-rw
     faq_delivery_time_q: 'Kubigeza bifata igihe kingana iki?', // verified-rw
     faq_intro: 'Ibyo ukeneye byose kugira ngo ugure kuri FreedomCosmeticShop wizeye.', // verified-rw
-    faq_payment_a: 'MTN MoMo ni yo isabwa cyane. Airtel Money, Visa/Mastercard no kwishyura ugejejweho muri Kigali na byo bishobora kuboneka. Ntuzigere usangiza undi PIN ya Mobile Money.', // verified-rw
+    faq_payment_a: 'Twakira MTN MoMo, Airtel Money, n’amafaranga afatika iyo ugejejweho. Wemeza ibyo watumije kuri WhatsApp maze ukishyura igihe ubigejejweho. Ntuzigere usangiza undi PIN yawe ya Mobile Money.', // verified-rw
     faq_payment_q: 'Nakwishyura nte?', // verified-rw
     faq_returns_a: 'Ibicuruzwa bidafunguye kandi bitakoreshejwe bishobora gusubizwa mu minsi 7. Ibikoresho byo kwisiga cyangwa kwita ku mubiri byafunguwe ntibisubizwa kubera isuku, keretse bifite inenge cyangwa atari byo watumije.', // verified-rw
     faq_returns_q: 'Nshobora gusubiza ibikoresho byo kwisiga?', // verified-rw
