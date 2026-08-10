@@ -93,12 +93,28 @@ describe('generated assets carry the two-colour FC monogram', () => {
   })
 })
 
-describe('the pipeline stays reproducible from the component', () => {
-  it('renders the masters from the React component, not a hand-copied SVG', () => {
+describe('the pipeline stays reproducible from the shared geometry', () => {
+  it('renders the masters from the shared path module, not a hand-copied SVG', () => {
+    // The geometry moved out of the .tsx into a plain data module so the
+    // component, the invoice generator and this script all read one copy.
     const script = readFileSync('brand-src/render-mark.mjs', 'utf8')
-    expect(script).toContain("'src', 'components', 'ui', 'logo.tsx'")
+    expect(script).toContain("'src', 'lib', 'brand-logo-paths.ts'")
     expect(script).toContain('mark-full')
     expect(script).toContain('mark-simple')
+  })
+
+  it('regenerates public/logo.svg so the stale template logo cannot return', () => {
+    const script = readFileSync('brand-src/render-mark.mjs', 'utf8')
+    expect(script).toContain("join(here, '..', 'public', 'logo.svg')")
+  })
+
+  it('writes traced output back to the data module, not the component', () => {
+    const vectorise = readFileSync('brand-src/vectorise-logo.py', 'utf8')
+    expect(vectorise).toContain('"src" / "lib" / "brand-logo-paths.ts"')
+    // The markers it searches for must match the `export const` form the
+    // data module actually uses, or the rewrite silently no-ops.
+    expect(vectorise).toContain('"export const F_PATH = \'"')
+    expect(vectorise).toContain('"export const LEAF_PATHS = ["')
   })
 
   it('feeds the generator from those masters', () => {

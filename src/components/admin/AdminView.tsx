@@ -58,6 +58,7 @@ import { useT } from "@/lib/i18n/LanguageContext"
 import { useStore } from "@/store/useStore"
 import { useAdminNotifications } from "@/hooks/useAdminNotifications"
 import { AdminLoginScreen } from "./AdminLoginScreen"
+import BrandMark from "@/components/brand/BrandMark"
 import {
   Shield,
   ShieldAlert,
@@ -478,9 +479,10 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
             {adminSettings?.logoUrl ? (
               <img src={adminSettings.logoUrl} alt="FreedomCosmeticShop" className="max-h-9 max-w-[120px] object-contain" />
             ) : (
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground">
-                <Shield className="h-4 w-4" />
-              </span>
+              // Fallback when the owner has not uploaded a custom logo. Was a
+              // generic `Shield` glyph, which read as "some admin tool" rather
+              // than this shop. Decorative: the name is spelled out beside it.
+              <BrandMark size={36} alt="" />
             )}
             <div className="hidden sm:block">
               <p className="text-sm font-bold leading-tight">FreedomCosmeticShop</p>

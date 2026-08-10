@@ -16,6 +16,7 @@
 import { Button } from "@/components/ui/button"
 import { formatRWF, PAYMENT_METHODS, PaymentMethodKey } from "@/lib/format"
 import { isPlaceholder, realValue, BUSINESS } from "@/lib/business-config"
+import { logoSvgMarkup } from "@/lib/brand-logo-svg"
 import { Printer } from "lucide-react"
 import type { Order } from "@/lib/types"
 
@@ -89,6 +90,21 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
       margin-bottom: 24px;
       border-bottom: 2px solid #b76e79;
       padding-bottom: 16px;
+    }
+    /* The mark sits beside the name rather than above it so the header keeps
+       its current height and nothing below it reflows.
+       print-color-adjust stops the browser dropping the gradients when the
+       user prints in "save ink" mode; without it the logo can come out as a
+       white silhouette, which reads as a rendering fault. */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand svg {
+      flex: none;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
     .logo {
       font-size: 24px;
@@ -188,7 +204,8 @@ export function InvoicePrinter({ order }: InvoicePrinterProps) {
 </head>
 <body>
   <div class="header">
-    <div>
+    <div class="brand">
+      ${logoSvgMarkup({ height: 46, idPrefix: 'inv', label: '' })}
       <div class="logo">
         ${BUSINESS.legalName.includes('TODO') ? BUSINESS.tradingName : BUSINESS.legalName}
         <small>${BUSINESS.tagline}</small>

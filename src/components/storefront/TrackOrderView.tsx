@@ -25,6 +25,7 @@ import { useOrderUpdates, useDeliveryUpdates } from "@/hooks/use-realtime"
 import { getWhatsAppLink } from '@/lib/business-config'
 import OrderStatusBadge from '@/components/a11y/OrderStatusBadge'
 import PaymentStatusBadge from '@/components/a11y/PaymentStatusBadge'
+import Logo from '@/components/ui/logo'
 import {
   Package,
   Search,
@@ -217,8 +218,12 @@ export function TrackOrderView() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
+          {/* Track-order is reachable from a WhatsApp link, so it is often the
+            * first page a customer sees. The generic Package glyph gave no
+            * signal about whose shop this is. Decorative: the heading names
+            * the action and the chrome names the shop. */}
           <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight sm:text-3xl">
-            <Package className="h-7 w-7 text-primary" /> {t('orders.track')}
+            <Logo size="md" label="" className="shrink-0" /> {t('orders.track')}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {t('orders.enter_number_status')}

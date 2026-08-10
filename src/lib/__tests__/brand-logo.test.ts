@@ -14,6 +14,7 @@
 
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import { C_PATH, F_PATH, LEAF_PATHS, PROFILE_PATH } from '@/lib/brand-logo-paths'
 
 const read = (path: string) => readFileSync(path, 'utf8')
 
@@ -78,11 +79,19 @@ describe('geometry is vectorised from the artwork, not hand-drawn', () => {
     return points
   }
 
-  function constant(name: string): string {
-    const marker = `const ${name} = '`
-    const start = logo.indexOf(marker) + marker.length
-    return logo.slice(start, logo.indexOf("'", start))
+  /**
+   * The geometry now lives in `lib/brand-logo-paths.ts`, a plain data module,
+   * so these tests import it instead of scraping it back out of the component
+   * with a regex. Previously a rename or a reformat of the component could
+   * make the scrape return an empty string and every bounds assertion would
+   * pass vacuously.
+   */
+  const PATHS: Record<string, string> = {
+    F_PATH,
+    C_PATH,
+    PROFILE_PATH,
   }
+  const constant = (name: string) => PATHS[name]
 
   /**
    * Bounding box of the ANCHOR points only.
@@ -143,9 +152,7 @@ describe('geometry is vectorised from the artwork, not hand-drawn', () => {
   it('keeps the leaf branch inside the measured bounds', () => {
     // Reference leaves span x268-362, y221-304. An early hand-drawn pass
     // overshot to x389.
-    const marker = 'const LEAF_PATHS = ['
-    const block = logo.slice(logo.indexOf(marker), logo.indexOf(']', logo.indexOf(marker)))
-    const paths = [...block.matchAll(/'([^']+)'/g)].map((m) => m[1])
+    const paths = LEAF_PATHS
     expect(paths.length).toBeGreaterThanOrEqual(2)
     for (const d of paths) {
       const b = bounds(d)

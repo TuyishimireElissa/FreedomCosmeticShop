@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { BUSINESS } from '@/lib/business-config'
+import Logo from '@/components/ui/logo'
 import { useT } from '@/lib/i18n/LanguageContext'
 
 export interface InformationSection {
@@ -25,7 +26,14 @@ export default function InformationPage({
   return (
     <main className="min-h-screen bg-[#f8f9fa] px-4 py-10 sm:px-6 lg:px-8">
       <article className="mx-auto max-w-4xl overflow-hidden rounded-[2rem] border border-gray-100 bg-white shadow-sm">
+        {/* One edit brands about, privacy, terms, shipping and returns — the
+          * five pages that share this shell. Decorative: the page title and
+          * the surrounding chrome already name the shop, so an accessible
+          * name here would only repeat it.
+          * Every mark colour clears AA on this #1a1a1a band: rose 5.14-8.37:1,
+          * gold 4.35-8.72:1 (computed, not assumed). */}
         <header className="bg-[#1a1a1a] px-6 py-10 text-white sm:px-10">
+          <Logo size="md" label="" className="mb-4" />
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#FFD700]">{eyebrow}</p>
           <h1 className="mt-3 text-3xl font-black sm:text-4xl">{title}</h1>
           <p className="mt-4 max-w-2xl text-sm leading-7 text-gray-300">{intro}</p>

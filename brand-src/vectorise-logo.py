@@ -44,7 +44,10 @@ import numpy as np
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-COMPONENT = ROOT / "src" / "components" / "ui" / "logo.tsx"
+# Geometry lives in a plain data module, not the React component: the
+# invoice generator and the PNG build read it too, and a test runner
+# without a JSX plugin cannot import a .tsx file.
+COMPONENT = ROOT / "src" / "lib" / "brand-logo-paths.ts"
 DEFAULT_REFERENCE = ROOT / "brand-src" / "logo-reference.png"
 
 # Contour geometry
@@ -153,19 +156,19 @@ def main() -> int:
 
     source = COMPONENT.read_text()
     replacements = [
-        ("const F_PATH = '", f_path),
-        ("const C_PATH = '", c_path),
-        ("const PROFILE_PATH = '", profile_path),
+        ("export const F_PATH = '", f_path),
+        ("export const C_PATH = '", c_path),
+        ("export const PROFILE_PATH = '", profile_path),
     ]
     for prefix, value in replacements:
         start = source.index(prefix) + len(prefix)
         end = source.index("'", start)
         source = source[:start] + value + source[end:]
 
-    start = source.index("const LEAF_PATHS = [")
+    start = source.index("export const LEAF_PATHS = [")
     end = source.index("]", start) + 1
     rendered = ", ".join(f"'{p}'" for p in leaf_paths)
-    source = source[:start] + f"const LEAF_PATHS = [{rendered}]" + source[end:]
+    source = source[:start] + f"export const LEAF_PATHS = [{rendered}]" + source[end:]
 
     COMPONENT.write_text(source)
     print(f"updated {COMPONENT.relative_to(ROOT)}")

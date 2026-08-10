@@ -22,12 +22,12 @@ import { useStore } from "@/store/useStore"
 import { isAdminRole } from '@/lib/admin-roles'
 import { useToast } from "@/hooks/use-toast"
 import MFALoginChallenge from "@/components/auth/MFALoginChallenge"
+import BrandMark from "@/components/brand/BrandMark"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
-  Sparkles,
   Phone,
   Lock,
   Eye,
@@ -230,11 +230,13 @@ export function AdminLoginScreen({ onBack }: AdminLoginScreenProps) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/20 px-4 py-8">
       <div className="w-full max-w-md">
-        {/* Branding */}
+        {/* Branding.
+          * Was a generic `Sparkles` glyph in a filled circle — a stock icon on
+          * the door to the shop's own admin panel. The mark is decorative here
+          * because the shop name is spelled out immediately below it, and a
+          * duplicate label makes a screen reader announce the brand twice. */}
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 grid h-16 w-16 place-items-center rounded-full bg-primary shadow-lg">
-            <Sparkles className="h-7 w-7 text-primary-foreground" />
-          </div>
+          <BrandMark size={56} alt="" className="mx-auto mb-3" />
           <h1 className="text-2xl font-bold text-foreground">
             FreedomCosmeticShop
           </h1>

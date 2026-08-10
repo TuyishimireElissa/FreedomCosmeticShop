@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState, type FormEvent } from 'react'
 import { CheckCircle2, Loader2, Mail, MapPin, MessageCircle, Phone, Send } from 'lucide-react'
 import { BUSINESS, WHATSAPP_ORDERING_NUMBERS, formatWhatsAppDisplay, getWhatsAppLink, isPlaceholder, realValue } from '@/lib/business-config'
+import Logo from '@/components/ui/logo'
 import { useT } from '@/lib/i18n/LanguageContext'
 
 type FieldErrors = Partial<Record<'name' | 'email' | 'phone' | 'message', string>>
@@ -100,6 +101,9 @@ export default function ContactPageClient() {
     <main className="min-h-screen bg-[#f8f9fa] px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         <header className="text-center">
+          {/* Contact is where a first-time buyer checks the shop is real.
+            * Decorative: the h1 below spells out the business name. */}
+          <Logo size="lg" label="" className="mx-auto mb-4" />
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-fcs-brand-text">{t('pages.customer_care')}</p>
           <h1 className="mt-3 text-4xl font-black text-[#1a1a1a]">{t('pages.contact_business', { business: BUSINESS.tradingName })}</h1>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-gray-500">{t('pages.contact_intro')}</p>

@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { Upload, Trash2, Loader2, CheckCircle2, XCircle, ImageIcon } from "lucide-react"
+import BrandMark from "@/components/brand/BrandMark"
 
 export function LogoUploader() {
   const { toast } = useToast()
@@ -164,14 +165,17 @@ export function LogoUploader() {
               className="max-h-20 max-w-full object-contain"
             />
           ) : (
-            <span className="text-lg font-bold text-muted-foreground">FreedomCosmeticShop</span>
+            // Showed the bare words "FreedomCosmeticShop", which told the
+            // owner the shop had no logo. It has one — the FC monogram is the
+            // built-in default on every surface. Show the real thing.
+            <BrandMark size={64} alt="Current logo: the FC monogram" />
           )}
         </div>
-        {currentLogo && (
-          <p className="mt-1 text-[10px] text-muted-foreground">
-            Logo is live on website, admin, and invoices.
-          </p>
-        )}
+        <p className="mt-1 text-[10px] text-muted-foreground">
+          {currentLogo
+            ? 'Logo is live on website, admin, and invoices.'
+            : 'Using the built-in FC monogram. Upload a file only if you want to replace it.'}
+        </p>
       </div>
 
       {/* File selection / preview */}
