@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth'
 import { rateLimit } from '@/lib/permissions'
 import { calculateDelivery } from '@/server/services/delivery.service'
+import { normalizeRwandaPhone } from '@/lib/phone'
 import { formatOrderReference } from '@/lib/whatsapp/buildOrderMessage'
 
 /**
@@ -26,7 +27,35 @@ const lineSchema = z.object({
 const schema = z
   .object({
     customerName: z.string().trim().min(2).max(100),
-    customerPhone: z.string().regex(/^(?:\+250|250|0)?7[2389]\d{7}$/, 'INVALID_PHONE'),
+    /**
+     * Accepts any common Rwandan format and stores the canonical +250 form.
+     *
+     * This rejected every real order until now. The checkout form keeps the
+     * phone display-formatted — `formatRwandaPhoneDisplay` renders
+     * "+250 788 123 456" with spaces — and posted that string verbatim, but
+     * the regex here had no room for whitespace, so every single WhatsApp
+     * order failed validation with INVALID_PHONE. The older
+     * /api/orders/create route allows `[0-9+\-\s]+`, which is why only this
+     * path broke.
+     *
+     * Normalising in the schema rather than loosening the regex fixes both
+     * halves of the problem: the customer can type spaces, dashes or
+     * parentheses, and the database gets one consistent format instead of
+     * whatever the form happened to render. `normalizeRwandaPhone` already
+     * strips separators and validates; it throws on genuine rubbish, which
+     * the catch turns back into INVALID_PHONE.
+     */
+    customerPhone: z
+      .string()
+      .max(30)
+      .transform((value, ctx) => {
+        try {
+          return normalizeRwandaPhone(value)
+        } catch {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'INVALID_PHONE' })
+          return z.NEVER
+        }
+      }),
     customerEmail: z.string().email().max(254).optional().or(z.literal('')),
     province: z.string().trim().min(2).max(60),
     district: z.string().trim().min(2).max(60),

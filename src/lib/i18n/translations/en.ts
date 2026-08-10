@@ -496,6 +496,8 @@ export const en = {
     wa_hours: 'Business hours: Mon-Sat 8AM-8PM, Sun 10AM-6PM',
     wa_sending: 'Saving your order...',
     wa_error: 'We could not save your order. Please try again.',
+    wa_error_stock: 'One of your items just went out of stock. Remove it from your bag or change the quantity.',
+    wa_error_rate_limited: 'Too many attempts. Please wait a minute and try again.',
     wa_success_title: 'Order sent to WhatsApp',
     wa_next1: 'We confirm your order',
     wa_next2: 'We call or message you',

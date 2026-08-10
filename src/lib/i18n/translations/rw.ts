@@ -564,6 +564,8 @@ export const rw = {
     wa_hours: 'Amasaha y’akazi: Kuwa Mbere-Gatandatu 8AM-8PM, Cyumweru 10AM-6PM', // verified-rw
     wa_sending: 'Turimo kubika order yawe...', // verified-rw
     wa_error: 'Ntitwashoboye kubika order yawe. Ongera ugerageze.', // verified-rw
+    wa_error_stock: 'Kimwe mu bicuruzwa wahisemo cyashize. Kura mu igitebo cyangwa uhindure umubare.', // verified-rw
+    wa_error_rate_limited: 'Wagerageje kenshi cyane. Tegereza umunota umwe wongere ugerageze.', // verified-rw
     wa_success_title: 'Order yoherejwe kuri WhatsApp', // verified-rw
     wa_next1: 'Twemeza order yawe', // verified-rw
     wa_next2: 'Turaguhamagara cyangwa tukwandikire', // verified-rw

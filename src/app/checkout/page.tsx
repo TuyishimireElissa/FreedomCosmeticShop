@@ -153,6 +153,27 @@ export default function CheckoutPage() {
   // there, never trusted from the client) and returns the persisted reference
   // so the message can carry it. PaymentSelector and placeOrder below are
   // retained but unreachable while payments are feature-flagged off.
+  /**
+   * Turn an API failure into advice the customer can act on.
+   *
+   * Field-level issues win over the generic code: "INVALID_INPUT" tells a
+   * shopper nothing, but "check your phone number" tells them exactly what to
+   * go and change.
+   */
+  const whatsAppOrderError = (
+    code: string | undefined,
+    issues: Array<{ field: string; code: string }> | undefined,
+  ): string => {
+    const badField = issues?.[0]?.field
+    if (badField === 'customerPhone') return t('checkout.error_rwanda_phone')
+    if (badField === 'customerEmail') return t('checkout.invalid_email')
+    if (badField === 'customerName') return t('checkout.error_full_name')
+    if (code === 'INSUFFICIENT_STOCK' || code === 'PRODUCT_UNAVAILABLE') return t('checkout.wa_error_stock')
+    if (code === 'RATE_LIMITED') return t('checkout.wa_error_rate_limited')
+    if (badField) return t('checkout.error_delivery_details')
+    return t('checkout.wa_error')
+  }
+
   const createWhatsAppOrder = async (): Promise<WhatsAppOrderData | null> => {
     try {
       const response = await fetch('/api/orders/whatsapp', {
@@ -175,7 +196,15 @@ export default function CheckoutPage() {
         }),
       })
       const payload = await response.json().catch(() => null)
-      if (!response.ok || !payload?.success) return null
+      if (!response.ok || !payload?.success) {
+        // Surface WHY. Returning a bare null made every failure — a sold-out
+        // product, a rate limit, a rejected phone — show the same "we could
+        // not save your order, try again" message, which is useless advice
+        // when retrying cannot possibly help.
+        setCheckoutError(whatsAppOrderError(payload?.error, payload?.issues))
+        return null
+      }
+      setCheckoutError(null)
 
       const data = payload.data
       setStep(3)
@@ -198,6 +227,7 @@ export default function CheckoutPage() {
         language: language === 'en' ? 'en' : 'rw',
       }
     } catch {
+      setCheckoutError(t('checkout.wa_error'))
       return null
     }
   }
