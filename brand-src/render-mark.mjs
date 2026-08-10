@@ -3,19 +3,21 @@
  *
  * `src/components/ui/logo.tsx` is the single source of truth: the site renders
  * that SVG inline. Favicons and OpenGraph images cannot consume SVG, so this
- * script extracts the paths straight out of the component and renders two PNG
- * masters for `build-brand-assets.py` to consume.
+ * script reads the traced path constants out of the component and renders two
+ * PNG masters for `build-brand-assets.py`.
  *
- * Extracting rather than duplicating matters. A hand-copied SVG beside the
- * component drifts the first time someone nudges a curve, and the drift is
- * invisible until a favicon looks subtly wrong months later.
+ * Reading the constants rather than keeping a second copy of the geometry
+ * matters: a duplicated SVG beside the component drifts the first time someone
+ * regenerates one and not the other, and the drift stays invisible until a
+ * favicon looks subtly wrong months later.
  *
- *   node brand-src/render-mark.mjs
+ *   python3 brand-src/vectorise-logo.py   # artwork  -> path constants
+ *   node    brand-src/render-mark.mjs     # constants -> PNG masters
  *   python3 brand-src/build-brand-assets.py
  *
  * Two masters are produced:
  *   mark-full.png    F + C + profile + leaves, for 128px and above
- *   mark-simple.png  F + C only, for favicons and 24-32px chrome
+ *   mark-simple.png  F + C only, matching what the component renders at <=32px
  */
 
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -26,30 +28,64 @@ import sharp from 'sharp'
 const here = dirname(fileURLToPath(import.meta.url))
 const component = join(here, '..', 'src', 'components', 'ui', 'logo.tsx')
 
-/** Turn the component's JSX into standalone SVG markup. */
-function toSvg(jsx) {
-  return jsx
-    .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')                 // JSX comments
-    .replace(/\{`url\(#\$\{rose\}\)`\}/g, '"url(#rose)"')
-    .replace(/\{`url\(#\$\{gold\}\)`\}/g, '"url(#gold)"')
-    .replace(/id=\{rose\}/g, 'id="rose"')
-    .replace(/id=\{gold\}/g, 'id="gold"')
-    .replace(/stopColor/g, 'stop-color')
+/** Read a single-quoted string constant out of the component. */
+function constant(source, name) {
+  const marker = `const ${name} = '`
+  const start = source.indexOf(marker)
+  if (start === -1) throw new Error(`${name} not found in logo.tsx`)
+  const from = start + marker.length
+  return source.slice(from, source.indexOf("'", from))
 }
 
+/** Read the LEAF_PATHS array. */
+function leafPaths(source) {
+  const marker = 'const LEAF_PATHS = ['
+  const start = source.indexOf(marker)
+  if (start === -1) throw new Error('LEAF_PATHS not found in logo.tsx')
+  const block = source.slice(start + marker.length, source.indexOf(']', start))
+  return [...block.matchAll(/'([^']+)'/g)].map((match) => match[1])
+}
+
+const GRADIENTS = `  <defs>
+    <linearGradient id="rose" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0%" stop-color="#DFA6A0"/>
+      <stop offset="55%" stop-color="#D07E7A"/>
+      <stop offset="100%" stop-color="#CA7370"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0.1" y1="0" x2="0.9" y2="1">
+      <stop offset="0%" stop-color="#D9B26A"/>
+      <stop offset="45%" stop-color="#C99B54"/>
+      <stop offset="100%" stop-color="#A8752D"/>
+    </linearGradient>
+  </defs>`
+
+const wrap = (inner) =>
+  `<svg viewBox="0 0 429 317" xmlns="http://www.w3.org/2000/svg">\n${inner}\n</svg>`
+
 const source = readFileSync(component, 'utf8')
-const body = source.slice(source.indexOf('      <defs>'), source.lastIndexOf('    </svg>'))
+const fPath = constant(source, 'F_PATH')
+const cPath = constant(source, 'C_PATH')
+const profilePath = constant(source, 'PROFILE_PATH')
+const leaves = leafPaths(source)
 
-// The detail block is wrapped in {!simplified && (<> ... </>)}; everything
-// before it is the F and C that both variants share.
-const detailStart = body.indexOf('{!simplified')
-const shared = toSvg(body.slice(0, detailStart))
-const full = toSvg(body).replace(/\{!simplified && \(\s*<>/, '').replace(/<\/>\s*\)\}/, '')
+// Gold first: the rose profile overlaps the crescent's inner edge, matching
+// the paint order in the component.
+const full = [
+  GRADIENTS,
+  `  <path fill="url(#gold)" d="${cPath}"/>`,
+  ...leaves.map((d) => `  <path fill="url(#gold)" d="${d}"/>`),
+  `  <path fill="url(#rose)" d="${fPath}"/>`,
+  `  <path fill="url(#rose)" d="${profilePath}"/>`,
+].join('\n')
 
-const wrap = (inner) => `<svg viewBox="0 0 429 317" xmlns="http://www.w3.org/2000/svg">\n${inner}\n</svg>`
+const simple = [
+  GRADIENTS,
+  `  <path fill="url(#gold)" d="${cPath}"/>`,
+  `  <path fill="url(#rose)" d="${fPath}"/>`,
+].join('\n')
 
 writeFileSync(join(here, 'logo-full.svg'), wrap(full))
-writeFileSync(join(here, 'logo-simple.svg'), wrap(shared))
+writeFileSync(join(here, 'logo-simple.svg'), wrap(simple))
 
 // 2048px tall: four times the largest consumer (512px), so every downsample
 // has headroom and none of them upscale.

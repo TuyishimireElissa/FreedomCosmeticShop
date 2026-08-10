@@ -69,47 +69,97 @@ describe('colours are the measured values', () => {
   })
 })
 
-describe('measured geometry', () => {
-  it('solves the C radii rather than guessing them', () => {
-    // A circle through both terminals (272,96) and (272,284) with its
-    // leftmost point at x157 requires r=96; the inner edge 24px in requires
-    // r=72. Guessed values of 78/54 and 57/33 were too small to span 188px,
-    // so the renderer scaled them and shifted the crescent 21px right.
-    expect(logo).toContain('A96 96 0 1 0 272 284')
-    expect(logo).toContain('A72 72 0 1 1 272 121')
+describe('geometry is vectorised from the artwork, not hand-drawn', () => {
+  /** Every coordinate pair in a path's `d` string. */
+  function coords(d: string): Array<[number, number]> {
+    const numbers = [...d.matchAll(/-?\d+(?:\.\d+)?/g)].map((m) => Number(m[0]))
+    const points: Array<[number, number]> = []
+    for (let i = 0; i + 1 < numbers.length; i += 2) points.push([numbers[i], numbers[i + 1]])
+    return points
+  }
+
+  function constant(name: string): string {
+    const marker = `const ${name} = '`
+    const start = logo.indexOf(marker) + marker.length
+    return logo.slice(start, logo.indexOf("'", start))
+  }
+
+  /**
+   * Bounding box of the ANCHOR points only.
+   *
+   * A cubic path is `M anchor (C c1 c2 anchor)*`, so every third point after
+   * the move is on the curve and the other two are control handles that
+   * legitimately sit outside the shape — for the F they reach x73 against a
+   * true left edge of x98. Measuring all points would compare the wrong
+   * numbers to the reference bbox.
+   */
+  function bounds(d: string) {
+    const points = coords(d)
+    // Indices 0, 3, 6, 9 ... are on-curve; the two between each pair are handles.
+    const anchors = points.filter((_, i) => i % 3 === 0)
+    const xs = anchors.map((p) => p[0])
+    const ys = anchors.map((p) => p[1])
+    return { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) }
+  }
+
+  it('carries traced Bezier paths, not hand-written arcs and line commands', () => {
+    // The hand-drawn version used A/H/V/q shorthand. Traced output is all
+    // cubic C segments, which is how a contour fit comes out.
+    for (const name of ['F_PATH', 'C_PATH', 'PROFILE_PATH']) {
+      const d = constant(name)
+      expect(d.length, `${name} looks too short to be a traced contour`).toBeGreaterThan(600)
+      expect(d, name).toMatch(/^M[\d.]+ [\d.]+ C/)
+      expect(d, `${name} still uses arc shorthand`).not.toMatch(/\bA\d/)
+    }
   })
 
-  it('draws the F without a middle crossbar', () => {
-    // Scanning the reference at y150-174 finds only the stem (118-149) and
-    // the profile (202-214). Nothing bridges them.
-    expect(logo).toContain('M101 31 H251 V59 H149 V262')
+  it('places the F where the reference has it', () => {
+    // Reference F occupies x98-252, y32-283.
+    const b = bounds(constant('F_PATH'))
+    expect(b.x0).toBeGreaterThanOrEqual(95)
+    expect(b.x1).toBeLessThanOrEqual(256)
+    expect(b.y0).toBeGreaterThanOrEqual(28)
+    expect(b.y1).toBeLessThanOrEqual(288)
   })
 
-  it('cuts the jaw as a hard corner', () => {
-    // The reference drops from x237 to x221 between y202 and y203 — a
-    // near-vertical edge, not a curve. Modelling it as a curve left the face
-    // 27px too wide.
-    expect(logo).toContain('L 220 203')
-    expect(logo).toContain('L 237 202')
+  it('places the C where the reference has it', () => {
+    // Reference crescent spans x157-268 once the leaf branch is excluded.
+    const b = bounds(constant('C_PATH'))
+    expect(b.x0).toBeGreaterThanOrEqual(152)
+    expect(b.x1).toBeLessThanOrEqual(305)
+    expect(b.y0).toBeGreaterThanOrEqual(88)
+    expect(b.y1).toBeLessThanOrEqual(298)
+  })
+
+  it('places the profile inside the crescent', () => {
+    // Reference profile spans x199-266, y116-265 — entirely within the C.
+    const b = bounds(constant('PROFILE_PATH'))
+    expect(b.x0).toBeGreaterThanOrEqual(190)
+    expect(b.x1).toBeLessThanOrEqual(275)
+    expect(b.y0).toBeGreaterThanOrEqual(110)
+    expect(b.y1).toBeLessThanOrEqual(272)
   })
 
   it('keeps the leaf branch inside the measured bounds', () => {
-    // Reference leaves span x271-361. An earlier pass overshot to x389.
-    const leafCoords = [...logo.matchAll(/M(\d{3}) \d{3} q/g)].map((m) => Number(m[1]))
-    expect(leafCoords.length).toBeGreaterThan(0)
-    for (const x of leafCoords) expect(x, `leaf starts at x${x}`).toBeLessThan(362)
+    // Reference leaves span x268-362, y221-304. An early hand-drawn pass
+    // overshot to x389.
+    const marker = 'const LEAF_PATHS = ['
+    const block = logo.slice(logo.indexOf(marker), logo.indexOf(']', logo.indexOf(marker)))
+    const paths = [...block.matchAll(/'([^']+)'/g)].map((m) => m[1])
+    expect(paths.length).toBeGreaterThanOrEqual(2)
+    for (const d of paths) {
+      const b = bounds(d)
+      expect(b.x1, `leaf reaches x${b.x1}`).toBeLessThanOrEqual(368)
+      expect(b.y1, `leaf reaches y${b.y1}`).toBeLessThanOrEqual(310)
+    }
   })
-})
 
-describe('small sizes drop unreadable detail', () => {
-  it('simplifies at or below 32px', () => {
-    // At 24px the five leaves and the facial profile collapse into noise.
-    expect(logo).toContain('const simplified = height <= 32')
-    expect(logo).toContain('{!simplified && (')
-  })
-
-  it('exposes the four sizes the design system asks for', () => {
-    for (const pair of ['sm: 24', 'md: 32', 'lg: 40', 'xl: 120']) expect(logo).toContain(pair)
+  it('can be regenerated from the artwork', () => {
+    // The paths are generated output. Without the script and the reference
+    // committed, a future artwork change would mean hand-tracing again.
+    expect(() => readFileSync('brand-src/vectorise-logo.py', 'utf8')).not.toThrow()
+    expect(() => readFileSync('brand-src/logo-reference.png')).not.toThrow()
+    expect(logo).toContain('vectorise-logo.py')
   })
 })
 

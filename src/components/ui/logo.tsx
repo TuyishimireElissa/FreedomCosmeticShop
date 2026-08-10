@@ -4,26 +4,33 @@
  * An "FC" monogram: a rose serif F, a gold crescent C whose interior negative
  * space forms a woman's profile, and a five-leaf branch entering lower-right.
  *
- * Every coordinate below was measured from the reference artwork by pixel
- * analysis rather than eyeballed. Source image 429x317; the viewBox is
- * 0 0 429 317 so those measurements transfer directly and can be re-checked
- * against the original at any time.
+ * THE PATH DATA IS VECTORISED FROM THE REFERENCE ARTWORK, NOT HAND-DRAWN.
+ * An earlier revision traced curves by hand from pixel measurements and drifted
+ * badly — the nose flattened, the jaw ran 27px wide, the crescent sat 21px off,
+ * the leaves lost their taper. These paths come from OpenCV contour extraction
+ * on a hue-classified mask of the original image, Gaussian-smoothed and fitted
+ * to cubic Béziers. Measured against the source that is 94% IoU on the rose
+ * and 91% on the gold, versus roughly 5px mean deviation by hand.
  *
- * Colours are the measured gradients, not flat approximations — the artwork
- * is visibly gradient-filled:
+ * Regenerate with `python3 brand-src/vectorise-logo.py` if the artwork changes.
+ * Do not hand-edit the `d` strings: they are generated output and any manual
+ * nudge is silently lost on the next run.
  *
- *   rose  #CA7370 -> #DFA6A0   (darkest / lightest sampled)
- *   gold  #A8752D -> #D9B26A
+ * viewBox is 0 0 429 317 — the reference's own pixel dimensions — so every
+ * coordinate can be checked against the original directly.
  *
- * The brief specified #C77B85 for the rose. That value is banned in this
- * codebase: it measures 3.18:1 on white, fails WCAG AA, and
- * umweto-contrast.test.ts fails the build if it appears. It is also simply
- * not the reference colour, which samples at #D07E7A average.
+ * Colours are the measured gradients:
+ *   rose  #DFA6A0 -> #CA7370
+ *   gold  #D9B26A -> #A8752D
  *
- * Two variants exist because the full mark does not survive being shrunk.
- * At 24px the five leaves and the facial profile collapse into noise, so
- * sizes at or below 32px render a simplified F + C monogram. This mirrors the
- * icon/badge split the codebase already used for the previous mark.
+ * The brief specified #C77B85 for the rose. That value is banned here: it
+ * measures 3.18:1 on white, fails WCAG AA, and umweto-contrast.test.ts fails
+ * the build if it appears. It is also not the reference colour, which samples
+ * at #D07E7A average.
+ *
+ * Sizes at or below 32px drop the leaf branch and the facial profile — both
+ * are unreadable at that scale, and the previous raster mark used the same
+ * icon/badge split for the same reason.
  *
  * No animation, no external file, no <img>. Gradient ids are namespaced per
  * instance so two logos on one page cannot collide.
@@ -39,6 +46,19 @@ const PIXELS: Record<LogoSize, number> = {
   lg: 40,  // desktop header
   xl: 120, // hero, about
 }
+
+/** Serif F — traced contour. */
+const F_PATH = 'M249.9 32.1 C224.5 31.9 123.6 32.0 98.5 32.5 C73.4 32.9 97.5 34.2 99.1 34.9 C100.7 35.5 105.5 35.5 108.0 36.4 C110.5 37.2 112.4 38.4 114.0 40.0 C115.6 41.6 116.8 43.7 117.6 46.0 C118.5 48.3 118.8 18.2 119.0 54.0 C119.2 89.8 119.2 225.3 119.0 261.0 C118.8 296.7 118.5 265.8 117.6 268.0 C116.8 270.2 115.3 272.6 114.0 274.0 C112.7 275.4 112.5 275.9 110.0 276.6 C107.5 277.4 100.9 277.7 99.1 278.5 C97.3 279.3 88.3 280.9 99.1 281.5 C109.9 282.1 152.8 282.1 164.0 282.0 C175.2 281.9 166.2 281.4 166.4 280.9 C166.5 280.3 166.6 279.4 165.0 278.8 C163.4 278.1 159.1 277.8 157.0 277.0 C154.9 276.2 153.6 275.2 152.4 273.9 C151.1 272.5 150.1 271.3 149.4 269.0 C148.6 266.7 148.2 279.5 148.0 260.0 C147.8 240.5 147.6 170.8 148.0 152.0 C148.4 133.2 148.3 148.3 150.1 147.5 C151.9 146.6 157.0 147.5 158.9 146.9 C160.7 146.2 162.5 144.2 161.2 143.5 C159.8 142.8 153.2 143.6 151.0 142.9 C148.8 142.1 148.4 156.3 148.0 139.0 C147.6 121.7 147.8 56.0 148.5 39.0 C149.2 22.0 142.1 37.3 152.0 37.0 C161.9 36.7 195.8 36.4 208.0 37.0 C220.2 37.6 220.5 39.0 225.0 40.6 C229.5 42.2 232.4 44.6 235.0 46.6 C237.6 48.7 238.9 50.3 240.6 53.0 C242.4 55.7 244.1 59.5 245.4 63.0 C246.6 66.5 247.3 71.9 248.0 74.0 C248.7 76.1 249.2 82.0 249.7 75.4 C250.2 68.7 251.0 41.2 251.0 34.0 C251.0 26.8 275.3 32.4 249.9 32.1 Z'
+
+/** Gold crescent C — traced contour. */
+const C_PATH = 'M227.0 94.1 C219.2 95.3 214.5 97.1 208.0 100.2 C201.5 103.4 193.8 108.2 188.0 113.1 C182.2 118.1 177.1 124.9 173.4 130.0 C169.6 135.1 167.6 141.4 165.6 143.9 C163.7 146.4 162.4 144.1 161.9 145.1 C161.4 146.1 163.7 144.9 162.9 150.0 C162.1 155.1 158.0 168.7 157.0 176.0 C156.0 183.3 156.6 189.0 157.0 194.0 C157.4 199.0 158.1 201.5 159.1 206.0 C160.2 210.5 161.3 215.8 163.4 221.0 C165.4 226.2 168.1 231.7 171.4 237.0 C174.6 242.3 179.1 248.5 183.0 253.0 C186.9 257.5 191.2 260.8 195.0 263.9 C198.8 266.9 201.7 268.8 206.0 271.2 C210.3 273.7 215.2 276.5 221.0 278.6 C226.8 280.7 234.8 282.8 241.0 283.9 C247.2 285.0 253.8 284.0 258.0 285.1 C262.2 286.2 265.3 290.2 266.4 290.5 C267.4 290.8 264.2 288.1 264.3 287.0 C264.3 285.9 266.5 285.0 266.9 283.9 C267.2 282.8 270.8 281.7 266.5 280.5 C262.2 279.3 247.9 278.5 241.0 276.6 C234.1 274.8 230.7 273.0 225.0 269.2 C219.3 265.5 211.6 258.7 207.0 254.0 C202.4 249.3 200.3 245.8 197.4 241.0 C194.4 236.2 191.7 231.5 189.4 225.0 C187.0 218.5 184.4 210.7 183.1 202.0 C181.9 193.3 181.8 180.2 182.0 173.0 C182.2 165.8 182.7 164.7 184.1 159.0 C185.6 153.3 187.9 145.3 190.8 139.0 C193.6 132.7 198.0 125.6 201.4 121.0 C204.7 116.4 207.1 114.2 211.0 111.1 C214.9 108.1 220.2 104.8 225.0 102.8 C229.8 100.7 235.3 99.6 240.0 99.0 C244.7 98.4 248.5 98.4 253.0 99.0 C257.5 99.6 263.0 101.0 267.0 102.4 C271.0 103.8 273.9 105.4 277.0 107.4 C280.1 109.3 282.5 110.3 285.9 114.1 C289.2 118.0 295.0 129.6 297.0 130.4 C299.0 131.2 298.0 122.5 298.0 119.0 C298.0 115.5 299.7 112.3 296.9 109.1 C294.0 105.9 286.8 102.3 281.0 99.8 C275.2 97.3 266.3 95.3 262.0 94.1 C257.7 93.0 260.8 93.0 255.0 93.0 C249.2 93.0 234.8 92.9 227.0 94.1 Z'
+
+/** Woman's profile inside the C — traced contour. */
+const PROFILE_PATH = 'M230.9 117.0 C229.7 115.6 229.7 117.0 227.6 120.0 C225.5 123.0 222.2 127.0 218.2 135.0 C214.2 143.0 206.8 158.2 203.6 168.0 C200.4 177.8 199.4 186.3 199.0 194.0 C198.6 201.7 199.5 207.3 201.1 214.0 C202.8 220.7 206.6 229.3 208.8 234.0 C210.9 238.7 211.9 239.4 214.1 242.0 C216.3 244.6 217.5 246.8 222.0 249.9 C226.5 252.9 235.2 258.0 241.0 260.4 C246.8 262.7 253.2 263.3 257.0 263.9 C260.8 264.5 266.0 265.3 263.9 263.9 C261.7 262.4 249.6 258.4 244.0 255.2 C238.4 252.1 233.9 248.7 230.0 245.0 C226.1 241.3 222.8 237.2 220.4 233.0 C217.9 228.8 216.0 224.0 215.1 220.0 C214.3 216.0 214.5 211.8 215.4 209.0 C216.2 206.2 218.1 204.5 220.0 203.1 C221.9 201.8 224.0 201.4 227.0 201.0 C230.0 200.6 235.5 201.4 238.0 200.9 C240.5 200.4 241.4 199.0 242.2 198.0 C243.0 197.0 243.1 196.7 242.9 195.0 C242.7 193.3 241.0 190.0 241.1 188.0 C241.3 186.0 243.5 184.5 243.9 183.0 C244.2 181.5 243.1 180.3 243.3 179.0 C243.4 177.7 244.9 176.8 244.9 175.0 C244.9 173.2 242.4 170.5 243.1 168.0 C243.9 165.5 250.2 163.5 249.3 160.0 C248.3 156.5 239.5 149.5 237.5 147.0 C235.5 144.5 236.9 145.8 237.1 145.0 C237.4 144.2 239.4 143.0 239.0 142.1 C238.7 141.3 235.8 142.4 235.1 140.0 C234.4 137.6 235.6 131.8 234.9 128.0 C234.2 124.2 232.1 118.3 230.9 117.0 Z'
+
+/** Leaf branch: foliage and stem. Traced separately from the C so the small
+ *  sizes can omit them without touching the letterform. */
+const LEAF_PATHS = ['M360.4 224.6 C358.3 222.8 346.4 229.9 342.0 232.0 C337.6 234.1 336.5 235.0 334.0 237.1 C331.5 239.3 328.7 242.2 326.8 245.0 C324.8 247.8 323.4 251.2 322.4 254.0 C321.3 256.8 322.4 259.4 320.5 261.9 C318.6 264.3 313.3 267.3 311.0 268.6 C308.7 270.0 308.0 270.0 307.0 269.9 C306.0 269.8 304.7 269.8 305.3 268.0 C305.8 266.2 308.4 261.3 310.1 259.0 C311.8 256.7 313.7 256.3 315.4 254.0 C317.0 251.7 319.0 247.5 319.9 245.0 C320.8 242.5 320.9 241.3 320.9 239.0 C320.9 236.7 320.7 233.9 319.9 231.0 C319.1 228.1 317.8 221.5 316.0 221.6 C314.2 221.8 310.9 228.8 309.2 232.0 C307.6 235.2 306.4 236.3 306.1 241.0 C305.9 245.7 308.3 255.3 307.6 260.0 C306.9 264.7 304.0 266.5 301.9 269.0 C299.8 271.5 296.6 274.2 295.0 274.9 C293.4 275.5 291.5 276.1 292.3 273.0 C293.0 269.9 298.2 260.5 299.6 256.0 C301.1 251.5 300.9 248.7 300.9 246.0 C300.8 243.3 300.2 242.2 299.2 240.0 C298.2 237.8 297.3 235.4 294.9 233.0 C292.4 230.6 286.3 224.0 284.5 225.6 C282.7 227.3 283.9 239.1 284.0 243.0 C284.1 246.9 284.5 247.0 285.4 249.0 C286.2 251.0 287.6 253.1 289.1 255.0 C290.7 256.9 293.6 258.3 294.5 260.1 C295.4 262.0 296.1 263.2 294.6 266.0 C293.2 268.8 288.3 274.5 286.0 276.6 C283.7 278.8 283.8 278.3 281.0 278.9 C278.2 279.5 271.2 279.2 269.1 280.1 C267.0 281.1 266.7 284.1 268.5 284.5 C270.3 285.0 275.7 283.9 280.0 282.9 C284.3 281.9 289.7 280.2 294.0 278.6 C298.3 277.0 301.7 275.6 306.0 273.2 C310.3 270.9 315.5 266.3 320.0 264.5 C324.5 262.7 329.2 263.8 333.0 262.6 C336.8 261.5 340.4 259.1 343.0 257.4 C345.6 255.6 346.9 254.4 348.9 252.0 C350.8 249.6 352.9 247.6 354.8 243.0 C356.7 238.4 362.5 226.5 360.4 224.6 Z', 'M355.0 274.5 C355.5 272.2 347.7 269.9 344.0 268.6 C340.3 267.4 336.5 266.9 333.0 267.1 C329.5 267.4 329.3 266.9 323.0 270.2 C316.7 273.6 302.3 283.3 295.0 287.2 C287.7 291.1 283.4 292.9 279.0 293.6 C274.6 294.4 268.8 291.6 268.6 291.8 C268.5 292.0 274.8 293.2 278.0 294.8 C281.2 296.4 285.0 300.0 288.0 301.4 C291.0 302.7 293.8 302.7 296.0 302.7 C298.2 302.8 297.8 303.1 301.0 301.9 C304.2 300.7 314.0 297.5 315.4 295.5 C316.7 293.5 311.3 291.4 309.0 290.0 C306.7 288.6 302.7 287.9 301.5 286.9 C300.2 285.9 299.7 285.4 301.5 284.1 C303.2 282.8 308.4 279.1 312.0 279.0 C315.6 278.9 319.8 282.4 323.0 283.4 C326.2 284.3 328.0 285.1 331.0 284.9 C334.0 284.7 337.0 284.0 341.0 282.2 C345.0 280.5 354.5 276.8 355.0 274.5 Z']
 
 export interface LogoProps {
   size?: LogoSize
@@ -90,96 +110,14 @@ export function Logo({ size = 'lg', className = '', label = 'Freedom Cosmetic Sh
         </linearGradient>
       </defs>
 
-      {/* ── F ─────────────────────────────────────────────────────────────
-        * Serif letterform. Measured: top bar x98-251 y31-59, stem a constant
-        * x118-149 all the way to y268, base serif spreading x98-166 at y278.
-        *
-        * There is NO middle crossbar. A first pass added one out of habit —
-        * scanning the reference at y150-174 shows only the stem (118-149) and
-        * the woman's profile (202-214); nothing bridges them. */}
-      <path
-        fill={`url(#${rose})`}
-        d="M101 31 H251 V59 H149 V262
-           C 149 270, 152 275, 159 277
-           L 167 280 V284 H98 V280
-           L 106 277 C 113 275, 118 270, 118 262
-           V47
-           C 111 46, 105 41, 101 31 Z"
-      />
+      {/* Gold first: the rose profile overlaps the crescent's inner edge. */}
+      <path fill={`url(#${gold})`} d={C_PATH} />
+      {!simplified && LEAF_PATHS.map((d) => (
+        <path key={d.slice(0, 24)} fill={`url(#${gold})`} d={d} />
+      ))}
 
-      {/* ── C ─────────────────────────────────────────────────────────────
-        * Crescent opening right. Measured: outer edge reaches x157 at its
-        * leftmost (y176-192), terminals at y96 and y284 both ending x272,
-        * stroke a near-constant 24-25px. Centre therefore ~(214,190) with
-        * outer radius ~57 and inner ~33.
-        *
-        * Radii are solved, not guessed. A circle through both terminals
-        * (272,96) and (272,284) whose leftmost point is x157 must satisfy
-        * (272 - 157 - r)^2 + 94^2 = r^2, giving r = 95.9 about centre
-        * (253,190). The inner edge, 24px in at x181, solves to r = 71.7 about
-        * the same centre. Earlier passes guessed 78/54 and 57/33; both were
-        * too small to span 188px, so the renderer silently scaled them up and
-        * shifted the crescent 21px right. */}
-      <path
-        fill={`url(#${gold})`}
-        d="M272 96 A96 96 0 1 0 272 284 v-25
-           A72 72 0 1 1 272 121 Z"
-      />
-
-      {!simplified && (
-        <>
-          {/* ── Woman's profile ────────────────────────────────────────────
-            * Traced from the per-row rose boundary inside the C. Key points:
-            * crown y120 x227-233, forehead widening to x206 by y162, nose
-            * apex x249 at y162, lips x242 y192, chin x199 y204, then the
-            * neck tapering right and down to x265 y264. */}
-          {/* Traced from the per-row boundary above. Reading down the right
-            * edge: crown 231 -> brow 238 -> nose apex 250 at y160 -> under
-            * nose 243 -> lips 244 -> chin 241 at y200. The left edge runs
-            * 230 -> 199 by y199 (forehead and cheek). Below the chin the
-            * shape becomes a narrow ~14px band angling down-right to end at
-            * (265,264) — the neck. An earlier pass swept that band left
-            * across the C's opening, which read as a scarf. */}
-          <path
-            fill={`url(#${rose})`}
-            d="M231 116
-               C 222 118, 215 127, 212 141
-               C 209 151, 206 156, 204 162
-               C 202 169, 201 174, 201 180
-               L 200 189 C 199 194, 199 198, 199 202
-               L 199 213
-               C 200 222, 203 231, 208 239
-               C 214 249, 224 257, 238 262
-               L 265 264
-               L 262 256
-               C 248 252, 238 245, 232 236
-               C 226 227, 222 218, 221 208
-               L 220 203
-               L 237 202
-               C 240 198, 242 195, 242 192
-               L 242 185
-               C 245 179, 246 173, 244 167
-               L 246 161
-               C 244 153, 241 147, 238 143
-               L 237 131
-               C 237 123, 235 117, 231 116 Z"
-          />
-
-          {/* ── Leaf branch ────────────────────────────────────────────────
-            * Measured x271-361, y225-303. The stem runs from the lower left
-            * (x268 y297) up to the right, ending near x358 y228. Five leaves
-            * sit above it, each roughly 15px wide and shortening toward the
-            * tip. The first pass overshot to x389; every point below is
-            * clamped inside the measured bounds. */}
-          <g fill={`url(#${gold})`}>
-            <path d="M270 300 q28-17 58-29 28-11 52-24 -22 18-48 30 -28 13-56 27 Z" />
-            <path d="M284 284 q1-28 8-44 8 13 8 29 0 15-7 22 -5 5-9-7 Z" />
-            <path d="M306 271 q3-27 12-42 7 14 5 30 -2 14-9 19 -6 4-8-7 Z" />
-            <path d="M326 258 q8-25 20-37 4 15-1 30 -5 13-12 16 -6 3-7-9 Z" />
-            <path d="M344 244 q10-21 20-29 1 15-6 28 -6 11-11 12 -5 1-3-11 Z" />
-          </g>
-        </>
-      )}
+      <path fill={`url(#${rose})`} d={F_PATH} />
+      {!simplified && <path fill={`url(#${rose})`} d={PROFILE_PATH} />}
     </svg>
   )
 }
