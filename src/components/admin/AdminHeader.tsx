@@ -1,6 +1,6 @@
 'use client'
 
-import { Bell, Menu } from 'lucide-react'
+import { Bell, Menu, Smartphone } from 'lucide-react'
 import { useAdminShell } from '@/components/admin/AdminShellContext'
 import { useStore } from '@/store/useStore'
 import BrandMark from '@/components/brand/BrandMark'
@@ -23,7 +23,7 @@ const tabTitles: Record<string, string> = {
 }
 
 export default function AdminHeader() {
-  const { activeTab, setMobileOpen } = useAdminShell()
+  const { activeTab, setMobileOpen, mobilePanel, setMobilePanel } = useAdminShell()
   const user = useStore((state) => state.user)
 
   return (
@@ -39,6 +39,24 @@ export default function AdminHeader() {
       </div>
 
       <div className="flex items-center gap-1.5">
+        {/* Mini-panel toggle.
+          * The only control for this used to live in AdminView's own header,
+          * which is now hidden below md to stop two headers stacking on a
+          * phone. Without this button the compact panel would be unreachable
+          * on exactly the devices it was built for. */}
+        <button
+          type="button"
+          onClick={() => setMobilePanel(!mobilePanel)}
+          className={`grid h-10 w-10 place-items-center rounded-xl border transition-colors ${
+            mobilePanel
+              ? 'border-fcs-brand-strong bg-fcs-brand-strong text-white'
+              : 'border-gray-200 text-gray-600 hover:bg-gray-100'
+          }`}
+          aria-pressed={mobilePanel}
+          aria-label={mobilePanel ? 'Show the full dashboard' : 'Show the quick mobile panel'}
+        >
+          <Smartphone className="h-5 w-5" />
+        </button>
         <button type="button" className="relative grid h-10 w-10 place-items-center rounded-xl text-gray-600 hover:bg-gray-100" aria-label="Notifications">
           <Bell className="h-5 w-5" />
           <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />

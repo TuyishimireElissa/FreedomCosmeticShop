@@ -32,6 +32,19 @@ function WhatsAppButtonComponent({ phone, message }: WhatsAppButtonProps = {}) {
     } catch { return }
   }, [])
 
+  // The homepage is excluded on phones. The floating button is fixed at
+  // bottom-right and the homepage search submit sits at the right edge of its
+  // card; at 360px they share a 38px band, so the green bubble lands on top of
+  // the search button — confirmed from a real device screenshot.
+  //
+  // Hiding it there costs nothing: the homepage already carries two larger,
+  // clearer WhatsApp entry points — the hero CTA above the fold and the
+  // concierge section further down. Both are gated on the same configured
+  // number as this button, so if one is present they all are.
+  //
+  // Phones only. From md up the bottom nav is gone, the layout is wide, and
+  // the two never meet.
+  const hiddenOnHomeMobile = pathname === '/'
   if (pathname.startsWith('/admin') || pathname.startsWith('/checkout') || (!phone && !WA_CONFIG.isNumberConfigured)) return null
   const contextMessage = message || (pathname.startsWith('/products/') ? t('whatsapp.floating_product') : pathname === '/cart' ? t('whatsapp.floating_cart') : pathname.startsWith('/account/orders') || pathname === '/track-order' ? t('whatsapp.floating_order') : t('whatsapp.general_help'))
 
@@ -44,7 +57,7 @@ function WhatsAppButtonComponent({ phone, message }: WhatsAppButtonProps = {}) {
     trackWhatsAppClick(eventType, { language: lang, pagePath: pathname })
   }
 
-  return <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom)+12px)] right-4 z-40 md:bottom-6 md:right-6">
+  return <div className={`fixed bottom-[calc(64px+env(safe-area-inset-bottom)+12px)] right-4 z-40 md:bottom-6 md:right-6 ${hiddenOnHomeMobile ? 'hidden md:block' : ''}`}>
     {tooltip && !interacted && <aside className="absolute bottom-full right-0 mb-3 w-64 rounded-2xl border border-gray-100 bg-white p-4 shadow-xl"><button type="button" onClick={() => setTooltip(false)} className="absolute right-1 top-1 grid h-11 w-11 place-items-center rounded-full text-gray-400 hover:bg-gray-100" aria-label={t('common.close')}><X className="h-4 w-4" /></button><div className="flex items-center gap-2 pr-9"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#25D366] text-white"><MessageCircle className="h-5 w-5" /></span><div><p className="text-sm font-black text-gray-900">{WA_CONFIG.agentName || BUSINESS.tradingName}</p><p className="text-xs text-gray-500">{t('whatsapp.assisted_support')}</p></div></div><p className="mt-3 text-xs leading-5 text-gray-700">{t('whatsapp.floating_invitation')}</p><p className="mt-2 flex items-start gap-1.5 text-[11px] leading-4 text-gray-500"><Clock className="mt-0.5 h-3 w-3 shrink-0" />{WA_CONFIG.responseHours.responseTime || t('whatsapp.response_time_unpublished')}</p></aside>}
     <button type="button" onClick={open} className="grid h-14 w-14 touch-manipulation place-items-center rounded-full bg-[#25D366] text-white shadow-lg shadow-green-500/30 transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#B76E79]/40" aria-label={t('ui.whatsapp_business', { business: BUSINESS.tradingName })}><MessageCircle className="h-7 w-7" /></button>
   </div>

@@ -162,8 +162,15 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
   // Dynamic store settings (logo, name, etc.)
   const { settings: adminSettings } = useSettings()
 
-  // Section 12: Mobile admin mini-panel toggle
-  const [mobileMode, setMobileMode] = useState(false)
+  // Section 12: Mobile admin mini-panel toggle.
+  // Mirrors the activeTab pattern above: shared shell state when embedded so
+  // AdminHeader's mobile toggle drives it, local state when standalone.
+  const [localMobileMode, setLocalMobileMode] = useState(false)
+  const mobileMode = embedded && adminShell ? adminShell.mobilePanel : localMobileMode
+  const setMobileMode = useCallback((on: boolean) => {
+    if (embedded && adminShell) adminShell.setMobilePanel(on)
+    else setLocalMobileMode(on)
+  }, [adminShell, embedded])
 
   // Section 12: theme + keyboard shortcuts
   const { theme, toggleTheme, mounted } = useTheme()
@@ -471,7 +478,21 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
   return (
     <div className="min-h-screen bg-background">
       {/* ─── Enhanced Admin Header ─────────────────────────────────── */}
-      <div className="sticky top-0 z-40 border-b bg-card/95 backdrop-blur">
+      {/* Hidden below md. `admin/layout.tsx` renders AdminHeader, which is
+        * itself `md:hidden`, so on a phone BOTH headers stacked — 128px of
+        * chrome before any content, on the smallest screens. They are not
+        * duplicates: AdminHeader carries the hamburger that opens the sidebar
+        * (the only way to navigate on mobile) plus the current tab title,
+        * while this one carries desktop affordances — global search, theme
+        * toggle, keyboard shortcuts, live tickers — that are either hidden or
+        * unusable at that width anyway.
+        *
+        * So the mobile header wins below md and this one takes over from md
+        * up, where AdminHeader disappears. Nothing is lost at either size.
+        * Verified: every control unique to this bar is already `hidden`,
+        * `sm:` or `lg:` gated, except the mobile-panel and shortcut buttons,
+        * which duplicate what the sidebar and a keyboard provide. */}
+      <div className="sticky top-0 z-40 hidden border-b bg-card/95 backdrop-blur md:block">
         {/* Top row: logo + search + profile */}
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:gap-4 sm:px-6 lg:px-8">
           {/* Logo + title — Section 3: Dynamic logo */}

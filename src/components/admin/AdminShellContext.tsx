@@ -24,6 +24,16 @@ interface AdminShellValue {
   setActiveTab: (tab: AdminTab) => void
   mobileOpen: boolean
   setMobileOpen: (open: boolean) => void
+  /**
+   * Whether the compact mobile mini-panel replaces the full dashboard.
+   *
+   * Lives here rather than inside AdminView because the only control that
+   * toggled it sat in AdminView's own header, and that header is now hidden
+   * below md — which would have left the mobile panel unreachable on the very
+   * devices it exists for. AdminHeader (the mobile bar) drives it instead.
+   */
+  mobilePanel: boolean
+  setMobilePanel: (on: boolean) => void
 }
 
 const AdminShellContext = createContext<AdminShellValue | null>(null)
@@ -31,10 +41,11 @@ const AdminShellContext = createContext<AdminShellValue | null>(null)
 export function AdminShellProvider({ children }: { children: React.ReactNode }) {
   const [activeTab, setActiveTab] = useState<AdminTab>('overview')
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobilePanel, setMobilePanel] = useState(false)
 
   const value = useMemo(
-    () => ({ activeTab, setActiveTab, mobileOpen, setMobileOpen }),
-    [activeTab, mobileOpen],
+    () => ({ activeTab, setActiveTab, mobileOpen, setMobileOpen, mobilePanel, setMobilePanel }),
+    [activeTab, mobileOpen, mobilePanel],
   )
 
   return <AdminShellContext.Provider value={value}>{children}</AdminShellContext.Provider>
