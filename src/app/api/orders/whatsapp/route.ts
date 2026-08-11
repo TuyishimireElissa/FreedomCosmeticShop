@@ -117,27 +117,52 @@ export async function POST(request: Request) {
     }
     const input = parsed.data
 
-    // Re-fetch every product server-side. A client cannot inject a price,
-    // resurrect a deleted product, or order beyond available stock.
+    // Re-fetch every product server-side. A client cannot inject a price or
+    // resurrect a deleted product.
     const productIds = input.items.map((item) => item.productId)
     const products = await prisma.product.findMany({
       where: { id: { in: productIds }, isActive: true, isDeleted: false },
       select: { id: true, name: true, price: true, stock: true, volume: true, size: true },
     })
-    if (products.length !== new Set(productIds).size) {
-      return NextResponse.json({ success: false, error: 'PRODUCT_UNAVAILABLE' }, { status: 400, headers })
+
+    // Data integrity only: an id that resolves to nothing cannot be priced, so
+    // the order cannot be built. This is NOT a stock condition — it means the
+    // line references a product that is deleted, deactivated, or was never a
+    // product at all (a bundle id, or a stale localStorage cart, which
+    // persists indefinitely).
+    //
+    // Reported as UNKNOWN_ITEM with the offending ids rather than folded into
+    // a stock error. It previously returned PRODUCT_UNAVAILABLE, which the
+    // client mapped onto "one of your products is out of stock" — a lie that
+    // sent the customer hunting for a stock problem that did not exist.
+    const byId = new Map(products.map((product) => [product.id, product]))
+    const missing = [...new Set(productIds)].filter((id) => !byId.has(id))
+    if (missing.length > 0) {
+      return NextResponse.json(
+        { success: false, error: 'UNKNOWN_ITEM', productIds: missing },
+        { status: 400, headers },
+      )
     }
 
-    const byId = new Map(products.map((product) => [product.id, product]))
+    // NO STOCK GATE HERE — deliberate.
+    //
+    // The business model is WhatsApp-first: this endpoint records intent, it
+    // does not reserve inventory. Stock moves in exactly one place, the
+    // source-gated PENDING_WHATSAPP -> CONFIRMED transition in
+    // /api/orders/[id] (Defect 3), which holds row locks and refuses to
+    // oversell with a 409.
+    //
+    // Rejecting at creation was wrong on its own terms: it threw away a lead
+    // the owner could have fulfilled from a restock or by offering an
+    // alternative over WhatsApp, which is the entire point of the channel.
+    // The owner reconciles reality at confirmation time in the admin
+    // dashboard, where they can see the shortfall and talk to the customer.
+    //
+    // `stock` is still selected above so the response can carry it, letting
+    // the client show honest availability without blocking anything.
     const orderItems: Array<{ productId: string; name: string; price: number; quantity: number; variant: string | null }> = []
     for (const item of input.items) {
       const product = byId.get(item.productId)!
-      if (product.stock < item.quantity) {
-        return NextResponse.json(
-          { success: false, error: 'INSUFFICIENT_STOCK', productId: product.id },
-          { status: 409, headers },
-        )
-      }
       orderItems.push({
         productId: product.id,
         name: product.name,
@@ -222,6 +247,20 @@ export async function POST(request: Request) {
       }),
     )
 
+    // Lines the shop cannot currently cover in full. Reported, never blocking:
+    // the order is already saved by this point. The owner sees the shortfall
+    // in the admin dashboard and settles it with the customer over WhatsApp,
+    // and the CONFIRMED transition is what actually enforces stock.
+    const shortfalls = orderItems
+      .map((item) => ({ item, available: byId.get(item.productId)!.stock }))
+      .filter(({ item, available }) => available < item.quantity)
+      .map(({ item, available }) => ({
+        productId: item.productId,
+        name: item.name,
+        requested: item.quantity,
+        available: Math.max(0, available),
+      }))
+
     return NextResponse.json(
       {
         success: true,
@@ -236,6 +275,7 @@ export async function POST(request: Request) {
             subtotal: item.price * item.quantity,
           })),
           pricing: { subtotal, deliveryFee: delivery.fee, discount: discountAmount, couponCode, total },
+          ...(shortfalls.length > 0 ? { stockShortfalls: shortfalls } : {}),
         },
       },
       { status: 201, headers },

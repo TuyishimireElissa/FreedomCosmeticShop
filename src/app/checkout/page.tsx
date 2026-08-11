@@ -168,6 +168,16 @@ export default function CheckoutPage() {
     if (badField === 'customerPhone') return t('checkout.error_rwanda_phone')
     if (badField === 'customerEmail') return t('checkout.invalid_email')
     if (badField === 'customerName') return t('checkout.error_full_name')
+    // UNKNOWN_ITEM means a line references something that is not a sellable
+    // product — a bundle id, or a stale localStorage cart pointing at a
+    // product since deleted. It used to arrive as PRODUCT_UNAVAILABLE and got
+    // mapped onto "one of your products is out of stock", which sent the
+    // customer looking for a stock problem that did not exist.
+    //
+    // INSUFFICIENT_STOCK is gone from this endpoint entirely: WhatsApp orders
+    // no longer check stock at creation. Kept in the map only so an older
+    // cached client that still receives it degrades to sane wording.
+    if (code === 'UNKNOWN_ITEM') return t('checkout.wa_error_unknown_item')
     if (code === 'INSUFFICIENT_STOCK' || code === 'PRODUCT_UNAVAILABLE') return t('checkout.wa_error_stock')
     if (code === 'RATE_LIMITED') return t('checkout.wa_error_rate_limited')
     if (badField) return t('checkout.error_delivery_details')
@@ -175,6 +185,22 @@ export default function CheckoutPage() {
   }
 
   const createWhatsAppOrder = async (): Promise<WhatsAppOrderData | null> => {
+    // Bundles cannot go through this endpoint: it prices lines by productId
+    // against the Product table, and a bundle id resolves to nothing there.
+    // The paid path handles this at line ~248 by mapping to { bundleId }; the
+    // WhatsApp path never did, so a bundle in the bag failed the whole order
+    // with a message about stock.
+    //
+    // Caught here rather than server-side so the customer is told which item
+    // to remove instead of watching the request fail. There are currently 0
+    // bundles in the catalogue, so this is a guard, not a live path — full
+    // bundle support on this endpoint is a larger change and was deferred.
+    const bundleNames = items.filter((item) => item.isBundle).map((item) => item.name)
+    if (bundleNames.length > 0) {
+      setCheckoutError(t('checkout.wa_error_bundle', { items: bundleNames.join(', ') }))
+      return null
+    }
+
     try {
       const response = await fetch('/api/orders/whatsapp', {
         method: 'POST',
@@ -293,7 +319,7 @@ export default function CheckoutPage() {
 
         {step === 3 && completedOrder ? <ConfirmationView order={completedOrder} address={address} paymentMethod={paymentMethod} /> : <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
           <main className="rounded-xl border border-[#EEEEEE] bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] sm:p-7">
-            {step === 1 ? <><div className="mb-6"><h2 className="flex items-center gap-2 text-xl font-bold"><Truck className="h-5 w-5 text-fcs-brand-text" />{t('checkout.step_address')}</h2><p className="mt-1 text-sm text-gray-500">{t('checkout.delivery_intro')}</p></div><AddressForm value={address} onChange={setAddress} errors={addressErrors} /><div className="mt-5 flex items-center justify-between rounded-xl bg-rose-50 p-4"><span><strong className="block text-sm text-gray-800">{t('checkout.delivery_to', { place: address.district })}</strong><span className="text-xs text-gray-500">{deliveryLoading ? t('checkout.calculating') : address.province}</span></span><strong className="text-fcs-brand-text">{deliveryLoading ? '—' : formatRWF(finalDelivery)}</strong></div><button type="button" onClick={() => { if (addressValid) { trackAddressCompleted(address.district); setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) } }} disabled={!addressValid} className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-[10px] bg-fcs-brand-strong text-base font-bold text-white disabled:opacity-40">{t('checkout.step_payment')} <ChevronRight className="h-4 w-4" /></button></> : <><div className="mb-6"><h2 className="font-display text-2xl font-normal text-fcs-text">{t('checkout.wa_step_title')}</h2></div>{checkoutError && <p role="alert" aria-live="assertive" className="mb-4 flex items-center gap-2 rounded-fcs-md bg-red-50 p-3 text-sm font-semibold text-red-700"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />{checkoutError}</p>}<WhatsAppCompleteOrder onCreateOrder={createWhatsAppOrder} /><button type="button" onClick={() => setStep(1)} className="mt-4 min-h-12 w-full rounded-fcs-md border border-fcs-border text-base font-bold text-fcs-text">{t('common.back')}</button></>}
+            {step === 1 ? <><div className="mb-6"><h2 className="flex items-center gap-2 text-xl font-bold"><Truck className="h-5 w-5 text-fcs-brand-text" />{t('checkout.step_address')}</h2><p className="mt-1 text-sm text-gray-500">{t('checkout.delivery_intro')}</p></div><AddressForm value={address} onChange={setAddress} errors={addressErrors} /><div className="mt-5 flex items-center justify-between rounded-xl bg-rose-50 p-4"><span><strong className="block text-sm text-gray-800">{t('checkout.delivery_to', { place: address.district })}</strong><span className="text-xs text-gray-500">{deliveryLoading ? t('checkout.calculating') : address.province}</span></span><strong className="text-fcs-brand-text">{deliveryLoading ? '—' : formatRWF(finalDelivery)}</strong></div><button type="button" onClick={() => { if (addressValid) { trackAddressCompleted(address.district); setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) } }} disabled={!addressValid} className="mt-6 flex min-h-12 w-full items-center justify-center gap-2 rounded-[10px] bg-fcs-brand-strong text-base font-bold text-white disabled:opacity-40">{t('checkout.step_payment')} <ChevronRight className="h-4 w-4" /></button></> : <><div className="mb-6"><h2 className="font-display text-2xl font-normal text-fcs-text">{t('checkout.wa_step_title')}</h2></div>{checkoutError && <p role="alert" aria-live="assertive" className="mb-4 flex items-center gap-2 rounded-fcs-md bg-red-50 p-3 text-sm font-semibold text-red-700"><AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />{checkoutError}</p>}<WhatsAppCompleteOrder onCreateOrder={createWhatsAppOrder} reportsOwnErrors /><button type="button" onClick={() => setStep(1)} className="mt-4 min-h-12 w-full rounded-fcs-md border border-fcs-border text-base font-bold text-fcs-text">{t('common.back')}</button></>}
           </main>
           <details className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm lg:hidden">
             <summary className="flex min-h-[52px] cursor-pointer list-none items-center justify-between gap-3 p-4 text-sm font-semibold text-gray-800">

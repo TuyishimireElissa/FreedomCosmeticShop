@@ -497,6 +497,8 @@ export const en = {
     wa_sending: 'Saving your order...',
     wa_error: 'We could not save your order. Please try again.',
     wa_error_stock: 'One of your items just went out of stock. Remove it from your bag or change the quantity.',
+    wa_error_unknown_item: 'One of the items in your bag is no longer available. Please remove it and try again.',
+    wa_error_bundle: 'Bundles ({items}) cannot be ordered on WhatsApp yet. Please remove them from your bag, or call us and we will help.',
     wa_error_rate_limited: 'Too many attempts. Please wait a minute and try again.',
     wa_success_title: 'Order sent to WhatsApp',
     wa_next1: 'We confirm your order',

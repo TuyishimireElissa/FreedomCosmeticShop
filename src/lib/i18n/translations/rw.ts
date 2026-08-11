@@ -565,6 +565,8 @@ export const rw = {
     wa_sending: 'Turimo kubika order yawe...', // verified-rw
     wa_error: 'Ntitwashoboye kubika order yawe. Ongera ugerageze.', // verified-rw
     wa_error_stock: 'Kimwe mu bicuruzwa wahisemo cyashize. Kura mu igitebo cyangwa uhindure umubare.', // verified-rw
+    wa_error_unknown_item: 'Kimwe mu bicuruzwa biri mu igitebo cyawe ntikikiboneka. Gikure mu igitebo wongere ugerageze.', // verified-rw
+    wa_error_bundle: 'Ibicuruzwa bifatanyije ({items}) ntibishobora gutumizwa kuri WhatsApp ubu. Bikure mu igitebo, cyangwa uduhamagare tubigufashemo.', // verified-rw
     wa_error_rate_limited: 'Wagerageje kenshi cyane. Tegereza umunota umwe wongere ugerageze.', // verified-rw
     wa_success_title: 'Order yoherejwe kuri WhatsApp', // verified-rw
     wa_next1: 'Twemeza order yawe', // verified-rw

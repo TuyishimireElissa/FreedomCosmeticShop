@@ -10,6 +10,16 @@ interface Props {
   /** Saves the order server-side and resolves with the persisted reference. */
   onCreateOrder: () => Promise<WhatsAppOrderData | null>
   disabled?: boolean
+  /**
+   * True when the caller has already shown the customer why it failed.
+   *
+   * Without this the page rendered TWO red banners for one failure: the
+   * caller's specific reason ("check your phone number") and this card's
+   * generic "we could not save your order, try again" underneath it — which
+   * contradicted the first and told the customer to retry something that
+   * could not succeed. Reported from a real screenshot showing both at once.
+   */
+  reportsOwnErrors?: boolean
 }
 
 /**
@@ -20,7 +30,7 @@ interface Props {
  * before wa.me opens — if the customer never sends the message, the order still
  * exists and can be followed up.
  */
-export default function WhatsAppCompleteOrder({ onCreateOrder, disabled }: Props) {
+export default function WhatsAppCompleteOrder({ onCreateOrder, disabled, reportsOwnErrors }: Props) {
   const t = useT()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -42,7 +52,9 @@ export default function WhatsAppCompleteOrder({ onCreateOrder, disabled }: Props
     try {
       const order = await onCreateOrder()
       if (!order) {
-        setError(t('checkout.wa_error'))
+        // Stay silent when the caller has already explained the failure —
+        // two contradictory banners is worse than one accurate one.
+        if (!reportsOwnErrors) setError(t('checkout.wa_error'))
         return
       }
       const message = buildWhatsAppOrderMessage(order)
