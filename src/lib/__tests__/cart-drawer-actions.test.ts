@@ -220,6 +220,26 @@ describe('no component anywhere still calls a dead navigation action', () => {
   })
 })
 
+describe('the admin notification bell is not a dead ornament', () => {
+  const header = code('src/components/admin/AdminHeader.tsx')
+
+  it('does something when tapped', () => {
+    // It had no onClick at all.
+    expect(header).toContain("router.push('/admin/orders')")
+  })
+
+  it('no longer shows an unread dot it can never clear', () => {
+    // The red dot was hard-coded, not driven by an unread count, so it
+    // permanently implied notifications the owner could not open.
+    const bell = header.slice(header.indexOf('<Bell') - 400, header.indexOf('<Bell') + 200)
+    expect(bell).not.toContain('bg-red-500')
+  })
+
+  it('is labelled for what it actually does', () => {
+    expect(header).toContain('aria-label="Open orders"')
+  })
+})
+
 describe('both languages carry the new label', () => {
   it('order_via_whatsapp exists in rw and en', () => {
     expect(rw).toContain('order_via_whatsapp:')

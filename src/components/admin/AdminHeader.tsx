@@ -1,6 +1,7 @@
 'use client'
 
 import { Bell, Menu, Smartphone } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useAdminShell } from '@/components/admin/AdminShellContext'
 import { useStore } from '@/store/useStore'
 import BrandMark from '@/components/brand/BrandMark'
@@ -24,6 +25,7 @@ const tabTitles: Record<string, string> = {
 
 export default function AdminHeader() {
   const { activeTab, setMobileOpen, mobilePanel, setMobilePanel } = useAdminShell()
+  const router = useRouter()
   const user = useStore((state) => state.user)
 
   return (
@@ -57,9 +59,20 @@ export default function AdminHeader() {
         >
           <Smartphone className="h-5 w-5" />
         </button>
-        <button type="button" className="relative grid h-10 w-10 place-items-center rounded-xl text-gray-600 hover:bg-gray-100" aria-label="Notifications">
+        {/* Notifications.
+          * This had no onClick at all — a dead button showing a permanent red
+          * dot that never cleared, implying unread items the owner could never
+          * open. Real-time order alerts arrive as toasts (useAdminNotifications)
+          * and every one of them is an order, so the bell opens the order list.
+          * The dot is gone: it was hard-coded, not driven by any unread count,
+          * so it signalled nothing. */}
+        <button
+          type="button"
+          onClick={() => router.push('/admin/orders')}
+          className="relative grid h-10 w-10 place-items-center rounded-xl text-gray-600 hover:bg-gray-100"
+          aria-label="Open orders"
+        >
           <Bell className="h-5 w-5" />
-          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
         </button>
         <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-fcs-brand-strong text-xs font-bold text-white">
           {user?.name
