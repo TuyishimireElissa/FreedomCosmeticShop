@@ -43,7 +43,6 @@ export function CartDrawer() {
     cartSubtotal,
     user,
     clearCart,
-    goProduct,
   } = useStore()
 
   const subtotal = cartSubtotal()
@@ -109,7 +108,7 @@ export function CartDrawer() {
               variant="outline"
               onClick={() => {
                 setCartOpen(false)
-                useStore.getState().goCatalog(null)
+                router.push('/products')
               }}
             >
               {t('cart.browse_products')}
@@ -124,7 +123,7 @@ export function CartDrawer() {
                   <button
                     onClick={() => {
                       setCartOpen(false)
-                      goProduct(item.slug)
+                      router.push(`/products/${item.slug}`)
                     }}
                     className="bg-secondary/30 h-16 w-16 shrink-0 overflow-hidden rounded-lg"
                     aria-label={t('product.view_product', { product: item.name })}
@@ -147,7 +146,7 @@ export function CartDrawer() {
                     <button
                       onClick={() => {
                         setCartOpen(false)
-                        goProduct(item.slug)
+                        router.push(`/products/${item.slug}`)
                       }}
                       className="hover:text-primary line-clamp-2 text-left text-xs leading-snug font-medium sm:text-sm"
                     >
@@ -171,16 +170,16 @@ export function CartDrawer() {
             </ul>
 
             {/* Footer.
-              * Both buttons here used to be dead. `goCart()` and `goCheckout()`
+              * Both buttons here used to be dead. The store's goCart/goCheckout
               * only set a `view` field on the store — a leftover from the
               * single-page architecture this app had before it moved to Next
               * file routing. Nothing in src/app or src/components reads `view`,
               * so tapping either one closed the drawer, scrolled to the top and
               * did nothing else. They now navigate for real.
               *
-              * The store actions are left in place rather than deleted: cart
-              * state is out of scope, and WholesaleDashboard still calls
-              * goCart(). Fixing the call sites is enough. */}
+              * The store actions themselves are left in place rather than
+              * deleted — cart state is out of scope (they are now unused by
+              * any component, but removing them touches useStore). */}
             <div className="bg-card border-t p-4">
               <div className="mb-3 flex items-baseline justify-between">
                 <span className="text-muted-foreground text-sm">{t('cart.subtotal')}</span>

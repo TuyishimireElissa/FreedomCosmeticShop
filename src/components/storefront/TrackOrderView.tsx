@@ -13,7 +13,6 @@
  */
 
 import { useState } from "react"
-import { useStore } from "@/store/useStore"
 import { formatRWF, PAYMENT_METHODS, PaymentMethodKey, deliveryTimeFor } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,6 +25,7 @@ import { getWhatsAppLink } from '@/lib/business-config'
 import OrderStatusBadge from '@/components/a11y/OrderStatusBadge'
 import PaymentStatusBadge from '@/components/a11y/PaymentStatusBadge'
 import Logo from '@/components/ui/logo'
+import { useRouter } from 'next/navigation'
 import {
   Package,
   Search,
@@ -80,7 +80,9 @@ interface TimelineStep {
 }
 
 export function TrackOrderView() {
-  const { goHome } = useStore()
+  // `goHome` from the store only sets an unread `view` field — dead since
+  // the move to Next file routing. Navigate for real.
+  const router = useRouter()
   const { toast } = useToast()
   const { t, language } = useLanguage()
   const [orderNumber, setOrderNumber] = useState("")
@@ -229,7 +231,7 @@ export function TrackOrderView() {
             {t('orders.enter_number_status')}
           </p>
         </div>
-        <Button variant="ghost" size="sm" onClick={goHome}>
+        <Button variant="ghost" size="sm" onClick={() => router.push('/')}>
           <ArrowLeft className="mr-1.5 h-4 w-4" /> {t('nav.home')}
         </Button>
       </div>

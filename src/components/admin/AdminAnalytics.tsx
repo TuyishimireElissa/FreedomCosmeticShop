@@ -49,7 +49,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts"
-import { useStore } from "@/store/useStore"
+import { useRouter } from "next/navigation"
 import WhatsAppAnalytics from '@/components/admin/WhatsAppAnalytics'
 
 // Removed unused imports: TrendingDown, ArrowRight, Clock, Legend, toast
@@ -115,7 +115,9 @@ const PAYMENT_COLORS: Record<string, string> = {
 }
 
 export function AdminAnalytics() {
-  const { goTrackOrder } = useStore()
+  // goTrackOrder only set an unread `view` field. Admins want the admin
+  // order list anyway, and /track-order does not read an order number.
+  const router = useRouter()
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [range, setRange] = useState("month")
@@ -497,7 +499,7 @@ export function AdminAnalytics() {
                   <tr
                     key={o.id}
                     className="cursor-pointer hover:bg-secondary/20"
-                    onClick={() => goTrackOrder(o.orderNumber)}
+                    onClick={() => router.push('/admin/orders')}
                   >
                     <td className="py-2 pr-3 font-mono text-xs font-medium">
                       {o.orderNumber}

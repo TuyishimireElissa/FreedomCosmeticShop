@@ -145,6 +145,81 @@ describe('the drawer never opens wa.me directly', () => {
   })
 })
 
+describe('no component anywhere still calls a dead navigation action', () => {
+  /**
+   * The drawer was not the only casualty. Every `go*` action in the store and
+   * `setView(...)` only ever set the unread `view` field, so EVERY button
+   * wired to one did nothing. Found across the site:
+   *
+   *   CartDrawer          browse products, 2x product thumbnails
+   *   AdminOverview       6 Quick Actions + recent-order rows
+   *   AdminAnalytics      recent-order rows
+   *   AdminView           back-to-store, access-denied, logout
+   *   AdminMobilePanel    back button
+   *   TrackOrderView      home button
+   *   WholesaleView       back-to-store x3, login x2, continue shopping x3
+   *   WholesaleDashboard  back-to-store, modify-order, track orders
+   *
+   * This test fails the build if any of them is reintroduced.
+   */
+  const SOURCES = [
+    'src/components/storefront/CartDrawer.tsx',
+    'src/components/storefront/TrackOrderView.tsx',
+    'src/components/admin/AdminOverview.tsx',
+    'src/components/admin/AdminAnalytics.tsx',
+    'src/components/admin/AdminView.tsx',
+    'src/components/admin/AdminMobilePanel.tsx',
+    'src/components/admin/AdminAuthGuard.tsx',
+    'src/components/admin/AdminSidebar.tsx',
+    'src/components/wholesale/WholesaleView.tsx',
+    'src/components/wholesale/WholesaleDashboard.tsx',
+  ]
+
+  /** Calls only — `goHome` is also a legitimate local router wrapper name. */
+  const DEAD_CALLS = [
+    'goCatalog(',
+    'goProduct(',
+    'goCart(',
+    'goCheckout(',
+    'goConfirmation(',
+    'goTrackOrder(',
+    'setView("admin")',
+    "setView('trackOrder')",
+  ]
+
+  it.each(SOURCES)('%s calls no dead store navigation', (path) => {
+    const source = code(path)
+    for (const call of DEAD_CALLS) {
+      expect(source, `${path} still calls ${call}`).not.toContain(call)
+    }
+  })
+
+  it.each(SOURCES)('%s navigates with the router or a Link', (path) => {
+    const source = code(path)
+    // Every file in this list previously had at least one navigating control.
+    const navigates =
+      source.includes('router.push') ||
+      source.includes('next/link') ||
+      source.includes('<Link')
+    expect(navigates, `${path} has no real navigation left`).toBe(true)
+  })
+
+  it('the admin quick actions each go somewhere distinct', () => {
+    // All six previously called setView("admin") — identical, and dead.
+    const overview = code('src/components/admin/AdminOverview.tsx')
+    for (const route of ['/admin/products', '/admin/orders', '/admin/settings', '/admin/analytics']) {
+      expect(overview, `quick actions never reach ${route}`).toContain(`router.push('${route}')`)
+    }
+  })
+
+  it('admin logout actually leaves the admin panel', () => {
+    // It called logout() then goHome(), which did nothing — leaving a
+    // logged-out user sitting on the admin screen.
+    const view = code('src/components/admin/AdminView.tsx')
+    expect(view).toMatch(/logout\(\)[\s\S]{0,80}?router\.push\('\/'\)/)
+  })
+})
+
 describe('both languages carry the new label', () => {
   it('order_via_whatsapp exists in rw and en', () => {
     expect(rw).toContain('order_via_whatsapp:')

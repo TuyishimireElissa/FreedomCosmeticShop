@@ -15,6 +15,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { useStore } from "@/store/useStore"
 import { RWANDA_DISTRICTS, RWANDA_PROVINCES } from "@/lib/rwanda-locations"
 import { Button } from "@/components/ui/button"
@@ -76,7 +77,8 @@ const HEARD_FROM_OPTIONS = [
 
 export function WholesaleView() {
   const t = useT()
-  const { user, goHome, goCatalog } = useStore()
+  const user = useStore((state) => state.user)
+  const router = useRouter()
   const [view, setView] = useState<InternalView>("landing")
 
   // Check if user already has a wholesale application on mount
@@ -99,7 +101,7 @@ export function WholesaleView() {
       <div className="border-b bg-card">
         <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3 sm:px-6">
           <button
-            onClick={goHome}
+            onClick={() => router.push('/')}
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" /> {t('wholesale.back_store')}
@@ -110,8 +112,8 @@ export function WholesaleView() {
       {view === "landing" && <WholesaleLanding onApply={() => setView("apply")} onCheckStatus={() => setView("status")} onDashboard={() => setView("dashboard")} />}
       {view === "apply" && <WholesaleApplicationForm onSuccess={() => setView("success")} onBack={() => setView("landing")} />}
       {view === "status" && <WholesaleStatusPage onApply={() => setView("apply")} />}
-      {view === "success" && <WholesaleSuccessPage onCheckStatus={() => setView("status")} onContinue={() => goCatalog()} />}
-      {view === "dashboard" && <WholesaleDashboard onInvoices={() => setView("invoices")} onCatalog={() => goCatalog()} />}
+      {view === "success" && <WholesaleSuccessPage onCheckStatus={() => setView("status")} onContinue={() => router.push('/products')} />}
+      {view === "dashboard" && <WholesaleDashboard onInvoices={() => setView("invoices")} onCatalog={() => router.push('/products')} />}
       {view === "invoices" && <WholesaleInvoices onBack={() => setView("dashboard")} />}
     </div>
   )
@@ -267,7 +269,8 @@ function WholesaleLanding({ onApply, onCheckStatus, onDashboard }: { onApply: ()
 
 function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void; onBack: () => void }) {
   const t = useT()
-  const { user, goLogin } = useStore()
+  const user = useStore((state) => state.user)
+  const router = useRouter()
   const { toast } = useToast()
   const { resilientFetch } = useResilientFetch()
   const { trackWholesaleApplicationCompleted, trackWholesaleApplicationStarted } = useAnalytics()
@@ -312,7 +315,7 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
         <p className="mt-2 text-sm text-muted-foreground">
           {t('wholesale.login_apply_hint')}
         </p>
-        <Button className="mt-6" onClick={goLogin}>
+        <Button className="mt-6" onClick={() => router.push('/login')}>
           {t('auth.go_login')}
         </Button>
       </div>
@@ -503,7 +506,8 @@ function WholesaleApplicationForm({ onSuccess, onBack }: { onSuccess: () => void
 
 function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
   const t = useT()
-  const { user, goHome, goCatalog, goLogin } = useStore()
+  const user = useStore((state) => state.user)
+  const router = useRouter()
   const [application, setApplication] = useState<{
     hasApplication: boolean
     status: string | null
@@ -541,7 +545,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
       <div className="mx-auto max-w-md px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">{t('wholesale.login_required')}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t('wholesale.login_status_hint')}</p>
-        <Button className="mt-6" onClick={goLogin}>{t('auth.go_login')}</Button>
+        <Button className="mt-6" onClick={() => router.push('/login')}>{t('auth.go_login')}</Button>
       </div>
     )
   }
@@ -553,7 +557,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
         <h1 className="mt-4 text-xl font-bold">{t('wholesale.no_application')}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t('wholesale.not_applied')}</p>
         <Button className="mt-6" onClick={onApply}>{t('home.apply_wholesale')} →</Button>
-        <button onClick={goHome} className="mt-4 block w-full text-xs text-muted-foreground hover:text-foreground">← {t('wholesale.back_store')}</button>
+        <button onClick={() => router.push('/')} className="mt-4 block w-full text-xs text-muted-foreground hover:text-foreground">← {t('wholesale.back_store')}</button>
       </div>
     )
   }
@@ -561,7 +565,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
   const status = application.status
   const startWholesaleShopping = () => {
     if (typeof window !== 'undefined') sessionStorage.setItem('wholesaleShoppingMode', '1')
-    goCatalog()
+    router.push('/products')
   }
   const applicationId = application.application?.id?.slice(-8).toUpperCase()
 
@@ -584,7 +588,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
             ))}
           </div>
         </div>
-        <button onClick={goHome} className="mt-6 w-full text-center text-xs text-muted-foreground hover:text-foreground">← {t('wholesale.continue_retail')}</button>
+        <button onClick={() => router.push('/')} className="mt-6 w-full text-center text-xs text-muted-foreground hover:text-foreground">← {t('wholesale.continue_retail')}</button>
       </div>
     )
   }
@@ -621,7 +625,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
           )}
           <div className="mt-6 space-y-2">
             <Button variant="outline" className="w-full" onClick={onApply}>{t('wholesale.honest_submit_updated_application')}</Button>
-            <Button className="w-full" onClick={() => goCatalog()}>{t('cart.continue_shopping')}</Button>
+            <Button className="w-full" onClick={() => router.push('/products')}>{t('cart.continue_shopping')}</Button>
           </div>
         </div>
       </div>
@@ -631,7 +635,7 @@ function WholesaleStatusPage({ onApply }: { onApply: () => void }) {
   return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <p className="text-sm text-muted-foreground">{t('orders.status_label')}: {status}</p>
-      <Button className="mt-6" onClick={goHome}>{t('wholesale.back_store')}</Button>
+      <Button className="mt-6" onClick={() => router.push('/')}>{t('wholesale.back_store')}</Button>
     </div>
   )
 }

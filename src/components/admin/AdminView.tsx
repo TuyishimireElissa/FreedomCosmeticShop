@@ -20,6 +20,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react"
 import dynamic from "next/dynamic"
+import { useRouter } from "next/navigation"
 import { Order } from "@/lib/types"
 import { formatRWF, PAYMENT_METHODS, PaymentMethodKey } from "@/lib/format"
 import { Button } from "@/components/ui/button"
@@ -146,7 +147,12 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
-  const { goHome, user } = useStore()
+  // goHome() from the store only set an unread `view` field, so "back to
+  // store" and the logout item below left the admin exactly where they
+  // were. Navigate for real.
+  const router = useRouter()
+  const goHome = useCallback(() => router.push('/'), [router])
+  const user = useStore((state) => state.user)
   const canChangePayments = isOwnerAdminRole(user?.role)
   const canCancelOrders = ['SUPER_ADMIN', 'ADMIN', 'MANAGER'].includes(user?.role || '')
   const { toast } = useToast()
@@ -699,7 +705,7 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
                   onClick={async () => {
                     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
                     useStore.getState().logout()
-                    goHome()
+                    router.push('/')
                   }}
                   className="text-destructive"
                 >

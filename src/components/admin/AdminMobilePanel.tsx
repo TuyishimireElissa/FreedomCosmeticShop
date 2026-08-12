@@ -21,7 +21,7 @@
  */
 
 import { useEffect, useState, useCallback } from "react"
-import { useStore } from "@/store/useStore"
+import { useRouter } from "next/navigation"
 import { formatRWF, formatRWFCompact } from "@/lib/format"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -79,7 +79,8 @@ interface MobileDashboard {
 
 export function AdminMobilePanel() {
   const t = useT()
-  const { goHome } = useStore()
+  // Store go* only sets an unread `view` field — dead. Navigate for real.
+  const router = useRouter()
   const { toast } = useToast()
   const [data, setData] = useState<MobileDashboard | null>(null)
   const [loading, setLoading] = useState(true)
@@ -226,7 +227,7 @@ export function AdminMobilePanel() {
       <div className="sticky top-0 z-10 border-b bg-card/95 backdrop-blur">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <IconButton label={t('accessibility.go_back')} icon={<ArrowLeft className="h-4 w-4" />} onClick={goHome} variant="ghost" className="rounded-lg" />
+            <IconButton label={t('accessibility.go_back')} icon={<ArrowLeft className="h-4 w-4" />} onClick={() => router.push('/')} variant="ghost" className="rounded-lg" />
             <div>
               <h1 className="text-base font-bold">Admin Panel</h1>
               <p className="text-[10px] text-muted-foreground">Mobile mini-panel · auto-refresh 10s</p>

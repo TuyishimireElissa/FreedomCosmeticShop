@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ArrowLeft, BarChart3, FileText, MessageCircle, Package, Phone, RefreshCw, ShoppingBag, Truck } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useStore } from '@/store/useStore'
 import { formatRWF } from '@/lib/format'
 import { WHOLESALE_CONFIG } from '@/lib/wholesale-config'
@@ -30,7 +31,9 @@ interface ReorderItem { productId: string; slug: string; name: string; price: nu
 export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () => void; onCatalog: () => void }) {
   const t = useT()
   const { toast } = useToast()
-  const { goHome } = useStore()
+  // Store go* actions only set an unread `view` field (dead since the move
+  // to Next file routing), so these navigate for real.
+  const router = useRouter()
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [reorderingOrderId, setReorderingOrderId] = useState<string | null>(null)
@@ -67,7 +70,7 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
       for (const item of result.items as ReorderItem[]) useStore.getState().addToCart({ productId: item.productId, slug: item.slug, name: item.name, price: item.price, image: item.image, stock: item.stock }, item.quantity)
       sessionStorage.setItem('wholesaleReorderId', result.reorder.id)
       toast({ title: t('wholesale.reorder_prepared'), description: result.unavailableCount > 0 ? t('wholesale.reorder_partial', { added: result.addedProductCount, unavailable: result.unavailableCount }) : t('wholesale.reorder_all_available', { count: result.addedProductCount }) })
-      if (modify) useStore.getState().goCart(); else openWholesaleCatalog()
+      if (modify) router.push('/cart'); else openWholesaleCatalog()
     } catch (error) { toast({ title: t('wholesale.reorder_failed'), description: error instanceof Error ? error.message : t('common.error'), variant: 'destructive' }) }
     finally { setReorderingOrderId(null) }
   }
@@ -84,7 +87,7 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-      <header className="flex items-start gap-3"><IconButton label={t('wholesale.back_store')} icon={<ArrowLeft className="h-4 w-4" />} onClick={goHome} variant="ghost" /><div><p className="text-sm font-semibold text-fcs-brand-text">{greeting}, {firstName}!</p><h1 className="text-2xl font-bold text-gray-950">{data.user.businessName}</h1><p className="text-sm text-gray-500">{data.relationship.tier ? `${data.relationship.tier} Partner` : t('wholesale.dashboard')}</p><p className="mt-1 text-sm font-medium text-gray-700">{data.relationship.accountDiscount > 0 ? `Account discount: ${data.relationship.accountDiscount}%` : 'Wholesale prices appear on products where your shop has configured pricing.'}</p></div></header>
+      <header className="flex items-start gap-3"><IconButton label={t('wholesale.back_store')} icon={<ArrowLeft className="h-4 w-4" />} onClick={() => router.push('/')} variant="ghost" /><div><p className="text-sm font-semibold text-fcs-brand-text">{greeting}, {firstName}!</p><h1 className="text-2xl font-bold text-gray-950">{data.user.businessName}</h1><p className="text-sm text-gray-500">{data.relationship.tier ? `${data.relationship.tier} Partner` : t('wholesale.dashboard')}</p><p className="mt-1 text-sm font-medium text-gray-700">{data.relationship.accountDiscount > 0 ? `Account discount: ${data.relationship.accountDiscount}%` : 'Wholesale prices appear on products where your shop has configured pricing.'}</p></div></header>
 
       <section className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat label="Orders" value={String(data.orderCount)} icon={<Package />} />
@@ -100,7 +103,7 @@ export function WholesaleDashboard({ onInvoices, onCatalog }: { onInvoices: () =
 
       <section className="mt-6 rounded-2xl border bg-white p-5"><h2 className="font-bold">Preferred delivery days</h2><p className="mt-1 text-sm text-gray-500">Choose up to two days. The shop will try to schedule deliveries on these days; this is not a guaranteed appointment.</p><div className="mt-3 flex flex-wrap gap-2">{['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'].map((day) => <button key={day} type="button" onClick={() => void toggleDeliveryDay(day)} className={`min-h-10 rounded-full border px-3 text-xs font-semibold ${data.relationship.preferredDeliveryDays.includes(day) ? 'border-fcs-brand bg-rose-50 text-fcs-brand-text' : 'text-gray-600'}`}>{day.charAt(0) + day.slice(1).toLowerCase()}</button>)}</div></section>
 
-      <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4"><Button variant="outline" className="h-auto py-4" onClick={openWholesaleCatalog}><ShoppingBag className="mr-2 h-5 w-5" />Your prices</Button>{data.lastOrder && <Button variant="outline" className="h-auto py-4" disabled={!!reorderingOrderId} onClick={() => reorder(data.lastOrder!.id)}><RefreshCw className="mr-2 h-5 w-5" />Reorder last</Button>}<Button variant="outline" className="h-auto py-4" onClick={onInvoices}><FileText className="mr-2 h-5 w-5" />Invoices</Button><Button variant="outline" className="h-auto py-4" onClick={() => useStore.getState().setView('trackOrder')}><Truck className="mr-2 h-5 w-5" />Track orders</Button></section>
+      <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4"><Button variant="outline" className="h-auto py-4" onClick={openWholesaleCatalog}><ShoppingBag className="mr-2 h-5 w-5" />Your prices</Button>{data.lastOrder && <Button variant="outline" className="h-auto py-4" disabled={!!reorderingOrderId} onClick={() => reorder(data.lastOrder!.id)}><RefreshCw className="mr-2 h-5 w-5" />Reorder last</Button>}<Button variant="outline" className="h-auto py-4" onClick={onInvoices}><FileText className="mr-2 h-5 w-5" />Invoices</Button><Button variant="outline" className="h-auto py-4" onClick={() => router.push('/track-order')}><Truck className="mr-2 h-5 w-5" />Track orders</Button></section>
 
       {data.lastOrder && <section className="mt-6 rounded-2xl border bg-white p-5"><h2 className="font-bold">Your last order ({data.lastOrder.orderNumber})</h2><ul className="mt-3 divide-y">{data.lastOrder.items.map((item, index) => <li key={`${item.name}-${index}`} className="flex justify-between py-2 text-sm"><span>{item.name} × {item.quantity}</span><span>{formatRWF(item.price * item.quantity)}</span></li>)}</ul><p className="mt-3 text-right font-bold">{formatRWF(data.lastOrder.total)}</p><div className="mt-4 flex gap-2"><Button disabled={!!reorderingOrderId} onClick={() => reorder(data.lastOrder!.id)}>Reorder same items</Button><Button variant="outline" disabled={!!reorderingOrderId} onClick={() => reorder(data.lastOrder!.id, true)}>Modify in cart</Button></div></section>}
 

@@ -90,7 +90,7 @@ export default function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const router = useRouter()
   const { activeTab, setActiveTab, mobileOpen, setMobileOpen } = useAdminShell()
-  const { user, logout, goHome } = useStore()
+  const { user, logout } = useStore()
 
   const selectTab = (tab: AdminTab) => {
     setActiveTab(tab)
@@ -99,7 +99,6 @@ export default function AdminSidebar() {
 
   const handleLogout = async () => {
     await logout()
-    goHome()
     router.push('/')
   }
 

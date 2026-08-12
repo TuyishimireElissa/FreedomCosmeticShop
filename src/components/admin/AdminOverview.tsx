@@ -17,6 +17,7 @@
  */
 
 import { useEffect, useState, useCallback } from "react"
+import { useRouter } from "next/navigation"
 import {
   ResponsiveContainer,
   LineChart,
@@ -34,7 +35,6 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { formatRWF, formatRWFCompact } from "@/lib/format"
-import { useStore } from "@/store/useStore"
 import { useLiveStats, type LiveEvent } from "@/hooks/use-live-stats"
 import {
   TrendingUp,
@@ -115,7 +115,10 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export function AdminOverview() {
-  const { goTrackOrder } = useStore()
+  // Every navigation here used to call a store go*/setView action. Those only
+  // set a `view` field that nothing in the app reads — dead since the move to
+  // Next file routing — so all seven buttons in this component did nothing.
+  const router = useRouter()
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
   const [chartRange, setChartRange] = useState<"today" | "week" | "month">("month")
@@ -332,10 +335,10 @@ export function AdminOverview() {
             <Zap className="h-4 w-4 text-primary" /> Quick Actions
           </h3>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => router.push('/admin/products')}>
               <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Product
             </Button>
-            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => router.push('/admin/orders')}>
               <Package className="mr-1.5 h-3.5 w-3.5" /> Pending Orders
               {(data.ordersByStatus.PENDING || 0) > 0 && (
                 <span className="ml-1 rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
@@ -343,16 +346,16 @@ export function AdminOverview() {
                 </span>
               )}
             </Button>
-            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => router.push('/admin/settings')}>
               <Bell className="mr-1.5 h-3.5 w-3.5" /> Send SMS
             </Button>
-            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => router.push('/admin/settings')}>
               <Gift className="mr-1.5 h-3.5 w-3.5" /> New Coupon
             </Button>
-            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => router.push('/admin/orders')}>
               <Truck className="mr-1.5 h-3.5 w-3.5" /> Assign Rider
             </Button>
-            <Button variant="outline" size="sm" className="justify-start" onClick={() => useStore.getState().setView("admin")}>
+            <Button variant="outline" size="sm" className="justify-start" onClick={() => router.push('/admin/analytics')}>
               <Download className="mr-1.5 h-3.5 w-3.5" /> Export
             </Button>
           </div>
@@ -606,7 +609,7 @@ export function AdminOverview() {
               {data.recentOrders.slice(0, 6).map((order) => (
                 <button
                   key={order.id}
-                  onClick={() => goTrackOrder(order.orderNumber)}
+                  onClick={() => router.push('/admin/orders')}
                   className="flex w-full items-center justify-between rounded-lg border p-2 text-left hover:bg-secondary/30"
                 >
                   <div className="min-w-0 flex-1">

@@ -9,7 +9,7 @@ import { isAdminRole } from '@/lib/admin-roles'
 
 export default function AdminAuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter()
-  const { user, authLoading, fetchUser, goHome } = useStore()
+  const { user, authLoading, fetchUser } = useStore()
 
   useEffect(() => {
     fetchUser()
@@ -19,8 +19,9 @@ export default function AdminAuthGuard({ children }: { children: React.ReactNode
     if (!authLoading && user?.mustChangePassword) router.replace('/change-password')
   }, [authLoading, router, user?.mustChangePassword])
 
+  // goHome() used to be called here too. It only set an unread `view` field,
+  // so the router.push below was already doing all the work.
   const returnToStore = () => {
-    goHome()
     router.push('/')
   }
 
