@@ -11,6 +11,7 @@
  * price changes, deletions) and updates the cart accordingly.
  */
 
+import { useRouter } from "next/navigation"
 import { useStore } from "@/store/useStore"
 import { formatRWF } from "@/lib/format"
 import { optimizedImageUrl } from "@/lib/cloudinary-images"
@@ -22,7 +23,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet"
-import { Check, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react"
+import { Check, Minus, Plus, Trash2, ShoppingBag, MessageCircle } from "lucide-react"
 import { useCartUpdates } from "@/hooks/use-realtime"
 import { useToast } from "@/hooks/use-toast"
 import { useT } from '@/lib/i18n/LanguageContext'
@@ -31,6 +32,7 @@ import WholesaleCartOrderButton from '@/components/cart/WholesaleCartOrderButton
 
 export function CartDrawer() {
   const t = useT()
+  const router = useRouter()
   const { toast } = useToast()
   const {
     isCartOpen,
@@ -39,8 +41,6 @@ export function CartDrawer() {
     updateQuantity,
     removeFromCart,
     cartSubtotal,
-    goCart,
-    goCheckout,
     user,
     clearCart,
     goProduct,
@@ -170,27 +170,83 @@ export function CartDrawer() {
               ))}
             </ul>
 
-            {/* Footer */}
+            {/* Footer.
+              * Both buttons here used to be dead. `goCart()` and `goCheckout()`
+              * only set a `view` field on the store — a leftover from the
+              * single-page architecture this app had before it moved to Next
+              * file routing. Nothing in src/app or src/components reads `view`,
+              * so tapping either one closed the drawer, scrolled to the top and
+              * did nothing else. They now navigate for real.
+              *
+              * The store actions are left in place rather than deleted: cart
+              * state is out of scope, and WholesaleDashboard still calls
+              * goCart(). Fixing the call sites is enough. */}
             <div className="bg-card border-t p-4">
               <div className="mb-3 flex items-baseline justify-between">
                 <span className="text-muted-foreground text-sm">{t('cart.subtotal')}</span>
                 <span className="text-lg font-bold">{formatRWF(subtotal)}</span>
               </div>
               {isWholesale ? <p className="mb-3 flex items-center gap-1.5 text-xs font-bold text-emerald-700"><Check className="h-4 w-4" />Wholesale prices applied</p> : <p className="text-muted-foreground mb-3 text-xs">{t('cart.delivery_fee_checkout')}</p>}
-              <div className={isWholesale ? 'space-y-2' : 'grid grid-cols-2 gap-2'}>
-                <Button variant="outline" className="w-full" onClick={() => { setCartOpen(false); goCart() }}>
-                  {t('cart.view_cart')}
-                </Button>
-                {isWholesale ? <WholesaleCartOrderButton
-                  items={items}
-                  managerWhatsApp={user?.assignedManagerWhatsApp}
-                  onClearCart={clearCart}
-                  onNavigate={() => setCartOpen(false)}
-                /> : <Button onClick={() => { setCartOpen(false); goCheckout() }}>
-                  {t('checkout.title')}
-                  <ArrowRight className="ml-1.5 h-4 w-4" />
-                </Button>}
-              </div>
+
+              {isWholesale ? (
+                <div className="space-y-2">
+                  <Button variant="outline" className="w-full" onClick={() => { setCartOpen(false); router.push('/cart') }}>
+                    {t('cart.view_cart')}
+                  </Button>
+                  <WholesaleCartOrderButton
+                    items={items}
+                    managerWhatsApp={user?.assignedManagerWhatsApp}
+                    onClearCart={clearCart}
+                    onNavigate={() => setCartOpen(false)}
+                  />
+                </div>
+              ) : (
+                <>
+                  {/* Stacked at 360px, side by side from sm: up. The primary
+                    * action sits second in the DOM so it reads last on a phone,
+                    * closest to the thumb. */}
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button
+                      variant="outline"
+                      className="w-full border-fcs-border-subtle text-fcs-brand-text sm:flex-1"
+                      onClick={() => setCartOpen(false)}
+                    >
+                      {t('cart.continue_shopping')}
+                    </Button>
+
+                    {/* Goes to /checkout, not straight to wa.me.
+                      * /api/orders/whatsapp needs a name, phone and district to
+                      * save the order, and the drawer collects none of them.
+                      * Opening wa.me from here would recreate the bug where an
+                      * order existed only in the customer's WhatsApp app: no FC
+                      * reference, nothing in /admin/whatsapp-orders, gone if the
+                      * tab closed. Checkout collects those fields and then calls
+                      * the saving endpoint. Same destination, one saved path.
+                      *
+                      * #1E874A (--fcs-whatsapp-pill) is 4.55:1 with white text.
+                      * The brief asked for #1F8A4C, which measures 4.38:1 and
+                      * fails AA — computed, not assumed. */}
+                    <Button
+                      className="w-full bg-fcs-whatsapp-pill text-white hover:bg-fcs-whatsapp-hover sm:flex-1"
+                      onClick={() => { setCartOpen(false); router.push('/checkout') }}
+                    >
+                      <MessageCircle className="mr-1.5 h-4 w-4" aria-hidden="true" />
+                      {t('cart.order_via_whatsapp')}
+                    </Button>
+                  </div>
+
+                  {/* Kept as a quieter third route: the drawer is a summary, and
+                    * the full bag is where quantities, coupons and saved items
+                    * live. It was equally dead before. */}
+                  <button
+                    type="button"
+                    onClick={() => { setCartOpen(false); router.push('/cart') }}
+                    className="mt-3 min-h-11 w-full text-sm font-semibold text-fcs-brand-text underline underline-offset-4"
+                  >
+                    {t('cart.view_cart')}
+                  </button>
+                </>
+              )}
             </div>
           </>
         )}

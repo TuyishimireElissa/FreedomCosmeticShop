@@ -453,7 +453,7 @@ export const rw = {
     drawer_summary: 'Ibicuruzwa {count} · {subtotal}', // verified-rw
     realtime_removed: '“{product}” yakuwe mu gitebo cyawe kuko itakiboneka.', // verified-rw
     price_now: 'Igiciro cya “{product}” ubu ni {price}', // verified-rw
-    delivery_fee_checkout: 'Ikiguzi cyo kukugezaho kibarwa mu gihe cyo kwishyura.', // verified-rw
+    delivery_fee_checkout: 'Ikiguzi cyo kukugezaho kibarwa mu gihe cyo kwishyura.', order_via_whatsapp: 'Tumiza kuri WhatsApp' /* verified-rw */, // verified-rw
     view_cart: 'Reba igitebo', // verified-rw
     removed_from_cart: 'Cyakuwe mu gitebo', // verified-rw
     undo: 'Subizamo', // verified-rw
