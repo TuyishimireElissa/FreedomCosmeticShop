@@ -5,6 +5,7 @@ import { HairType, type Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { PUBLIC_PRODUCT_CARD_SELECT, getRealUnitSales, serializePublicProductCard } from '@/lib/public-product'
 import { expandSearchQuery, parsePriceFromQuery, removePriceExpression } from '@/lib/search-vocabulary'
+import { findMatchingProductIds, type SearchMatch } from '@/lib/search-match'
 import { recordSearch } from '@/server/services/search-analytics'
 
 const SKIN_TYPES = new Set(['ALL', 'OILY', 'DRY', 'COMBINATION', 'SENSITIVE', 'NORMAL'])
@@ -63,7 +64,29 @@ export async function GET(request: NextRequest) {
       and.push({ price: { ...(effectiveMinPrice !== undefined ? { gte: effectiveMinPrice } : {}), ...(effectiveMaxPrice !== undefined ? { lte: effectiveMaxPrice } : {}) } })
     }
 
+    // Search matching is resolved in ONE trigram-indexed statement rather than
+    // as hundreds of Prisma ILIKE ORs. See src/lib/search-match.ts: the old
+    // path measured 17.1s from Vercel for q=uruhu (640 OR clauses), the new
+    // one ~3ms. Every other filter below is untouched and still applied by
+    // Prisma, so only search speed changes.
+    let searchMatch: SearchMatch | null = null
     if (expandedTerms.length > 0) {
+      try {
+        searchMatch = await findMatchingProductIds(expandedTerms, searchableText || search)
+      } catch (error) {
+        // pg_trgm missing, or the raw query failed. Fall through to the
+        // original clause builder so search degrades in speed, never in
+        // correctness.
+        console.error('Trigram search failed, falling back to ILIKE:', error)
+        searchMatch = null
+      }
+    }
+
+    if (searchMatch) {
+      // No matches at all: short-circuit to an impossible id so the rest of
+      // the pipeline (count, pagination, analytics) runs unchanged.
+      and.push({ id: { in: searchMatch.ids.length > 0 ? searchMatch.ids : ['__no_match__'] } })
+    } else if (expandedTerms.length > 0) {
       and.push({
         OR: expandedTerms.flatMap((term) => [
           { name: { contains: term, mode: 'insensitive' as const } },
@@ -108,7 +131,20 @@ export async function GET(request: NextRequest) {
             : sort === 'relevance' && search
               ? [{ featured: 'desc' }, { createdAt: 'desc' }]
               : [{ createdAt: 'desc' }]
-      rows = await prisma.product.findMany({ where, select: PUBLIC_PRODUCT_CARD_SELECT, orderBy, skip: (page - 1) * pageSize, take: pageSize })
+
+      if (searchMatch && (sort === 'relevance' || !sort) && search) {
+        // Preserve the trigram ranking. `IN (...)` returns rows in whatever
+        // order Postgres finds them, so paginate over the ranked id list and
+        // re-sort the fetched page back into that order — otherwise the best
+        // match could land on page 3.
+        const pageIds = searchMatch.ids.slice((page - 1) * pageSize, page * pageSize)
+        const unordered = pageIds.length > 0
+          ? await prisma.product.findMany({ where: { AND: [...and, { id: { in: pageIds } }] }, select: PUBLIC_PRODUCT_CARD_SELECT })
+          : []
+        rows = unordered.sort((left, right) => (searchMatch!.rank.get(left.id) ?? 0) - (searchMatch!.rank.get(right.id) ?? 0))
+      } else {
+        rows = await prisma.product.findMany({ where, select: PUBLIC_PRODUCT_CARD_SELECT, orderBy, skip: (page - 1) * pageSize, take: pageSize })
+      }
     }
 
     const sales = await getRealUnitSales(rows.map((product) => product.id))

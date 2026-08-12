@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { expandSearchQuery, parsePriceFromQuery, removePriceExpression } from '@/lib/search-vocabulary'
+import { findMatchingProductIds } from '@/lib/search-match'
 import { getCloudinaryUrl } from '@/lib/cloudinary-images'
 
 function legacyPrimaryImage(value: string) {
@@ -20,7 +21,10 @@ export async function GET(request: NextRequest) {
     if (query.length < 2) return NextResponse.json({ success: true, data: { suggestions: [] }, suggestions: [], products: [], categories: [], brands: [] })
 
     const price = parsePriceFromQuery(query)
-    const terms = expandSearchQuery(removePriceExpression(query, price)).slice(0, 12)
+    // Autocomplete fires on every debounced keystroke, so it gets the
+    // tightest budget in the app. The old 12-terms x 9-fields ILIKE list
+    // measured 2.2s live; the trigram statement below replaces it.
+    const terms = expandSearchQuery(removePriceExpression(query, price))
     if (terms.length === 0) return NextResponse.json({ success: true, data: { suggestions: [] }, suggestions: [], products: [], categories: [], brands: [] })
     const productMatches = terms.flatMap((term) => [
       { name: { contains: term, mode: 'insensitive' as const } },
@@ -34,9 +38,25 @@ export async function GET(request: NextRequest) {
       { category: { name: { contains: term, mode: 'insensitive' as const } } },
     ])
 
+    // Resolve product matches with the trigram statement when possible; fall
+    // back to the ILIKE OR list if pg_trgm is unavailable. Same reasoning as
+    // /api/products — see src/lib/search-match.ts.
+    let matchedIds: string[] | null = null
+    try {
+      const match = await findMatchingProductIds(terms, query)
+      matchedIds = match ? match.ids : null
+    } catch (error) {
+      console.error('Trigram suggestions failed, falling back to ILIKE:', error)
+      matchedIds = null
+    }
+
+    const productWhere = matchedIds
+      ? { isActive: true, isDeleted: false, stock: { gt: 0 }, id: { in: matchedIds.length > 0 ? matchedIds : ['__no_match__'] } }
+      : { isActive: true, isDeleted: false, stock: { gt: 0 }, OR: productMatches }
+
     const [products, categories, brands] = await Promise.all([
       prisma.product.findMany({
-        where: { isActive: true, isDeleted: false, stock: { gt: 0 }, OR: productMatches },
+        where: productWhere,
         take: 6,
         orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
         select: {
