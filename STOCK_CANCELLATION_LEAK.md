@@ -1,6 +1,35 @@
 # Stock is never restored when an order is cancelled
 
-Filed as deferred work by owner decision. **Not fixed in this session.**
+**STATUS: FIXED for CANCELLED. RETURNED still leaks, deliberately.**
+
+Shipped after the owner delegated the decision. The two blockers that caused
+the earlier deferrals are both resolved:
+
+* **Asymmetry.** All four decrement paths now stamp `stockTakenAt`, so no path
+  behaves differently from another — the objection was to *inconsistency*, not
+  to fixing the leak.
+* **The RETURNED question.** Sidestepped rather than guessed. Release is scoped
+  to `CANCELLED` only. `RETURNED` is untouched, which is not a regression: it
+  leaks exactly as much as before, and auto-restoring possibly damaged or
+  opened goods would be worse than the leak. Still an owner decision.
+
+**The trap that shaped the design:** "did this order take stock?" cannot be
+inferred from status. `payment-events.ts` writes `CONFIRMED` with a *"requires
+stock review"* note when a paid order's units were unavailable — no decrement
+happened. Restoring from status alone would **invent** units. Verified on
+production: of 11 live orders, two are CONFIRMED yet never took stock.
+
+Hence two explicit markers, both nullable so historical rows read as "unknown"
+and never auto-release: `stockTakenAt` (every decrement site) and
+`stockReleasedAt` (once, on release). Release requires the first set and the
+second null, so a double-cancel or replayed webhook is a no-op.
+
+Verified end-to-end against the live database: 36/38/91 → 37/39/92 on the
+first release, unchanged on the second, then every value restored.
+
+---
+
+## Original filing (kept for the record)
 
 ---
 

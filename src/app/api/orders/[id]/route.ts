@@ -239,7 +239,10 @@ export async function PATCH(
 
           // Status moves inside the same transaction, so stock and status can
           // never disagree — both commit or neither does.
-          await tx.order.update({ where: { id: existing.id }, data: { status: 'CONFIRMED' } })
+          // stockTakenAt records that these units are now off the shelf, so a
+          // later cancellation knows there is something to put back. Set in
+          // the same transaction as the decrement: they cannot disagree.
+          await tx.order.update({ where: { id: existing.id }, data: { status: 'CONFIRMED', stockTakenAt: new Date() } })
 
           const depleted = products.filter((product) => {
             const needed = required.get(product.id)
@@ -277,6 +280,59 @@ export async function PATCH(
     }
     if (parsed.data.status) {
       if (parsed.data.status === 'CANCELLED') {
+        // ─── Return the units to the shelf ────────────────────────────────
+        //
+        // Every decrement path stamps stockTakenAt. Releasing requires it set
+        // and stockReleasedAt null, so a double-cancel, a retry, or a replayed
+        // webhook is a no-op — the mirror of the double-decrement guard above.
+        //
+        // Scoped to CANCELLED only. RETURNED is deliberately excluded: returned
+        // goods may be damaged, opened or expired, and whether they can be
+        // resold is a business decision the owner has not made. Auto-restoring
+        // them would silently put unsellable units back into the catalogue.
+        // Leaving RETURNED alone preserves today's behaviour exactly.
+        try {
+          await db.$transaction(async (tx) => {
+            // Re-read inside the transaction: two admins cancelling the same
+            // order at once must not both see stockReleasedAt as null.
+            const fresh = await tx.order.findUnique({
+              where: { id: existing.id },
+              select: { stockTakenAt: true, stockReleasedAt: true },
+            })
+            if (!fresh?.stockTakenAt || fresh.stockReleasedAt) return
+
+            const lines = await tx.orderItem.findMany({
+              where: { orderId: existing.id, productId: { not: null } },
+              select: { productId: true, quantity: true },
+            })
+
+            // Merge duplicate lines, mirroring the decrement exactly.
+            const giveBack = new Map<string, number>()
+            for (const line of lines) {
+              giveBack.set(line.productId!, (giveBack.get(line.productId!) || 0) + line.quantity)
+            }
+            if (giveBack.size === 0) return
+
+            // Same sorted lock order as the decrement, so a concurrent confirm
+            // and cancel cannot deadlock.
+            for (const productId of [...giveBack.keys()].sort()) {
+              await tx.$queryRaw`SELECT id FROM "Product" WHERE id = ${productId} FOR UPDATE`
+            }
+            for (const [productId, quantity] of giveBack) {
+              await tx.product.update({ where: { id: productId }, data: { stock: { increment: quantity } } })
+            }
+
+            // Stamped last and inside the same transaction: if any increment
+            // fails, the whole release rolls back and can be retried.
+            await tx.order.update({ where: { id: existing.id }, data: { stockReleasedAt: new Date() } })
+          })
+        } catch (releaseError) {
+          // A failed release must not block the cancellation itself — the
+          // customer's order still needs to be cancelled. Surfaced loudly so
+          // the discrepancy can be corrected by hand.
+          console.error(`Stock release failed for order ${existing.orderNumber}:`, releaseError)
+        }
+
         await Promise.all([
           db.payment.updateMany({
             where: { orderId: existing.id, status: 'PENDING' },

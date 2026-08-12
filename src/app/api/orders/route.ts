@@ -315,6 +315,11 @@ export async function POST(req: Request) {
           data: { stock: { decrement: item.quantity } },
         })
       }
+      // Mark the units as taken so a cancellation can return them. Same
+      // transaction as the decrement above.
+      if (orderItems.length > 0) {
+        await tx.order.update({ where: { id: created.id }, data: { stockTakenAt: new Date() } })
+      }
 
       return created
     })

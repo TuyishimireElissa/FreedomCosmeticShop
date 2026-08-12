@@ -112,6 +112,11 @@ export async function POST(request: Request) {
           if (updated.count !== 1) throw new Error(`Insufficient stock for ${needed.product.name}`)
         }
         for (const line of bundleLines) await tx.bundle.update({ where: { id: line.bundleId }, data: { totalSales: { increment: line.quantity } } })
+        // COD takes stock at creation, so record it here. Online orders do NOT
+        // decrement yet — payment-events.ts stamps them at the PAID webhook.
+        if (stockNeeded.size > 0) {
+          await tx.order.update({ where: { id: created.id }, data: { stockTakenAt: new Date() } })
+        }
       }
       // COD is confirmed immediately. Online-payment coupons are consumed only
       // after the provider confirms payment in handlePaymentSuccess().

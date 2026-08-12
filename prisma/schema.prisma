@@ -656,6 +656,20 @@ model Order {
   // Status: PENDING | PENDING_WHATSAPP | CONFIRMED | PROCESSING | SHIPPED | DELIVERED | CANCELLED | RETURNED
   status String @default("PENDING")
 
+  // Inventory ledger for this order.
+  //
+  // "Did this order take stock?" cannot be inferred from status: a paid online
+  // order can reach CONFIRMED *without* decrementing when the units were not
+  // available (payment-events.ts writes a "requires stock review" note in that
+  // case). Restoring on status alone would invent units that were never taken.
+  //
+  // stockTakenAt is stamped by every decrement path; stockReleasedAt exactly
+  // once when a cancellation puts the units back. Release requires the first
+  // set and the second null, so a double-cancel or a replayed webhook is a
+  // no-op. Null on historical rows, which therefore never auto-release.
+  stockTakenAt    DateTime?
+  stockReleasedAt DateTime?
+
   // ─── WhatsApp-first ordering (additive, all nullable) ─────────────
   // status is a String, not an enum, so PENDING_WHATSAPP needs no migration.
   whatsappSentAt      DateTime?
@@ -690,6 +704,8 @@ model Order {
   @@index([createdAt])
   @@index([couponId])
   @@index([orderType])
+  @@index([stockTakenAt])
+  @@index([stockReleasedAt])
   @@index([whatsappSentAt])
 }
 

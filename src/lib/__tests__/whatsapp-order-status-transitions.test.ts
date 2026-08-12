@@ -113,7 +113,9 @@ describe('PENDING_WHATSAPP is not a dead end', () => {
     const res = await patch('CONFIRMED')
     expect(res.status).toBe(200)
     // Proves the DB write happened, not merely that the guard let it through.
-    expect(state.updates).toContainEqual({ status: 'CONFIRMED' })
+    // objectContaining: the confirm now also stamps stockTakenAt, which this
+    // test does not care about but must not break on.
+    expect(state.updates).toContainEqual(expect.objectContaining({ status: 'CONFIRMED' }))
   })
 
   it('accepts PENDING_WHATSAPP → CANCELLED so a no-show can be closed', async () => {

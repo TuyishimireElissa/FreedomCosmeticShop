@@ -146,7 +146,11 @@ export async function handlePaymentSuccess(payload: PaymentSuccessPayload): Prom
       if (updated.count !== 1) throw new Error(`Concurrent stock change while confirming order ${order.orderNumber}`)
     }
     for (const [bundleId, quantity] of bundleSales) await tx.bundle.update({ where: { id: bundleId }, data: { totalSales: { increment: quantity } } })
-    await tx.order.update({ where: { id: orderId }, data: { status: 'CONFIRMED' } })
+    // Reached only when every line was actually decremented above — the
+    // insufficient-stock branch returns earlier with a review note and NO
+    // decrement, so it must not be stamped. That distinction is exactly why
+    // "did this order take stock?" cannot be inferred from status alone.
+    await tx.order.update({ where: { id: orderId }, data: { status: 'CONFIRMED', stockTakenAt: new Date() } })
     await tx.delivery.updateMany({ where: { orderId }, data: { status: 'ASSIGNED', assignedAt: new Date() } })
     return { processed: true, stockIssue: false, duplicatePayment: false }
   })

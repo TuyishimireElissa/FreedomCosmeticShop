@@ -144,7 +144,14 @@ describe('successful decrement', () => {
 
   it('moves the order to CONFIRMED in the same transaction', async () => {
     await patch('CONFIRMED')
-    expect(state.orderUpdates).toContainEqual({ status: 'CONFIRMED' })
+    // objectContaining, not an exact shape: the same update now also stamps
+    // stockTakenAt so a later cancellation knows these units can be returned
+    // (see stock-release-on-cancel.test.ts). The status is what this test is
+    // about, and it is still asserted.
+    expect(state.orderUpdates).toContainEqual(expect.objectContaining({ status: 'CONFIRMED' }))
+    // The stamp must ride in the SAME update, inside the same transaction as
+    // the decrement — stock and its marker can never disagree.
+    expect(state.orderUpdates.some((update) => update.status === 'CONFIRMED' && update.stockTakenAt instanceof Date)).toBe(true)
     expect(state.order?.status).toBe('CONFIRMED')
   })
 
