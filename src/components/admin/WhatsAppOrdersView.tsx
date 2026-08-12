@@ -299,6 +299,7 @@ function OrderDetail({
 }) {
   const [busy, setBusy] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [shortfall, setShortfall] = useState<Array<{ productId: string; name: string; needed: number; available: number }> | null>(null)
   const [copied, setCopied] = useState(false)
   const [timeline, setTimeline] = useState<TimelineEntry[] | null>(null)
   const [hasAudit, setHasAudit] = useState(true)
@@ -354,7 +355,21 @@ function OrderDetail({
         method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: next }),
       })
       const body = await res.json()
-      if (!res.ok) { setActionError(body.error || t('whatsapp.action_failed')); return }
+      if (!res.ok) {
+        // A confirm can now fail on stock. WhatsApp orders are no longer
+        // blocked at creation — the owner accepts the order first and settles
+        // availability afterwards — so the shortfall surfaces here instead.
+        // The API names every short line; showing only "action failed" would
+        // leave the owner guessing which of 44 items is the problem.
+        if (body.code === 'INSUFFICIENT_STOCK' && Array.isArray(body.items) && body.items.length > 0) {
+          setShortfall(body.items)
+          setActionError(null)
+          return
+        }
+        setActionError(body.error || t('whatsapp.action_failed'))
+        return
+      }
+      setShortfall(null)
       setCurrent((prev) => ({ ...prev, status: next }))
       onChanged()
     } catch { setActionError(t('whatsapp.action_failed')) } finally { setBusy(false) }
@@ -412,6 +427,26 @@ function OrderDetail({
             <X className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
+
+        {shortfall && (
+          <div role="alert" className="mb-3 rounded-fcs-md border border-fcs-border-subtle bg-fcs-surface-muted p-3">
+            <p className="flex items-start gap-2 text-sm font-semibold text-fcs-text">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-fcs-urgent" aria-hidden="true" />
+              {t('whatsapp.stock_short_title')}
+            </p>
+            <ul className="mt-2 space-y-1">
+              {shortfall.map((line) => (
+                <li key={line.productId} className="flex justify-between gap-3 text-xs text-fcs-text-muted">
+                  <span className="min-w-0 truncate">{line.name}</span>
+                  <span className="shrink-0 font-semibold text-fcs-text">
+                    {t('whatsapp.stock_short_line', { needed: line.needed, available: line.available })}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs leading-5 text-fcs-text-muted">{t('whatsapp.stock_short_hint')}</p>
+          </div>
+        )}
 
         {actionError && (
           <p role="alert" aria-live="assertive" className="mb-4 flex items-start gap-2 rounded-fcs-md bg-red-50 p-3 text-sm font-semibold text-red-800">

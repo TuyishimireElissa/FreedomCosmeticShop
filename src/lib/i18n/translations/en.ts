@@ -1046,6 +1046,9 @@ export const en = {
     cart: 'Your bag is empty', cart_hint: 'Browse our products and add items to cart', wishlist: 'Your wishlist is empty', wishlist_hint: 'Save products you love for later', orders: 'No orders yet', orders_hint: 'Your orders will appear here', products: 'No products found', products_hint: 'Try different search terms or filters', reviews: 'No reviews yet', reviews_hint: 'Be the first to review this product', notifications: 'No notifications', search: 'No results for "{query}"', search_hint: 'Try skin cream, lotion, hair oil, or browse categories',
   },
   whatsapp: {
+    stock_short_title: 'Cannot confirm: not enough stock',
+    stock_short_line: 'Needs {needed} · Have {available}',
+    stock_short_hint: 'Restock, or message the customer on WhatsApp to adjust the quantity before confirming.',
     general_help: 'Hello FreedomCosmeticShop! I need help.', order_help: 'Hello! I need help with my order #{order}.', product_inquiry: 'Hello! I am interested in this product: {product}. Is it available?', return_request: 'Hello! I would like to return an item from order #{order}.', wholesale_inquiry: 'Hello! I am interested in wholesale pricing.', share_product: 'Check out this product on FreedomCosmeticShop:\n{product}\nPrice: {price} RWF\n{url}', share_cart: 'I found great products on FreedomCosmeticShop!\n{items}\nTotal: {total} RWF\n{url}',
     message_greeting: 'Hello FreedomCosmeticShop! ',
     product_order_intro: 'I would like to order this product:',

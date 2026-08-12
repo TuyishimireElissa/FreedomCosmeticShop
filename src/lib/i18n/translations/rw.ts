@@ -1114,6 +1114,9 @@ export const rw = {
     cart: 'Igitebo cyawe kirimo ubusa', cart_hint: 'Reba ibicuruzwa ubishyire mu gitebo', wishlist: 'Nta bicuruzwa biri mu byo wifuza', wishlist_hint: 'Bika ibicuruzwa ukunda uzabirebe nyuma', orders: 'Nta byo uratumiza', orders_hint: 'Ibyo utumije bizagaragara hano', products: 'Nta bicuruzwa byabonetse', products_hint: 'Gerageza andi magambo cyangwa inshungura', reviews: 'Nta bitekerezo biratangwa', reviews_hint: 'Ba uwa mbere gutanga igitekerezo kuri iki gicuruzwa', notifications: 'Nta makuru mashya', search: 'Nta bisubizo kuri "{query}"', search_hint: 'Gerageza amavuta yo kwisiga, amavuta y’umusatsi, isabune cyangwa urebe ibyiciro', //  REVIEW
   },
   whatsapp: {
+    stock_short_title: 'Ntibishoboka kwemeza: ibicuruzwa bimwe ntibihagije', // verified-rw
+    stock_short_line: 'Bisabwa {needed} · Bihari {available}', // verified-rw
+    stock_short_hint: 'Ongera ububiko, cyangwa uganire n\u2019umukiriya kuri WhatsApp muhindure umubare mbere yo kwemeza.', // verified-rw
     general_help: 'Muraho FreedomCosmeticShop! Nkeneye ubufasha.', order_help: 'Muraho! Nkeneye ubufasha kuri komande #{order}.', product_inquiry: 'Muraho! Nifuza kumenya ibijyanye n’iki gicuruzwa: {product}. Kirahari?', return_request: 'Muraho! Nifuza gusubiza igicuruzwa cyo kuri komande #{order}.', wholesale_inquiry: 'Muraho! Nifuza amakuru ajyanye n’ibiciro byo kurangura.', share_product: 'Reba iki gicuruzwa kuri FreedomCosmeticShop:\n{product}\nIgiciro: {price} RWF\n{url}', share_cart: 'Nabonye ibicuruzwa byiza kuri FreedomCosmeticShop!\n{items}\nIgiteranyo: {total} RWF\n{url}', //  REVIEW
     message_greeting: 'Muraho FreedomCosmeticShop! ', // verified-rw
     product_order_intro: 'Nifuza gutumiza iki gicuruzwa:', // verified-rw
