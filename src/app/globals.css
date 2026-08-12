@@ -504,6 +504,48 @@
   }
 }
 
+/* Delivery ticker marquee.
+ *
+ * The track holds the list twice and slides exactly -50%, so the second copy
+ * lands where the first began and the loop is seamless.
+ *
+ * transform only, and `min-width: max-content` so the row never wraps and
+ * force a reflow mid-animation.
+ *
+ * Under reduced motion the animation stops and the duplicate copy is hidden,
+ * leaving a static readable row rather than a frozen half-scrolled one.
+ */
+@keyframes fcs-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.fcs-marquee {
+  overflow: hidden;
+}
+
+.fcs-marquee-track {
+  min-width: max-content;
+  animation: fcs-marquee 24s linear infinite;
+  will-change: transform;
+}
+
+.fcs-marquee:hover .fcs-marquee-track,
+.fcs-marquee:focus-within .fcs-marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fcs-marquee-track {
+    animation: none;
+    transform: none;
+  }
+  /* Hide the seam copy so the row is not read or seen twice when static. */
+  .fcs-marquee-track > [aria-hidden='true'] {
+    display: none;
+  }
+}
+
 @keyframes cb-camera-1 {
   from { transform: scale(1) translate3d(0, 0, 0); }
   to   { transform: scale(1.08) translate3d(calc(-12px * var(--cb-drift)), calc(-8px * var(--cb-drift)), 0); }

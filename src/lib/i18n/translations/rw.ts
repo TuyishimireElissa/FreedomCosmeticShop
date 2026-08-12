@@ -199,6 +199,12 @@ export const rw = {
     hero_title: 'Ubwisanzure mu bwiza bw’u Rwanda ', // verified-rw
     hero_description: 'Ibicuruzwa by’umwimerere 100%. Ishyura na MTN MoMo. Tukabikugezaho vuba mu Rwanda hose.', // verified-rw
     hero_cta_primary: 'Haha nonaha', // verified-rw
+    ticker_delivered: 'Byagejejwe {district}', // verified-rw
+    ticker_label: 'Ibicuruzwa bigezweho vuba aha', // verified-rw
+    routines_eyebrow: 'Uko wabikoresha', // verified-rw
+    routines_title: 'Gahunda z\u2019umunsi', // verified-rw
+    routines_subtitle: 'Ibicuruzwa bihuza, byateguwe hamwe ku giciro gito.', // verified-rw
+    routines_cta: 'Reba gahunda zose', // verified-rw
     trust_advice_title: 'Inama mu Kinyarwanda', // verified-rw
     trust_advice_detail: 'Tuganira kuri WhatsApp, ntutubwire nka robo.', // verified-rw
     trust_pay_title: 'Wishyura igihe wakiriye', // verified-rw

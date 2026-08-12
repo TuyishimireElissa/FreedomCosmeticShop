@@ -51,6 +51,16 @@ const WhatsAppCTA = dynamic(
   () => import('@/components/home/WhatsAppCTA'),
   { loading: () => null },
 )
+// Both self-hide when their data is empty, so they cost nothing while the
+// owner has no delivered orders and no routine bundles configured.
+const DeliveryTicker = dynamic(
+  () => import('@/components/home/DeliveryTicker'),
+  { loading: () => null },
+)
+const RoutineBundles = dynamic(
+  () => import('@/components/home/RoutineBundles'),
+  { loading: () => null },
+)
 
 interface ApiResource<T> {
   data: T | null
@@ -122,6 +132,9 @@ function Homepage() {
 
       <HomeSearch />
 
+      {/* Real deliveries, if any exist. Hides itself otherwise. */}
+      <DeliveryTicker />
+
       {/* Three verifiable facts, immediately under the fold. */}
       <SocialProofBar />
 
@@ -136,6 +149,10 @@ function Homepage() {
       <CategoryGrid categories={categories.data?.categories || []} loading={categories.loading} error={categories.error} />
 
       <FeaturedBento limit={3} />
+
+      {/* Curated routines from the Bundle model. Hidden until the owner
+        * creates one in the admin bundle manager. */}
+      <RoutineBundles limit={3} />
 
       <LazySection label={t('personalized_recommendations.section_label')}>
         <PersonalizedRecommendations />
