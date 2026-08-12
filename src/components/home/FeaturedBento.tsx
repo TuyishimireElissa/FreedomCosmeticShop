@@ -66,7 +66,7 @@ export default function FeaturedBento({ limit = 3 }: { limit?: number }) {
   const bento = products.length >= 3
 
   return (
-    <section className="bg-fcs-bg px-4 py-10 md:py-16" aria-labelledby="featured-bento-title">
+    <section id="featured-products" className="scroll-mt-20 bg-fcs-bg px-4 py-10 md:py-16" aria-labelledby="featured-bento-title">
       <div className="mx-auto max-w-5xl">
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>

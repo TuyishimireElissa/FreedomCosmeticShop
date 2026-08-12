@@ -451,6 +451,59 @@
 /* ── 2A. Camera motion: five distinct moves, one per slide ─────────────────
    Linear is deliberate. Any eased curve makes a multi-second zoom visibly
    accelerate, which reads as a glitch rather than a camera. */
+/* Hero "living" zoom.
+ *
+ * No video: no asset exists, and a 500 KB autoplaying loop is a poor trade on
+ * a Rwandan mobile connection where the shared JS bundle is only 103 kB. A
+ * slow scale on the still image gives the same sense of life for 0 bytes.
+ *
+ * 12s rather than 8s, and 1.06 rather than 1.05 — over a shorter cycle the
+ * movement reads as a jitter on a 360px screen instead of a drift.
+ * transform only, so it composites on the GPU and never triggers layout.
+ */
+@keyframes fcs-hero-zoom {
+  from { transform: scale(1); }
+  to   { transform: scale(1.06); }
+}
+
+.fcs-hero-zoom {
+  animation: fcs-hero-zoom 12s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fcs-hero-zoom {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* Scroll reveal.
+ *
+ * Pure CSS + a tiny IntersectionObserver hook: the element starts shifted and
+ * transparent, and gets `.is-revealed` when it enters the viewport. No library,
+ * no layout thrash — opacity and transform only, both GPU-composited.
+ *
+ * The initial hidden state is scoped behind `@media (prefers-reduced-motion:
+ * no-preference)` so that a reduced-motion user, or anyone whose JS fails to
+ * run, sees fully visible content. Hiding by default and revealing with JS
+ * would leave the page blank if the observer never fired.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .fcs-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 400ms var(--fcs-transition-snap),
+      transform 400ms var(--fcs-transition-snap);
+  }
+
+  .fcs-reveal.is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes cb-camera-1 {
   from { transform: scale(1) translate3d(0, 0, 0); }
   to   { transform: scale(1.08) translate3d(calc(-12px * var(--cb-drift)), calc(-8px * var(--cb-drift)), 0); }

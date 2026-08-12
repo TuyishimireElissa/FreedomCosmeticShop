@@ -199,6 +199,14 @@ export const rw = {
     hero_title: 'Ubwisanzure mu bwiza bw’u Rwanda ', // verified-rw
     hero_description: 'Ibicuruzwa by’umwimerere 100%. Ishyura na MTN MoMo. Tukabikugezaho vuba mu Rwanda hose.', // verified-rw
     hero_cta_primary: 'Haha nonaha', // verified-rw
+    trust_advice_title: 'Inama mu Kinyarwanda', // verified-rw
+    trust_advice_detail: 'Tuganira kuri WhatsApp, ntutubwire nka robo.', // verified-rw
+    trust_pay_title: 'Wishyura igihe wakiriye', // verified-rw
+    trust_pay_detail: 'MoMo, Airtel, cyangwa amafaranga afatika igihe uhawe ibicuruzwa.', // verified-rw
+    trust_delivery_title: 'Tugeza mu Rwanda hose', // verified-rw
+    trust_delivery_detail: 'Mu turere twose 30, ku gihe.', // verified-rw
+    trust_authentic_title: 'Ibicuruzwa by\u2019umwimerere', // verified-rw
+    trust_authentic_copy: 'Ntitugurisha ibihimbano. Buri kintu kiva ku bacuruzi bemewe.', // verified-rw
     hero_cta_secondary: 'Gura kuri WhatsApp', // verified-rw
     hero_alt: 'Ibicuruzwa by’ubwiza bya FreedomCosmeticShop mu Rwanda', // verified-rw
     join_wholesale_program: 'Saba kubona ibiciro byo kurangura byashyizweho kuri buri gicuruzwa.', // verified-rw

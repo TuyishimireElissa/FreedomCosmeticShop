@@ -43,7 +43,7 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
 
   return (
     <section
-      className="relative h-[300px] overflow-hidden bg-[#1a1a1a] sm:h-[380px] md:h-[500px]"
+      className="relative h-[420px] overflow-hidden bg-[#1a1a1a] sm:h-[460px] md:h-[540px]"
       aria-label={t('home.hero_title')}
       aria-busy={loading}
     >
@@ -52,6 +52,9 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
           {t('low_data.hero_optimized')}
         </p>
       )}
+      {/* The zoom lives on a wrapper, not the <img>, so Next's fill layout and
+        * the object-cover crop are untouched by the transform. */}
+      <div className={`absolute inset-0 ${showImage && !isLowData ? 'fcs-hero-zoom' : ''}`}>
       {showImage ? (
         isLowData ? (
           <img
@@ -85,9 +88,16 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
           aria-hidden="true"
         />
       )}
+      </div>
 
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/55 to-black/20" aria-hidden="true" />
       <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/15" aria-hidden="true" />
+      {/* Melts the hero into the page below instead of ending on a hard line.
+        * Sits under the content layer (z-10) so it never dims the copy. */}
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-white"
+        aria-hidden="true"
+      />
 
       <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 md:px-12 lg:px-20">
         <div className="max-w-sm md:max-w-lg">
@@ -101,8 +111,20 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row">
+            {/* Scrolls to the curated shelf when it is on the page, otherwise
+              * navigates to the catalogue. FeaturedBento hides itself when the
+              * owner has curated nothing, so a plain href="#featured-products"
+              * would be a dead link on an empty catalogue. Checking at click
+              * time rather than render time avoids an SSR/DOM mismatch. */}
             <Link
               href="/products"
+              onClick={(event) => {
+                const target = document.getElementById('featured-products')
+                if (!target) return
+                event.preventDefault()
+                const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' })
+              }}
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-fcs-brand-strong px-7 text-sm font-semibold text-white transition-colors duration-150 ease-fcs-snap hover:bg-fcs-brand-strong-hover active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
             >
               {t('home.hero_cta_primary')}
