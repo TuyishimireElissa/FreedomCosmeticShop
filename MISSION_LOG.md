@@ -318,3 +318,60 @@ times across `/`, `/contact`, `/support/whatsapp`, `/wholesale` and `/cart`;
 a legitimate env override still wins, and the fake one is still rejected.
 
 Gates: tsc clean, lint clean, **701 tests passing** (was 694), build 65/65.
+
+---
+
+## Thumbnails were downloading full-size artwork
+
+Ten surfaces rendered the stored image URL straight into a tiny box with no
+Cloudinary transformation at all — `<img src={item.image} className="h-10 w-10" />`.
+The browser downloaded the whole asset and discarded ~99% of the pixels.
+
+This is a **different defect** from the product-card ratio fix (`ef009a4`).
+That one was about shape; this one is about weight. Fixing the cards never
+touched these ten, because they never called a helper.
+
+**Measured against live production data:**
+
+| | before | after | saved |
+| --- | ---: | ---: | ---: |
+| Product photo 1024² → 80px | 120,222 B | 1,893 B | **98.4%** |
+| Order snapshot `w_1200` → 56px | 286,104 B | 632 B | **99.8%** |
+| Blog cover `w_1200` → 768px | 24,150 B | 8,556 B | **64.6%** |
+
+The order case is the worst. `OrderItem.image` is a snapshot frozen at
+checkout, and **8 of the 16 stored snapshots are `/fetch/` URLs with a
+baked-in `w_1200`**. The live database holds orders of **44 and 43 items**, so
+those pages pulled 1200px artwork dozens of times to paint 56px squares.
+
+**Verified live after deploy:** a real order thumbnail now returns **284 bytes
+instead of 286,104** — 99.9% less. The blog post page serves
+`<img src=...w_768>` with a srcSet; the two remaining `w_1200` strings are the
+data payload and the OpenGraph tag, which *should* stay large for social
+previews.
+
+### Three mistakes of mine, caught and recorded
+
+1. **My audit missed a surface.** I mapped nine `<img>` tags. The regression
+   test I wrote to ban raw bindings failed immediately on a tenth — the admin
+   header logo. The guard found the gap in my own work within a minute.
+2. **I shipped a broken regex into the test.** `[\s\S]{0,400?}` is an invalid
+   quantifier that matched nothing, so one test would have passed vacuously.
+   It surfaced only because I had put a bounds check on the match count.
+3. **One assertion was vacuous; mutation testing proved it.** My clamp test
+   asserted only `w_1`, and removing the clamp still passed because
+   `buildCloudinaryUrl` clamps width independently. The real risk was the
+   *height*: unclamped, `size 0` gives `height 0`, which reads as "no height"
+   and silently falls back to the **cropping** `c_fill` branch.
+
+I also corrected a piece of my own advice in `THUMBNAIL_SIZING_FIX.md`: I first
+wrote that `OrderItem.image` storing `w_1200` was "worth fixing at the source."
+That is wrong. Storing the largest reference and transforming at read time is
+correct for a snapshot — baking in a small size would lock every future
+consumer to it. The write path is deliberately unchanged.
+
+**Mutation tested: 12 of 12 caught**, each confirmed to have actually modified
+the file first.
+
+Gates: tsc clean · lint 0 errors / 6 pre-existing warnings · **1,376 tests
+passing** (was 1,351) · build 66/66 · **shared JS 103 kB, unchanged**.

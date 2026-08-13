@@ -128,9 +128,14 @@ passing, up from 1,351** · build 66/66 · **shared JS 103 kB, unchanged**.
 
 - **No re-upload or re-processing.** All of this is delivery-time
   transformation. The stored originals are untouched.
-- **`OrderItem.image` still stores `w_1200` URLs at write time.** The read path
-  now rewrites them, so this is cosmetic rather than costly, but new snapshots
-  will keep being written oversized. Worth fixing at the source later.
+- **`OrderItem.image` still stores `w_1200` URLs at write time — and it should.**
+  I first wrote here that this was "worth fixing at the source later." That was
+  wrong advice and I am correcting it. The stored value is a *snapshot*, kept so
+  the order still shows the right picture after a product is deleted. Storing
+  the largest available reference and transforming at read time is the correct
+  design: it scales down for a 40px thumbnail and back up for an invoice.
+  Baking a small size into the database would lock every future consumer to
+  that one size permanently. The write path is left alone deliberately.
 - **`AdminProductManager` / `AdminProductImageManager` previews left alone.**
   Those render `blob:` object URLs for files not yet uploaded; a Cloudinary
   transform cannot apply and the helper correctly passes them through.
