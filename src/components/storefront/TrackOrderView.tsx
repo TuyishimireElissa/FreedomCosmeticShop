@@ -258,7 +258,7 @@ export function TrackOrderView() {
         <Button type="submit" size="lg" className="w-full" disabled={loading || !orderNumber.trim() || !phone.trim()}>
           {loading ? t('common.loading') : t('orders.track')}
         </Button>
-        <p className="text-xs text-muted-foreground">For privacy, enter the same phone number used at checkout.</p>
+        <p className="text-xs text-muted-foreground">{t('orders.track_privacy_hint')}</p>
       </form>
 
       {/* Loading */}

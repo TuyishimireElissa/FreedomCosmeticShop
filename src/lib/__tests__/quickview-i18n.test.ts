@@ -41,6 +41,7 @@ const code = (path: string) =>
     .replace(/^\s*\/\/.*$/gm, '')
 
 const quickView = code('src/components/products/QuickView.tsx')
+const trackOrder = code('src/components/storefront/TrackOrderView.tsx')
 const enSource = read('src/lib/i18n/translations/en.ts')
 const rwSource = read('src/lib/i18n/translations/rw.ts')
 
@@ -93,6 +94,21 @@ describe('QuickView renders no hardcoded English', () => {
   it('translates both zoom states', () => {
     expect(quickView).toContain("t('product.zoom_out')")
     expect(quickView).toContain("t('product.zoom_in')")
+  })
+})
+
+describe('order tracking speaks both languages', () => {
+  // Found by the same sweep that found QuickView: the privacy hint under the
+  // phone field was hardcoded English, on the one screen a worried customer
+  // uses to find their order.
+  it('translates the privacy hint', () => {
+    expect(trackOrder).toContain("t('orders.track_privacy_hint')")
+    expect(trackOrder).not.toContain('For privacy, enter the same phone number')
+  })
+
+  it('resolves that key in both languages', () => {
+    expect(hasKey(enSource, 'orders', 'track_privacy_hint')).toBe(true)
+    expect(hasKey(rwSource, 'orders', 'track_privacy_hint')).toBe(true)
   })
 })
 

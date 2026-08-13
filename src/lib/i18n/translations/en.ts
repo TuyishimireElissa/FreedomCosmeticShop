@@ -1021,6 +1021,7 @@ export const en = {
     admin_action_failed: 'The moderation action could not be completed.',
   },
   orders: {
+    track_privacy_hint: 'For privacy, enter the same phone number used at checkout.',
     title: 'My Orders', empty: 'You have no orders yet', empty_hint: 'Start shopping and your orders will appear here', order_number: 'Order #{number}', placed_on: 'Placed on {date}', total: 'Total: {amount} RWF', status_pending: 'Pending', status_confirmed: 'Confirmed', status_processing: 'Processing', status_shipped: 'Shipped', status_delivered: 'Delivered', status_cancelled: 'Cancelled', status_returned: 'Returned', status_refunded: 'Refunded', track: 'Track Order', view_details: 'View Details', reorder: 'Order Again', cancel_order: 'Cancel Order', tracking_title: 'Track Order #{number}', tracking_live: ' LIVE', step_placed: 'Order Placed', step_confirmed: 'Order Confirmed', step_processing: 'Being Prepared', step_shipped: 'Out for Delivery', step_delivered: 'Delivered', rider_info: 'Your Rider', rider_name: 'Name: {name}', rider_phone: 'Phone: {phone}', estimated: 'Estimated: {time}', call_rider: 'Call Rider', whatsapp_rider: 'WhatsApp Rider', delivery_address: 'Delivery Address', payment_info: 'Payment Information', leave_review: 'Leave a Review', review_prompt: 'How was your experience?',
 
     account_home: 'Account home',

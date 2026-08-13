@@ -1089,6 +1089,7 @@ export const rw = {
     admin_action_failed: 'Igikorwa cyo kugenzura nticyashoboye kurangira.', // verified-rw
   },
   orders: {
+    track_privacy_hint: 'Kubw’ibanga, andika nimero ya telefoni wakoresheje mu gutumiza.', // verified-rw
     title: 'Ibyo natumije', empty: 'Nta byo uratumiza', empty_hint: 'Tangira guhaha, ibyo utumije bizagaragara hano', order_number: 'Komande #{number}', placed_on: 'Byatumijwe ku wa {date}', total: 'Igiteranyo: {amount} RWF', status_pending: 'Bitegereje', status_confirmed: 'Byemejwe', status_processing: 'Birimo gutegurwa', status_shipped: 'Biri mu nzira', status_delivered: 'Byagejejwe', status_cancelled: 'Byahagaritswe', status_returned: 'Byasubijwe', status_refunded: 'Amafaranga yasubijwe', track: 'Kurikirana komande', view_details: 'Reba ibisobanuro', reorder: 'Ongera utumize', cancel_order: 'Hagarika komande', tracking_title: 'Kurikirana komande #{number}', tracking_live: ' AKO KANYA', step_placed: 'Komande yakiriwe', step_confirmed: 'Komande yemejwe', step_processing: 'Irimo gutegurwa', step_shipped: 'Iri mu nzira', step_delivered: 'Yagejejwe', rider_info: 'Umumotari wawe', rider_name: 'Amazina: {name}', rider_phone: 'Telefoni: {phone}', estimated: 'Biteganyijwe: {time}', call_rider: 'Hamagara umumotari', whatsapp_rider: 'Andikira umumotari kuri WhatsApp', delivery_address: 'Aho ibicuruzwa bigezwa', payment_info: 'Amakuru yo kwishyura', leave_review: 'Tanga igitekerezo', review_prompt: 'Serivisi yakunyuze ite?', //  REVIEW
 
     account_home: 'Ahabanza ha konti', // verified-rw
