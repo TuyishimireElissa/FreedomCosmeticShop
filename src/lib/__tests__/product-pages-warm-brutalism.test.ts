@@ -52,7 +52,8 @@ describe('filter chips stay visible while scrolling results', () => {
 
 describe('related products rail', () => {
   it('replaced the stacked grid on the detail page', () => {
-    expect(detail).toContain('<RoutineRail products={related || []} />')
+    expect(detail).toContain('<RoutineRail products={')
+    expect(detail).toContain('similar.length > 0 ? similar : (related || [])')
     expect(detail).not.toContain('<ProductGrid products={related')
   })
 

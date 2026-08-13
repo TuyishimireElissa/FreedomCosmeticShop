@@ -57,7 +57,8 @@ describe('complete accessible product Quick View', () => {
     // Related products moved from ProductGrid to RoutineRail (horizontal rail
     // on phones). Both render the shared ProductCard, which is the guarantee
     // this test exists to protect — assert that rather than the container.
-    expect(detail).toContain('<RoutineRail products={related || []}')
+    expect(detail).toContain('<RoutineRail products={')
+    expect(detail).toContain('similar.length > 0 ? similar : (related || [])')
     expect(read('src/components/products/RoutineRail.tsx')).toContain("from '@/components/storefront/ProductCard'")
   })
 })

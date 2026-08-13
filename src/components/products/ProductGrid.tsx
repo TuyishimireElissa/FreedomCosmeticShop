@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { ProductCard } from '@/components/storefront/ProductCard'
+import DidYouMean from '@/components/products/DidYouMean'
 
 interface ProductGridProps {
   products: Product[]
@@ -19,9 +20,12 @@ interface ProductGridProps {
   /** Offered in the empty state so a visitor is never stuck behind a filter. */
   onClearFilters?: () => void
   hasActiveFilters?: boolean
+  /** Current search term, so the empty state can offer a spelling correction. */
+  searchQuery?: string
+  onSearchCorrection?: (term: string) => void
 }
 
-export default function ProductGrid({ products, loading = false, error, onRetry, onClearFilters, hasActiveFilters = false }: ProductGridProps) {
+export default function ProductGrid({ products, loading = false, error, onRetry, onClearFilters, hasActiveFilters = false, searchQuery, onSearchCorrection }: ProductGridProps) {
   const { t } = useLanguage()
   const user = useStore((state) => state.user)
   const router = useRouter()
@@ -83,6 +87,9 @@ export default function ProductGrid({ products, loading = false, error, onRetry,
         <PackageOpen className="mx-auto h-10 w-10 text-gray-300" />
         <h2 className="mt-4 font-bold text-gray-700">{t('search.no_filter_results')}</h2>
         <p className="mt-1 text-sm text-gray-500">{t('search.broaden_search')}</p>
+        {/* Only when there is a search term AND the correction is verified to
+          * return products. See DidYouMean: it probes before it renders. */}
+        {searchQuery && onSearchCorrection && <DidYouMean query={searchQuery} onSelect={onSearchCorrection} />}
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           {hasActiveFilters && onClearFilters && (
             <button type="button" onClick={onClearFilters} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-fcs-brand-strong px-5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#9B5A64]">

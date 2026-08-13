@@ -75,6 +75,32 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
     return () => observer.disconnect()
   }, [])
 
+  // "More like this", scored rather than merely same-category.
+  //
+  // MUST sit above the early returns: I first placed it after
+  // `if (loading) return`, which is a Rules of Hooks violation — the hook
+  // count changes between the loading render and the loaded one. eslint
+  // caught it (react-hooks/rules-of-hooks) and it is a real bug, not noise.
+  // Keyed off `data?.product?.id` so it works before destructuring.
+  const seedId = data?.product?.id
+  const [similar, setSimilar] = useState<Product[]>([])
+  useEffect(() => {
+    setSimilar([])
+    if (!seedId) return
+    const controller = new AbortController()
+    fetch(`/api/products/similar?id=${encodeURIComponent(seedId)}&limit=6`, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (controller.signal.aborted) return
+        const rows = payload?.data?.products
+        if (Array.isArray(rows) && rows.length > 0) setSimilar(rows)
+      })
+      .catch(() => {
+        // Silent: the server-provided `related` list is already on screen.
+      })
+    return () => controller.abort()
+  }, [seedId])
+
   if (loading) return <DetailSkeleton />
   if (error || !data) return <div className="mx-auto grid min-h-[60vh] max-w-3xl place-items-center px-4 py-16 text-center"><div><div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-rose-50 text-fcs-brand-text"><ShoppingBag className="h-7 w-7" /></div><h1 className="mt-5 text-2xl font-bold text-[#1a1a1a]">{error || t('product.product_not_found')}</h1><p className="mt-2 text-sm text-gray-500">{t('product.unavailable_hint')}</p><div className="mt-6 flex justify-center gap-3"><button type="button" onClick={() => router.push('/products')} className="rounded-full bg-[#1a1a1a] px-5 py-2.5 text-sm font-bold text-white">{t('product.browse_products')}</button><button type="button" onClick={() => setRequest((value) => value + 1)} className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-5 py-2.5 text-sm font-bold"><RefreshCw className="h-4 w-4" />{t('common.retry')}</button></div></div></div>
 
@@ -123,7 +149,15 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 
         <div id="product-details"><ProductTabs product={product} /></div>
 
-        <RoutineRail products={related || []} />
+        {/* Similarity-scored, with the server's category list as the
+          * fallback. /api/products/similar ranks on category + shared skin
+          * type + price band and PENALISES the same brand, because four more
+          * bottles of what is already on screen is the least useful answer.
+          *
+          * Progressive enhancement on purpose: `related` from the page
+          * response renders immediately, and the scored list replaces it when
+          * it arrives. If the request fails the shopper still sees a rail. */}
+        <RoutineRail products={similar.length > 0 ? similar : (related || [])} />
       </div>
 
       {/* Mobile sticky buy bar. At 360px the real add-to-cart button sits

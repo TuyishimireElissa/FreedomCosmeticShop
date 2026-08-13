@@ -68,7 +68,12 @@ describe('premium shared product card redesign', () => {
     // Related products moved from ProductGrid to RoutineRail (horizontal rail
     // on phones). Both render the shared ProductCard, which is the guarantee
     // this test exists to protect — assert that rather than the container.
-    expect(detail).toContain('<RoutineRail products={related || []}')
+    // The rail now prefers the similarity-scored list and falls back to the
+    // server's `related`. Assert BOTH halves rather than the old literal, so
+    // dropping the fallback (which would blank the rail whenever
+    // /api/products/similar fails) still fails this test.
+    expect(detail).toContain('<RoutineRail products={')
+    expect(detail).toContain('similar.length > 0 ? similar : (related || [])')
     expect(read('src/components/products/RoutineRail.tsx')).toContain("from '@/components/storefront/ProductCard'")
     expect(featured).toContain('<ProductCard')
     expect(personalized).toContain('<ProductCard')
