@@ -399,6 +399,9 @@ export const rw = {
     delivery_exact_fee: 'Hitamo akarere kawe urebe ikiguzi cyo kukugezaho n’igihe giteganyijwe. Ikiguzi cya nyuma cyemezwa mu gihe cyo kwishyura.', // verified-rw
   },
   search: {
+    quick_view: 'Reba vuba', // verified-rw
+    stock_kigali: 'Biri i Kigali', // verified-rw
+    stock_low_left: 'Hasigaye {count} gusa', // verified-rw
     voice_start: 'Shakisha ukoresheje ijwi', // verified-rw
     voice_stop: 'Hagarika kumva', // verified-rw
     voice_listening: 'Ndumva…', // verified-rw

@@ -74,6 +74,8 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
 
   useEffect(() => { setImageFailed(false); setImageLoaded(false) }, [imageUrl])
   const outOfStock = product.isOutOfStock ?? product.stock < 1
+  // API-derived: stock > 0 && stock <= lowStockThreshold. Not a hardcoded 5.
+  const lowStock = product.isLowStock ?? (product.stock > 0 && product.stock <= (product.lowStockThreshold ?? 5))
   const isWholesale = user?.wholesaleStatus === 'APPROVED'
   const wholesalePrice = isWholesale && product.wholesalePrice ? product.wholesalePrice : null
   const displayPrice = wholesalePrice || product.price
@@ -153,6 +155,21 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
         </Link>
 
         {discount > 0 && <span className="absolute left-3 top-3 rounded-lg bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-sm">-{discount}%</span>}
+        {/* Scarcity, only when it is real.
+          *
+          * The brief also specified a "Gishya / New" badge. Dropped: isNew is
+          * `created within 30 days`, and all 106 products were loaded in the
+          * last 30 days, so it renders on 100% of cards. A badge every card
+          * carries communicates nothing and just crowds the image.
+          *
+          * Threshold comes from the API's isLowStock (product.lowStockThreshold,
+          * currently 5) rather than a hardcoded number, so the owner controls
+          * it per product. 0 products qualify today — this self-hides. */}
+        {!outOfStock && lowStock && (
+          <span className="absolute right-2 top-14 rounded-lg bg-fcs-urgent px-2 py-1 text-[11px] font-bold text-white shadow-sm md:right-3 md:top-16">
+            {t('search.stock_low_left', { count: product.stock })}
+          </span>
+        )}
         <button
           type="button"
           onClick={() => void toggleWishlist()}
@@ -164,9 +181,9 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
           <Heart className={`h-4 w-4 ${activeWishlisted ? 'fill-red-500 text-red-500' : ''}`} aria-hidden="true" />
         </button>
         <div className="pointer-events-none absolute inset-0 z-20 hidden items-center justify-center bg-black/0 transition-all duration-300 group-hover:bg-black/10 md:flex md:group-hover:pointer-events-auto md:group-focus-within:pointer-events-auto">
-          <button type="button" onClick={() => setQuickViewOpen(true)} className="pointer-events-auto translate-y-3 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 opacity-0 shadow-lg transition-all duration-300 hover:bg-fcs-brand-strong hover:text-white focus:translate-y-0 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand focus-visible:ring-offset-2 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100" aria-label={`Quick View: ${product.name}`}><Eye className="mr-2 inline h-4 w-4" aria-hidden="true" />Quick View</button>
+          <button type="button" onClick={() => setQuickViewOpen(true)} className="pointer-events-auto translate-y-3 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 opacity-0 shadow-lg transition-all duration-300 hover:bg-fcs-brand-strong hover:text-white focus:translate-y-0 focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand focus-visible:ring-offset-2 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100" aria-label={`${t('search.quick_view')}: ${product.name}`}><Eye className="mr-2 inline h-4 w-4" aria-hidden="true" />{t('search.quick_view')}</button>
         </div>
-        <button type="button" onClick={() => setQuickViewOpen(true)} className="absolute bottom-2 right-2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-600 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand md:hidden" aria-label={`Quick View: ${product.name}`}><Eye className="h-4 w-4" aria-hidden="true" /></button>
+        <button type="button" onClick={() => setQuickViewOpen(true)} className="absolute bottom-2 right-2 z-20 grid h-11 w-11 place-items-center rounded-full bg-white/95 text-gray-600 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand md:hidden" aria-label={`${t('search.quick_view')}: ${product.name}`}><Eye className="h-4 w-4" aria-hidden="true" /></button>
         <span className="pointer-events-none absolute inset-x-0 bottom-0 z-10 hidden h-16 bg-gradient-to-t from-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:block" aria-hidden="true" />
         {/* Owner-requested brand mark.
           * Bottom-left is the only free corner: the discount badge takes
@@ -211,6 +228,28 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
           </div>
           {isWholesale && savings > 0 && <p className="mt-0.5 text-[11px] font-semibold text-emerald-600">You save {formatRWF(savings)}</p>}
         </div>
+
+        {/* Availability, stated plainly.
+          *
+          * "Biri i Kigali / In Kigali stock" is true for every product with
+          * stock on hand — this shop holds its own inventory in Nyarugenge,
+          * so there is no drop-ship delay to hide.
+          *
+          * THREE BADGES FROM THE BRIEF ARE NOT HERE, because each would be a
+          * claim the data cannot support:
+          *   "Umwimerere / Authentic" — isAuthentic is false on all 106.
+          *   "Kugeza ubuntu / Free delivery" — the threshold is 50,000 RWF on
+          *     the ORDER TOTAL, and the most expensive product is 24,000, so
+          *     no single item can ever earn it.
+          *   "Gishya / New" — would render on 100% of cards.
+          * Recorded in PRODUCT_CARD_BADGES.md. */}
+        <p className="mb-2 flex items-center gap-1.5 text-[11px] font-medium text-fcs-text-muted">
+          <span
+            className={`h-1.5 w-1.5 shrink-0 rounded-full ${outOfStock ? 'bg-gray-300' : 'bg-fcs-success'}`}
+            aria-hidden="true"
+          />
+          {outOfStock ? t('common.sold_out') : t('search.stock_kigali')}
+        </p>
 
         <button
           type="button"

@@ -11,7 +11,12 @@ const detail = read('src/components/products/ProductDetailClient.tsx')
 describe('complete accessible product Quick View', () => {
   it('provides desktop and mobile triggers from the one shared card', () => {
     expect(card).toContain("dynamic(() => import('@/components/products/QuickView')")
-    expect(card).toContain('Quick View: ${product.name}')
+    // The label was the hardcoded English "Quick View: ${product.name}" on a
+    // bilingual site. It is now translated, so this asserts the accessible
+    // name is still per-product and still present on BOTH triggers, without
+    // pinning it to one language.
+    const labels = card.match(/aria-label=\{`\$\{t\('search\.quick_view'\)\}: \$\{product\.name\}`\}/g) || []
+    expect(labels.length, 'both Quick View triggers need a per-product label').toBe(2)
     expect(card).toContain('group-hover:opacity-100')
     expect(card).toContain('md:hidden')
     expect(card).toContain('<Eye')

@@ -393,6 +393,9 @@ export const en = {
     delivery_exact_fee: 'Select your district for the current delivery fee and estimated time. The final fee is confirmed at checkout.',
   },
   search: {
+    quick_view: 'Quick view',
+    stock_kigali: 'In Kigali stock',
+    stock_low_left: 'Only {count} left',
     voice_start: 'Search by voice',
     voice_stop: 'Stop listening',
     voice_listening: 'Listening…',
