@@ -6,6 +6,7 @@ import type { Brand, Category } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { useT } from '@/lib/i18n/LanguageContext'
 import { useProductFilters } from '@/hooks/useProductFilters'
+import { useFacets } from '@/hooks/use-facets'
 
 interface FilterSidebarProps {
   availableCategories: Category[]
@@ -19,6 +20,11 @@ const HAIR_TYPES = ['NATURAL', 'RELAXED', 'WAVY', 'CURLY', 'COILY', 'ALL_HAIR'] 
 export default function FilterSidebar({ availableCategories, availableBrands, className = '' }: FilterSidebarProps) {
   const t = useT()
   const { filters, activeFilterCount, setFilter, setFilters, clearAllFilters } = useProductFilters()
+  // Live counts for the current query. Also tells us which filters can lead
+  // anywhere at all — hair type, rating and shade are empty across the whole
+  // catalogue today, so rendering them would offer 10 controls that always
+  // empty the page.
+  const { countFor, showRating, showHairType, showShade, showBrand } = useFacets()
   const priceRanges = [
     { label: t('search.price_under', { price: '5,000' }), min: '', max: '5000' },
     { label: t('search.price_under', { price: '10,000' }), min: '', max: '10000' },
@@ -37,7 +43,7 @@ export default function FilterSidebar({ availableCategories, availableBrands, cl
       <div className="max-h-[calc(100vh-9rem)] overflow-y-auto pr-1">
         {availableCategories.length > 0 && <FilterSection title={t('nav.categories')}>
           <FilterButton selected={!filters.category} onClick={() => setFilter('category', '')} label={t('categories.all')} />
-          {availableCategories.map((category) => <FilterButton key={category.id} selected={filters.category === category.slug} onClick={() => setFilter('category', filters.category === category.slug ? '' : category.slug)} label={category.name} />)}
+          {availableCategories.map((category) => <FilterButton key={category.id} selected={filters.category === category.slug} onClick={() => setFilter('category', filters.category === category.slug ? '' : category.slug)} label={category.name} count={countFor.category(category.slug)} />)}
         </FilterSection>}
 
         <FilterSection title={t('search.price_range_label')}>
@@ -52,24 +58,24 @@ export default function FilterSidebar({ availableCategories, availableBrands, cl
         </FilterSection>
 
         <FilterSection title={t('search.skin_type')}>
-          {SKIN_TYPES.map((skinType) => <FilterButton key={skinType} selected={filters.skinType === skinType} onClick={() => setFilter('skinType', filters.skinType === skinType ? '' : skinType)} label={t(`skin_types.${skinType}`)} />)}
+          {SKIN_TYPES.map((skinType) => <FilterButton key={skinType} selected={filters.skinType === skinType} onClick={() => setFilter('skinType', filters.skinType === skinType ? '' : skinType)} label={t(`skin_types.${skinType}`)} count={countFor.skinType(skinType)} />)}
         </FilterSection>
 
-        <FilterSection title={t('product.hair_type')}>
-          {HAIR_TYPES.map((hairType) => <FilterButton key={hairType} selected={filters.hairType === hairType} onClick={() => setFilter('hairType', filters.hairType === hairType ? '' : hairType)} label={t(`hair_types.${hairType}`)} />)}
-        </FilterSection>
-
-        {availableBrands.length > 0 && <FilterSection title={t('search.brand')}>
-          {availableBrands.slice(0, 12).map((brand) => <FilterButton key={brand.id} selected={filters.brand === brand.slug} onClick={() => setFilter('brand', filters.brand === brand.slug ? '' : brand.slug)} label={brand.name} />)}
+        {showHairType && <FilterSection title={t('product.hair_type')}>
+          {HAIR_TYPES.map((hairType) => <FilterButton key={hairType} selected={filters.hairType === hairType} onClick={() => setFilter('hairType', filters.hairType === hairType ? '' : hairType)} label={t(`hair_types.${hairType}`)} count={countFor.hairType(hairType)} />)}
         </FilterSection>}
 
-        <FilterSection title={t('product.shade')}>
-          <input type="search" value={filters.shade} onChange={(event) => setFilter('shade', event.target.value)} className="min-h-10 w-full rounded-lg border border-gray-200 px-3 text-sm outline-none transition-colors focus:border-fcs-brand" aria-label={t('product.shade')} />
-        </FilterSection>
+        {showBrand && availableBrands.length > 0 && <FilterSection title={t('search.brand')}>
+          {availableBrands.slice(0, 12).map((brand) => <FilterButton key={brand.id} selected={filters.brand === brand.slug} onClick={() => setFilter('brand', filters.brand === brand.slug ? '' : brand.slug)} label={brand.name} count={countFor.brand(brand.slug)} />)}
+        </FilterSection>}
 
-        <FilterSection title={t('search.customer_rating')}>
+        {showShade && <FilterSection title={t('product.shade')}>
+          <input type="search" value={filters.shade} onChange={(event) => setFilter('shade', event.target.value)} className="min-h-10 w-full rounded-lg border border-gray-200 px-3 text-sm outline-none transition-colors focus:border-fcs-brand" aria-label={t('product.shade')} />
+        </FilterSection>}
+
+        {showRating && <FilterSection title={t('search.customer_rating')}>
           {[4, 3, 2].map((rating) => <button key={rating} type="button" onClick={() => setFilter('minRating', filters.minRating === String(rating) ? '' : String(rating))} className={cn('flex min-h-10 w-full items-center gap-2 rounded-lg px-2 text-left text-sm transition-colors', filters.minRating === String(rating) ? 'bg-rose-50 font-semibold text-fcs-brand-text' : 'text-gray-600 hover:bg-gray-50')}><span className="flex">{Array.from({ length: 5 }, (_, index) => <Star key={index} className={cn('h-3 w-3', index < rating ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200')} aria-hidden="true" />)}</span>{t('search.and_up', { rating })}</button>)}
-        </FilterSection>
+        </FilterSection>}
 
         <button type="button" onClick={() => setFilter('inStock', !filters.inStock)} className="flex min-h-11 w-full items-center justify-between rounded-lg bg-gray-50 px-3 text-sm font-semibold text-gray-700 hover:bg-gray-100"><span>{t('search.in_stock_only')}</span><span className={cn('relative h-5 w-8 rounded-full transition-colors', filters.inStock ? 'bg-fcs-brand' : 'bg-gray-300')}><span className={cn('absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform', filters.inStock ? 'translate-x-3.5' : 'translate-x-0.5')} /></span></button>
       </div>
@@ -81,6 +87,25 @@ function FilterSection({ title, children }: { title: string; children: ReactNode
   return <section className="mb-5 border-b border-[#EEEEEE] pb-4"><h3 className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-gray-500">{title}</h3><div className="space-y-1">{children}</div></section>
 }
 
-function FilterButton({ selected, onClick, label }: { selected: boolean; onClick: () => void; label: string }) {
-  return <button type="button" onClick={onClick} className={cn('flex min-h-10 w-full items-center rounded-lg px-3 text-left text-sm transition-colors', selected ? 'bg-rose-50 font-semibold text-fcs-brand-text' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900')}><span className="truncate">{label}</span></button>
+function FilterButton({ selected, onClick, label, count }: { selected: boolean; onClick: () => void; label: string; count?: number }) {
+  // A zero count is rendered but disabled rather than hidden: the option
+  // vanishing as you type is more disorienting than seeing it greyed out.
+  // `undefined` means "counts have not loaded", which is not the same as zero.
+  const empty = count === 0
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={empty && !selected}
+      aria-disabled={empty && !selected}
+      className={cn(
+        'flex min-h-10 w-full items-center justify-between gap-2 rounded-lg px-3 text-left text-sm transition-colors',
+        selected ? 'bg-rose-50 font-semibold text-fcs-brand-text' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+        empty && !selected && 'cursor-not-allowed opacity-40 hover:bg-transparent',
+      )}
+    >
+      <span className="truncate">{label}</span>
+      {count !== undefined && <span className="shrink-0 text-xs tabular-nums text-fcs-text-muted">{count}</span>}
+    </button>
+  )
 }

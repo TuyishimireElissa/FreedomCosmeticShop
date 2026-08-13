@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { formatRWF } from '@/lib/format'
 import { useT } from '@/lib/i18n/LanguageContext'
 import { type ProductFilters, useProductFilters } from '@/hooks/useProductFilters'
+import { useFacets } from '@/hooks/use-facets'
 
 interface Chip {
   key: keyof ProductFilters
@@ -13,11 +14,17 @@ interface Chip {
 export default function FilterChips() {
   const t = useT()
   const { filters, activeFilterCount, clearFilter, clearAllFilters } = useProductFilters()
+  // Chips showed the raw URL slug — "Category: body-care" instead of
+  // "Category: Body Care". The facet response already carries the display
+  // names, so reuse them rather than re-fetching the category list.
+  const { facets } = useFacets()
+  const displayName = (entries: { name: string; slug?: string }[], slug: string) =>
+    entries.find((entry) => entry.slug === slug)?.name || slug
   if (activeFilterCount === 0) return null
 
   const chips: Chip[] = []
-  if (filters.category) chips.push({ key: 'category', label: t('search.filter_category', { category: filters.category }) })
-  if (filters.brand) chips.push({ key: 'brand', label: t('search.filter_brand', { brand: filters.brand }) })
+  if (filters.category) chips.push({ key: 'category', label: t('search.filter_category', { category: displayName(facets.categories, filters.category) }) })
+  if (filters.brand) chips.push({ key: 'brand', label: t('search.filter_brand', { brand: displayName(facets.brands, filters.brand) }) })
   if (filters.minPrice || filters.maxPrice) {
     const label = filters.minPrice && filters.maxPrice
       ? t('search.price_range', { min: Number(filters.minPrice).toLocaleString('en-RW'), max: Number(filters.maxPrice).toLocaleString('en-RW') })

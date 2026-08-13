@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
-import { buildFilterClauses, parseProductFilters, resolveSearchClause } from '@/lib/product-filters'
+import { SKIN_TYPES, buildFilterClauses, parseProductFilters, resolveSearchClause } from '@/lib/product-filters'
 
 /**
  * Available filter values for the CURRENT query.
@@ -51,12 +51,37 @@ export async function GET(request: NextRequest) {
     const priceWhere = withSearch(buildFilterClauses(filters, 'price'))
     const exactWhere = withSearch(buildFilterClauses(filters))
 
-    const [categoryGroups, brandGroups, skinRows, priceAggregate, total] = await Promise.all([
+    const [categoryGroups, brandGroups, skinRows, priceAggregate, total, hairGroups, ratedCount, shadedCount] = await Promise.all([
       prisma.product.groupBy({ by: ['categoryId'], where: categoryWhere, _count: { _all: true } }),
       prisma.product.groupBy({ by: ['brandId'], where: brandWhere, _count: { _all: true } }),
       prisma.product.findMany({ where: skinWhere, select: { skinType: true } }),
       prisma.product.aggregate({ where: priceWhere, _min: { price: true }, _max: { price: true } }),
       prisma.product.count({ where: exactWhere }),
+      // These three decide whether the hair-type, rating and shade controls
+      // are rendered at all. Measured, not assumed: all three are currently
+      // empty across the catalogue, so those 20 controls were dead ends that
+      // always emptied the page. Reported as data so the UI hides them, and
+      // brings them straight back the day the owner fills the columns in.
+      prisma.product.groupBy({ by: ['hairType'], where: { AND: [...buildFilterClauses(filters), { hairType: { not: null } }] }, _count: { _all: true } }),
+      prisma.product.count({ where: { AND: [...buildFilterClauses(filters), { reviewsCount: { gt: 0 } }] } }),
+      // NOT `{ shades: { not: null } }`. That counted 105 products, because
+      // `shades` stores the STRING "[]" — an empty JSON array, not NULL. My
+      // first version reported shadedCount 105 and would have rendered a
+      // shade box that returns 0 results for every input. Both the empty
+      // array and the empty string have to be excluded explicitly.
+      prisma.product.count({
+        where: {
+          AND: [
+            ...buildFilterClauses(filters),
+            {
+              OR: [
+                { shade: { not: null, notIn: ['', '[]'] } },
+                { shades: { not: null, notIn: ['', '[]'] } },
+              ],
+            },
+          ],
+        },
+      }),
     ])
 
     const categoryIds = categoryGroups.map((group) => group.categoryId)
@@ -94,6 +119,19 @@ export async function GET(request: NextRequest) {
     // enum column, so it cannot be grouped in SQL. 106 rows of one short
     // string is cheap to fold in memory; a groupBy would return one bucket
     // per distinct JSON string instead of per skin type.
+    // The count MUST mirror what the filter actually selects, or the sidebar
+    // promises one number and the grid shows another.
+    //
+    // buildFilterClauses matches `skinType CONTAINS X *OR* CONTAINS 'ALL'` —
+    // a product tagged ALL suits every skin type. Counting each JSON value in
+    // isolation reported OILY = 1 while /api/products?skinType=OILY returned
+    // 20. Caught by comparing facet counts against grid totals before
+    // shipping; every category matched, every skin type did not.
+    //
+    // So a product tagged ALL is counted toward every specific skin type as
+    // well as toward ALL itself.
+    const ALL_SKIN = 'ALL'
+    const specificTypes = [...SKIN_TYPES].filter((value) => value !== ALL_SKIN)
     const skinCounts = new Map<string, number>()
     for (const row of skinRows) {
       if (!row.skinType) continue
@@ -104,12 +142,20 @@ export async function GET(request: NextRequest) {
         continue
       }
       if (!Array.isArray(values)) continue
-      for (const value of values) {
-        if (typeof value !== 'string') continue
-        const key = value.trim().toUpperCase()
-        if (!key) continue
-        skinCounts.set(key, (skinCounts.get(key) || 0) + 1)
+      const tags = new Set(
+        values
+          .filter((value): value is string => typeof value === 'string')
+          .map((value) => value.trim().toUpperCase())
+          .filter(Boolean),
+      )
+      if (tags.size === 0) continue
+      if (tags.has(ALL_SKIN)) {
+        // Suits everyone: counts once per specific type, plus ALL itself.
+        skinCounts.set(ALL_SKIN, (skinCounts.get(ALL_SKIN) || 0) + 1)
+        for (const type of specificTypes) skinCounts.set(type, (skinCounts.get(type) || 0) + 1)
+        continue
       }
+      for (const tag of tags) skinCounts.set(tag, (skinCounts.get(tag) || 0) + 1)
     }
     const skinTypes = [...skinCounts.entries()]
       .map(([name, count]) => ({ name, count }))
@@ -123,6 +169,12 @@ export async function GET(request: NextRequest) {
         skinTypes,
         priceRange: { min: priceAggregate._min.price ?? 0, max: priceAggregate._max.price ?? 0 },
         total,
+        hairTypes: hairGroups
+          .filter((group) => group.hairType)
+          .map((group) => ({ name: String(group.hairType), count: group._count._all }))
+          .sort((left, right) => right.count - left.count),
+        ratedCount,
+        shadedCount,
         // Stated explicitly so a client cannot mistake "no colour data" for
         // "colour facet failed to load".
         colors: [],
