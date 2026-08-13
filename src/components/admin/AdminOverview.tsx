@@ -56,6 +56,7 @@ import {
   Activity,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { thumbnailImageUrl } from "@/lib/cloudinary-images"
 
 interface AnalyticsData {
   range: string
@@ -651,7 +652,7 @@ export function AdminOverview() {
                   </span>
                   <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary/30">
                     {p.image && (
-                      <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+                      <img src={thumbnailImageUrl(p.image, 40)} alt={p.name} loading="lazy" decoding="async" className="h-full w-full object-contain" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -704,7 +705,7 @@ export function AdminOverview() {
                 className="flex items-center gap-3 rounded-lg bg-background p-2"
               >
                 <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary/30">
-                  {p.image && <img src={p.image} alt={p.name} className="h-full w-full object-cover" />}
+                  {p.image && <img src={thumbnailImageUrl(p.image, 40)} alt={p.name} loading="lazy" decoding="async" className="h-full w-full object-contain" />}
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium">{p.name}</p>

@@ -14,6 +14,7 @@
 
 import { useState } from "react"
 import { formatRWF, PAYMENT_METHODS, PaymentMethodKey, deliveryTimeFor } from "@/lib/format"
+import { thumbnailImageUrl } from "@/lib/cloudinary-images"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -395,7 +396,13 @@ export function TrackOrderView() {
                 <li key={item.id} className="flex gap-3">
                   <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-secondary/30">
                     {item.image && (
-                      <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                      <img
+                        src={thumbnailImageUrl(item.image, 48)}
+                        alt={item.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-contain"
+                      />
                     )}
                   </div>
                   <div className="flex-1">

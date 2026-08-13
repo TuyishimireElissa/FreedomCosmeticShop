@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft, Calendar, Eye } from 'lucide-react'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { optimizedImageSrcSet, optimizedImageUrl } from '@/lib/cloudinary-images'
 
 interface BlogPostContentProps {
   post: {
@@ -41,7 +42,7 @@ export default function BlogPostContent({ post }: BlogPostContentProps) {
         <Breadcrumbs items={[{ name: title, url: `/blog/${post.slug}` }]} />
       </div>
       <article className="mx-auto max-w-3xl overflow-hidden rounded-[2rem] border border-gray-100 bg-white shadow-sm">
-        {post.coverImage && <img src={post.coverImage} alt={imageAlt} className="aspect-[16/8] w-full object-cover" />}
+        {post.coverImage && <img src={optimizedImageUrl(post.coverImage, 768)} srcSet={optimizedImageSrcSet(post.coverImage, [420, 768])} sizes="(max-width: 768px) 100vw, 768px" alt={imageAlt} decoding="async" className="aspect-[16/8] w-full object-cover" />}
         <div className="p-6 sm:p-10">
           <Link href="/" className="inline-flex min-h-11 items-center gap-1 text-xs font-bold text-[#9c5964]">
             <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />{t('blog.back_to_guides')}

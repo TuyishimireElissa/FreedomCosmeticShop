@@ -55,8 +55,8 @@ export function optimizeCloudinaryUrl(
 /**
  * Build a Cloudinary delivery URL.
  *
- * `ratio: true` pins the output to PRODUCT_CARD_RATIO with `c_pad`, so every
- * product image arrives the same shape.
+ * Passing `height` pins the output box and pads to it with `c_pad`, so the
+ * image arrives at exactly that shape. Omitting `height` scales by width only.
  *
  * WHY c_pad AND NOT c_fill
  *
@@ -80,7 +80,12 @@ export function optimizeCloudinaryUrl(
  */
 export function buildCloudinaryUrl(
   source: string,
-  { width, quality = IMAGE_QUALITY.normal, ratio = false }: { width: number; quality?: string; ratio?: boolean },
+  {
+    width,
+    quality = IMAGE_QUALITY.normal,
+    ratio = false,
+    height,
+  }: { width: number; quality?: string; ratio?: boolean; height?: number },
 ) {
   try {
     const url = new URL(source)
@@ -95,8 +100,10 @@ export function buildCloudinaryUrl(
 
     const safeWidth = Math.max(1, Math.min(1280, Math.round(width)))
     const safeQuality = quality === IMAGE_QUALITY.lowData ? IMAGE_QUALITY.lowData : IMAGE_QUALITY.normal
-    const transformation = ratio
-      ? `w_${safeWidth},h_${productCardHeight(safeWidth)},c_pad,b_auto,q_${safeQuality},f_auto,dpr_auto`
+    const explicitHeight = height && height > 0 ? Math.max(1, Math.min(1280, Math.round(height))) : undefined
+    const boxHeight = ratio ? productCardHeight(safeWidth) : explicitHeight
+    const transformation = boxHeight
+      ? `w_${safeWidth},h_${boxHeight},c_pad,b_auto,q_${safeQuality},f_auto,dpr_auto`
       : `w_${safeWidth},c_fill,g_auto,q_${safeQuality},f_auto,dpr_auto`
     const remainder = url.pathname.slice(prefix.length)
     const segments = remainder.split('/')
@@ -132,6 +139,47 @@ export function optimizedImageSrcSet(url: string | null | undefined, widths: num
 export function productCardImageUrl(url: string | null | undefined, width = 400, quality: string = IMAGE_QUALITY.normal) {
   if (!url) return ''
   return buildCloudinaryUrl(url, { width: Math.max(1, Math.min(1280, Math.round(width))), quality, ratio: true })
+}
+
+/**
+ * Small square thumbnail, sized to the box it is rendered in.
+ *
+ * WHY THIS EXISTS
+ *
+ * Nine surfaces rendered the *stored original* straight into a 32-80px box —
+ * `<img src={item.image} className="h-10 w-10" />` with no transformation at
+ * all. The browser downloaded the full-size asset and then threw ~99% of the
+ * pixels away on the client.
+ *
+ * Measured against live production data:
+ *
+ *   product photo   1024x1024  120,222 B  ->  w_80   1,893 B   (98.4% saved)
+ *   order thumbnail w_1200     286,104 B  ->  w_80     632 B   (99.8% saved)
+ *
+ * The order case is the worst because `OrderItem.image` is a *snapshot* taken
+ * at checkout, and 8 of the 16 stored snapshots are Cloudinary `/fetch/` URLs
+ * that already carry a baked-in `w_1200`. A 44-item order therefore pulled tens
+ * of megabytes of 1200px artwork to paint a column of 56px squares. On a
+ * Rwandan mobile connection that is the difference between a page that loads
+ * and one that does not.
+ *
+ * `c_pad` + `b_auto` for the same reason product cards use it: a padded
+ * thumbnail keeps the whole bottle silhouette, whereas `c_fill` on a wide pack
+ * shot crops the label off. Square by default because every one of these boxes
+ * is square; pass `height` for the one that is not (the 20x14 banner row).
+ */
+export function thumbnailImageUrl(
+  url: string | null | undefined,
+  size = 80,
+  options: { height?: number; quality?: string } = {},
+) {
+  if (!url) return ''
+  const width = Math.max(1, Math.min(1280, Math.round(size)))
+  return buildCloudinaryUrl(url, {
+    width,
+    height: options.height && options.height > 0 ? options.height : width,
+    quality: options.quality ?? IMAGE_QUALITY.normal,
+  })
 }
 
 /** Matching srcSet, every entry on the same ratio. */

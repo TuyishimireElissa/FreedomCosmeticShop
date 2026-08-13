@@ -51,6 +51,7 @@ import {
 } from "recharts"
 import { useRouter } from "next/navigation"
 import WhatsAppAnalytics from '@/components/admin/WhatsAppAnalytics'
+import { thumbnailImageUrl } from '@/lib/cloudinary-images'
 
 // Removed unused imports: TrendingDown, ArrowRight, Clock, Legend, toast
 
@@ -427,7 +428,7 @@ export function AdminAnalytics() {
                 <li key={p.id} className="flex items-center gap-3 rounded-lg border p-2">
                   <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary/30">
                     {p.image && (
-                      <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+                      <img src={thumbnailImageUrl(p.image, 40)} alt={p.name} loading="lazy" decoding="async" className="h-full w-full object-contain" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -461,7 +462,7 @@ export function AdminAnalytics() {
                   </span>
                   <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary/30">
                     {p.image && (
-                      <img src={p.image} alt={p.name} className="h-full w-full object-cover" />
+                      <img src={thumbnailImageUrl(p.image, 40)} alt={p.name} loading="lazy" decoding="async" className="h-full w-full object-contain" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">

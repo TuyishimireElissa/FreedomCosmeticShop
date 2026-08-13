@@ -29,6 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 import { useT } from '@/lib/i18n/LanguageContext'
 import IconButton from '@/components/a11y/IconButton'
+import { thumbnailImageUrl } from '@/lib/cloudinary-images'
 import {
   TrendingUp,
   Package,
@@ -326,7 +327,7 @@ export function AdminMobilePanel() {
             {data.lowStock.map((p) => (
               <div key={p.id} className="flex items-center gap-2 rounded-lg border p-2">
                 {p.image && (
-                  <img src={p.image} alt={p.name} className="h-8 w-8 rounded object-cover" />
+                  <img src={thumbnailImageUrl(p.image, 32)} alt={p.name} loading="lazy" decoding="async" className="h-8 w-8 rounded object-contain" />
                 )}
                 <p className="flex-1 truncate text-xs font-medium">{p.name}</p>
                 <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">

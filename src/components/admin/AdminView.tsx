@@ -97,6 +97,7 @@ import { useSettings } from "@/hooks/use-settings"
 import { formatRWFCompact } from "@/lib/format"
 import { type AdminTab, useOptionalAdminShell } from "./AdminShellContext"
 import { isOwnerAdminRole } from '@/lib/admin-roles'
+import { optimizedImageUrl, thumbnailImageUrl } from '@/lib/cloudinary-images'
 
 const AdminSectionLoading = () => <div className="space-y-3 py-6" aria-label="Loading admin section"><Skeleton className="h-10 w-48" /><Skeleton className="h-72 w-full" /></div>
 const AdminOverview = dynamic(() => import('./AdminOverview').then((module) => module.AdminOverview), { loading: AdminSectionLoading })
@@ -504,7 +505,7 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
           {/* Logo + title — Section 3: Dynamic logo */}
           <div className="flex shrink-0 items-center gap-2">
             {adminSettings?.logoUrl ? (
-              <img src={adminSettings.logoUrl} alt="FreedomCosmeticShop" className="max-h-9 max-w-[120px] object-contain" />
+              <img src={optimizedImageUrl(adminSettings.logoUrl, 240)} alt="FreedomCosmeticShop" decoding="async" className="max-h-9 max-w-[120px] object-contain" />
             ) : (
               // Fallback when the owner has not uploaded a custom logo. Was a
               // generic `Shield` glyph, which read as "some admin tool" rather
@@ -1141,7 +1142,7 @@ export function AdminView({ embedded = false }: { embedded?: boolean } = {}) {
                     {selectedOrder.items.map((item) => (
                       <li key={item.id} className="flex gap-2 text-sm">
                         <div className="h-10 w-10 shrink-0 overflow-hidden rounded bg-secondary/30">
-                          {item.image && <img src={item.image} alt={item.name} className="h-full w-full object-cover" />}
+                          {item.image && <img src={thumbnailImageUrl(item.image, 40)} alt={item.name} loading="lazy" decoding="async" className="h-full w-full object-contain" />}
                         </div>
                         <div className="flex-1">
                           <p className="text-xs font-medium leading-snug">{item.name}</p>

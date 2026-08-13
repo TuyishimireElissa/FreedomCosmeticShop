@@ -64,6 +64,7 @@ import {
 } from "lucide-react"
 import { LogoUploader } from "./LogoUploader"
 import { useStore } from '@/store/useStore'
+import { thumbnailImageUrl } from '@/lib/cloudinary-images'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -714,7 +715,7 @@ function BannersManager() {
               className="flex items-center gap-3 rounded-xl border bg-card p-3"
             >
               <div className="h-14 w-20 shrink-0 overflow-hidden rounded bg-secondary/30">
-                <img src={b.image} alt={b.title} className="h-full w-full object-cover" />
+                <img src={thumbnailImageUrl(b.image, 80, { height: 56 })} alt={b.title} loading="lazy" decoding="async" className="h-full w-full object-contain" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
