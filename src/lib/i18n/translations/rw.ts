@@ -399,6 +399,21 @@ export const rw = {
     delivery_exact_fee: 'Hitamo akarere kawe urebe ikiguzi cyo kukugezaho n’igihe giteganyijwe. Ikiguzi cya nyuma cyemezwa mu gihe cyo kwishyura.', // verified-rw
   },
   search: {
+    voice_start: 'Shakisha ukoresheje ijwi', // verified-rw
+    voice_stop: 'Hagarika kumva', // verified-rw
+    voice_listening: 'Ndumva…', // verified-rw
+    voice_listening_hint: "Vuga izina ry'igicuruzwa, hanyuma uhagarare", // verified-rw
+    voice_denied: 'Mikoro yafunzwe. Yemerere muri browser yawe, cyangwa wandike.', // verified-rw
+    voice_error: 'Gushakisha n’ijwi ntibyakunze. Nyamuneka andika.', // verified-rw
+    voice_unsupported: 'Andika ushakishe', // verified-rw
+    trending: 'Bikunze gushakishwa', // verified-rw
+    open_full_search: 'Fungura ahashakirwa', // verified-rw
+    close_search: 'Funga ahashakirwa', // verified-rw
+    overlay_placeholder: 'Shakisha ibicuruzwa, ubwoko bw’uruhu, ibyiciro...', // verified-rw
+    see_all_count: 'Reba ibisubizo {count}', // verified-rw
+    did_you_mean: 'Waba washakaga: {term}?', // verified-rw
+    chat_whatsapp: 'Tuganire kuri WhatsApp', // verified-rw
+    no_products_found: 'Nta gicuruzwa kibonetse', // verified-rw
     placeholder: 'Shakisha ibita ku ruhu, ibikoresho byo kwisiga, ibita ku musatsi...', results: 'Ibisubizo {count} kuri "{query}"', no_results: 'Nta bicuruzwa byabonetse kuri "{query}"', no_results_hint: 'Gerageza andi magambo cyangwa urebe mu byiciro', suggestions: 'Ibyifuzo', popular: 'Ibikunze gushakishwa', local_terms: 'Amagambo akoreshwa mu Rwanda', price_searches: 'Shakisha ukurikije igiciro', recent: 'Ibyashakishijwe vuba', clear_recent: 'Siba ibyashakishijwe vuba', price_under: 'Munsi ya {price} RWF', price_range: 'Hagati ya {min} na {max} RWF', searching: 'Birimo gushakishwa...', search_in: 'Shakisha muri {category}', filters_active: 'Inshungura {count} zirakoreshwa', filters: 'Inshungura', reset: 'Subiza ku ntangiriro', category: 'Icyiciro', brand: 'Ikirango', all_brands: 'Ibirango byose', price_range_label: 'Urwego rw’ibiciro (RWF)', minimum: 'Igiciro gito', maximum: 'Igiciro kinini', skin_type: 'Ubwoko bw’uruhu', customer_rating: 'Amanota y’abakiriya', and_up: '{rating} no hejuru', in_stock_only: 'Ibirahari gusa', products_load_failed_hint: 'Reba umurongo wa interineti wongere ugerageze.', no_filter_results: 'Nta bicuruzwa bihuye n’inshungura', broaden_search: 'Gerageza gukuraho inshungura cyangwa ukoreshe amagambo rusange.', wishlist_failed: 'Guhindura ibyo wifuza ntibyakunze', removed_wishlist: 'Cyakuwe mu byo wifuza', saved_wishlist: 'Cyabitswe mu byo wifuza', //  REVIEW // verified-rw
 
     adjust_filters_hint: 'Gerageza guhindura inshungura cyangwa amagambo yo gushakisha. Reba icyiciro cyangwa ukureho zimwe mu nshungura.', // verified-rw

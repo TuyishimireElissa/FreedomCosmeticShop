@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react'
 import { SearchWithSuggestions } from '@/components/storefront/SearchWithSuggestions'
+import SearchOverlay from '@/components/storefront/SearchOverlay'
 import LanguageSelector from '@/components/ui/LanguageSelector'
 import Logo from '@/components/ui/logo'
 import { useT } from '@/lib/i18n/LanguageContext'
@@ -42,6 +43,9 @@ export default function Navbar() {
   const t = useT()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  // Focus returns here when the search overlay closes, so a keyboard or
+  // screen-reader user is not dumped at the top of the document.
+  const searchTriggerRef = useRef<HTMLButtonElement>(null)
   const [accountOpen, setAccountOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const accountRef = useRef<HTMLDivElement>(null)
@@ -139,11 +143,13 @@ export default function Navbar() {
 
         <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
           <button
+            ref={searchTriggerRef}
             type="button"
             onClick={() => setSearchOpen((open) => !open)}
             className="grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 md:hidden"
             aria-label={searchOpen ? t('nav.close_search') : t('nav.open_search')}
             aria-expanded={searchOpen}
+            aria-haspopup="dialog"
           >
             {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </button>
@@ -265,13 +271,15 @@ export default function Navbar() {
         </nav>
       </div>
 
-      {searchOpen && (
-        <div className="border-t border-gray-100 bg-white px-3 py-3 md:hidden">
-          <div className="mx-auto max-w-xl">
-            <SearchWithSuggestions placeholder={t('search.placeholder')} />
-          </div>
-        </div>
-      )}
+      {/* Full-screen overlay on phones: voice input, category chips, trending
+        * terms and instant results. Replaces the inline strip, which offered
+        * only a text field. Desktop keeps the inline SearchWithSuggestions
+        * dropdown above — it is already a working combobox. */}
+      <SearchOverlay
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        returnFocusTo={searchTriggerRef}
+      />
 
       {mobileOpen && (
         <div className="absolute inset-x-0 top-full z-50 max-h-[calc(100dvh-7rem)] overflow-y-auto border-t border-gray-100 bg-white shadow-2xl md:hidden">
