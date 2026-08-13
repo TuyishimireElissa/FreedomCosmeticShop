@@ -48,6 +48,17 @@ const code = (path: string) =>
 
 const matcher = code('src/lib/search-match.ts')
 const products = code('src/app/api/products/route.ts')
+/**
+ * The filter and search-resolution logic moved OUT of the route and into
+ * src/lib/product-filters.ts so that /api/search/facets counts the exact same
+ * predicate the result list uses. These assertions follow it there. The
+ * guarantees are unchanged — verified against the live database after the
+ * move: vitamin 22, seramu 4, uruhu 70, vitanin 26, izuba 0, xyzfake 0,
+ * cream+skincare+price 10 — identical to production before the refactor.
+ */
+const filters = code('src/lib/product-filters.ts')
+/** Route plus the module it delegates to: the search path as a whole. */
+const productsPipeline = `${products}\n${filters}`
 const suggestions = code('src/app/api/search/suggestions/route.ts')
 const migration = read('prisma/manual-migrations/20260812_search_trigram.sql')
 
@@ -153,8 +164,10 @@ describe('recall is preserved — the narrowing attempt is locked out', () => {
 
 describe('both search endpoints use the fast path with a safe fallback', () => {
   it('/api/products resolves ids through the matcher', () => {
-    expect(products).toContain("from '@/lib/search-match'")
-    expect(products).toContain('await findMatchingProductIds(')
+    // Now via src/lib/product-filters, which the route imports.
+    expect(products).toContain("from '@/lib/product-filters'")
+    expect(filters).toContain("from '@/lib/search-match'")
+    expect(filters).toContain('await findMatchingProductIds(')
   })
 
   it('/api/search/suggestions does too', () => {
@@ -163,7 +176,7 @@ describe('both search endpoints use the fast path with a safe fallback', () => {
   })
 
   it.each([
-    ['products', products],
+    ['products', productsPipeline],
     ['suggestions', suggestions],
   ])('%s degrades to the old ILIKE path instead of failing', (_name, source) => {
     // If pg_trgm is ever missing on a replica, search must get slower, never
@@ -173,15 +186,30 @@ describe('both search endpoints use the fast path with a safe fallback', () => {
 
   it('an empty match short-circuits without breaking pagination', () => {
     // A sentinel id keeps count/pagination/analytics on the normal path.
-    expect(products).toContain("['__no_match__']")
+    expect(productsPipeline).toContain("['__no_match__']")
     expect(suggestions).toContain("['__no_match__']")
   })
 
   it('every other filter is still applied by Prisma', () => {
     // The matcher only narrows by text. Category, brand, price, stock,
     // skinType, hairType, shade and rating must be untouched.
-    for (const filter of ['category:', 'brand:', 'price:', 'skinType', 'hairType', 'rating:']) {
-      expect(products, `lost the ${filter} filter`).toContain(filter)
+    //
+    // Asserting the bare word is NOT enough: 'category:' also appears in the
+    // ILIKE fallback clause, so renaming the real category filter still
+    // passed. Mutation testing caught that. These assert the actual
+    // clause-building call instead.
+    const clauses: Array<[string, RegExp]> = [
+      ['category', /and\.push\(\{\s*category:\s*\{\s*OR:/],
+      ['brand', /and\.push\(\{\s*brand:\s*\{\s*OR:/],
+      ['price', /and\.push\(\{\s*price:\s*\{/],
+      ['stock', /and\.push\(\{\s*stock:\s*\{\s*gt:\s*0\s*\}\s*\}\)/],
+      ['skinType', /and\.push\(\{\s*OR:\s*\[\{\s*skinType:/],
+      ['hairType', /and\.push\(\{\s*OR:\s*\[\{\s*hairType:/],
+      ['shade', /and\.push\(\{\s*OR:\s*\[\{\s*shade:/],
+      ['rating', /and\.push\(\{\s*rating:\s*\{\s*gte:/],
+    ]
+    for (const [name, pattern] of clauses) {
+      expect(filters, `lost the ${name} filter`).toMatch(pattern)
     }
   })
 

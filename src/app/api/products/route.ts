@@ -1,21 +1,11 @@
 export const dynamic = 'force-dynamic'
 
 import { NextRequest, NextResponse } from 'next/server'
-import { HairType, type Prisma } from '@prisma/client'
+import { type Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { PUBLIC_PRODUCT_CARD_SELECT, getRealUnitSales, serializePublicProductCard } from '@/lib/public-product'
-import { expandSearchQuery, parsePriceFromQuery, removePriceExpression } from '@/lib/search-vocabulary'
-import { findMatchingProductIds, type SearchMatch } from '@/lib/search-match'
+import { buildFilterClauses, parseProductFilters, resolveSearchClause } from '@/lib/product-filters'
 import { recordSearch } from '@/server/services/search-analytics'
-
-const SKIN_TYPES = new Set(['ALL', 'OILY', 'DRY', 'COMBINATION', 'SENSITIVE', 'NORMAL'])
-const HAIR_TYPES = new Set(['NATURAL', 'RELAXED', 'WAVY', 'CURLY', 'COILY', 'ALL_HAIR'])
-
-function numericParam(value: string | null) {
-  if (value === null || value.trim() === '') return undefined
-  const number = Number(value)
-  return Number.isFinite(number) && number >= 0 ? number : null
-}
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,88 +16,20 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Invalid pagination' }, { status: 400 })
     }
 
-    const search = (params.get('search') || params.get('q') || '').trim().slice(0, 200)
-    const category = params.get('category')?.trim() || undefined
-    const brand = params.get('brand')?.trim() || undefined
-    const skinType = params.get('skinType')?.trim().toUpperCase() || undefined
-    const hairType = params.get('hairType')?.trim().toUpperCase() || undefined
-    const shade = params.get('shade')?.trim() || undefined
-    const minPriceParam = numericParam(params.get('minPrice'))
-    const maxPriceParam = numericParam(params.get('maxPrice'))
-    const minRatingParam = numericParam(params.get('minRating'))
-    if (minPriceParam === null || maxPriceParam === null || minRatingParam === null) {
-      return NextResponse.json({ success: false, error: 'Invalid numeric filter' }, { status: 400 })
-    }
-    if (skinType && !SKIN_TYPES.has(skinType)) return NextResponse.json({ success: false, error: 'Invalid skin type' }, { status: 400 })
-    if (hairType && !HAIR_TYPES.has(hairType)) return NextResponse.json({ success: false, error: 'Invalid hair type' }, { status: 400 })
+    const parsed = parseProductFilters(params)
+    if (!parsed.ok || !parsed.filters) return NextResponse.json({ success: false, error: parsed.error || 'Invalid filter' }, { status: 400 })
+    const parsedFilters = parsed.filters
+    const { search, searchableText, expandedTerms, category, brand, skinType, hairType, shade, minRating: minRatingParam, sort } = parsedFilters
+    const effectiveMinPrice = parsedFilters.minPrice
+    const effectiveMaxPrice = parsedFilters.maxPrice
 
-    const sort = params.get('sort') || (search ? 'relevance' : 'newest')
-    const priceSearch = parsePriceFromQuery(search)
-    const searchableText = removePriceExpression(search, priceSearch)
-    const expandedTerms = expandSearchQuery(searchableText)
-    const effectiveMinPrice = minPriceParam ?? priceSearch?.minPrice
-    const effectiveMaxPrice = maxPriceParam ?? priceSearch?.maxPrice
-    if (effectiveMinPrice !== undefined && effectiveMaxPrice !== undefined && effectiveMinPrice > effectiveMaxPrice) {
-      return NextResponse.json({ success: false, error: 'Minimum price cannot exceed maximum price' }, { status: 400 })
-    }
-
-    const and: Prisma.ProductWhereInput[] = [{ isActive: true, isDeleted: false }]
-    if (category && category !== 'all') and.push({ category: { OR: [{ slug: category }, { name: { contains: category, mode: 'insensitive' } }] } })
-    if (brand && brand !== 'all') and.push({ brand: { OR: [{ slug: brand }, { name: { contains: brand, mode: 'insensitive' } }] } })
-    if (params.get('featured') === 'true') and.push({ featured: true })
-    if (params.get('inStock') === 'true') and.push({ stock: { gt: 0 } })
-    if (skinType) and.push({ OR: [{ skinType: { contains: skinType } }, { skinType: { contains: 'ALL' } }] })
-    if (hairType) and.push({ OR: [{ hairType: hairType as HairType }, { hairType: 'ALL_HAIR' }] })
-    if (shade) and.push({ OR: [{ shade: { contains: shade, mode: 'insensitive' } }, { shades: { contains: shade, mode: 'insensitive' } }] })
-    if (minRatingParam !== undefined) and.push({ rating: { gte: Math.min(5, minRatingParam) } })
-    if (effectiveMinPrice !== undefined || effectiveMaxPrice !== undefined) {
-      and.push({ price: { ...(effectiveMinPrice !== undefined ? { gte: effectiveMinPrice } : {}), ...(effectiveMaxPrice !== undefined ? { lte: effectiveMaxPrice } : {}) } })
-    }
-
-    // Search matching is resolved in ONE trigram-indexed statement rather than
-    // as hundreds of Prisma ILIKE ORs. See src/lib/search-match.ts: the old
-    // path measured 17.1s from Vercel for q=uruhu (640 OR clauses), the new
-    // one ~3ms. Every other filter below is untouched and still applied by
-    // Prisma, so only search speed changes.
-    let searchMatch: SearchMatch | null = null
-    if (expandedTerms.length > 0) {
-      try {
-        searchMatch = await findMatchingProductIds(expandedTerms, searchableText || search)
-      } catch (error) {
-        // pg_trgm missing, or the raw query failed. Fall through to the
-        // original clause builder so search degrades in speed, never in
-        // correctness.
-        console.error('Trigram search failed, falling back to ILIKE:', error)
-        searchMatch = null
-      }
-    }
-
-    if (searchMatch) {
-      // No matches at all: short-circuit to an impossible id so the rest of
-      // the pipeline (count, pagination, analytics) runs unchanged.
-      and.push({ id: { in: searchMatch.ids.length > 0 ? searchMatch.ids : ['__no_match__'] } })
-    } else if (expandedTerms.length > 0) {
-      and.push({
-        OR: expandedTerms.flatMap((term) => [
-          { name: { contains: term, mode: 'insensitive' as const } },
-          { shortDescription: { contains: term, mode: 'insensitive' as const } },
-          { description: { contains: term, mode: 'insensitive' as const } },
-          { sku: { contains: term, mode: 'insensitive' as const } },
-          { ingredients: { contains: term, mode: 'insensitive' as const } },
-          { ingredientsRw: { contains: term, mode: 'insensitive' as const } },
-          { expectedResults: { contains: term, mode: 'insensitive' as const } },
-          { expectedResultsRw: { contains: term, mode: 'insensitive' as const } },
-          { howToUse: { contains: term, mode: 'insensitive' as const } },
-          { howToUseRw: { contains: term, mode: 'insensitive' as const } },
-          { shade: { contains: term, mode: 'insensitive' as const } },
-          { shades: { contains: term, mode: 'insensitive' as const } },
-          { undertone: { contains: term, mode: 'insensitive' as const } },
-          { countryOfOrigin: { contains: term, mode: 'insensitive' as const } },
-          { brand: { name: { contains: term, mode: 'insensitive' as const } } },
-          { category: { name: { contains: term, mode: 'insensitive' as const } } },
-        ]),
-      })
-    }
+    // Filter clauses and search resolution both come from src/lib/product-filters
+    // so that /api/search/facets counts the SAME predicate this list returns.
+    // If the two ever diverge the sidebar promises "Skincare (12)" and the grid
+    // shows 9.
+    const and = buildFilterClauses(parsedFilters)
+    const { clause: searchClause, match: searchMatch } = await resolveSearchClause(expandedTerms, searchableText || search)
+    if (searchClause) and.push(searchClause)
 
     const where: Prisma.ProductWhereInput = { AND: and }
     const total = await prisma.product.count({ where })
