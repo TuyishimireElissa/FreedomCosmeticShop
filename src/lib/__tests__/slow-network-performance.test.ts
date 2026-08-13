@@ -23,7 +23,7 @@ describe('slow-network and low-end Android performance', () => {
     expect(image).toContain('optimizedImageUrl')
     expect(image).toContain('optimizedImageSrcSet')
     expect(image).toContain('f_${format}')
-    expect(card).toContain('srcSet={optimizedImageSrcSet(imageUrl, [300, 400, 500])}')
+    expect(card).toContain('srcSet={productCardSrcSet(imageUrl, [300, 400, 500])}')
     expect(card).toContain('loading="lazy"')
     expect(card).toContain('decoding="async"')
     expect(card).toContain('animate-pulse motion-reduce:animate-none')

@@ -30,9 +30,57 @@ export const IMAGE_PRESETS = {
 export type ImagePreset = keyof typeof IMAGE_PRESETS
 export type ResponsiveImageContext = keyof typeof IMAGE_SIZES
 
+/**
+ * Aspect ratio every product card renders at.
+ *
+ * 4:5 (0.8), matching the `aspect-[4/5]` box ProductCard already uses. Not the
+ * 3:4 some style guides suggest: this catalogue is overwhelmingly square
+ * (11 of 14 sampled images are 1:1), and a taller box would shrink every one
+ * of them on screen for no gain.
+ */
+export const PRODUCT_CARD_RATIO = { width: 4, height: 5 } as const
+
+/** Card height for a given width, on the product ratio. */
+export function productCardHeight(width: number) {
+  return Math.round((width * PRODUCT_CARD_RATIO.height) / PRODUCT_CARD_RATIO.width)
+}
+
 export function optimizeCloudinaryUrl(
   source: string,
   { width, quality = IMAGE_QUALITY.normal }: { width: number; quality?: string },
+) {
+  return buildCloudinaryUrl(source, { width, quality })
+}
+
+/**
+ * Build a Cloudinary delivery URL.
+ *
+ * `ratio: true` pins the output to PRODUCT_CARD_RATIO with `c_pad`, so every
+ * product image arrives the same shape.
+ *
+ * WHY c_pad AND NOT c_fill
+ *
+ * The old transformation was `w_500,c_fill,g_auto` with NO height. Without a
+ * height, `c_fill` has no target box, so it only scales: a 480x359 photo came
+ * back 500x374 (ratio 1.34) while a 1024x1024 came back 500x500 (ratio 1.00).
+ * Dropped into the same `aspect-[4/5]` container with `object-contain`, the
+ * wide one shrank to a letterboxed sliver and the square one nearly filled the
+ * box — which is exactly the "unequal photo sizes" the owner reported. The
+ * containers were always identical; the images inside them were not.
+ *
+ * Adding a height fixes the ratio, but `c_fill` would crop to reach it. On the
+ * measured 1.73-wide image that discards ~54% of the frame. Verified visually
+ * on a real product: `c_fill` sliced the "fresh / ANTI-BACTERIAL" wording off
+ * a Dettol pack, while `c_pad` kept the whole thing. For cosmetics the label
+ * and bottle silhouette are the recognition cue, so nothing may be cropped.
+ *
+ * `b_auto` fills the padding with a colour sampled from the image edge, so the
+ * bars read as background rather than as a grey box. Measured cost: 20 kB vs
+ * 17 kB on the wide image, 24 kB unchanged on the square one.
+ */
+export function buildCloudinaryUrl(
+  source: string,
+  { width, quality = IMAGE_QUALITY.normal, ratio = false }: { width: number; quality?: string; ratio?: boolean },
 ) {
   try {
     const url = new URL(source)
@@ -47,11 +95,13 @@ export function optimizeCloudinaryUrl(
 
     const safeWidth = Math.max(1, Math.min(1280, Math.round(width)))
     const safeQuality = quality === IMAGE_QUALITY.lowData ? IMAGE_QUALITY.lowData : IMAGE_QUALITY.normal
-    const transformation = `w_${safeWidth},c_fill,g_auto,q_${safeQuality},f_auto,dpr_auto`
+    const transformation = ratio
+      ? `w_${safeWidth},h_${productCardHeight(safeWidth)},c_pad,b_auto,q_${safeQuality},f_auto,dpr_auto`
+      : `w_${safeWidth},c_fill,g_auto,q_${safeQuality},f_auto,dpr_auto`
     const remainder = url.pathname.slice(prefix.length)
     const segments = remainder.split('/')
     const firstSegment = segments[0] || ''
-    const hasExistingTransformation = /(?:^|,)(?:w|h|c|g|q|f|dpr)_/.test(firstSegment)
+    const hasExistingTransformation = /(?:^|,)(?:w|h|c|g|q|f|b|dpr)_/.test(firstSegment)
     if (hasExistingTransformation) segments.shift()
     url.pathname = `${prefix}${transformation}/${segments.join('/')}`
     return url.toString()
@@ -70,6 +120,25 @@ export function optimizedImageSrcSet(url: string | null | undefined, widths: num
   if (!url) return ''
   return [...new Set(widths)].filter((width) => width > 0 && width <= 1280)
     .map((width) => `${optimizedImageUrl(url, width)} ${width}w`).join(', ')
+}
+
+/**
+ * Product card image, normalised to PRODUCT_CARD_RATIO.
+ *
+ * Separate from `optimizedImageUrl` on purpose: hero banners, category tiles
+ * and review photos are legitimately other shapes and must keep the plain
+ * width-only transform. Only product imagery is pinned.
+ */
+export function productCardImageUrl(url: string | null | undefined, width = 400, quality: string = IMAGE_QUALITY.normal) {
+  if (!url) return ''
+  return buildCloudinaryUrl(url, { width: Math.max(1, Math.min(1280, Math.round(width))), quality, ratio: true })
+}
+
+/** Matching srcSet, every entry on the same ratio. */
+export function productCardSrcSet(url: string | null | undefined, widths: number[]) {
+  if (!url) return ''
+  return [...new Set(widths)].filter((width) => width > 0 && width <= 1280)
+    .map((width) => `${productCardImageUrl(url, width)} ${width}w`).join(', ')
 }
 
 export interface StructuredProductImage {

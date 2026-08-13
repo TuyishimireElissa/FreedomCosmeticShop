@@ -9,7 +9,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { useStore } from '@/store/useStore'
 import { useToast } from '@/hooks/use-toast'
 import dynamic from 'next/dynamic'
-import { optimizedImageSrcSet, optimizedImageUrl } from '@/lib/cloudinary-images'
+import { productCardImageUrl, productCardSrcSet } from '@/lib/cloudinary-images'
 import LogoRef from '@/components/brand/LogoRef'
 
 const QuickView = dynamic(() => import('@/components/products/QuickView'), { ssr: false })
@@ -135,15 +135,15 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
         <Link href={`/products/${product.slug}`} prefetch={true} className="block h-full w-full rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fcs-brand" aria-label={t('product.view_product', { product: product.name })}>
           {imageUrl && !imageFailed ? (
             <img
-              src={optimizedImageUrl(imageUrl, 500)}
-              srcSet={optimizedImageSrcSet(imageUrl, [300, 400, 500])}
+              src={productCardImageUrl(imageUrl, 500)}
+              srcSet={productCardSrcSet(imageUrl, [300, 400, 500])}
               sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
               alt={product.name}
               loading="lazy"
               decoding="async"
               onLoad={() => setImageLoaded(true)}
               onError={() => setImageFailed(true)}
-              className={`h-full w-full object-contain p-4 drop-shadow-[0_10px_14px_rgba(15,23,42,0.10)] transition-transform duration-500 group-hover:scale-105 md:p-6 ${outOfStock ? 'opacity-60' : ''}`}
+              className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100 ${outOfStock ? 'opacity-60' : ''}`}
             />
           ) : (
             <span role="img" aria-label={product.name} className="flex h-full w-full items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4 text-center">

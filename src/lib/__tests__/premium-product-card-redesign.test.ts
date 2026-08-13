@@ -14,7 +14,10 @@ describe('premium shared product card redesign', () => {
     for (const value of [
       'aspect-[4/5]',
       'bg-gradient-to-b from-gray-50 to-white',
-      'drop-shadow-[0_10px_14px_rgba(15,23,42,0.10)]',
+      // drop-shadow removed: it floated a contained image above the card.
+      // Cloudinary now pads to 4:5 so the image fills the frame edge to
+      // edge and there is nothing left to float.
+      'object-cover',
       'group-hover:scale-105',
       'duration-500',
       'from-black/20 to-transparent',

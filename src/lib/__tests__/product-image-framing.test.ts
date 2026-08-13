@@ -9,9 +9,11 @@ const gallery = readFileSync('src/components/products/ProductImageGallery.tsx', 
 describe('product image framing', () => {
   it('renders a large studio-style image card with an intentional fallback', () => {
     expect(card).toContain('aspect-[4/5]')
-    expect(card).toContain('object-contain p-4')
+    // Cloudinary now delivers a padded 4:5 image, so the card fills its box
+    // with object-cover. The padding lives inside the image, not the CSS.
+    expect(card).toContain('object-cover')
     expect(card).toContain('<img')
-    expect(card).toContain('src={optimizedImageUrl(imageUrl, 500)}')
+    expect(card).toContain('src={productCardImageUrl(imageUrl, 500)}')
     expect(card).toContain('<ImageIcon className="mx-auto h-12 w-12 text-gray-300"')
   })
 
@@ -19,7 +21,7 @@ describe('product image framing', () => {
     for (const field of ['product.images', 'product.image', 'product.imageUrl', 'product.productImages', 'product.thumbnailUrl']) expect(card).toContain(field)
     expect(card.indexOf('product.productImages')).toBeLessThan(card.indexOf('product.images'))
     expect(card).toContain('<img')
-    expect(card).toContain('src={optimizedImageUrl(imageUrl, 500)}')
+    expect(card).toContain('src={productCardImageUrl(imageUrl, 500)}')
     expect(card).toContain('onError={() => setImageFailed(true)}')
     expect(cart).toContain('src={optimizedImageUrl(item.image, 80)}')
     expect(publicProduct).toContain('images: true')

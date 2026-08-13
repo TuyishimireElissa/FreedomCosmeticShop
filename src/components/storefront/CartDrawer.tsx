@@ -134,7 +134,11 @@ export function CartDrawer() {
                         alt={item.name}
                         loading="lazy"
                         decoding="async"
-                        className="h-full w-full object-cover"
+                        // object-contain, matching the bag page and every
+                        // other thumbnail. cover crops a wide product photo
+                        // inside this square box, so the same item looked
+                        // different in the drawer and on /cart.
+                        className="h-full w-full object-contain p-1"
                       />
                     ) : (
                       <div className="text-muted-foreground grid h-full w-full place-items-center text-xs">

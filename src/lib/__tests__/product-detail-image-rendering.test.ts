@@ -39,7 +39,7 @@ describe('reliable product image rendering', () => {
   })
 
   it('uses the same direct URL strategy on cards and keeps empty reviews in the reviews section', () => {
-    expect(card).toContain('src={optimizedImageUrl(imageUrl, 500)}')
+    expect(card).toContain('src={productCardImageUrl(imageUrl, 500)}')
     expect(card).toContain('onError={() => setImageFailed(true)}')
     expect(cartDrawer).toContain('src={optimizedImageUrl(item.image, 80)}')
     expect(detail).not.toContain("t('product.no_reviews')")
