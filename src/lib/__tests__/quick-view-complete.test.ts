@@ -33,15 +33,15 @@ describe('complete accessible product Quick View', () => {
 
   it('supports a responsive gallery with zoom, swipe, arrows, and dots', () => {
     for (const value of [
-      'getProductImageGallery', 'activeIndex', 'nextImage', 'previousImage', 'Zoom in product image', 'duration-300',
+      'getProductImageGallery', 'activeIndex', 'nextImage', 'previousImage', "t('product.zoom_in')", 'duration-300',
       'Previous product image', 'Next product image', 'Show image ${index + 1}', 'bg-gradient-to-b from-gray-50 to-white', '<ImageIcon',
     ]) expect(quickView).toContain(value)
   })
 
   it('shows truthful product information, live totals, wholesale pricing, and real delivery data', () => {
     for (const value of [
-      'product.brand?.name', 'product.reviewsCount > 0', 'comparePrice', 'You save', 'product.skinType?.slice',
-      "product.shortDescription", 'displayPrice * quantity', "t('product.add_to_cart')", 'Added!', 'Wholesale',
+      'product.brand?.name', 'product.reviewsCount > 0', 'comparePrice', "t('product.you_save')", 'product.skinType?.slice',
+      "product.shortDescription", 'displayPrice * quantity', "t('product.add_to_cart')", "t('product.added')", 'Wholesale',
       'product.stock <= 5', '/api/delivery/calculate?district=Gasabo&orderTotal=', 'delivery.deliveryTime',
     ]) expect(quickView).toContain(value)
     expect(quickView).not.toContain('Same day delivery')
@@ -50,7 +50,7 @@ describe('complete accessible product Quick View', () => {
 
   it('supports cart, details, wishlist, and WhatsApp sharing on every shared-card surface', () => {
     for (const value of [
-      'addToCart({', "fetch('/api/wishlist'", 'buildWhatsAppShareUrl', 'View Full Details', "trackWhatsAppClick('share_product'",
+      'addToCart({', "fetch('/api/wishlist'", 'buildWhatsAppShareUrl', "t('product.view_full_details')", "trackWhatsAppClick('share_product'",
     ]) expect(quickView).toContain(value)
     expect(grid).toContain('<ProductCard')
     expect(featured).toContain('<ProductCard')

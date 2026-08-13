@@ -349,6 +349,13 @@ export const rw = {
     all: 'Ibicuruzwa byose', skincare: 'Kwita ku ruhu', makeup: 'Ibikoresho byo kwisiga', haircare: 'Kwita ku musatsi', fragrance: 'Imibavu', body_care: 'Kwita ku mubiri', mens: "Ibikoresho by'abagabo", natural: 'Ibikomoka ku bidukikije', gifts: 'Impano', new_arrivals: 'Ibicuruzwa bishya', best_sellers: 'Ibicuruzwa bikunzwe cyane', on_sale: 'Ibyagabanyijwe', //  REVIEW // verified-rw
   },
   product: {
+    saved: 'Byabitswe', // verified-rw
+    kigali_label: 'Kigali', // verified-rw
+    zoom_in: 'Kwegereza ifoto', // verified-rw
+    zoom_out: 'Kwikuramo ifoto', // verified-rw
+    left_in_stock: 'Hasigaye {count}', // verified-rw
+    per_unit: ' kuri buri kimwe', // verified-rw
+    view_full_details: 'Reba byose', // verified-rw
     wholesale_application_hint: 'Igiciro cyo kurangura gishobora kuboneka iyo cyashyizweho kuri iki gicuruzwa.', // verified-rw
     wholesale_terms_hint: 'Saba konti yo kurangura kugira ngo urebe ibiciro byashyizweho ku gicuruzwa n’ingano.', // verified-rw
     apply_wholesale: 'Saba konti yo kurangura', // verified-rw

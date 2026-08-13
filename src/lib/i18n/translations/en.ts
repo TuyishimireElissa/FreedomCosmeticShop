@@ -343,6 +343,13 @@ export const en = {
     all: 'All Products', skincare: 'Skincare', makeup: 'Makeup', haircare: 'Hair Care', fragrance: 'Fragrance', body_care: 'Body Care', mens: "Men's Grooming", natural: 'Natural & Organic', gifts: 'Gift Sets', new_arrivals: 'New Arrivals', best_sellers: 'Best Sellers', on_sale: 'On Sale',
   },
   product: {
+    saved: 'Saved',
+    kigali_label: 'Kigali',
+    zoom_in: 'Zoom in product image',
+    zoom_out: 'Zoom out product image',
+    left_in_stock: '{count} left in stock',
+    per_unit: ' per unit',
+    view_full_details: 'View full details',
     wholesale_application_hint: 'Wholesale pricing may be available when configured for this product.',
     wholesale_terms_hint: 'Apply for a wholesale account to view configured product and quantity pricing.',
     apply_wholesale: 'Apply for wholesale',
