@@ -17,6 +17,9 @@ import { z } from "zod"
 
 const UpdateCategorySchema = z.object({
   name: z.string().min(2).max(100).optional(),
+  // Kinyarwanda display name, editable from the admin panel so the owner
+  // never needs a developer to rename a category.
+  nameRw: z.string().min(1).max(100).optional().nullable(),
   description: z.string().max(500).optional().nullable(),
   image: z.string().url().optional().nullable(),
   icon: z.string().optional().nullable(),

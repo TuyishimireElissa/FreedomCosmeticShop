@@ -18,6 +18,9 @@ import { z } from "zod"
 
 const CreateCategorySchema = z.object({
   name: z.string().min(2).max(100),
+  // Kinyarwanda display name. Optional so an existing caller that omits it
+  // still succeeds; the UI falls back to the i18n key, then to `name`.
+  nameRw: z.string().min(1).max(100).optional().nullable(),
   description: z.string().max(500).optional().nullable(),
   image: z.string().url().optional().nullable(),
   icon: z.string().optional().nullable(),
@@ -35,7 +38,9 @@ export async function GET() {
     await requirePermission(PERMISSIONS.PRODUCTS_READ)
     const categories = await db.category.findMany({
       where: { isDeleted: false },
-      orderBy: { name: "asc" },
+      // sortOrder is the order the storefront nav uses; the admin table must
+      // show the same sequence or reordering is guesswork.
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       include: { _count: { select: { products: true } } },
     })
     return NextResponse.json({ categories })
@@ -70,6 +75,7 @@ export async function POST(req: Request) {
     const category = await db.category.create({
       data: {
         name: parsed.data.name!,
+        nameRw: parsed.data.nameRw || null,
         slug,
         description: parsed.data.description || null,
         image: parsed.data.image || null,

@@ -198,6 +198,9 @@ model StaffProfile {
 model Category {
   id          String  @id @default(cuid())
   name        String
+  /// Kinyarwanda display name. Nullable: the UI falls back to the i18n key
+  /// and then to `name`, so an unfilled row renders correctly today.
+  nameRw      String?
   slug        String  @unique
   description String?
   image       String?
