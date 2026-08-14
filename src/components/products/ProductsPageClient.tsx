@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { categoryLabel } from '@/lib/category-i18n-map'
 import type { Brand, Category, Product } from '@/lib/types'
 import ProductGrid from '@/components/products/ProductGrid'
 import FilterSidebar from '@/components/products/FilterSidebar'
@@ -8,7 +9,7 @@ import MobileFilters from '@/components/products/MobileFilters'
 import FilterChips from '@/components/products/FilterChips'
 import SearchWithSuggestions from '@/components/storefront/SearchWithSuggestions'
 import { useProductFilters } from '@/hooks/useProductFilters'
-import { useT } from '@/lib/i18n/LanguageContext'
+import { useLanguage, useT } from '@/lib/i18n/LanguageContext'
 import { cn } from '@/lib/utils'
 import { useLowData } from '@/contexts/LowDataContext'
 import StructuredData from '@/components/seo/StructuredData'
@@ -31,15 +32,6 @@ interface Pagination {
 const LOW_DATA_PAGE_SIZE = 8
 const NORMAL_PAGE_SIZE = 12
 
-const CATEGORY_TRANSLATION_KEYS: Record<string, string> = {
-  skincare: 'categories.skincare',
-  haircare: 'categories.haircare',
-  makeup: 'categories.makeup',
-  fragrance: 'categories.fragrance',
-  'body-care': 'categories.body_care',
-  mens: 'categories.mens',
-  natural: 'categories.natural',
-}
 
 const EMPTY_PAGINATION: Pagination = { page: 1, pageSize: NORMAL_PAGE_SIZE, total: 0, totalPages: 0, hasMore: false }
 
@@ -49,6 +41,7 @@ export default function ProductsPageClient() {
 
 function ProductsContent() {
   const t = useT()
+  const { language } = useLanguage()
   const user = useStore((state) => state.user)
   const isWholesale = user?.wholesaleStatus === 'APPROVED'
   const { isLowData } = useLowData()
@@ -140,10 +133,12 @@ function ProductsContent() {
   const selectedCategory = filters.category
     ? categories.find((category) => category.slug === filters.category)
     : undefined
+  // Was keyed off a local map whose `mens` entry never matched the real
+  // `mens-grooming` slug, so that breadcrumb always fell back to English.
   const categoryName = filters.category
-    ? CATEGORY_TRANSLATION_KEYS[filters.category]
-      ? t(CATEGORY_TRANSLATION_KEYS[filters.category])
-      : selectedCategory?.name || filters.category
+    ? selectedCategory
+      ? categoryLabel(selectedCategory, t, language)
+      : filters.category
     : null
   const breadcrumbItems = [
     { name: t('nav.products'), url: '/products' },

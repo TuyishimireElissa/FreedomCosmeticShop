@@ -18,7 +18,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import type { Category } from '@/lib/types'
-import { useT } from '@/lib/i18n/LanguageContext'
+import { useLanguage, useT } from '@/lib/i18n/LanguageContext'
+import { categoryLabel } from '@/lib/category-i18n-map'
 import LogoRef from '@/components/brand/LogoRef'
 
 interface CategoryGridProps {
@@ -27,14 +28,6 @@ interface CategoryGridProps {
   error?: string | null
 }
 
-const TRANSLATION_KEYS: Record<string, string> = {
-  skincare: 'categories.skincare',
-  haircare: 'categories.haircare',
-  'hair-care': 'categories.haircare',
-  'body-care': 'categories.body_care',
-  'bath-body': 'categories.body_care',
-  makeup: 'categories.makeup',
-}
 
 /** Warm surfaces for tiles with no photograph. Text on each is --fcs-text
  *  (>=4.5:1 on all three) rather than white, so contrast never depends on an
@@ -48,6 +41,7 @@ function productCount(category: Category): number {
 
 export default function CategoryGrid({ categories, loading = false, error }: CategoryGridProps) {
   const t = useT()
+  const { language } = useLanguage()
 
   // Largest first: a homepage tile is prime real estate and should point at
   // the deepest inventory, not at whichever slug was hard-coded first.
@@ -89,7 +83,7 @@ export default function CategoryGrid({ categories, loading = false, error }: Cat
         ) : (
           <ul className="grid grid-cols-2 gap-3 md:gap-4">
             {tiles.map((category, index) => {
-              const label = TRANSLATION_KEYS[category.slug] ? t(TRANSLATION_KEYS[category.slug]) : category.name
+              const label = categoryLabel(category, t, language)
               const count = productCount(category)
               const hasImage = Boolean(category.image)
               return (

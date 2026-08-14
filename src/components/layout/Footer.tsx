@@ -5,19 +5,19 @@ import Link from 'next/link'
 import { BUSINESS, OWNER_TODO } from '@/lib/business-config'
 import { ACCEPTED_PAYMENTS } from '@/lib/accepted-payments'
 import Logo from '@/components/ui/logo'
-import { useT } from '@/lib/i18n/LanguageContext'
+import { useLanguage, useT } from '@/lib/i18n/LanguageContext'
+import { useCategories } from '@/hooks/use-categories'
+import { categoryLabel } from '@/lib/category-i18n-map'
 
-const shopLinks = [
-  { key: 'all', translationKey: 'categories.all', slug: null },
-  { key: 'skincare', translationKey: 'categories.skincare', slug: 'skincare' },
-  { key: 'makeup', translationKey: 'categories.makeup', slug: 'makeup' },
-  { key: 'haircare', translationKey: 'categories.haircare', slug: 'haircare' },
-  { key: 'body-care', translationKey: 'categories.body_care', slug: 'body-care' },
-]
 function configured(value: string) { return value !== OWNER_TODO && !value.includes('TODO:') }
 
 export default function Footer() {
   const t = useT()
+  // Same source as the navbar. No Soon badge here: the footer is a dense link
+  // list and a row of pills would clutter it. Empty categories still appear,
+  // and still lead to the Coming Soon page.
+  const { language } = useLanguage()
+  const { categories } = useCategories()
   const contactRows = [
     configured(BUSINESS.phone) && { icon: Phone, href: `tel:${BUSINESS.phone}`, text: BUSINESS.phoneDisplay },
     configured(BUSINESS.email) && { icon: Mail, href: `mailto:${BUSINESS.email}`, text: BUSINESS.email },
@@ -38,7 +38,7 @@ export default function Footer() {
             <div className="mt-6 flex flex-wrap gap-2 text-xs text-gray-300">{ACCEPTED_PAYMENTS.map((payment) => <span key={payment} className="rounded-lg border border-white/10 px-2.5 py-1.5">{payment}</span>)}</div>
           </section>
 
-          <section><h2 className="text-xs font-semibold uppercase tracking-[0.16em]">{t('footer.shop')}</h2><ul className="mt-4 space-y-1">{shopLinks.map((item) => <li key={item.key}><Link href={item.slug ? `/products?category=${item.slug}` : '/products'} className="flex min-h-11 items-center text-sm text-[#AAAAAA] hover:text-white">{t(item.translationKey)}</Link></li>)}<li><Link href="/wholesale" className="flex min-h-11 items-center text-sm text-[#C4956A] hover:text-white">{t('footer.wholesale_beauty')}</Link></li></ul></section>
+          <section><h2 className="text-xs font-semibold uppercase tracking-[0.16em]">{t('footer.shop')}</h2><ul className="mt-4 space-y-1"><li><Link href="/products" className="flex min-h-11 items-center text-sm text-[#AAAAAA] hover:text-white">{t('categories.all')}</Link></li>{categories.map((category) => <li key={category.slug}><Link href={`/products?category=${category.slug}`} className="flex min-h-11 items-center text-sm text-[#AAAAAA] hover:text-white">{categoryLabel(category, t, language)}</Link></li>)}<li><Link href="/wholesale" className="flex min-h-11 items-center text-sm text-[#C4956A] hover:text-white">{t('footer.wholesale_beauty')}</Link></li></ul></section>
 
           <section><h2 className="text-xs font-semibold uppercase tracking-[0.16em]">{t('footer.help')}</h2><ul className="mt-4 space-y-1 text-sm">{[['/track-order','footer.track_order'],['/shipping','footer.shipping_policy'],['/returns','footer.returns_refunds'],['/faq','footer.faq'],['/privacy','footer.privacy_policy'],['/terms','footer.terms_conditions']].map(([href,key]) => <li key={href}><Link href={href} className="flex min-h-11 items-center text-[#AAAAAA] hover:text-white">{t(key)}</Link></li>)}</ul></section>
 

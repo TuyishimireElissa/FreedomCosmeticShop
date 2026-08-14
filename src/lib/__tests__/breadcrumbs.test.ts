@@ -35,7 +35,13 @@ describe('accessible visible breadcrumbs', () => {
   })
 
   it('renders catalogue breadcrumbs using the active translated category', () => {
-    expect(products).toContain('CATEGORY_TRANSLATION_KEYS')
+    // INTENTIONAL CHANGE, not a regression. The local CATEGORY_TRANSLATION_KEYS
+    // map was deleted: its `mens` entry never matched the real
+    // `mens-grooming` slug, so this breadcrumb always fell back to English.
+    // Translation now goes through the single shared map in
+    // src/lib/category-i18n-map.ts, which every surface uses.
+    expect(products).toContain('categoryLabel(selectedCategory, t, language)')
+    expect(products).toContain("from '@/lib/category-i18n-map'")
     expect(products).toContain("{ name: t('nav.products'), url: '/products' }")
     expect(products).toContain('<Breadcrumbs items={breadcrumbItems} />')
   })

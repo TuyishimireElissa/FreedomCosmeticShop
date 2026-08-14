@@ -44,7 +44,13 @@ describe('slow-network and low-end Android performance', () => {
     expect(productsApi).toContain('select: PUBLIC_PRODUCT_CARD_SELECT')
     expect(productsApi).toContain("s-maxage=60, stale-while-revalidate=300")
     expect(featuredApi).toContain("s-maxage=60, stale-while-revalidate=300")
-    expect(categoriesApi).toContain("s-maxage=300, stale-while-revalidate=900")
+    // INTENTIONAL CHANGE, not a regression. /api/categories now drives the
+    // navbar and footer, so an owner toggling a category off in admin expects
+    // the nav to follow quickly. 300s was too long a cold-load ceiling for
+    // that; 60s matches the products and featured routes above. The realtime
+    // broadcast still pushes the change instantly — this is only the ceiling
+    // for a visitor arriving cold on a CDN edge that has not been purged.
+    expect(categoriesApi).toContain("s-maxage=60, stale-while-revalidate=300")
     expect(zonesApi).toContain("s-maxage=3600, stale-while-revalidate=86400")
     expect(productsApi).toContain("params.get('limit') || 12")
   })

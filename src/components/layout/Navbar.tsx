@@ -21,26 +21,26 @@ import { SearchWithSuggestions } from '@/components/storefront/SearchWithSuggest
 import SearchOverlay from '@/components/storefront/SearchOverlay'
 import LanguageSelector from '@/components/ui/LanguageSelector'
 import Logo from '@/components/ui/logo'
-import { useT } from '@/lib/i18n/LanguageContext'
+import { useLanguage, useT } from '@/lib/i18n/LanguageContext'
 import { useScrolled } from '@/hooks/use-scrolled'
 import { useSettings } from '@/hooks/use-settings'
 import { useToast } from '@/hooks/use-toast'
 import { useStore } from '@/store/useStore'
 import { BUSINESS } from '@/lib/business-config'
 import LowDataToggle from '@/components/settings/LowDataToggle'
+import CategorySoonBadge from '@/components/layout/CategorySoonBadge'
+import { liveProductCount, useCategories } from '@/hooks/use-categories'
+import { categoryLabel } from '@/lib/category-i18n-map'
 
-const categories = [
-  { slug: 'skincare', translationKey: 'categories.skincare' },
-  { slug: 'makeup', translationKey: 'categories.makeup' },
-  { slug: 'haircare', translationKey: 'categories.haircare' },
-  { slug: 'fragrance', translationKey: 'categories.fragrance' },
-  { slug: 'body-care', translationKey: 'categories.body_care' },
-  { slug: 'mens-grooming', translationKey: 'categories.mens' },
-]
 
 export default function Navbar() {
   const router = useRouter()
   const t = useT()
+  // Categories come from the database, not a hardcoded list. The old array
+  // linked to Makeup, which has no live products — verified live, that link
+  // led to "No products match your filters".
+  const { language } = useLanguage()
+  const { categories, loading: categoriesLoading } = useCategories()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   // Focus returns here when the search overlay closes, so a keyboard or
@@ -257,11 +257,17 @@ export default function Navbar() {
           <button type="button" onClick={() => router.push('/products')} className="shrink-0 border-b-2 border-transparent py-3 text-[13px] font-medium text-[#777777] transition-colors hover:border-fcs-brand hover:text-[#1a1a1a]">
             {t('categories.all')}
           </button>
-          {categories.map((category) => (
-            <button key={category.slug} type="button" onClick={() => router.push(`/products?category=${category.slug}`)} className="shrink-0 border-b-2 border-transparent py-3 text-[13px] font-medium text-[#777777] transition-colors hover:border-fcs-brand hover:text-[#1a1a1a]">
-              {t(category.translationKey)}
-            </button>
-          ))}
+          {categoriesLoading
+            ? /* Skeleton matches the real row height so the strip does not jump. */
+              [0, 1, 2, 3].map((slot) => (
+                <span key={slot} className="my-3 h-4 w-20 shrink-0 animate-pulse rounded bg-fcs-surface-secondary motion-reduce:animate-none" aria-hidden="true" />
+              ))
+            : categories.map((category) => (
+                <button key={category.slug} type="button" onClick={() => router.push(`/products?category=${category.slug}`)} className="flex shrink-0 items-center gap-1.5 border-b-2 border-transparent py-3 text-[13px] font-medium text-[#777777] transition-colors hover:border-fcs-brand hover:text-[#1a1a1a]">
+                  {categoryLabel(category, t, language)}
+                  {liveProductCount(category) === 0 && <CategorySoonBadge />}
+                </button>
+              ))}
           <button type="button" onClick={() => router.push('/bundles')} className="ml-auto flex shrink-0 items-center gap-1.5 border-b-2 border-transparent px-3 py-3 text-sm font-bold text-fcs-brand-text transition-colors hover:border-fcs-brand hover:text-fcs-brand-text">
             {t('nav.bundles')}
           </button>
@@ -292,11 +298,16 @@ export default function Navbar() {
               <button type="button" onClick={() => navigate(() => router.push('/products'))} className="col-span-2 flex items-center gap-3 rounded-2xl border border-gray-100 bg-[#f8f9fa] px-4 py-3 text-left font-semibold">
                 <ShoppingBag className="h-5 w-5" aria-hidden="true" /> {t('categories.all')}
               </button>
-              {categories.map((category) => (
-                <button key={category.slug} type="button" onClick={() => navigate(() => router.push(`/products?category=${category.slug}`))} className="flex min-h-16 items-center gap-2 rounded-2xl border border-gray-100 px-3 py-3 text-left text-sm font-medium transition-colors hover:border-rose-200 hover:bg-rose-50">
-                  {t(category.translationKey)}
-                </button>
-              ))}
+              {categoriesLoading
+                ? [0, 1, 2, 3].map((slot) => (
+                    <span key={slot} className="min-h-16 animate-pulse rounded-2xl bg-fcs-surface-secondary motion-reduce:animate-none" aria-hidden="true" />
+                  ))
+                : categories.map((category) => (
+                    <button key={category.slug} type="button" onClick={() => navigate(() => router.push(`/products?category=${category.slug}`))} className="flex min-h-16 flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-gray-100 px-3 py-3 text-left text-sm font-medium transition-colors hover:border-rose-200 hover:bg-rose-50">
+                      {categoryLabel(category, t, language)}
+                      {liveProductCount(category) === 0 && <CategorySoonBadge />}
+                    </button>
+                  ))}
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-2">
