@@ -29,7 +29,7 @@ import { useStore } from '@/store/useStore'
 import { BUSINESS } from '@/lib/business-config'
 import LowDataToggle from '@/components/settings/LowDataToggle'
 import CategorySoonBadge from '@/components/layout/CategorySoonBadge'
-import { liveProductCount, useCategories } from '@/hooks/use-categories'
+import { liveProductCount, stockedFirst, useCategories } from '@/hooks/use-categories'
 import { categoryLabel } from '@/lib/category-i18n-map'
 
 
@@ -302,7 +302,7 @@ export default function Navbar() {
                 ? [0, 1, 2, 3].map((slot) => (
                     <span key={slot} className="min-h-16 animate-pulse rounded-2xl bg-fcs-surface-secondary motion-reduce:animate-none" aria-hidden="true" />
                   ))
-                : categories.map((category) => (
+                : stockedFirst(categories).map((category) => (
                     <button key={category.slug} type="button" onClick={() => navigate(() => router.push(`/products?category=${category.slug}`))} className="flex min-h-16 flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-gray-100 px-3 py-3 text-left text-sm font-medium transition-colors hover:border-rose-200 hover:bg-rose-50">
                       {categoryLabel(category, t, language)}
                       {liveProductCount(category) === 0 && <CategorySoonBadge />}

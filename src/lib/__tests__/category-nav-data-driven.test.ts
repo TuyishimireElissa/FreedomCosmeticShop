@@ -24,6 +24,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { CATEGORY_I18N_KEYS, categoryLabel } from '@/lib/category-i18n-map'
+import { stockedFirst, type StorefrontCategory } from '@/hooks/use-categories'
 
 const read = (path: string) => {
   const raw = readFileSync(path, 'utf8')
@@ -181,10 +182,31 @@ describe('one shared i18n map replaces the three broken ones', () => {
     expect(productsPage).not.toContain('const CATEGORY_TRANSLATION_KEYS')
   })
 
-  it('covers every slug that exists in the database today', () => {
-    // Queried live 2026-08-14.
-    for (const slug of ['skincare', 'body-care', 'fragrance', 'haircare', 'makeup', 'mens-grooming', 'hair-care']) {
+  it('covers all 16 slugs that exist in the database', () => {
+    // Queried live 2026-08-14 after the ten new rows were created.
+    const slugs = [
+      'skincare', 'body-care', 'soap', 'fragrance', 'whitening', 'haircare',
+      'makeup', 'mens-grooming', 'baby-kids', 'body-oil', 'petroleum-jelly',
+      'hair-growth', 'natural-organic', 'nail-care', 'deodorant', 'shampoo',
+      'hair-care', // the retired ghost, mapped so it never renders as a slug
+    ]
+    for (const slug of slugs) {
       expect(CATEGORY_I18N_KEYS[slug], `no i18n key for ${slug}`).toBeTruthy()
+    }
+    expect(Object.keys(CATEGORY_I18N_KEYS).length).toBeGreaterThanOrEqual(17)
+  })
+
+  it('every one of the ten new keys is reviewed Kinyarwanda', () => {
+    const block = /^  categories: \{([\s\S]*?)^  \},/m.exec(rwSource)
+    expect(block, 'categories namespace missing').not.toBeNull()
+    const body = block![1]
+    const added = ['soap', 'whitening', 'baby_kids', 'body_oil', 'petroleum_jelly',
+                   'hair_growth', 'natural_organic', 'nail_care', 'deodorant', 'shampoo']
+    for (const key of added) {
+      const line = body.split('\n').find((candidate) => candidate.trim().startsWith(`${key}:`))
+      expect(line, `rw.ts has no ${key}`).toBeDefined()
+      expect(line, `unreviewed rw: ${line?.trim()}`).toContain('verified-rw')
+      expect(line!, `igare in ${key}`).not.toMatch(/\bigare\b/i)
     }
   })
 
@@ -235,5 +257,56 @@ describe('categoryLabel resolves in the right order', () => {
     const label = categoryLabel({ slug: 'soap', name: 'Soap' }, t, 'rw')
     expect(label).toBe('Soap')
     expect(label).not.toContain('categories.')
+  })
+})
+
+describe('the phone menu leads with categories that have stock', () => {
+  // 16 categories, 11 empty on day one. Strict sortOrder would put Soap (3,
+  // empty) and Whitening (5, empty) above Hair Care and Men's Grooming, which
+  // have products. On a 360px screen the menu is ~640px in a ~528px box, so
+  // anything past row 4 needs a scroll.
+  const make = (slug: string, sortOrder: number, products: number): StorefrontCategory =>
+    ({ id: slug, name: slug, slug, sortOrder, _count: { products } })
+
+  const sample = [
+    make('skincare', 1, 23), make('body-care', 2, 44), make('soap', 3, 0),
+    make('fragrance', 4, 33), make('whitening', 5, 0), make('haircare', 6, 5),
+    make('makeup', 7, 0), make('mens-grooming', 8, 1), make('shampoo', 16, 0),
+  ]
+
+  it('puts every stocked category before every empty one', () => {
+    const order = stockedFirst(sample)
+    const lastStocked = order.findLastIndex((c) => (c._count?.products ?? 0) > 0)
+    const firstEmpty = order.findIndex((c) => (c._count?.products ?? 0) === 0)
+    expect(firstEmpty).toBeGreaterThan(lastStocked)
+  })
+
+  it('keeps sortOrder within each group', () => {
+    // SHUFFLED input. Array.sort is stable, so a sample already in sortOrder
+    // comes back correct even with the tiebreak deleted — mutation testing
+    // showed exactly that. The input must be out of order to prove the
+    // comparator, not the engine's stability, is doing the work.
+    const shuffled = [sample[8], sample[3], sample[6], sample[0], sample[4], sample[7], sample[1], sample[5], sample[2]]
+    expect(shuffled.map((c) => c.slug)).not.toEqual(sample.map((c) => c.slug))
+    const order = stockedFirst(shuffled).map((c) => c.slug)
+    expect(order.slice(0, 5)).toEqual(['skincare', 'body-care', 'fragrance', 'haircare', 'mens-grooming'])
+    expect(order.slice(5)).toEqual(['soap', 'whitening', 'makeup', 'shampoo'])
+  })
+
+  it('does not mutate the array it is given', () => {
+    // Same trap: sorting an already-sorted array in place leaves it looking
+    // untouched. Shuffle first so an in-place sort is detectable.
+    const shuffled = [sample[8], sample[3], sample[0], sample[6], sample[1]]
+    const snapshot = shuffled.map((c) => c.slug)
+    stockedFirst(shuffled)
+    expect(shuffled.map((c) => c.slug), 'stockedFirst sorted in place').toEqual(snapshot)
+  })
+
+  it('applies to the phone menu only, not the desktop strip', () => {
+    // The strip and footer must keep pure sortOrder so the owner's sequence
+    // is what a desktop shopper sees.
+    const uses = navbar.match(/stockedFirst\(categories\)/g) || []
+    expect(uses.length, 'exactly one call, in the mobile menu').toBe(1)
+    expect(footer).not.toContain('stockedFirst')
   })
 })

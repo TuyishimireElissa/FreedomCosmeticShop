@@ -340,6 +340,16 @@ export const en = {
     featured_loading: 'Loading featured products',
   },
   categories: {
+    soap: 'Soap',
+    whitening: 'Whitening & Brightening',
+    baby_kids: 'Baby & Kids',
+    body_oil: 'Body Oil',
+    petroleum_jelly: 'Petroleum Jelly',
+    hair_growth: 'Hair Growth',
+    natural_organic: 'Natural & Organic',
+    nail_care: 'Nail Care',
+    deodorant: 'Deodorant',
+    shampoo: 'Shampoo',
     all: 'All Products', skincare: 'Skincare', makeup: 'Makeup', haircare: 'Hair Care', fragrance: 'Fragrance', body_care: 'Body Care', mens: "Men's Grooming", natural: 'Natural & Organic', gifts: 'Gift Sets', new_arrivals: 'New Arrivals', best_sellers: 'Best Sellers', on_sale: 'On Sale',
   },
   product: {

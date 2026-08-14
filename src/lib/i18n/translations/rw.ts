@@ -346,6 +346,16 @@ export const rw = {
     featured_loading: 'Ibicuruzwa byatoranyijwe birimo gufunguka', // verified-rw
   },
   categories: {
+    soap: 'Isabune', // verified-rw
+    whitening: 'Kwera no Kurangaza', // verified-rw
+    baby_kids: 'Abana', // verified-rw
+    body_oil: 'Amavuta y’Umubiri', // verified-rw
+    petroleum_jelly: 'Vaseline', // verified-rw
+    hair_growth: 'Gukura Umusatsi', // verified-rw
+    natural_organic: 'Kamere', // verified-rw
+    nail_care: 'Ifarasi', // verified-rw
+    deodorant: 'Deodorante', // verified-rw
+    shampoo: 'Shampoo', // verified-rw
     all: 'Ibicuruzwa byose', skincare: 'Kwita ku ruhu', makeup: 'Ibikoresho byo kwisiga', haircare: 'Kwita ku musatsi', fragrance: 'Imibavu', body_care: 'Kwita ku mubiri', mens: "Ibikoresho by'abagabo", natural: 'Ibikomoka ku bidukikije', gifts: 'Impano', new_arrivals: 'Ibicuruzwa bishya', best_sellers: 'Ibicuruzwa bikunzwe cyane', on_sale: 'Ibyagabanyijwe', //  REVIEW // verified-rw
   },
   product: {

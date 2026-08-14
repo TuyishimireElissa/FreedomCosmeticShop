@@ -28,6 +28,31 @@ export function liveProductCount(category: StorefrontCategory): number {
   return category._count?.products ?? 0
 }
 
+/**
+ * Categories with stock first, each group keeping the owner's sortOrder.
+ *
+ * FOR THE PHONE MENU ONLY. With 16 categories and 11 of them empty on day
+ * one, strict sortOrder buries real inventory: Soap (empty) at 3 and
+ * Whitening (empty) at 5 would sit above Hair Care and Men's Grooming, which
+ * have products. Measured on a 360px screen, the menu is ~640px in a ~528px
+ * box, so anything past row 4 needs a scroll.
+ *
+ * This ordering puts all five stocked categories in the first four rows.
+ * Empty ones follow, still one tap away and still badged.
+ *
+ * The API deliberately keeps returning pure sortOrder, so the desktop strip,
+ * the footer and the admin table are unaffected — only the phone menu
+ * reorders.
+ */
+export function stockedFirst(categories: StorefrontCategory[]): StorefrontCategory[] {
+  return [...categories].sort((left, right) => {
+    const leftEmpty = liveProductCount(left) === 0
+    const rightEmpty = liveProductCount(right) === 0
+    if (leftEmpty !== rightEmpty) return leftEmpty ? 1 : -1
+    return left.sortOrder - right.sortOrder
+  })
+}
+
 export function useCategories() {
   const [categories, setCategories] = useState<StorefrontCategory[]>([])
   const [loading, setLoading] = useState(true)
