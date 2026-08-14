@@ -10,9 +10,9 @@ import { recordSearch } from '@/server/services/search-analytics'
 export async function GET(request: NextRequest) {
   try {
     const params = request.nextUrl.searchParams
-    const page = Number(params.get('page') || 1)
+    const requestedPage = Number(params.get('page') || 1)
     const pageSize = Number(params.get('pageSize') || params.get('limit') || 12)
-    if (!Number.isInteger(page) || page < 1 || !Number.isInteger(pageSize) || pageSize < 1 || pageSize > 48) {
+    if (!Number.isInteger(requestedPage) || requestedPage < 1 || !Number.isInteger(pageSize) || pageSize < 1 || pageSize > 48) {
       return NextResponse.json({ success: false, error: 'Invalid pagination' }, { status: 400 })
     }
 
@@ -33,6 +33,40 @@ export async function GET(request: NextRequest) {
 
     const where: Prisma.ProductWhereInput = { AND: and }
     const total = await prisma.product.count({ where })
+
+    /**
+     * Clamp the page to the last one that actually has rows.
+     *
+     * THE BUG THIS FIXES. `page` was honoured verbatim, so any request past
+     * the end returned zero rows while still reporting the true total.
+     * Measured live on 2026-08-13:
+     *
+     *     ?pageSize=12&page=5&category=haircare
+     *        -> rows 0, total 5, totalPages 1
+     *
+     * The grid then hit its `products.length === 0` branch and rendered
+     * "No products match your filters" directly beneath a header reading
+     * "5 products found" — a blank shelf and a contradiction.
+     *
+     * HOW A REAL SHOPPER GOT THERE. Filter state lives in the URL by design,
+     * so a shared or bookmarked link, or the back button, can carry a deep
+     * `page` into a smaller result set. The low-data toggle does it too:
+     * pageSize 8 page 12 returns 8 rows, but switching to pageSize 12 makes
+     * page 12 past the end of 106 products. ProductsPageClient has a reset
+     * effect for that switch, but it only fires when isLowData changes during
+     * a session — it cannot help a page loaded directly at ?page=12.
+     *
+     * Clamping here fixes every entry point at once, server-side, without
+     * changing the component, the filter hook or the URL contract. An
+     * over-range page now shows the last real page instead of nothing.
+     *
+     * `total === 0` is left on page 1 deliberately: a genuinely empty result
+     * SHOULD render the empty state, and Math.ceil(0 / 12) would clamp to 0
+     * and break the skip arithmetic below.
+     */
+    const totalPages = Math.max(1, Math.ceil(total / pageSize))
+    const page = Math.min(requestedPage, totalPages)
+
     let rows
     if (sort === 'best-selling' || sort === 'best_selling') {
       const matching = await prisma.product.findMany({ where, select: { id: true } })
@@ -71,7 +105,7 @@ export async function GET(request: NextRequest) {
 
     const sales = await getRealUnitSales(rows.map((product) => product.id))
     const products = rows.map((product) => serializePublicProductCard(product, sales.get(product.id) || 0))
-    const pagination = { page, pageSize, total, totalPages: Math.ceil(total / pageSize), hasMore: page * pageSize < total }
+    const pagination = { page, pageSize, total, totalPages: total === 0 ? 0 : totalPages, hasMore: page * pageSize < total }
     const filters = { category, brand, minPrice: effectiveMinPrice, maxPrice: effectiveMaxPrice, skinType, hairType, inStock: params.get('inStock') === 'true', sort, shade, minRating: minRatingParam }
 
     if (search && page === 1) {
