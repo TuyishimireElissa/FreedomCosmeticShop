@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     ])
     const and: Prisma.ProductWhereInput[] = [
       { isActive: true, isDeleted: false, stock: { gt: 0 } },
-      { category: { slug: recommendation.category } },
+      { category: { slug: { in: recommendation.categorySlugs } } },
     ]
     if (searchConditions.length) and.push({ OR: searchConditions })
     if (recommendation.skinType) and.push({ OR: [{ skinType: { contains: recommendation.skinType } }, { skinType: { contains: 'ALL' } }] })

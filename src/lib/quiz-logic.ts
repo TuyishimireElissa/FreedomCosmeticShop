@@ -79,6 +79,27 @@ const RESULT_TERMS: Record<QuizCategory, Record<string, string[]>> = {
   },
 }
 
+/**
+ * Every category slug a quiz answer may draw products from.
+ *
+ * The quiz used to filter on a single slug. That was safe while Skin Care held
+ * 23 products, but the 2026-08-14 re-categorisation moved 20 of them into the
+ * specific categories they belonged in (soap, whitening, petroleum jelly, baby)
+ * and left Skin Care with 3. Six of the nine skin concerns then matched nothing
+ * at all. A shopper asking for help with dark spots is not asking to be shown
+ * only products filed under one slug — a whitening lotion or a kojic soap is a
+ * perfectly good answer. So each quiz path now spans the categories a customer
+ * would reasonably expect it to.
+ *
+ * Hair is unchanged in practice (hair-growth and shampoo are empty today) but is
+ * listed so new stock is picked up automatically.
+ */
+export const QUIZ_CATEGORY_SLUGS: Record<QuizCategory, string[]> = {
+  skin: ['skincare', 'whitening', 'soap', 'petroleum-jelly', 'body-care', 'body-oil', 'natural-organic'],
+  hair: ['haircare', 'hair-growth', 'shampoo'],
+  makeup: ['makeup'],
+}
+
 export function buildRecommendationQuery(answers: QuizAnswers) {
   const price = BUDGET_RANGES[answers.budget]
   const searchTerms = new Set([
@@ -86,11 +107,15 @@ export function buildRecommendationQuery(answers: QuizAnswers) {
     ...(RESULT_TERMS[answers.category][answers.preferredResult] || []),
   ])
   if (answers.sensitivity !== 'none') ['gentle', 'sensitive skin', 'soothing'].forEach((term) => searchTerms.add(term))
+  const categorySlugs = QUIZ_CATEGORY_SLUGS[answers.category]
   return {
     searchTerms: [...searchTerms],
     skinType: answers.skinType,
     hairType: answers.hairType,
-    category: answers.category === 'skin' ? 'skincare' : answers.category === 'hair' ? 'haircare' : 'makeup',
+    // Primary slug. Kept for Bundle.targetCategory, which stores exactly one.
+    category: categorySlugs[0],
+    // Every slug the product search may draw from.
+    categorySlugs,
     minPrice: price.min > 0 ? price.min : undefined,
     maxPrice: price.max,
     excludeRecordedAllergens: answers.sensitivity === 'high',
