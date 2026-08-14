@@ -1,0 +1,1347 @@
+{
+  "snapshotAt": "2026-08-14T20:55:54.078Z",
+  "database": "PostgreSQL 17.6 Supabase aws-1-eu-central-1 (production)",
+  "purpose": "Rollback safety net for the auto-categorisation data migration.",
+  "totalProductRows": 128,
+  "liveProductRows": 107,
+  "softDeletedRows": 21,
+  "liveDistributionBySlug": {
+    "skincare": 23,
+    "body-care": 44,
+    "fragrance": 33,
+    "mens-grooming": 1,
+    "haircare": 6
+  },
+  "categories": [
+    {
+      "id": "cmrolygcr0004mfrc4ed6uqvz",
+      "slug": "skincare",
+      "name": "Skincare",
+      "nameRw": "Kwita ku ruhu",
+      "sortOrder": 1,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cmrwfqcn40007fp33o5hwbb4i",
+      "slug": "body-care",
+      "name": "Body Care",
+      "nameRw": "Kwita ku mubiri",
+      "sortOrder": 2,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_545de7c3ea70b1fdb590a",
+      "slug": "soap",
+      "name": "Soap",
+      "nameRw": "Isabune",
+      "sortOrder": 3,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cmrwesxn30004w327ku2eixwj",
+      "slug": "fragrance",
+      "name": "Fragrance",
+      "nameRw": "Imibavu",
+      "sortOrder": 4,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_195402c896ba0cc2b7bf1",
+      "slug": "whitening",
+      "name": "Whitening & Brightening",
+      "nameRw": "Kwera no Kurangaza",
+      "sortOrder": 5,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cmrolygsa0006mfrc75yn0sha",
+      "slug": "haircare",
+      "name": "Haircare",
+      "nameRw": "Kwita ku musatsi",
+      "sortOrder": 6,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cmrolygn50005mfrcadintip4",
+      "slug": "makeup",
+      "name": "Makeup",
+      "nameRw": "Ibikoresho byo kwisiga",
+      "sortOrder": 7,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cmrwfqcrb0008fp339lyw8ykj",
+      "slug": "mens-grooming",
+      "name": "Men's Grooming",
+      "nameRw": "Ibikoresho by'abagabo",
+      "sortOrder": 8,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_99955595e0ece5fe7bccd",
+      "slug": "baby-kids",
+      "name": "Baby & Kids",
+      "nameRw": "Abana",
+      "sortOrder": 9,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_ae64caabb30fdaa2635bc",
+      "slug": "body-oil",
+      "name": "Body Oil",
+      "nameRw": "Amavuta y'Umubiri",
+      "sortOrder": 10,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_8f47828e5911bfa1b1873",
+      "slug": "petroleum-jelly",
+      "name": "Petroleum Jelly",
+      "nameRw": "Vaseline",
+      "sortOrder": 11,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_cac01745b6de81ba5525a",
+      "slug": "hair-growth",
+      "name": "Hair Growth",
+      "nameRw": "Gukura Umusatsi",
+      "sortOrder": 12,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_3306d49483f9f8835b7f5",
+      "slug": "natural-organic",
+      "name": "Natural & Organic",
+      "nameRw": "Kamere",
+      "sortOrder": 13,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_fe73c9f003a3895bc005a",
+      "slug": "nail-care",
+      "name": "Nail Care",
+      "nameRw": "Ifarasi",
+      "sortOrder": 14,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_9c944a282301c37c1c444",
+      "slug": "deodorant",
+      "name": "Deodorant",
+      "nameRw": "Deodorante",
+      "sortOrder": 15,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cat_b809576d2886ebde3f717",
+      "slug": "shampoo",
+      "name": "Shampoo",
+      "nameRw": "Shampoo",
+      "sortOrder": 16,
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "id": "cmrwfqcep0005fp33e2plcz56",
+      "slug": "hair-care",
+      "name": "Hair Care",
+      "nameRw": "Kwita ku musatsi",
+      "sortOrder": 99,
+      "isActive": false,
+      "isDeleted": true
+    }
+  ],
+  "products": [
+    {
+      "productId": "cmrolygxh0008mfrcr2hjtqdh",
+      "name": "Vitamin C Brightening Serum",
+      "slug": "vitamin-c-brightening-serum",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyh7w000amfrc724y6abg",
+      "name": "Hyaluronic Acid Hydrating Serum",
+      "slug": "hyaluronic-acid-hydrating-serum",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyhd3000cmfrccilvii7x",
+      "name": "Gentle Foaming Cleanser",
+      "slug": "gentle-foaming-cleanser",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyhi9000emfrcoph36wi4",
+      "name": "Mineral Sunscreen SPF 50",
+      "slug": "mineral-sunscreen-spf-50",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyhnf000gmfrc5prlh8ji",
+      "name": "Daily Moisturizing Cream",
+      "slug": "daily-moisturizing-cream",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyhsm000imfrc0qva9pdp",
+      "name": "Overnight Repair Night Cream",
+      "slug": "overnight-repair-night-cream",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyhxt000kmfrcqxyqobhr",
+      "name": "Full Coverage Foundation — Deep",
+      "slug": "full-coverage-foundation-deep",
+      "currentCategoryId": "cmrolygn50005mfrcadintip4",
+      "currentCategorySlug": "makeup",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyi2z000mmfrcuma4xi8f",
+      "name": "Matte Liquid Lipstick — Mocha",
+      "slug": "matte-liquid-lipstick-mocha",
+      "currentCategoryId": "cmrolygn50005mfrcadintip4",
+      "currentCategorySlug": "makeup",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyi87000omfrcmoxkpox5",
+      "name": "Volumizing Mascara — Black",
+      "slug": "volumizing-mascara-black",
+      "currentCategoryId": "cmrolygn50005mfrcadintip4",
+      "currentCategorySlug": "makeup",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyidd000qmfrcm5c6a5ic",
+      "name": "Eyeshadow Palette — Earth Tones",
+      "slug": "eyeshadow-palette-earth-tones",
+      "currentCategoryId": "cmrolygn50005mfrcadintip4",
+      "currentCategorySlug": "makeup",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyiik000smfrccopekef5",
+      "name": "Soft Matte Blush — Rosewood",
+      "slug": "soft-matte-blush-rosewood",
+      "currentCategoryId": "cmrolygn50005mfrcadintip4",
+      "currentCategorySlug": "makeup",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyinq000umfrcrey0omrl",
+      "name": "High-Shine Lip Gloss — Honey",
+      "slug": "high-shine-lip-gloss-honey",
+      "currentCategoryId": "cmrolygn50005mfrcadintip4",
+      "currentCategorySlug": "makeup",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyisw000wmfrcuecpch1u",
+      "name": "Sulfate-Free Shampoo — Curl Care",
+      "slug": "sulfate-free-shampoo-curl-care",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyiy2000ymfrcw28ctcl4",
+      "name": "Deep Conditioner — Moisture Lock",
+      "slug": "deep-conditioner-moisture-lock",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyj390010mfrc8h2asfcp",
+      "name": "Hair Growth Oil — Rosemary & Peppermint",
+      "slug": "hair-growth-oil-rosemary-peppermint",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyj8g0012mfrccdz13t99",
+      "name": "Curl Defining Cream",
+      "slug": "curl-defining-cream",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyjdm0014mfrcycqaxiza",
+      "name": "Intensive Hair Mask — Repair",
+      "slug": "intensive-hair-mask-repair",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrolyjis0016mfrc1s6zrdra",
+      "name": "Edge Control Gel — Strong Hold",
+      "slug": "edge-control-gel-strong-hold",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmrxot6sb0002emxghg18nhay",
+      "name": "soap",
+      "slug": "soap",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmryqjq140003kyng291sn001",
+      "name": "vaseline",
+      "slug": "vaseline",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cms4plbon0005bowdenx82emd",
+      "name": "Rinju Beauté Réelle Body & Hand Cream",
+      "slug": "rinju-beaut-r-elle-body-hand-cream",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms4suf3n0001x24oetogdzx7",
+      "name": "Kojie San Classic Skin Lightening Soap",
+      "slug": "kojie-san-classic-skin-lightening-soap",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms4tp4ty0001eqxvzmmbadiq",
+      "name": "Asantee Papaya & Honey Soap 125g",
+      "slug": "asantee-papaya-honey-soap-125g",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms4ucr6r0001eynuz1zhaxbu",
+      "name": "Pyary Ayurvedic Turmeric Soap",
+      "slug": "pyary-ayurvedic-turmeric-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms4vg4xm00015l2oui220ec3",
+      "name": "Dove Original Beauty Cream Bar 100g",
+      "slug": "dove-original-beauty-cream-bar-100g",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms4wdtl90001x1mh127py0zy",
+      "name": "Carambola Black Spots Herbal Soap with Honey",
+      "slug": "carambola-black-spots-herbal-soap-with-honey",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms4yk5pb0001t3aabkqr2oki",
+      "name": "Dalan Glycerin Soap with Organic Argan Oil",
+      "slug": "dalan-glycerin-soap-with-organic-argan-oil",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms51x3oz0001gf87xs15edhf",
+      "name": "Duru Natural Olive Soap with Olive Oil Extract",
+      "slug": "duru-natural-olive-soap-with-olive-oil-extract",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms578nno0001jr6sq5phvigx",
+      "name": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
+      "slug": "bouchou-soft-soap-moisturizing-soothing-gentle-baby-family-bar",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms5wk8x60001wdrea56h0e3t",
+      "name": "Dettol Original Antibacterial Soap 100g",
+      "slug": "dettol-original-antibacterial-soap-100g",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms5zgrqo0004dwavyskobpcs",
+      "name": "Dettol Juniors Glycerine Soap",
+      "slug": "dettol-juniors-glycerine-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms6290ff0001fdsmvql3jcew",
+      "name": "ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ)",
+      "slug": "asantee-tamarind-goat-milk-herbal-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms65ikyk0001vz1l30jv8x4u",
+      "name": "Dalan Glycerin Soap Organic Lime",
+      "slug": "dalan-glycerin-soap-organic-lime",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms677uhx0001kr9ecz3tks1m",
+      "name": "Dalan Glycerin Soap Organic Olive Oil",
+      "slug": "dalan-glycerin-soap-organic-olive-oil",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms68h5df0001pb35yw3r1zog",
+      "name": "Imperial Leather Timeless Classic Bathing Bar Soap",
+      "slug": "imperial-leather-timeless-classic-bathing-bar-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms693nko0001ys62whi1oob6",
+      "name": "Extract Whitening Herbal Soap Papaya Calaman",
+      "slug": "extract-whitening-herbal-soap-papaya-calaman",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms69urjz00012ybtw3nhp744",
+      "name": "Protex Gentle Anti-Germ Bar Soap",
+      "slug": "protex-gentle-anti-germ-bar-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms6b6sgf0002125knjxjpu06",
+      "name": "EVA Bathing Soap Refresh (Coconut & Lavender)",
+      "slug": "eva-bathing-soap-refresh-coconut-lavender",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms6c0sex00012d6d84l7gfsu",
+      "name": "Dalan Citron Frais Classic Multipurpose Soap",
+      "slug": "dalan-citron-frais-classic-multipurpose-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms6cdi270002iswzxzla4gj1",
+      "name": "MPYA Rungu-Medi Anti-Bacterial Soap",
+      "slug": "mpya-rungu-medi-anti-bacterial-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms6er9za00055m8824bba3mr",
+      "name": "NINA Family Soap Bathing Bar (Rose & Peach)",
+      "slug": "nina-family-soap-bathing-bar-rose-peach",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms6g7bw50001t2e8iqwbr34y",
+      "name": "Turmeric Super Whitening Soap (Body Repair, Anti Dark Spots & Anti-aging)",
+      "slug": "turmeric-super-whitening-soap-body-repair-anti-dark-spots-anti-aging",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7bb9280002ejyvh1o11cov",
+      "name": "Duru Fresh Sensations Beauty Soap – Ocean Breeze (Pack of 4)",
+      "slug": "duru-fresh-sensations-beauty-soap-ocean-breeze-pack-of-4",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7cinnp00015bhmexib1lan",
+      "name": "Duru Perfume Beauties Beauty Soap – Orchid Charm (Pack of 4)",
+      "slug": "duru-perfume-beauties-beauty-soap-orchid-charm-pack-of-4",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7d6j95000513cic5k08v19",
+      "name": "Duru Fresh Sensations Beauty Soap – Floral Infusion (Pack of 4)",
+      "slug": "duru-fresh-sensations-beauty-soap-floral-infusion-pack-of-4",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7fceal00022308eyj9ur8f",
+      "name": "Papaya Carrot Gluta Soap Scrub Beads",
+      "slug": "papaya-carrot-gluta-soap-scrub-beads",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7g0osm0002w9i2873h1wy1",
+      "name": "Geisha Caring Coconut & Honey Soap",
+      "slug": "geisha-caring-coconut-honey-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7ip3bs0001ko5avz90rcy8",
+      "name": "Victoria Super Colorful (VSC) Carrot 7 Days Extra Whitening Soap",
+      "slug": "victoria-super-colorful-vsc-carrot-7-days-extra-whitening-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7jul6x000113qtorjqurs5",
+      "name": "Veet Gold Vitamin C Body Corrector Soap (7 Days Whitening and Glowing Soap SPF15)",
+      "slug": "veet-gold-vitamin-c-body-corrector-soap-7-days-whitening-and-glowing-soap-spf15",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7kufdq00016lc6yjfcd1ju",
+      "name": "Geisha Soothing Aloe Vera & Honey Soap (Strong & Long Lasting Daily Bathing Bar)",
+      "slug": "geisha-soothing-aloe-vera-honey-soap-strong-long-lasting-daily-bathing-bar",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7mccso0001oeb62jno3s53",
+      "name": "KOJIC WHITE X2 Double Whitening Suite Soap (By Nano D-ne)",
+      "slug": "kojic-white-x2-double-whitening-suite-soap-by-nano-d-ne",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7ncfro0004jcau1tynbb5i",
+      "name": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
+      "slug": "touch-me-please-whitening-soap-for-oily-skin-with-natural-extracts",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7p9wf20001122jdjnheulh",
+      "name": "Original Pure Egyptian Magic Whitening Gold Soap (With Egg Yolk & L-Glutathione)",
+      "slug": "original-pure-egyptian-magic-whitening-gold-soap-with-egg-yolk-l-glutathione",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms7qdf1f0005gxk6nrps1u6t",
+      "name": "Lab White Atom Whitening Egg Yolk Soap",
+      "slug": "lab-white-atom-whitening-egg-yolk-soap",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms8z0ttw00013zz5jp5fx4tl",
+      "name": "Barakkat Rouge 540 Eau De Parfum",
+      "slug": "barakkat-rouge-540-eau-de-parfum",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms8znl1u0001re9voge1oej3",
+      "name": "MAYORA Eau De Parfum 2-Piece Luxury Gift Set",
+      "slug": "mayora-eau-de-parfum-2-piece-luxury-gift-set",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms90fi830006ysskkc4bz492",
+      "name": "Super Love Eau De Parfum 2-Piece Gift Set",
+      "slug": "super-love-eau-de-parfum-2-piece-gift-set",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms9152qd00012p9rpgupqj61",
+      "name": "BARA Eau De Parfum 2-Piece Luxury Gift Set",
+      "slug": "bara-eau-de-parfum-2-piece-luxury-gift-set",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms91n9fj00013xqnwnd959ip",
+      "name": "SUPER LOVE' RED Eau de Parfum 2PCS Gift Set",
+      "slug": "super-love-red-eau-de-parfum-2pcs-gift-set",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms92idc80001ttcu2r69e8um",
+      "name": "BLEU DE PARFUM Paris 50ml Eau de Parfum Set",
+      "slug": "bleu-de-parfum-paris-50ml-eau-de-parfum-set",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cms9b8hrs0001f8t7xiowuk96",
+      "name": "777 MEN Super Love Perfume Set (2 Pcs)",
+      "slug": "777-men-super-love-perfume-set-2-pcs",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cms9cqjl7000111muyg1capi2",
+      "name": "777 MEN Super Love Perfume Set (2 Pcs)",
+      "slug": "777-men-super-love-perfume-set-2-pcs-1",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsa0wo8t0001q151gsnj1jfq",
+      "name": "Sweet Rose Eau de Parfum Spray for Women",
+      "slug": "sweet-rose-eau-de-parfum-spray-for-women",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsa3iocl0001jj1yqrai5ggi",
+      "name": "SCANOAL A PARIS Eau de Parfum Spray Set (2 Pcs)",
+      "slug": "scanoal-a-paris-eau-de-parfum-spray-set-2-pcs",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsa58a2a000112dh8kccowa9",
+      "name": "Dear Body Be Myself Fine Fragrance Mist",
+      "slug": "dear-body-be-myself-fine-fragrance-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsa60dro0002gsjknj58ys9v",
+      "name": "Dear Body Border Girl Fine Fragrance Mist",
+      "slug": "dear-body-border-girl-fine-fragrance-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsa6d2xg00023jxrvtxpu0xo",
+      "name": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
+      "slug": "dear-body-brilliant-sunflower-fine-fragrance-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsa72uo100015x0lvciizqhf",
+      "name": "Coconut Fantasy Fine Fragrance Mist",
+      "slug": "coconut-fantasy-fine-fragrance-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsa7nixc00013zn0tswdjmo5",
+      "name": "Dear Body Autumn Cicada Fine Fragrance Mist",
+      "slug": "dear-body-autumn-cicada-fine-fragrance-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsa93l6j00064o2fxr9qs4qi",
+      "name": "Dear Body Sweet Vanilla Fine Fragrance Mist",
+      "slug": "dear-body-sweet-vanilla-fine-fragrance-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsa9mj770001113wvci5xj44",
+      "name": "Dear Body SCARLET for Men Body Mist",
+      "slug": "dear-body-scarlet-for-men-body-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsaa0w3v0001o6qc1bpdxabl",
+      "name": "Dear Body NOIR for men Body Mist",
+      "slug": "dear-body-noir-for-men-body-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsabm81500017bgg9a1l78f0",
+      "name": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
+      "slug": "bath-body-week-les-floraux-lune-smell-body-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsac4mn40001omexnkogsiew",
+      "name": "Bath & Baby Week Beauty Summery Body Mist",
+      "slug": "bath-baby-week-beauty-summery-body-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsacjlqf0001141bk4t2ttc5",
+      "name": "Verlorna World Fantsly",
+      "slug": "verlorna-world-fantsly",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsad34xi0002euugmjdv8g31",
+      "name": "Verlorna World For Away Body Mist",
+      "slug": "verlorna-world-for-away-body-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsadssi900042fl3jez68jhi",
+      "name": "Verlorna World Barakkat Rouge 540 Body Mist",
+      "slug": "verlorna-world-barakkat-rouge-540-body-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsae5ur30007euugerxn639u",
+      "name": "Verlorna World Ideal Fragrance Mist",
+      "slug": "verlorna-world-ideal-fragrance-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsaelbey0006tw9ib19ed2ur",
+      "name": "Dear Body Noir Fragrance Mist",
+      "slug": "dear-body-noir-fragrance-mist",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsagjyjk0002oc8138ta37l4",
+      "name": "Kristal Fragrance Mist (Brume Parfumée)",
+      "slug": "kristal-fragrance-mist-brume-parfum-e",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsah4iua0001zappdvw4c887",
+      "name": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
+      "slug": "barakkat-rouge-540-fragrance-mist-brume-parfum-e",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsahlm7s0001fm0meke4wtmc",
+      "name": "Oud For Glory (Bade'e Al Oud) Fragrance Mist (Brume Parfumée)",
+      "slug": "oud-for-glory-bade-e-al-oud-fragrance-mist-brume-parfum-e",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsahx2k90006fm0m5epar6ed",
+      "name": "ONIRO Fragrance Mist (Brume Parfumée)",
+      "slug": "oniro-fragrance-mist-brume-parfum-e",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsaic8y70001sc0bern6k4dj",
+      "name": "Intense Wood Fragrance Mist (Brume Parfumée)",
+      "slug": "intense-wood-fragrance-mist-brume-parfum-e",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsaiyven0001z4vhveccls3e",
+      "name": "Yara Pink Fragrance Mist (Brume Parfumée)",
+      "slug": "yara-pink-fragrance-mist-brume-parfum-e",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsajj927000291ufr27aexly",
+      "name": "Change De Canal Fragrance Mist (Brume Parfumée)",
+      "slug": "change-de-canal-fragrance-mist-brume-parfum-e",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsatfab10005he7x9bprusfo",
+      "name": "Baby Line Perfumed Baby Petroleum Jelly",
+      "slug": "baby-line-perfumed-baby-petroleum-jelly",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsbnqbkh000230vvnjxemb3g",
+      "name": "Johnson's Baby Aqueous Cream Lightly Fragranced 350ml",
+      "slug": "johnson-s-baby-aqueous-cream-lightly-fragranced-350ml",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsc2vilv0002icjzpdov05r0",
+      "name": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
+      "slug": "vaseline-blue-seal-original-100-pure-petroleum-jelly-240ml",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmscxq1wy0001ejm7ubfgu73h",
+      "name": "Vaseline Blue Seal Aloe Vera Perfumed Petroleum Jelly 240ml",
+      "slug": "vaseline-blue-seal-aloe-vera-perfumed-petroleum-jelly-240ml",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmscxz6xf00019dzmithv675i",
+      "name": "Vaseline Blue Seal Men Cooling Perfumed Petroleum Jelly 240ml",
+      "slug": "vaseline-blue-seal-men-cooling-perfumed-petroleum-jelly-240ml",
+      "currentCategoryId": "cmrwfqcrb0008fp339lyw8ykj",
+      "currentCategorySlug": "mens-grooming",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmscy45bz00099dzmmu8a62ag",
+      "name": "Vaseline Blue Seal Baby Perfumed Petroleum Jelly",
+      "slug": "vaseline-blue-seal-baby-perfumed-petroleum-jelly",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmscz557t00019j2t3kc6m3ni",
+      "name": "Vaseline Blue Seal Cocoa Butter Perfumed Petroleum Jelly",
+      "slug": "vaseline-blue-seal-cocoa-butter-perfumed-petroleum-jelly",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsd2f75j0003xfnl3fcl9otj",
+      "name": "Boudchou Baby Ointment (Pommade Bébé)",
+      "slug": "boudchou-baby-ointment-pommade-b-b",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsd2qsmz0005pjclrqbzcusa",
+      "name": "Boudchou Baby Petroleum Jelly / Crème Onctueuse Protectrice",
+      "slug": "boudchou-baby-petroleum-jelly-cr-me-onctueuse-protectrice",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsd3dro20001lpyr6m8ruwxm",
+      "name": "More Up Aloe Vera & Vitamin E 2-in-1 Pure Petroleum Jelly",
+      "slug": "more-up-aloe-vera-vitamin-e-2-in-1-pure-petroleum-jelly",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsd6fm1200018s02lqneuspg",
+      "name": "Dabur Herbolene Aloe Jelly",
+      "slug": "dabur-herbolene-aloe-jelly",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsd9o6u70004r3jbyum8i348",
+      "name": "Dabur Herbolene Aloe Jelly",
+      "slug": "dabur-herbolene-aloe-jelly-1",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsdc3dyq0001sdqqkb12ple4",
+      "name": "Roushun Turmeric with Vitamin C Lighten Body Lotion",
+      "slug": "roushun-turmeric-with-vitamin-c-lighten-body-lotion",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsdcr4wc0001f9co2r3ox2n4",
+      "name": "Purec Egyptian Gold 14Days Face & Body Lotion",
+      "slug": "purec-egyptian-gold-14days-face-body-lotion",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsdde2m0000155o25dtohbd4",
+      "name": "Vaseline Intensive Care Cocoa Radiant Vitalizing Body Oil",
+      "slug": "vaseline-intensive-care-cocoa-radiant-vitalizing-body-oil",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsde337h0001y24f3r3lz7nd",
+      "name": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
+      "slug": "zwitsal-baby-body-lotion-with-avocado-oil-400ml",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsdejvam0001d044mywwyseo",
+      "name": "RDL Papaya Extract Whitening Hand & Body Lotion + Vitamin E",
+      "slug": "rdl-papaya-extract-whitening-hand-body-lotion-vitamin-e",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsdf5nx30001iss6889uu9fg",
+      "name": "DRODAVEN Whitening Papaya + Milk Body Lotion",
+      "slug": "drodaven-whitening-papaya-milk-body-lotion",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsdfrdpc000412inr1s1hb47",
+      "name": "LA TCHADIENNE Whitening Lotion Super White Face & Body Lotion",
+      "slug": "la-tchadienne-whitening-lotion-super-white-face-body-lotion",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsdgcvls0001wm1aoxb0hubw",
+      "name": "Piment Doux 5 Days Extra Whitening Milk (Lait Traitant)",
+      "slug": "piment-doux-5-days-extra-whitening-milk-lait-traitant",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsdhxzqm0001swguwcc8t8ft",
+      "name": "White Express Lait Éclaircissant – Complexe Duo-Éclat",
+      "slug": "white-express-lait-claircissant-complexe-duo-clat",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsdid43t0005njbfcwha5c7m",
+      "name": "White Express Lait Éclaircissant – Extra Whitening Lotion 500ml",
+      "slug": "white-express-lait-claircissant-extra-whitening-lotion-500ml",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsfv8rom0001x6patrclifit",
+      "name": "MIADI Hair Curl Activator Gel",
+      "slug": "miadi-hair-curl-activator-gel",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsfwlrg40001ahis31ry6ud4",
+      "name": "MIADI Hair Mouldin' Gel Wax (With Olive Oil)",
+      "slug": "miadi-hair-mouldin-gel-wax-with-olive-oil",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsfxe8zb000279xbr3qzjod3",
+      "name": "Exfoliating Gold Face & Body Scrub (With Natural Exfoliating Fruit Shells & Gold Pearl)",
+      "slug": "exfoliating-gold-face-body-scrub-with-natural-exfoliating-fruit-shells-gold-pearl",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsfxf92j0001u15rv5ms7csm",
+      "name": "Exfoliating Gold Face & Body Scrub (With Natural Exfoliating Fruit Shells & Gold Pearl)",
+      "slug": "exfoliating-gold-face-body-scrub-with-natural-exfoliating-fruit-shells-gold-pearl-1",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": false,
+      "isDeleted": true
+    },
+    {
+      "productId": "cmsg0mh1p0004ayfzyxpa2sdn",
+      "name": "DAX Pomade Now With Lanolin",
+      "slug": "dax-pomade-now-with-lanolin",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsg180la000111gyw5y5io78",
+      "name": "Silky Cool Milk Face and Body Scrub",
+      "slug": "silky-cool-milk-face-and-body-scrub",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsg2jiuw0001e5agtafu6v1x",
+      "name": "Silky Cool Cucumber Face and Body Scrub Cream",
+      "slug": "silky-cool-cucumber-face-and-body-scrub-cream",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsg5kmjc0002665aar9y75po",
+      "name": "Mega Growth Break-Free Hair & Scalp Food",
+      "slug": "mega-growth-break-free-hair-scalp-food",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsgai04700026k5cim13kwl1",
+      "name": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
+      "slug": "cantu-shea-butter-for-natural-hair-coconut-curling-cream",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsgbn2w00001t1chpknr6g9u",
+      "name": "American Dream Cocoa Butter Lemon Cream",
+      "slug": "american-dream-cocoa-butter-lemon-cream",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsgc7y6m0001rqg2omrg09c4",
+      "name": "Veet Gold Turmeric Super Whitening Oil",
+      "slug": "veet-gold-turmeric-super-whitening-oil",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsgd1vne0001xr62k2p30osg",
+      "name": "Veet Gold Turmeric Super Whitening Oil",
+      "slug": "veet-gold-turmeric-super-whitening-oil-1",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsgd7e0u0001rkiavi8qq4p0",
+      "name": "Veet Gold Turmeric Super Whitening Oil",
+      "slug": "veet-gold-turmeric-super-whitening-oil-2",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsgflac50002zrpcc3jka7kt",
+      "name": "Movit Sheen Hair Spray Olive & Argan Oil",
+      "slug": "movit-sheen-hair-spray-olive-argan-oil",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsohn7i10001713u7w7djv4o",
+      "name": "Pure Egyptian Magic Whitening Serum Gold 14 Days Face & Body Serum",
+      "slug": "pure-egyptian-magic-whitening-serum-gold-14-days-face-body-serum",
+      "currentCategoryId": "cmrolygcr0004mfrc4ed6uqvz",
+      "currentCategorySlug": "skincare",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsongvnh0001byoef1mwjir0",
+      "name": "Bismid Skin Glowing Bath with Carrot Oil",
+      "slug": "bismid-skin-glowing-bath-with-carrot-oil",
+      "currentCategoryId": "cmrwfqcn40007fp33o5hwbb4i",
+      "currentCategorySlug": "body-care",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsr7hchh0001hojjkimojqlm",
+      "name": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+      "slug": "verlorna-la-vaid-east-bellah-fragrance-mist-250ml",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsr9267g0001i34jismepmv7",
+      "name": "VERLORNA MY LOVE Fragrance Mist – 250ml",
+      "slug": "verlorna-my-love-fragrance-mist-250ml",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmsrayfrm0001x9jvuqpig7nl",
+      "name": "VERLORNA SUAWACE Fragrance Mist – 250ml",
+      "slug": "verlorna-suawace-fragrance-mist-250ml",
+      "currentCategoryId": "cmrwesxn30004w327ku2eixwj",
+      "currentCategorySlug": "fragrance",
+      "isActive": true,
+      "isDeleted": false
+    },
+    {
+      "productId": "cmstck2wb000299ilkb4suqyu",
+      "name": "The Original Sunny Isle Jamaican Black Castor Oil",
+      "slug": "the-original-sunny-isle-jamaican-black-castor-oil",
+      "currentCategoryId": "cmrolygsa0006mfrc75yn0sha",
+      "currentCategorySlug": "haircare",
+      "isActive": true,
+      "isDeleted": false
+    }
+  ],
+  "restoreSql": [
+    "-- ROLLBACK SQL — restores every Product.categoryId to its value at snapshot time.",
+    "-- Snapshot taken: 2026-08-14T20:55:54.078Z",
+    "-- Rows covered: 128 (all products, including soft-deleted)",
+    "-- Run inside a transaction. Touches ONLY categoryId.",
+    "BEGIN;",
+    "-- skincare (29 rows)",
+    "UPDATE \"Product\" SET \"categoryId\" = 'cmrolygcr0004mfrc4ed6uqvz' WHERE \"id\" IN ('cmrolygxh0008mfrcr2hjtqdh', 'cmrolyh7w000amfrc724y6abg', 'cmrolyhd3000cmfrccilvii7x', 'cmrolyhi9000emfrcoph36wi4', 'cmrolyhnf000gmfrc5prlh8ji', 'cmrolyhsm000imfrc0qva9pdp', 'cmrxot6sb0002emxghg18nhay', 'cms4plbon0005bowdenx82emd', 'cms4suf3n0001x24oetogdzx7', 'cms578nno0001jr6sq5phvigx', 'cms65ikyk0001vz1l30jv8x4u', 'cms677uhx0001kr9ecz3tks1m', 'cms7mccso0001oeb62jno3s53', 'cmsatfab10005he7x9bprusfo', 'cmsbnqbkh000230vvnjxemb3g', 'cmsc2vilv0002icjzpdov05r0', 'cmscxq1wy0001ejm7ubfgu73h', 'cmscy45bz00099dzmmu8a62ag', 'cmscz557t00019j2t3kc6m3ni', 'cmsd2f75j0003xfnl3fcl9otj', 'cmsd3dro20001lpyr6m8ruwxm', 'cmsd6fm1200018s02lqneuspg', 'cmsd9o6u70004r3jbyum8i348', 'cmsdc3dyq0001sdqqkb12ple4', 'cmsdcr4wc0001f9co2r3ox2n4', 'cmsfxe8zb000279xbr3qzjod3', 'cmsgd1vne0001xr62k2p30osg', 'cmsgd7e0u0001rkiavi8qq4p0', 'cmsohn7i10001713u7w7djv4o');",
+    "-- makeup (6 rows)",
+    "UPDATE \"Product\" SET \"categoryId\" = 'cmrolygn50005mfrcadintip4' WHERE \"id\" IN ('cmrolyhxt000kmfrcqxyqobhr', 'cmrolyi2z000mmfrcuma4xi8f', 'cmrolyi87000omfrcmoxkpox5', 'cmrolyidd000qmfrcm5c6a5ic', 'cmrolyiik000smfrccopekef5', 'cmrolyinq000umfrcrey0omrl');",
+    "-- haircare (12 rows)",
+    "UPDATE \"Product\" SET \"categoryId\" = 'cmrolygsa0006mfrc75yn0sha' WHERE \"id\" IN ('cmrolyisw000wmfrcuecpch1u', 'cmrolyiy2000ymfrcw28ctcl4', 'cmrolyj390010mfrc8h2asfcp', 'cmrolyj8g0012mfrccdz13t99', 'cmrolyjdm0014mfrcycqaxiza', 'cmrolyjis0016mfrc1s6zrdra', 'cmsfv8rom0001x6patrclifit', 'cmsfwlrg40001ahis31ry6ud4', 'cmsg0mh1p0004ayfzyxpa2sdn', 'cmsg5kmjc0002665aar9y75po', 'cmsgai04700026k5cim13kwl1', 'cmstck2wb000299ilkb4suqyu');",
+    "-- body-care (46 rows)",
+    "UPDATE \"Product\" SET \"categoryId\" = 'cmrwfqcn40007fp33o5hwbb4i' WHERE \"id\" IN ('cmryqjq140003kyng291sn001', 'cms4tp4ty0001eqxvzmmbadiq', 'cms4ucr6r0001eynuz1zhaxbu', 'cms4vg4xm00015l2oui220ec3', 'cms4wdtl90001x1mh127py0zy', 'cms4yk5pb0001t3aabkqr2oki', 'cms51x3oz0001gf87xs15edhf', 'cms5wk8x60001wdrea56h0e3t', 'cms5zgrqo0004dwavyskobpcs', 'cms6290ff0001fdsmvql3jcew', 'cms68h5df0001pb35yw3r1zog', 'cms693nko0001ys62whi1oob6', 'cms69urjz00012ybtw3nhp744', 'cms6b6sgf0002125knjxjpu06', 'cms6c0sex00012d6d84l7gfsu', 'cms6cdi270002iswzxzla4gj1', 'cms6er9za00055m8824bba3mr', 'cms6g7bw50001t2e8iqwbr34y', 'cms7bb9280002ejyvh1o11cov', 'cms7cinnp00015bhmexib1lan', 'cms7d6j95000513cic5k08v19', 'cms7fceal00022308eyj9ur8f', 'cms7g0osm0002w9i2873h1wy1', 'cms7ip3bs0001ko5avz90rcy8', 'cms7jul6x000113qtorjqurs5', 'cms7kufdq00016lc6yjfcd1ju', 'cms7ncfro0004jcau1tynbb5i', 'cms7p9wf20001122jdjnheulh', 'cms7qdf1f0005gxk6nrps1u6t', 'cmsagjyjk0002oc8138ta37l4', 'cmsd2qsmz0005pjclrqbzcusa', 'cmsdde2m0000155o25dtohbd4', 'cmsde337h0001y24f3r3lz7nd', 'cmsdejvam0001d044mywwyseo', 'cmsdf5nx30001iss6889uu9fg', 'cmsdfrdpc000412inr1s1hb47', 'cmsdgcvls0001wm1aoxb0hubw', 'cmsdhxzqm0001swguwcc8t8ft', 'cmsdid43t0005njbfcwha5c7m', 'cmsfxf92j0001u15rv5ms7csm', 'cmsg180la000111gyw5y5io78', 'cmsg2jiuw0001e5agtafu6v1x', 'cmsgbn2w00001t1chpknr6g9u', 'cmsgc7y6m0001rqg2omrg09c4', 'cmsgflac50002zrpcc3jka7kt', 'cmsongvnh0001byoef1mwjir0');",
+    "-- fragrance (34 rows)",
+    "UPDATE \"Product\" SET \"categoryId\" = 'cmrwesxn30004w327ku2eixwj' WHERE \"id\" IN ('cms8z0ttw00013zz5jp5fx4tl', 'cms8znl1u0001re9voge1oej3', 'cms90fi830006ysskkc4bz492', 'cms9152qd00012p9rpgupqj61', 'cms91n9fj00013xqnwnd959ip', 'cms92idc80001ttcu2r69e8um', 'cms9b8hrs0001f8t7xiowuk96', 'cms9cqjl7000111muyg1capi2', 'cmsa0wo8t0001q151gsnj1jfq', 'cmsa3iocl0001jj1yqrai5ggi', 'cmsa58a2a000112dh8kccowa9', 'cmsa60dro0002gsjknj58ys9v', 'cmsa6d2xg00023jxrvtxpu0xo', 'cmsa72uo100015x0lvciizqhf', 'cmsa7nixc00013zn0tswdjmo5', 'cmsa93l6j00064o2fxr9qs4qi', 'cmsa9mj770001113wvci5xj44', 'cmsaa0w3v0001o6qc1bpdxabl', 'cmsabm81500017bgg9a1l78f0', 'cmsac4mn40001omexnkogsiew', 'cmsacjlqf0001141bk4t2ttc5', 'cmsad34xi0002euugmjdv8g31', 'cmsadssi900042fl3jez68jhi', 'cmsae5ur30007euugerxn639u', 'cmsaelbey0006tw9ib19ed2ur', 'cmsah4iua0001zappdvw4c887', 'cmsahlm7s0001fm0meke4wtmc', 'cmsahx2k90006fm0m5epar6ed', 'cmsaic8y70001sc0bern6k4dj', 'cmsaiyven0001z4vhveccls3e', 'cmsajj927000291ufr27aexly', 'cmsr7hchh0001hojjkimojqlm', 'cmsr9267g0001i34jismepmv7', 'cmsrayfrm0001x9jvuqpig7nl');",
+    "-- mens-grooming (1 rows)",
+    "UPDATE \"Product\" SET \"categoryId\" = 'cmrwfqcrb0008fp339lyw8ykj' WHERE \"id\" IN ('cmscxz6xf00019dzmithv675i');",
+    "COMMIT;",
+    "-- Verify: SELECT c.slug, COUNT(*) FROM \"Product\" p JOIN \"Category\" c ON c.id=p.\"categoryId\"",
+    "--         WHERE p.\"isActive\"=true AND p.\"isDeleted\"=false GROUP BY c.slug ORDER BY c.slug;",
+    "-- Expected: body-care=44, fragrance=33, haircare=6, mens-grooming=1, skincare=23"
+  ]
+}
