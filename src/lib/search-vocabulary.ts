@@ -425,3 +425,60 @@ export const POPULAR_LOCAL_SEARCHES = [
   'amavuta',
   'isabune',
 ] as const
+
+/**
+ * Controlled vocabulary for popular-search reporting — owner-supplied.
+ *
+ * WHY A FIXED LIST. Customer search text may contain names, phone numbers or
+ * addresses, so `recordSearch` stores only an HMAC of the query and the raw
+ * text is unrecoverable by design. That privacy model is deliberate and is not
+ * being weakened. The consequence is that "what did people search for?" cannot
+ * be answered by reading the log back.
+ *
+ * A controlled vocabulary answers it without storing free text: when a query
+ * contains one of these known catalogue words, the WORD — not the query — is
+ * recorded alongside the hash. "12 people searched sunscreen" becomes
+ * answerable; "who searched for Mukamana" stays permanently unanswerable.
+ *
+ * Anything a shopper types that is not on this list is simply not counted.
+ * That is the trade, and it is the safe direction to fail in.
+ */
+export const CONTROLLED_SEARCH_VOCABULARY = [
+  // Kinyarwanda
+  'isabune', 'amavuta', 'seramu', 'imibavu', 'umusatsi', 'uruhu',
+  'ibikoresho', 'kwera', 'umubiri', 'abana', 'ifarasi', 'deodorante',
+  // English — product types
+  'soap', 'lotion', 'cream', 'perfume', 'oil', 'serum', 'shampoo',
+  'moisturizer', 'toner', 'cleanser', 'scrub', 'mask', 'gel', 'sunscreen',
+  'vaseline', 'deodorant',
+  // English — body areas and outcomes
+  'hair', 'skin', 'body', 'face', 'whitening', 'brightening', 'glowing',
+  'anti-aging', 'baby',
+  // Brands
+  'dettol', 'johnson', 'dove', 'kojic',
+  // Ingredients
+  'vitamin c', 'retinol', 'collagen', 'aloe vera', 'shea butter',
+  'coconut oil', 'castor oil', 'argan oil', 'rose water', 'charcoal',
+  'turmeric',
+] as const
+
+export type ControlledSearchTerm = (typeof CONTROLLED_SEARCH_VOCABULARY)[number]
+
+/**
+ * The controlled term a query refers to, or null.
+ *
+ * Longest match first, so "coconut oil" is not reported as the far broader
+ * "oil", and "vitamin c" is not lost to a bare token match. Word-boundary
+ * matched so "soap" does not fire on "soapstone" and, more importantly, a
+ * short term cannot match inside an unrelated word a customer typed.
+ */
+export function matchControlledTerm(query: string): ControlledSearchTerm | null {
+  const haystack = ` ${query.toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim()} `
+  if (haystack.trim().length === 0) return null
+
+  const byLength = [...CONTROLLED_SEARCH_VOCABULARY].sort((left, right) => right.length - left.length)
+  for (const term of byLength) {
+    if (haystack.includes(` ${term} `)) return term
+  }
+  return null
+}

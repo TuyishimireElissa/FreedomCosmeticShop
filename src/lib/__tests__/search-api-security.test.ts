@@ -41,9 +41,33 @@ describe('search API data and analytics security', () => {
   })
 
   it('does not expose hashed identifiers as readable popular searches', () => {
+    // Updated when the controlled vocabulary shipped. This used to assert the
+    // endpoint returned `data: []` — i.e. that it reported nothing at all. That
+    // was a description of a missing feature, not of a security property, and
+    // it would have blocked the safe implementation.
+    //
+    // The guarantee that actually matters is unchanged and is asserted below:
+    // no hashed identifier and no customer text ever reaches the response. The
+    // endpoint reads one column — a term from our own fixed vocabulary.
     expect(popularRoute).toContain('rawQueriesStored: false')
-    expect(popularRoute).toContain('controlledVocabularyConfigured: false')
-    expect(popularRoute).toContain('data: []')
-    expect(popularRoute).not.toContain('prisma.searchLog.groupBy')
+
+    // No hash may be selected, returned, or reversed here.
+    expect(popularRoute).not.toContain('hashSearchValue')
+    expect(popularRoute).not.toContain('sha256')
+
+    // The only SearchLog column read is the controlled term.
+    expect(popularRoute).toContain(`"filters"->>'term'`)
+    expect(popularRoute).not.toMatch(/SELECT[\s\S]*?"query"/)
+    expect(popularRoute).not.toMatch(/SELECT[\s\S]*?"sessionId"/)
+
+    // And nothing outside the published vocabulary can be emitted.
+    expect(popularRoute).toContain('known.has(row.term)')
+  })
+
+  it('still refuses to store raw query text', () => {
+    // The privacy model itself, asserted at the write side.
+    expect(analyticsService).toContain("hashSearchValue(normalizedQuery, 'query')")
+    expect(analyticsService).not.toMatch(/query:\s*normalizedQuery\b/)
+    expect(analyticsService).not.toMatch(/term:\s*normalizedQuery\b/)
   })
 })
