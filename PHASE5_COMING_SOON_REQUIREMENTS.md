@@ -1,6 +1,20 @@
 # Phase 5 — Coming Soon page for empty categories
 
-**Status:** filed, not built. Deferred behind Phase 4 (admin category UI).
+**Status: BUILT AND SHIPPED — `a4b675d`.** This file is the requirement as
+filed; read `PHASE5_COMPLETE.md` for what shipped. Resolutions to the three
+open questions recorded at the bottom of this file were:
+
+1. **Wording** — `"Biraza vuba"`, not `"Bizaza vuba"` or
+   `"Turaritegura — biraza vuba!"`. It matches the Vuba badge already on the
+   menu, and sold-out reuses `"Byashize"` from `common.sold_out`.
+2. **Where** — inline in `ProductGrid`, as recommended. No redirect, no second
+   URL.
+3. **Sold out vs never stocked** — implemented. `/api/categories` now also
+   returns `totalProducts` (ignores stock) alongside `_count` (stock > 0), so
+   the two cases get different messages.
+
+The count below is also out of date: after the 2026-08-15 re-categorisation
+**7 of 16** categories are empty, not 11.
 **Filed:** 2026-08-14, after Phases 1–3 deployed at `eb6643a`.
 
 ---

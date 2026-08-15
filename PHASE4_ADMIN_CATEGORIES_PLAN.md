@@ -1,6 +1,15 @@
 # Phase 4 plan — admin category management UI
 
-**Status:** planned, not built. Awaiting owner's mobile-device green light.
+**Status: BUILT AND SHIPPED — `77da80d`.** This file is the plan as written
+beforehand; keep it for the reasoning, but read `PHASE4_COMPLETE.md` for what
+actually shipped. Two things changed during the build:
+
+- **TanStack Query was not used.** Step 4D specified "the existing TanStack
+  Query pattern"; no such pattern exists in this codebase. Owner chose
+  `useState` + `fetch`, matching all 12 other admin screens.
+- **Hiding a stocked category now asks for confirmation**, which this plan did
+  not call for. One tap would otherwise pull 33 products off the shop.
+- **Category image upload was dropped**, see `PHASE4_COMPLETE.md` for why.
 **Written:** 2026-08-14, after Phases 1–3 deployed at `eb6643a`.
 
 ---
