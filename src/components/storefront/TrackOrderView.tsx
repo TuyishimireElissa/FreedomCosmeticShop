@@ -475,7 +475,7 @@ export function TrackOrderView() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackWhatsAppClick('track_order', { language: language === 'en' ? 'en' : 'rw', pagePath: '/track-order' })}
-            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-fcs-whatsapp-pill px-6 text-sm font-semibold text-white transition-colors duration-150 ease-fcs-snap hover:bg-fcs-whatsapp-hover motion-reduce:transition-none"
+            className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-fcs-whatsapp-pill px-6 text-sm font-semibold text-white transition-colors duration-150 ease-fcs-snap hover:bg-fcs-whatsapp-pill-hover motion-reduce:transition-none"
           >
             <MessageCircle className="h-4 w-4" aria-hidden="true" />
             {t('orders.ask_question')}

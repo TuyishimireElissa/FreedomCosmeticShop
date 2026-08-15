@@ -138,7 +138,7 @@ export default function Hero({ banners, loading = false, error }: HeroProps) {
                 href={whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-whatsapp-pill px-7 text-sm font-semibold text-white transition-colors duration-150 ease-fcs-snap hover:bg-fcs-whatsapp-hover active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-fcs-whatsapp-pill px-7 text-sm font-semibold text-white transition-colors duration-150 ease-fcs-snap hover:bg-fcs-whatsapp-pill-hover active:scale-[0.98] motion-reduce:transition-none motion-reduce:active:scale-100"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 {t('home.hero_cta_secondary')}

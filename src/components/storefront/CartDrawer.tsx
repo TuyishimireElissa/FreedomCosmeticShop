@@ -230,7 +230,7 @@ export function CartDrawer() {
                       * The brief asked for #1F8A4C, which measures 4.38:1 and
                       * fails AA — computed, not assumed. */}
                     <Button
-                      className="w-full bg-fcs-whatsapp-pill text-white hover:bg-fcs-whatsapp-hover sm:flex-1"
+                      className="w-full bg-fcs-whatsapp-pill text-white hover:bg-fcs-whatsapp-pill-hover sm:flex-1"
                       onClick={() => { setCartOpen(false); router.push('/checkout') }}
                     >
                       <MessageCircle className="mr-1.5 h-4 w-4" aria-hidden="true" />

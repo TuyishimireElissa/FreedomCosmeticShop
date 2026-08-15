@@ -98,7 +98,7 @@ export default function CategoryComingSoon({ categoryName, soldOut = false }: Ca
             href={waHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-11 w-full max-w-xs items-center justify-center gap-2 rounded-full bg-fcs-whatsapp-pill px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-fcs-whatsapp-hover sm:w-auto"
+            className="inline-flex min-h-11 w-full max-w-xs items-center justify-center gap-2 rounded-full bg-fcs-whatsapp-pill px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-fcs-whatsapp-pill-hover sm:w-auto"
           >
             <MessageCircle className="h-4 w-4" aria-hidden="true" />
             {ctaLabel}
