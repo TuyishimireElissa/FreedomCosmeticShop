@@ -11,6 +11,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { ProductCard } from '@/components/storefront/ProductCard'
 import DidYouMean from '@/components/products/DidYouMean'
+import CategoryComingSoon from '@/components/products/CategoryComingSoon'
 
 interface ProductGridProps {
   products: Product[]
@@ -23,9 +24,16 @@ interface ProductGridProps {
   /** Current search term, so the empty state can offer a spelling correction. */
   searchQuery?: string
   onSearchCorrection?: (term: string) => void
+  /**
+   * Set only when the page is showing one category, that category has nothing
+   * on the shelf, and no other filter or search term is narrowing the result.
+   * In that case the shopper made no mistake and must not be told to remove a
+   * filter — they get the Coming Soon panel instead.
+   */
+  comingSoonCategory?: { name: string; soldOut: boolean } | null
 }
 
-export default function ProductGrid({ products, loading = false, error, onRetry, onClearFilters, hasActiveFilters = false, searchQuery, onSearchCorrection }: ProductGridProps) {
+export default function ProductGrid({ products, loading = false, error, onRetry, onClearFilters, hasActiveFilters = false, searchQuery, onSearchCorrection, comingSoonCategory = null }: ProductGridProps) {
   const { t } = useLanguage()
   const user = useStore((state) => state.user)
   const router = useRouter()
@@ -82,6 +90,11 @@ export default function ProductGrid({ products, loading = false, error, onRetry,
   }
 
   if (products.length === 0) {
+    // An empty category is not a failed filter. Checked before the generic
+    // empty state so the wrong message can never win.
+    if (comingSoonCategory) {
+      return <CategoryComingSoon categoryName={comingSoonCategory.name} soldOut={comingSoonCategory.soldOut} />
+    }
     return (
       <div className="rounded-3xl border border-dashed border-gray-200 bg-[#f8f9fa] px-5 py-16 text-center">
         <PackageOpen className="mx-auto h-10 w-10 text-gray-300" />

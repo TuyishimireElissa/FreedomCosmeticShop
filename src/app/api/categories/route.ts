@@ -29,7 +29,15 @@ export async function GET() {
     // Live products only: active, not deleted, and actually on the shelf.
     const liveProducts = { isActive: true, isDeleted: false, stock: { gt: 0 } } as const
 
-    const categories = await prisma.category.findMany({
+    /**
+     * Same rows, ignoring stock. `_count` above answers "can a shopper buy
+     * something here right now"; this answers "has this category ever held a
+     * product". The Coming Soon panel needs both, because a category that sold
+     * out must not be told it is "coming soon" — customers bought from it.
+     */
+    const stockedRegardlessOfStock = { isActive: true, isDeleted: false } as const
+
+    const rows = await prisma.category.findMany({
       where: {
         isActive: true,
         isDeleted: false,
@@ -44,6 +52,19 @@ export async function GET() {
       },
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
     })
+
+    // One extra grouped query rather than a second _count per row.
+    const totals = await prisma.product.groupBy({
+      by: ['categoryId'],
+      where: stockedRegardlessOfStock,
+      _count: { _all: true },
+    })
+    const totalBySlug = new Map(totals.map((row) => [row.categoryId, row._count._all]))
+
+    const categories = rows.map((category) => ({
+      ...category,
+      totalProducts: totalBySlug.get(category.id) ?? 0,
+    }))
 
     const response = NextResponse.json({
       success: true,

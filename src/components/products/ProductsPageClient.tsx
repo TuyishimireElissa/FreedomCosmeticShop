@@ -140,6 +140,28 @@ function ProductsContent() {
       ? categoryLabel(selectedCategory, t, language)
       : filters.category
     : null
+  /**
+   * Show Coming Soon instead of "no products match your filters", but only
+   * when the shopper genuinely did nothing wrong:
+   *   - a category is selected, and we recognise its slug
+   *   - that category reports zero buyable products
+   *   - there is no search term
+   *   - no other filter is narrowing the list (category itself counts as one)
+   * Any of those missing means the empty result really is the filters, and
+   * the existing message is the correct one.
+   */
+  const comingSoonCategory = (() => {
+    if (!filters.category || !selectedCategory) return null
+    if (filters.search) return null
+    if (activeFilterCount > 1) return null
+    if ((selectedCategory._count?.products ?? 0) > 0) return null
+    // `_count` only counts stock > 0, so a sold-out category looks identical
+    // to one that was never stocked. `totalProducts` (when the API supplies
+    // it) counts rows regardless of stock, which separates the two.
+    const everStocked = (selectedCategory as { totalProducts?: number }).totalProducts ?? 0
+    return { name: categoryName || selectedCategory.name, soldOut: everStocked > 0 }
+  })()
+
   const breadcrumbItems = [
     { name: t('nav.products'), url: '/products' },
     ...(categoryName && filters.category
@@ -199,7 +221,7 @@ function ProductsContent() {
           <FilterSidebar availableCategories={categories} availableBrands={brands} className={filtersLoading ? 'animate-pulse opacity-60' : ''} />
           <main className="min-w-0 flex-1">
             <div id="product-results">
-              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} onClearFilters={clearAllFilters} hasActiveFilters={activeFilterCount > 0 || Boolean(filters.search)} searchQuery={filters.search} onSearchCorrection={(term) => setFilter('search', term)} />
+              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} onClearFilters={clearAllFilters} hasActiveFilters={activeFilterCount > 0 || Boolean(filters.search)} searchQuery={filters.search} onSearchCorrection={(term) => setFilter('search', term)} comingSoonCategory={comingSoonCategory} />
             </div>
             {error && products.length > 0 && <p role="alert" className="mt-4 text-center text-sm text-red-700">{error}</p>}
             {!error && products.length > 0 && (
