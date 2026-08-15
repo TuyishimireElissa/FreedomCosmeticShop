@@ -6,6 +6,7 @@ export type AdminTab =
   | 'overview'
   | 'orders'
   | 'products'
+  | 'categories'
   | 'bundles'
   | 'customers'
   | 'deliveries'

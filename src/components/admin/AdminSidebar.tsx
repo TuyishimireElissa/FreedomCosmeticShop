@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CreditCard,
+  FolderTree,
   FileText,
   LayoutDashboard,
   LogOut,
@@ -55,6 +56,8 @@ const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
       // grouping, so `key` must come from href to stay unique.
       { label: 'WhatsApp Orders', tab: 'orders', icon: MessageCircle, permission: 'orders.read', href: '/admin/whatsapp-orders', translationKey: 'whatsapp.admin_orders' },
       { label: 'Products', tab: 'products', icon: Package, permission: 'products.read' },
+      // href-based like Reviews above: its own page, not an AdminView tab.
+      { label: 'Categories', tab: 'categories', icon: FolderTree, permission: 'products.read', href: '/admin/categories' },
       { label: 'Bundles', tab: 'bundles', icon: Package, permission: 'products.read' },
       { label: 'Customers', tab: 'customers', icon: Users, permission: 'customers.read' },
       { label: 'Reviews', tab: 'products', icon: Star, permission: 'reviews.moderate', href: '/admin/reviews', translationKey: 'reviews.admin_nav' },
