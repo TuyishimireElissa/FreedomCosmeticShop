@@ -361,3 +361,56 @@ Executing the approved 67-row list would have reverted an approved change.
 **The rule.** A plan is only valid against the state it was computed from. After
 any write, regenerate the plan and diff it against the approved one. Pin
 owner decisions by primary key so no rule can outvote them.
+
+---
+
+## 18. Verify a class name exists before shipping it
+
+Phase 5 used `text-fcs-charcoal`. The token in `tailwind.config.ts` is
+`--fcs-text`; **`fcs-charcoal` does not exist**. Tailwind does not error on an
+unknown utility — it emits nothing — so the heading would have rendered in the
+browser default colour on a warm ivory card, and every test and the build would
+have passed.
+
+It was caught by grepping each class against the config before commit, not by
+any tooling.
+
+**The rule.** Every design token used in new markup is grepped against
+`tailwind.config.ts` in the same session it is written. An invalid Tailwind
+class is silent: no build error, no test failure, no console warning.
+
+---
+
+## 19. Assert against shipped code, not the raw file
+
+A Phase 5 test checked that four Kinyarwanda phrases were present, reading the
+**raw** file. The component also *documents* those phrases in its header
+comment. Deleting the real string left the comment behind, and the assertion
+passed on the comment alone.
+
+The same file already had a comment-stripped copy prepared for exactly this
+reason; the assertion simply used the wrong variable.
+
+**The rule.** Read RAW only when asserting on comments themselves (for example
+`// verified-rw` markers). For anything that must reach a customer, assert
+against the comment-stripped source. Keep both variables in the test file and
+name them so the difference is obvious.
+
+---
+
+## 20. Count the occurrences, then mutate each one
+
+Three Phase 5 mutations survived a green suite, all the same shape:
+
+| assertion | why it passed anyway |
+|---|---|
+| `_count` keeps its stock filter | two `_count` blocks exist (parent + children); one filtered copy satisfied it |
+| four `// verified-rw` markers | asserted `>= 3`, so removing one left three |
+| WhatsApp guard present | asserted the text existed, not that it still decided anything — `= true \|\|` short-circuited it |
+
+Each was found by mutating and watching the count stay at 21/21.
+
+**The rule.** Before writing an assertion, `grep -c` the anchor. If it appears
+more than once, assert the exact count and mutate **each** occurrence
+separately. For a boolean guard, assert that it is still derived, not merely
+that its name appears.
