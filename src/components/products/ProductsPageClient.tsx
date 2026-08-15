@@ -162,6 +162,17 @@ function ProductsContent() {
     return { name: categoryName || selectedCategory.name, soldOut: everStocked > 0 }
   })()
 
+  /**
+   * Offer to source the item only when the search itself is what came up
+   * empty. A filter narrowing a search to zero is still a filter problem, and
+   * the existing "clear filters" message is the right answer there.
+   *
+   * DidYouMean already handles the misspelling case and probes before it
+   * renders, so it stays visible in the generic state; this panel is for a
+   * query that is spelled fine and simply is not stocked.
+   */
+  const rfqQuery = filters.search && activeFilterCount === 0 ? filters.search.trim() : null
+
   const breadcrumbItems = [
     { name: t('nav.products'), url: '/products' },
     ...(categoryName && filters.category
@@ -221,7 +232,7 @@ function ProductsContent() {
           <FilterSidebar availableCategories={categories} availableBrands={brands} className={filtersLoading ? 'animate-pulse opacity-60' : ''} />
           <main className="min-w-0 flex-1">
             <div id="product-results">
-              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} onClearFilters={clearAllFilters} hasActiveFilters={activeFilterCount > 0 || Boolean(filters.search)} searchQuery={filters.search} onSearchCorrection={(term) => setFilter('search', term)} comingSoonCategory={comingSoonCategory} />
+              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} onClearFilters={clearAllFilters} hasActiveFilters={activeFilterCount > 0 || Boolean(filters.search)} searchQuery={filters.search} onSearchCorrection={(term) => setFilter('search', term)} comingSoonCategory={comingSoonCategory} rfqQuery={rfqQuery} />
             </div>
             {error && products.length > 0 && <p role="alert" className="mt-4 text-center text-sm text-red-700">{error}</p>}
             {!error && products.length > 0 && (

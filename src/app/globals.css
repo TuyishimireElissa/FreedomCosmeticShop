@@ -90,6 +90,12 @@
     --fcs-urgent: #C0392B;            /* 5.44:1 — accepted from the brief as-is */
     --fcs-info: #287CB3;              /* 4.54:1 */
     --fcs-whatsapp-pill: #1E874A;     /* 4.55:1 — solid CTA, unlike --fcs-whatsapp (1.98:1) */
+    /* Hover partner for the pill. --fcs-whatsapp-hover (#128C7E) is only
+       4.14:1 against white, so pairing it with the pill makes the label FAIL
+       AA at the moment of interaction — the button goes unreadable exactly
+       when it is being pressed. #17703D is 6.14:1 and genuinely darker than
+       the pill, so the hover still reads as a press. */
+    --fcs-whatsapp-pill-hover: #17703D; /* 6.14:1 */
 
     /* Snap easing for the redesign. Distinct from --fcs-ease-silk, which is
      * slower and used for editorial fades. */

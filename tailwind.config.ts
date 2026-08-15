@@ -45,6 +45,7 @@ const config: Config = {
           urgent: 'var(--fcs-urgent)',
           info: 'var(--fcs-info)',
           'whatsapp-pill': 'var(--fcs-whatsapp-pill)',
+          'whatsapp-pill-hover': 'var(--fcs-whatsapp-pill-hover)',
         },
         primary: {
           DEFAULT: '#B76E79',

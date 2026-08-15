@@ -12,6 +12,7 @@ import { useAnalytics } from '@/hooks/useAnalytics'
 import { ProductCard } from '@/components/storefront/ProductCard'
 import DidYouMean from '@/components/products/DidYouMean'
 import CategoryComingSoon from '@/components/products/CategoryComingSoon'
+import SearchRfq from '@/components/products/SearchRfq'
 
 interface ProductGridProps {
   products: Product[]
@@ -31,9 +32,16 @@ interface ProductGridProps {
    * filter — they get the Coming Soon panel instead.
    */
   comingSoonCategory?: { name: string; soldOut: boolean } | null
+  /**
+   * Set only when a search term found nothing AND no filter is narrowing the
+   * result. Source-gated: the caller decides, because only it knows whether a
+   * filter is also active. An empty result caused by a filter is still a filter
+   * problem and must keep the existing "clear filters" message.
+   */
+  rfqQuery?: string | null
 }
 
-export default function ProductGrid({ products, loading = false, error, onRetry, onClearFilters, hasActiveFilters = false, searchQuery, onSearchCorrection, comingSoonCategory = null }: ProductGridProps) {
+export default function ProductGrid({ products, loading = false, error, onRetry, onClearFilters, hasActiveFilters = false, searchQuery, onSearchCorrection, comingSoonCategory = null, rfqQuery = null }: ProductGridProps) {
   const { t } = useLanguage()
   const user = useStore((state) => state.user)
   const router = useRouter()
@@ -94,6 +102,11 @@ export default function ProductGrid({ products, loading = false, error, onRetry,
     // empty state so the wrong message can never win.
     if (comingSoonCategory) {
       return <CategoryComingSoon categoryName={comingSoonCategory.name} soldOut={comingSoonCategory.soldOut} />
+    }
+    // A search that found nothing is a sourcing request, not a filter mistake.
+    // Checked before the generic empty state so the wrong message cannot win.
+    if (rfqQuery) {
+      return <SearchRfq query={rfqQuery} />
     }
     return (
       <div className="rounded-3xl border border-dashed border-gray-200 bg-[#f8f9fa] px-5 py-16 text-center">

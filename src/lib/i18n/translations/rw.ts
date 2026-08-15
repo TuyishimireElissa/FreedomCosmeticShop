@@ -441,6 +441,13 @@ export const rw = {
     all_ratings: 'Amanota yose', // verified-rw
     catalog: 'Urutonde rw’ibicuruzwa', // verified-rw
     clear_all_filters: 'Siba inshungura zose', // verified-rw
+    // Zero-result sourcing request. Warm, not an error: the shop can often
+    // order in what it does not stock, and every order goes through WhatsApp
+    // anyway, so an empty search is a sourcing request that never arrived.
+    rfq_title: 'Ntabwo dubikeye ubu — ariko dushobora gufasha!', // verified-rw
+    rfq_body: 'Nta bicuruzwa twabonye kuri “{query}”. Twandikire kuri WhatsApp tukubwire niba dushobora kubikuzanira.', // verified-rw
+    rfq_whatsapp: 'Twandikire kuri WhatsApp', // verified-rw
+    rfq_browse: 'Reba ibicuruzwa byose', // verified-rw
     clear_search: 'Siba ibishakishwa', // verified-rw
     filter_brand: 'Ikirango: {brand}', // verified-rw
     filter_by_price: 'Shungura ukurikije igiciro', // verified-rw
