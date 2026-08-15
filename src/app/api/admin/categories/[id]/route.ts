@@ -20,6 +20,12 @@ const UpdateCategorySchema = z.object({
   // Kinyarwanda display name, editable from the admin panel so the owner
   // never needs a developer to rename a category.
   nameRw: z.string().min(1).max(100).optional().nullable(),
+  /**
+   * Explicit slug change. Renaming a category no longer rewrites its slug on
+   * its own — see the note on the update below. A caller that genuinely wants
+   * a new URL has to ask for one here.
+   */
+  slug: z.string().min(2).max(100).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Slug must be lowercase letters, numbers and single hyphens').optional(),
   description: z.string().max(500).optional().nullable(),
   image: z.string().url().optional().nullable(),
   icon: z.string().optional().nullable(),
@@ -50,11 +56,27 @@ export async function PUT(
     }
 
     const data: Record<string, unknown> = { ...parsed.data }
-    if (parsed.data.name && parsed.data.name !== existing.name) {
-      let slug = parsed.data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
-      const slugExists = await db.category.findFirst({ where: { slug, id: { not: id } } })
-      if (slugExists) slug = `${slug}-${Date.now().toString(36)}`
-      data.slug = slug
+
+    /**
+     * A rename must NOT silently change the slug.
+     *
+     * This route used to regenerate the slug from the name on every rename.
+     * The slug is the public URL (/products?category=<slug>) and it is what
+     * customers share on WhatsApp, so fixing a typo in a category name would
+     * quietly break every link already sent out — and there are no redirects
+     * to catch them. Product.categoryId is unaffected either way, so nothing
+     * is gained by rewriting it.
+     *
+     * The slug now changes only when a caller passes one explicitly.
+     */
+    if (parsed.data.slug && parsed.data.slug !== existing.slug) {
+      const slugExists = await db.category.findFirst({ where: { slug: parsed.data.slug, id: { not: id } } })
+      if (slugExists) {
+        return NextResponse.json({ error: "That slug is already used by another category" }, { status: 409 })
+      }
+      data.slug = parsed.data.slug
+    } else {
+      delete data.slug
     }
 
     const updated = await db.category.update({ where: { id }, data })
