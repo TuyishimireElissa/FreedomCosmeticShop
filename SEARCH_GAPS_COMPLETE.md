@@ -179,3 +179,65 @@ zero products. If you plan to stock makeup, add them to
 
 **Note:** facets now report **111 products across 10 categories** (was 107/9),
 so you have been adding stock since the category work.
+
+---
+
+## Follow-up: our own category names returned zero
+
+Found while verifying the deodorants added on 2026-08-15.
+
+Typing the Kinyarwanda label printed on the menu tile found nothing:
+
+| typed | before | now |
+|---|---|---|
+| `kwera` (Kwera no Kurangaza) | **0** | **24** |
+| `deodorante` (Deodorante) | **0** | **6** |
+| `ifarasi` (Ifarasi) | 0 | 0 — expansion works, no nail stock yet |
+
+### And `abana` returned men's products
+
+`abana` (children) had no vocabulary entry, so it fell through to fuzzy
+matching, where it scores **0.8533** against `abagabo` (men) — just over the
+0.85 threshold. A parent searching for baby products was shown men's deodorant
+and men's soap.
+
+Now returns Zwitsal Baby Lotion, Johnson's Baby Cream, Boudchou Baby Ointment.
+
+**Two fixes:** the missing entries were added, and fuzzy matching is now skipped
+when the query is already an exact vocabulary key. Adding the entry alone was
+not enough — the typo pass ran anyway and still bolted `abagabo` on. Typo
+tolerance is unchanged for unknown words: `vitamn` 19, `vitanin` 28,
+`skincaer` 73.
+
+### A weak assertion of my own, caught by mutation
+
+Deleting the `kwera` entry left the suite green, because the sibling key
+`kwera no kurangaza` matched by substring and satisfied the check — the
+sibling-satisfies trap in rule 20. Added a `hasOwnProperty` assertion per term;
+removing any of the four now fails.
+
+Shipped `bdf1a45`. 1,835 tests passing.
+
+---
+
+## Live search analytics — first real data
+
+`/api/search/popular` is now accumulating, with no raw query text stored:
+
+| term | searches | found nothing |
+|---|---|---|
+| abana | 4 | 0 |
+| deodorante | 3 | 2 |
+| amavuta | 2 | 0 |
+| isabune | 2 | 0 |
+| kwera | 2 | 1 |
+| uruhu | 2 | 0 |
+
+**Caveat, stated plainly:** most of these are my own verification searches, and
+the "found nothing" counts for `deodorante`, `kwera` and `ifarasi` were recorded
+*before* the vocabulary fix deployed. They are not customer demand. Real signal
+will build from now on — treat the table as proof the pipeline works, not as a
+stocking decision.
+
+The one row worth watching is **`ifarasi`**: nail care has no stock at all, so
+any future search there is genuine unmet demand.
