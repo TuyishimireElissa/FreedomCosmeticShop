@@ -414,3 +414,50 @@ Each was found by mutating and watching the count stay at 21/21.
 more than once, assert the exact count and mutate **each** occurrence
 separately. For a boolean guard, assert that it is still derived, not merely
 that its name appears.
+
+---
+
+## 21. Mocking the function under test proves only that it was called
+
+`/search` was built as a `page.tsx` calling `permanentRedirect()`, and tested by
+mocking `next/navigation` and asserting on the URL handed to the mock. Thirteen
+assertions passed. **In production the route returned 200 with an HTML body and
+never redirected at all.**
+
+Because the component rendered nothing, Next had already begun streaming the
+response, so instead of a `Location` header it embedded
+`NEXT_REDIRECT;replace;/products?search=soap;308` in the payload for the client
+to act on. Fine for an in-app click; useless for a shared WhatsApp link, a
+crawler, or `curl`.
+
+The mock could never have caught it: it verified the component's *intent*, while
+the bug lived in what the framework did with that intent.
+
+**The rule.** When a feature's contract is an HTTP response, assert on the
+response — `status`, `Location`, `content-type` — not on a mocked call. And test
+against the server the platform actually runs: `next start` was not
+representative here, because `next.config.js` sets `output: standalone`.
+
+---
+
+## 22. A test that encodes a missing feature will block the fix
+
+Shipping the controlled-vocabulary popular-searches endpoint broke
+`search-api-security.test.ts`, which asserted:
+
+```ts
+expect(popularRoute).toContain('controlledVocabularyConfigured: false')
+expect(popularRoute).toContain('data: []')
+```
+
+That is not a security property. It is a description of a feature that had not
+been built yet, frozen into an assertion. Left alone it would have made the safe
+implementation permanently un-shippable.
+
+The genuine guarantee — no hash imported, selected or returned; only the
+controlled term column read; nothing outside the vocabulary emitted — was never
+asserted at all.
+
+**The rule.** When a test fails on a feature addition, first ask whether it
+asserts a *property* or a *limitation*. Rewrite limitation-tests to assert the
+underlying property, and prove the rewrite by mutation. Never delete the test.
