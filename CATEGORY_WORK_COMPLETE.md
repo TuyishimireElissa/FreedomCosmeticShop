@@ -115,11 +115,12 @@ so nothing is wrong right now — but the question is still open. See
 
 **Fix two remaining data-quality items** (I did not touch these, they are
 yours to judge):
-- *Dabur Herbolene Aloe Jelly* appears twice with identical names — 225 ml at
-  3,500 and 425 ml at 5,800. Probably legitimate, but a shopper cannot tell them
-  apart in a grid. Suggest putting the size in the name, as we did for Veet.
 - **ingredients filled on 4 of 107 products; brand on 2 of 107.** Brand-based
   filtering and ingredient search cannot work usefully until these are filled.
+
+*(The duplicate Dabur listing that was here has been fixed — see `de7a3cb`
+onward. Both sizes now carry the size in the name, matching the Veet
+precedent. No duplicate product names remain among the 107 live products.)*
 
 ---
 
