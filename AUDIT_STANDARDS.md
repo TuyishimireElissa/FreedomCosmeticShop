@@ -281,3 +281,83 @@ Features declined this engagement because the data does not exist:
 
 **The rule.** Hide the section rather than render an empty box, and say plainly
 which owner action would light it up.
+
+---
+
+## 14. A green assertion is worthless until you have seen it go red
+
+Phase 4 shipped 22 assertions. 21 were real. One was decorative:
+
+```ts
+expect(code).not.toContain("from '@/components/ui/table'")   // single quotes
+```
+
+The component writes its imports in **double** quotes. The needle could never
+match, so the assertion passed no matter what the file contained. Adding a
+shadcn `Table` import — exactly what the check existed to prevent — left the
+suite green.
+
+It was caught only by mutating the source and watching the count stay at 22.
+
+**The rule.** Every new assertion gets a mutation that should break it, and the
+mutation itself is asserted to have landed (`assert s != orig, "DID NOT APPLY"`)
+before the result is believed. For string checks, prefer a quote-agnostic regex
+over `toContain` on a quoted literal.
+
+---
+
+## 15. HTTP 200 is not the same as working
+
+The re-categorisation moved 20 of 23 products out of Skin Care. The routine
+quiz filtered on `category.slug = 'skincare'`, so six of nine skin concerns
+started returning nothing. Live checks after the migration all passed:
+
+- `/api/quiz/recommend` → **200 OK**
+- valid JSON, `success: true`
+- no error in the logs
+
+The endpoint was answering perfectly. It was answering with an empty list.
+
+Measured afterwards against the pre-migration snapshot: acne 3 → 0,
+dark_spots 7 → 0, sensitivity 12 → 0, uneven_tone 5 → 0.
+
+**The rule.** For any endpoint that returns a *collection*, assert on the
+count, not the status code. A silent empty result is harder to spot than a
+crash and does more damage, because nothing alerts.
+
+---
+
+## 16. Read the picture before calling data junk
+
+Two products were reported as data-quality problems in the Phase 1 audit. Both
+reports were wrong, and both would have destroyed live inventory:
+
+| flagged as | actually |
+|---|---|
+| junk test row named `soap`, description `ggy` | a real **Dettol Fresh 4-bar pack** — Cloudinary photo, 96 in stock, 3 already sold |
+| three duplicate "Veet Gold Turmeric Oil" rows | three **sizes** — SKUs `…-500ML/300ML/200ML`, prices laddered, 4 orders bought two sizes together |
+
+The evidence was one `curl` and one `SELECT sku` away in both cases. Acting on
+the first report would have hidden a stocked product; acting on the owner's
+instruction for the second would have hidden the **best seller** (10 units,
+70,000 RWF) while keeping a variant with zero sales.
+
+**The rule.** Before recommending that any row be hidden or deleted: open the
+image, read the SKU, and count the orders. Bad *text* is not the same as a bad
+*product*.
+
+---
+
+## 17. Re-run the classifier after the data changes under it
+
+The move plan was built, approved at 67 rows, then two products were repaired
+first. Re-running the classifier against the repaired data showed it now wanted
+to drag the three Veet oils **back** into `whitening` — their names still
+contain the word "Whitening" — silently undoing a fix the owner had just
+approved.
+
+Executing the approved 67-row list would have reverted an approved change.
+
+**The rule.** A plan is only valid against the state it was computed from. After
+any write, regenerate the plan and diff it against the approved one. Pin
+owner decisions by primary key so no rule can outvote them.
