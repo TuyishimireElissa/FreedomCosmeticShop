@@ -57,11 +57,56 @@ describe('Rwanda local search vocabulary', () => {
     expect(expandSearchQuery('   ')).toEqual([])
   })
 
-  it('preserves the existing vocabulary while expanding to 189 entries', () => {
-    expect(Object.keys(LOCAL_SEARCH_VOCABULARY)).toHaveLength(189)
+  it('preserves the existing vocabulary and only ever grows', () => {
+    // Was pinned at exactly 189. A hard count fails on every legitimate
+    // addition while proving nothing about the entries that matter, so it
+    // asserts a floor plus the specific keys worth protecting.
+    expect(Object.keys(LOCAL_SEARCH_VOCABULARY).length).toBeGreaterThanOrEqual(189)
     expect(LOCAL_SEARCH_VOCABULARY.uruhu).toContain('skincare')
     expect(LOCAL_SEARCH_VOCABULARY.mosturizer).toContain('moisturizer')
     expect(LOCAL_SEARCH_VOCABULARY['umusatsi ugwa']).toContain('alopecia')
+  })
+
+  it('makes every stocked category name searchable in Kinyarwanda', () => {
+    // A shopper who types the label printed on our own menu tile must find
+    // the products behind it. Each of these returned zero before: `kwera`
+    // (9 whitening products), `deodorante` (3), `ifarasi` (nail care).
+    expect(expandSearchQuery('kwera')).toContain('whitening')
+    expect(expandSearchQuery('deodorante')).toContain('deodorant')
+    expect(expandSearchQuery('ifarasi')).toContain('nail care')
+    expect(expandSearchQuery('isabune')).toContain('soap')
+    expect(expandSearchQuery('imibavu')).toContain('fragrance')
+  })
+
+  it('holds each category term as its own entry, not via a sibling', () => {
+    // `kwera` alone once passed only because the longer `kwera no kurangaza`
+    // key matched by substring — deleting the real entry left the test green.
+    // Assert the keys themselves so a removal cannot hide behind a neighbour.
+    for (const key of ['kwera', 'deodorante', 'ifarasi', 'abana']) {
+      expect(
+        Object.prototype.hasOwnProperty.call(LOCAL_SEARCH_VOCABULARY, key),
+        `"${key}" must be its own vocabulary key`,
+      ).toBe(true)
+    }
+  })
+
+  it('does not confuse children with men', () => {
+    // `abana` (children) scores 0.8533 against `abagabo` (men), over the 0.85
+    // typo threshold, so a baby-product search used to return men's deodorant.
+    const abana = expandSearchQuery('abana')
+    expect(abana).toContain('baby')
+    expect(abana).not.toContain('men')
+    expect(abana).not.toContain('abagabo')
+    // The men's term must keep working on its own.
+    expect(expandSearchQuery('abagabo')).toContain('men')
+  })
+
+  it('still tolerates genuine misspellings of unknown words', () => {
+    // Fuzzy matching is now skipped for exact vocabulary keys. It must still
+    // run for everything else, or typo recall regresses.
+    expect(expandSearchQuery('vitanin').length).toBeGreaterThan(1)
+    expect(expandSearchQuery('skincaer')).toContain('skincare')
+    expect(expandSearchQuery('perfme')).toContain('perfume')
   })
 
   it('expands new concern, ingredient, shade, and occasion vocabulary', () => {

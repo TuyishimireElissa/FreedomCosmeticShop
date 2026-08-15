@@ -16,6 +16,10 @@ export const LOCAL_SEARCH_VOCABULARY: Readonly<Record<string, readonly string[]>
   imibavu: ['fragrance', 'perfume'],
   umubiri: ['body care', 'body lotion', 'body'],
   'kwita ku mubiri': ['body care', 'body lotion'],
+  // Kinyarwanda spelling of the Deodorante category tile. Without this,
+  // typing the label shown in the menu returned 0 of 3 deodorants.
+  deodorante: ['deodorant', 'body spray', 'roll-on', 'antiperspirant'],
+  ifarasi: ['nail care', 'nail polish', 'manicure', 'nails'],
 
   // Common product language —  REVIEW
   amavuta: ['oil', 'lotion', 'cream', 'body butter'],
@@ -103,6 +107,18 @@ export const LOCAL_SEARCH_VOCABULARY: Readonly<Record<string, readonly string[]>
 
   // Product benefits
   'gutesha ibara': ['whitening', 'lightening', 'brightening', 'fairness'],
+  /**
+   * The words printed on our own category tiles must be searchable.
+   *
+   * `Kwera no Kurangaza` is the Kinyarwanda label a shopper reads in the
+   * menu. Typing what they just read returned **0 of 9 whitening products**,
+   * because no vocabulary entry existed for it. The same was true of
+   * `Deodorante` below. A customer who copies your own navigation and finds
+   * nothing is the worst possible search result.
+   */
+  kwera: ['whitening', 'brightening', 'lightening', 'glowing', 'fairness'],
+  kurangaza: ['brightening', 'glowing', 'radiance', 'whitening'],
+  'kwera no kurangaza': ['whitening', 'brightening', 'lightening'],
   gutunga: ['moisturizing', 'hydrating', 'nourishing', 'softening'],
   'kwirinda izuba': ['sun protection', 'SPF', 'sunscreen', 'UV protection'],
   'gutabara imirire': ['anti-aging', 'anti-wrinkle', 'firming', 'lifting'],
@@ -204,6 +220,19 @@ export const LOCAL_SEARCH_VOCABULARY: Readonly<Record<string, readonly string[]>
   "ibikoresho by'abagabo": ["men's products", "men's grooming"],
   "ubuvura bw'abagabo": ["men's skincare", 'men moisturizer'],
   abagore: ['women', 'womens beauty', 'ladies cosmetics'],
+
+  /**
+   * Children. MUST be an explicit key, not left to fuzzy matching.
+   *
+   * `abana` (children) scores 0.8533 against `abagabo` (men) on
+   * Jaro-Winkler, just over the 0.85 typo threshold. With no entry of its
+   * own, a search for baby products expanded to men's grooming and returned
+   * deodorant and men's soap — the opposite audience. An exact key wins
+   * before fuzzy matching runs, so this fixes it without touching the
+   * threshold, which protects genuine typo recall elsewhere.
+   */
+  abana: ['baby', 'kids', 'children', 'baby care', 'baby lotion', 'baby oil'],
+  "ibikoresho by'abana": ['baby products', 'kids products'],
 
   // Product type variations
   'bb cream': ['BB cream', 'tinted moisturizer', 'skin tint'],
@@ -324,9 +353,23 @@ export function expandSearchQuery(query: string): string[] {
     if (localMatch || mappedMatch) addVocabulary(localTerm, mappedTerms)
   }
 
-  // Typo tolerance uses a deliberately high threshold and ignores very short
-  // input to avoid broad, expensive, or surprising matches.
-  if (normalized.length >= 4) {
+  /**
+   * Typo tolerance, but only for words we do not already recognise.
+   *
+   * Fuzzy matching used to run even when the query was an exact vocabulary
+   * key, which produced actively wrong results for near-miss pairs:
+   * `abana` (children) scores **0.8533** against `abagabo` (men), over the
+   * 0.85 threshold, so a search for baby products also pulled in men's
+   * grooming and returned deodorant and men's soap.
+   *
+   * Source-gated: if the shopper typed a word we know, they meant that word,
+   * and guessing at neighbours can only add noise. Typo correction still runs
+   * for everything else, so recall for genuine misspellings is unchanged —
+   * `vitanin` still finds vitamin products.
+   */
+  const isKnownExactly = Object.prototype.hasOwnProperty.call(LOCAL_SEARCH_VOCABULARY, normalized)
+
+  if (!isKnownExactly && normalized.length >= 4) {
     for (const [localTerm, mappedTerms] of Object.entries(LOCAL_SEARCH_VOCABULARY)) {
       const localSimilarity = jaroWinkler(normalized, localTerm)
       const englishMatch = mappedTerms.some((term) => jaroWinkler(normalized, term.toLocaleLowerCase('rw-RW')) >= 0.85)
