@@ -157,9 +157,22 @@ export const BUSINESS = {
   // ═══════════════════════════════════
   // WEBSITE & DOMAIN
   // ═══════════════════════════════════
-  domain: 'freedom-cosmetic-shop.vercel.app',
-  url: 'https://freedom-cosmetic-shop.vercel.app',
-  adminUrl: 'https://freedom-cosmetic-shop.vercel.app/admin',
+  /**
+   * The custom domain, live since 2026-08-15.
+   *
+   * `url` is the fallback behind `NEXT_PUBLIC_APP_URL` in seo-config.ts:21, and
+   * therefore the value that ends up in the canonical tag, og:url, sitemap.xml
+   * and robots.txt whenever the environment variable is absent. While this said
+   * `.vercel.app`, every page on freedomcosmeticshop.com carried a canonical
+   * pointing at the old host — which told Google to keep indexing the old URL,
+   * and pointed at a URL that 307-redirects straight back here.
+   *
+   * The old Vercel URL is not removed anywhere: Vercel still serves it and
+   * 307s it to this domain, so existing links keep working.
+   */
+  domain: 'freedomcosmeticshop.com',
+  url: 'https://freedomcosmeticshop.com',
+  adminUrl: 'https://freedomcosmeticshop.com/admin',
 
   // ═══════════════════════════════════
   // BUSINESS DETAILS FOR INVOICES

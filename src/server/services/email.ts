@@ -94,7 +94,7 @@ export async function sendEmail(opts: EmailOptions): Promise<EmailResult> {
  * unset (e.g. a worker process without NEXT_PUBLIC_APP_URL).
  */
 function emailAssetUrl(path: string): string {
-  const base = (process.env.NEXT_PUBLIC_APP_URL || 'https://freedom-cosmetic-shop.vercel.app').replace(/\/$/, '')
+  const base = (process.env.NEXT_PUBLIC_APP_URL || 'https://freedomcosmeticshop.com').replace(/\/$/, '')
   return `${base}${path}`
 }
 

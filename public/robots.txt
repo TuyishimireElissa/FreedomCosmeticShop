@@ -23,5 +23,5 @@ Disallow: /
 User-agent: CCBot
 Disallow: /
 
-Sitemap: https://freedom-cosmetic-shop.vercel.app/sitemap.xml
-Host: https://freedom-cosmetic-shop.vercel.app
+Sitemap: https://freedomcosmeticshop.com/sitemap.xml
+Host: https://freedomcosmeticshop.com

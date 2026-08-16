@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     })
     let credentialDelivery='NOT_CONFIGURED'
     if(features.sms){
-      enqueueSms(phone,`FreedomCosmeticShop staff account created. Open ${process.env.NEXT_PUBLIC_APP_URL || 'https://freedom-cosmetic-shop.vercel.app'}/admin and contact your supervisor for the one-time password. Change it immediately after login.`,{priority:0,template:'STAFF_ACCOUNT_CREATED',maxAttempts:3})
+      enqueueSms(phone,`FreedomCosmeticShop staff account created. Open ${process.env.NEXT_PUBLIC_APP_URL || 'https://freedomcosmeticshop.com'}/admin and contact your supervisor for the one-time password. Change it immediately after login.`,{priority:0,template:'STAFF_ACCOUNT_CREATED',maxAttempts:3})
       credentialDelivery='QUEUED'
     }
     await logActivity({userId:creator.id,userName:creator.name,userRole:creator.role,action:'STAFF_CREATED',entityType:'STAFF',entityId:user.id,description:`Created separate ${input.role} account for ${input.name}; SMS=${credentialDelivery}`,severity:'critical',req:request})

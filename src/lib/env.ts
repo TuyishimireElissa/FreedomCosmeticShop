@@ -9,7 +9,7 @@ const envSchema = z.object({
   // App
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   APP_NAME: z.string().default("FreedomCosmeticShop"),
-  APP_URL: z.string().url().default("https://freedom-cosmetic-shop.vercel.app"),
+  APP_URL: z.string().url().default("https://freedomcosmeticshop.com"),
   NEXT_PUBLIC_APP_URL: z.string().url().optional(),
   NEXT_PUBLIC_APP_NAME: z.string().default("FreedomCosmeticShop"),
 
@@ -103,7 +103,7 @@ function loadEnv(): Env {
         return {
           NODE_ENV: "production" as const,
           APP_NAME: "FreedomCosmeticShop",
-          APP_URL: "https://freedom-cosmetic-shop.vercel.app",
+          APP_URL: "https://freedomcosmeticshop.com",
           DATABASE_URL: process.env.DATABASE_URL || "postgresql://placeholder",
           DIRECT_URL: process.env.DIRECT_URL,
           NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
