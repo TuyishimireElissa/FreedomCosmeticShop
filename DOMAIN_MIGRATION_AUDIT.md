@@ -200,3 +200,70 @@ before any code change lands.
 ---
 
 **PHASE 0 AUDIT COMPLETE — Awaiting approval.**
+
+---
+
+# PHASES 1–4 COMPLETE — live verified 2026-08-15
+
+## ⚠️ My Phase 0 audit was wrong twice
+
+**1. I reported `public/robots.txt` as clean. It wasn't.** My grep covered
+`src/`, `prisma/` and the config files, never `public/`. That static file
+carried two hardcoded old URLs. `sitemap-robots.test.ts` failed and caught it.
+
+**2. I reported `NEXT_PUBLIC_APP_URL` as "unset". It was set — to the old URL.**
+I inferred its state from a symptom (production served the old host) instead of
+reading the project configuration. One Vercel API call would have shown the real
+value.
+
+That second error mattered: the Phase 1 code fix deployed green and **changed
+nothing**, because a `NEXT_PUBLIC_*` env var is inlined at build time and wins
+over the code fallback. The canonical tag kept pointing at the old host through
+three deploys.
+
+Corrected via the Vercel API, previous values recorded for rollback:
+
+| variable | was | now |
+|---|---|---|
+| `NEXT_PUBLIC_APP_URL` | `https://freedom-cosmetic-shop.vercel.app` | `https://freedomcosmeticshop.com` |
+| `NEXTAUTH_URL` | `https://freedom-cosmetic-shop.vercel.app` | `https://freedomcosmeticshop.com` |
+
+`NEXTAUTH_URL` was included on the owner's explicit instruction — a config
+value, not auth logic. No auth code touched.
+
+## Live verification
+
+| Check | Result |
+|---|---|
+| `robots.txt` Host | `https://freedomcosmeticshop.com` ✅ |
+| `robots.txt` Sitemap | `https://freedomcosmeticshop.com/sitemap.xml` ✅ |
+| `sitemap.xml` | **150 URLs, 0 on the old host** ✅ |
+| Homepage canonical | `https://freedomcosmeticshop.com` ✅ |
+| Product page canonical | `…/products/soap` ✅ |
+| Category page canonical | `…/products` ✅ |
+| `og:url` / `og:image` | new domain ✅ |
+| `twitter:image` | new domain ✅ |
+| JSON-LD `@id` ×3 | organization / store / website ✅ |
+| Old host in shipped HTML | **0 across 5 sampled pages** ✅ |
+| Old `.vercel.app` URL | still 307s to the new domain — no broken links ✅ |
+| Functional sweep | 13/13 routes, admin 401, search 71 hits, RFQ 200 ✅ |
+
+## `www` — largely mitigated, one step still yours
+
+`www.freedomcosmeticshop.com` still returns **200 rather than redirecting**, so
+both hostnames serve identical content. **But it now emits a canonical pointing
+at the apex**, so Google will consolidate and the duplicate-content risk is
+mostly gone.
+
+The clean fix is still a **301 from `www` to the apex**, set in Vercel →
+Domains. That is a dashboard setting, not code.
+
+## What to do in Google Search Console
+
+1. Add `https://freedomcosmeticshop.com` as a new property.
+2. Submit `https://freedomcosmeticshop.com/sitemap.xml`.
+3. Use the **Change of Address** tool from the old property, if the
+   `.vercel.app` domain was ever verified there.
+4. The 307 on the old URL is fine for users. If you want the strongest SEO
+   signal, Vercel can be set to 308/301 instead — a permanent redirect passes
+   ranking more decisively than a temporary one.
