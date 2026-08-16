@@ -1,7 +1,9 @@
 # Category system — final handover
 
 All phases complete, deployed and verified on production.
-Last verified 2026-08-15 against `https://freedom-cosmetic-shop.vercel.app`.
+Last verified 2026-08-15 against `https://freedom-cosmetic-shop.vercel.app`
+(the live URL at the time; the site moved to `https://freedomcosmeticshop.com`
+on 2026-08-15 and the old URL now 307-redirects there).
 
 ---
 

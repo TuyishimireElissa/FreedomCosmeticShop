@@ -51,7 +51,7 @@ both rose and gold pixels, so none of them silently reverted to the old lotus.
 starter-template logo: a dark charcoal rounded square with a white letter **Z**.
 I rasterised it to confirm rather than guessing from the path data.
 
-It is live right now: `https://freedom-cosmetic-shop.vercel.app/logo.svg`
+It is live right now: `https://freedomcosmeticshop.com/logo.svg`
 returns it with HTTP 200.
 
 It is referenced by `src/server/services/flutterwave.ts:224`, which passes it

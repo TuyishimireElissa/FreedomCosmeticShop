@@ -2,6 +2,15 @@
 
 Next.js commerce and administration application for a cosmetics store in Rwanda.
 
+**Live:** https://freedomcosmeticshop.com
+
+The former `freedom-cosmetic-shop.vercel.app` address still resolves and
+307-redirects to the custom domain, so older links keep working. Every
+canonical URL, sitemap entry and Open Graph tag is derived from
+`NEXT_PUBLIC_APP_URL`, falling back to `BUSINESS.url` in
+`src/lib/business-config.ts` — change it in one of those two places, never
+inline.
+
 ## Current operating model
 
 - Storefront, admin workspace, and API are one Next.js application.

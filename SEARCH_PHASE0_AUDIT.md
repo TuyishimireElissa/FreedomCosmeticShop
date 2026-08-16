@@ -1,7 +1,8 @@
 # Phase 0 — Search system audit (read only)
 
 Performed 2026-08-15 against `HEAD = 5d75f85`, the live database, and
-`https://freedom-cosmetic-shop.vercel.app`. No code written, nothing changed.
+`https://freedom-cosmetic-shop.vercel.app` (the live URL at the time; now
+`https://freedomcosmeticshop.com`). No code written, nothing changed.
 
 ---
 

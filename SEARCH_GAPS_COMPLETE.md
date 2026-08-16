@@ -1,7 +1,8 @@
 # Search gaps — Phases 1–4 complete
 
 All three genuine gaps built, deployed and verified live.
-Last verified 2026-08-15 against `https://freedom-cosmetic-shop.vercel.app`.
+Last verified 2026-08-15 against `https://freedom-cosmetic-shop.vercel.app`
+(the live URL at the time; now `https://freedomcosmeticshop.com`).
 
 ---
 
