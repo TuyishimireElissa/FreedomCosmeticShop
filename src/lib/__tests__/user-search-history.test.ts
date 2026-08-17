@@ -76,6 +76,21 @@ describe('one account can never reach another account rows', () => {
   })
 })
 
+describe('the route file obeys the Next.js export contract', () => {
+  it('exports only route handlers', () => {
+    // Next rejects any non-handler export with
+    // `"X" is not a valid Route export field`. `tsc --noEmit` passes anyway,
+    // so only `npm run build` catches it — which is exactly how this shipped
+    // broken once. Both route files are checked.
+    const ALLOWED = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'dynamic', 'revalidate', 'runtime', 'fetchCache', 'preferredRegion', 'maxDuration', 'generateStaticParams'])
+    for (const [label, source] of [['route.ts', route], ['[id]/route.ts', itemRoute]] as const) {
+      const exported = [...source.matchAll(/export\s+(?:async\s+)?(?:function|const|let|var)\s+(\w+)/g)].map((m) => m[1])
+      const invalid = exported.filter((name) => !ALLOWED.has(name))
+      expect(invalid, `${label} exports non-handler fields: ${invalid.join(', ')}`).toEqual([])
+    }
+  })
+})
+
 describe('the stored data is bounded', () => {
   it('caps the query length at the API boundary', () => {
     expect(route).toMatch(/MAX_QUERY_LENGTH = 100/)

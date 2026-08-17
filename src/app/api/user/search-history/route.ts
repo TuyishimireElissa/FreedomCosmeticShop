@@ -23,10 +23,15 @@ import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth'
 
+/**
+ * NOT exported. Next.js rejects any non-handler export from a route file with
+ * `"MAX_HISTORY_ITEMS" is not a valid Route export field` — and `tsc --noEmit`
+ * passes, so only `npm run build` catches it.
+ */
 /** Keep the list short enough to scan on a phone. */
-export const MAX_HISTORY_ITEMS = 10
+const MAX_HISTORY_ITEMS = 10
 /** Long enough for a real phrase, short enough to bound the column. */
-export const MAX_QUERY_LENGTH = 100
+const MAX_QUERY_LENGTH = 100
 
 const SaveSchema = z.object({
   query: z.string().trim().min(2).max(MAX_QUERY_LENGTH),
