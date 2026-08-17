@@ -451,6 +451,8 @@ export const rw = {
     // Category quick jumps above search results.
     quick_jump_title: 'Reba ku byiciro ({count})', // verified-rw
     quick_jump_label: 'Simbukira ku cyiciro', // verified-rw
+    // Related searches below the results grid.
+    related_title: 'Kandi bashakisha:', // verified-rw
     clear_search: 'Siba ibishakishwa', // verified-rw
     filter_brand: 'Ikirango: {brand}', // verified-rw
     filter_by_price: 'Shungura ukurikije igiciro', // verified-rw

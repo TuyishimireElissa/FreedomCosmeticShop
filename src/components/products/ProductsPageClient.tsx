@@ -8,6 +8,7 @@ import FilterSidebar from '@/components/products/FilterSidebar'
 import MobileFilters from '@/components/products/MobileFilters'
 import FilterChips from '@/components/products/FilterChips'
 import CategoryQuickJumps from '@/components/products/CategoryQuickJumps'
+import RelatedSearches from '@/components/products/RelatedSearches'
 import SearchWithSuggestions from '@/components/storefront/SearchWithSuggestions'
 import { useProductFilters } from '@/hooks/useProductFilters'
 import { useFacets } from '@/hooks/use-facets'
@@ -266,6 +267,15 @@ function ProductsContent() {
             <div id="product-results">
               <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} onClearFilters={clearAllFilters} hasActiveFilters={activeFilterCount > 0 || Boolean(filters.search)} searchQuery={filters.search} onSearchCorrection={(term) => setFilter('search', term)} comingSoonCategory={comingSoonCategory} rfqQuery={rfqQuery} />
             </div>
+            {/* Only under a search that produced results. On an empty grid the
+                sourcing panel owns the space, and on a bare browse there is no
+                "also searched" to relate to. */}
+            {filters.search && products.length > 0 && (
+              <RelatedSearches
+                currentQuery={filters.search}
+                onSelect={(term) => setFilter('search', term)}
+              />
+            )}
             {error && products.length > 0 && <p role="alert" className="mt-4 text-center text-sm text-red-700">{error}</p>}
             {!error && products.length > 0 && (
               <div className="mt-8 flex flex-col items-center gap-3">

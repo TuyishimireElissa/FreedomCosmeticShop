@@ -441,6 +441,7 @@ export const en = {
     rfq_browse: 'Browse all products',
     quick_jump_title: 'Browse by category ({count})',
     quick_jump_label: 'Jump to a category',
+    related_title: 'People also searched for:',
     clear_search: 'Clear search',
     filter_brand: 'Brand: {brand}',
     filter_by_price: 'Filter by price',
