@@ -114,6 +114,19 @@ export default function Navbar() {
       }`}
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-2 px-4 md:h-16 md:gap-6 md:px-6 lg:px-8">
+        {/* Left of the logo on phones, which is where Android users reach for
+          * it and what the mobile spec asks for. It also puts the menu first
+          * in the tab order instead of last. Hidden from md: up, where the
+          * category strip below the header replaces it. */}
+        <button
+          type="button"
+          onClick={() => setMobileOpen((open) => !open)}
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-fcs-text transition-colors hover:bg-rose-50 md:hidden"
+          aria-label={mobileOpen ? t('nav.close_menu') : t('nav.open_menu')}
+          aria-expanded={mobileOpen}
+        >
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
         <button
           type="button"
           onClick={() => navigate(() => router.push('/'))}
@@ -124,7 +137,7 @@ export default function Navbar() {
             <img
               src={settings.logoUrl}
               alt={BUSINESS.tradingName}
-              className="h-10 w-auto max-w-[150px] object-contain sm:max-w-[190px]"
+              className="h-8 w-auto max-w-[150px] object-contain md:h-10 sm:max-w-[190px]"
             />
           ) : (
             <>
@@ -141,12 +154,12 @@ export default function Navbar() {
           <SearchWithSuggestions placeholder={t('nav.search_placeholder')} />
         </div>
 
-        <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
+        <div className="ml-auto flex shrink-0 items-center gap-2 md:gap-1">
           <button
             ref={searchTriggerRef}
             type="button"
             onClick={() => setSearchOpen((open) => !open)}
-            className="grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 md:hidden"
+            className="grid h-11 w-11 place-items-center rounded-full text-fcs-text transition-colors hover:bg-rose-50 md:hidden"
             aria-label={searchOpen ? t('nav.close_search') : t('nav.open_search')}
             aria-expanded={searchOpen}
             aria-haspopup="dialog"
@@ -177,16 +190,21 @@ export default function Navbar() {
           <button
             type="button"
             onClick={handleWishlist}
-            className="hidden h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-fcs-brand-text md:grid"
+            className="hidden h-11 w-11 place-items-center rounded-full text-fcs-text transition-colors hover:bg-rose-50 hover:text-fcs-brand-text md:grid"
             aria-label={t('nav.wishlist')}
           >
             <Heart className="h-5 w-5" />
           </button>
 
+          {/* Desktop only. BottomNav is `md:hidden` and carries its own cart
+            * tab with the same badge, so below 768px this button was a second
+            * cart roughly 600px away from the first on one 360px screen.
+            * Gated rather than deleted: above 768px BottomNav is gone and
+            * this is the only cart in the chrome. */}
           <button
             type="button"
             onClick={() => router.push('/cart')}
-            className="relative grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 hover:text-fcs-brand-text"
+            className="relative hidden h-11 w-11 place-items-center rounded-full text-fcs-text transition-colors hover:bg-rose-50 hover:text-fcs-brand-text md:grid"
             aria-label={`${t('nav.cart')}: ${count}`}
           >
             <ShoppingCart className="h-5 w-5" />
@@ -246,15 +264,6 @@ export default function Navbar() {
             </button>
           )}
 
-          <button
-            type="button"
-            onClick={() => setMobileOpen((open) => !open)}
-            className="grid h-11 w-11 place-items-center rounded-full text-[#1a1a1a] transition-colors hover:bg-rose-50 md:hidden"
-            aria-label={mobileOpen ? t('nav.close_menu') : t('nav.open_menu')}
-            aria-expanded={mobileOpen}
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
         </div>
       </div>
 
@@ -348,9 +357,9 @@ export default function Navbar() {
               )}
             </div>
 
-            <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#1a1a1a] p-4 text-xs text-white">
+            <div className="mt-5 flex items-center justify-between rounded-2xl bg-fcs-text p-4 text-xs text-white">
               <button type="button" onClick={() => navigate(() => router.push('/support/whatsapp'))} className="flex min-h-11 items-center gap-2 font-semibold text-green-300"><MessageCircle className="h-4 w-4" />{t('nav.whatsapp_support')}</button>
-              <span className="flex items-center gap-1 text-white/70"><Globe className="h-4 w-4" /> RW</span>
+              <span className="flex items-center gap-1 text-white/70"><Globe className="h-4 w-4" aria-hidden="true" /> {language.toUpperCase()}</span>
             </div>
           </nav>
         </div>

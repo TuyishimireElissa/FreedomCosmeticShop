@@ -144,6 +144,89 @@ describe('the pills meet the spec', () => {
   })
 })
 
+describe('the phone header carries no duplicate cart (Phase 2)', () => {
+  it('hides the header cart below md, where BottomNav owns it', () => {
+    const cart = navbar.slice(navbar.indexOf("router.push('/cart')"))
+    const className = cart.slice(0, cart.indexOf('aria-label'))
+    expect(className).toContain('hidden')
+    expect(className).toContain('md:grid')
+  })
+
+  it('still shows a cart above md, where BottomNav is gone', () => {
+    // BottomNav is md:hidden. Deleting the header cart outright rather than
+    // gating it would have left desktop with no cart control anywhere.
+    expect(read('src/components/layout/BottomNav.tsx')).toContain('md:hidden')
+    expect(countOf(navbar, "router.push('/cart')")).toBe(1)
+  })
+
+  it('keeps the badge wired to real cart state', () => {
+    expect(navbar).toContain('cartCount()')
+    expect(navbar).toContain('bg-fcs-brand-strong')
+  })
+})
+
+describe('the phone header layout matches the spec (Phase 2)', () => {
+  it('puts the burger first, before the logo', () => {
+    const burger = navbar.indexOf('setMobileOpen((open) => !open)')
+    const logo = navbar.indexOf('aria-label={`${BUSINESS.tradingName} home`}')
+    expect(burger).toBeGreaterThan(-1)
+    expect(logo).toBeGreaterThan(-1)
+    expect(burger).toBeLessThan(logo)
+  })
+
+  it('keeps the burger outside the right-hand icon group', () => {
+    // Position in source order is not enough on its own: the burger could sit
+    // early in the file yet still be nested in the ml-auto group and render
+    // on the right. Assert it opens before that group begins.
+    const burger = navbar.indexOf('setMobileOpen((open) => !open)')
+    const rightGroup = navbar.indexOf('ml-auto flex shrink-0 items-center')
+    expect(rightGroup).toBeGreaterThan(-1)
+    expect(burger).toBeLessThan(rightGroup)
+  })
+
+  it('keeps the burger phone-only and 44px', () => {
+    const burger = navbar.slice(navbar.indexOf('setMobileOpen((open) => !open)'))
+    const className = burger.slice(0, burger.indexOf('aria-label'))
+    expect(className).toContain('h-11 w-11')
+    expect(className).toContain('md:hidden')
+  })
+
+  it('keeps the header 56px on a phone', () => {
+    expect(navbar).toContain('h-14 max-w-7xl')
+    expect(navbar).toContain('md:h-16')
+  })
+
+  it('spaces the right-hand icons by 8px on a phone', () => {
+    expect(navbar).toContain('gap-2 md:gap-1')
+  })
+
+  it('caps an owner-uploaded logo at 32px on a phone', () => {
+    expect(navbar).toContain('h-8 w-auto')
+    expect(navbar).toContain('md:h-10')
+  })
+
+  it('uses the fcs-text token for chrome icons, never a raw hex', () => {
+    // Counting >= n is not enough: swapping one button back to #1a1a1a still
+    // leaves enough siblings to satisfy a threshold. Assert that no chrome
+    // control carries the raw hex at all. The two remaining #1a1a1a in the
+    // file are the desktop-only category strip, which this mobile phase does
+    // not touch, so they are pinned by exact count instead.
+    expect(countOf(navbar, 'text-[#1a1a1a]')).toBe(2)
+    const strip = navbar.slice(navbar.indexOf("aria-label={t('nav.product_categories')}"))
+    expect(countOf(strip, 'text-[#1a1a1a]')).toBe(2)
+    // The mobile burger panel banner was bg-[#1a1a1a].
+    expect(navbar).toContain('bg-fcs-text')
+    expect(navbar).not.toContain('bg-[#1a1a1a]')
+  })
+
+  it('shows the live language in the burger panel footer, not a static RW', () => {
+    // The panel hard-coded "RW", so it kept claiming Kinyarwanda after a
+    // shopper switched to English.
+    expect(navbar).toContain('{language.toUpperCase()}')
+    expect(navbar).not.toContain('<Globe className="h-4 w-4" /> RW')
+  })
+})
+
 describe('switching language', () => {
   it('does no work when the active language is tapped again', () => {
     expect(selector).toContain('if (nextLanguage === language) return')
