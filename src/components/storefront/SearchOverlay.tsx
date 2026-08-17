@@ -55,6 +55,12 @@ interface SearchOverlayProps {
    * violation — the parent would have to touch the ref while rendering.
    */
   returnFocusTo?: React.RefObject<HTMLElement | null>
+  /**
+   * Begin listening as soon as the overlay opens. Set by the mobile search
+   * bar's microphone, so voice is one tap from any page instead of two.
+   * Ignored when the browser cannot do speech recognition.
+   */
+  autoStartVoice?: boolean
 }
 
 const RECENT_SEARCHES_KEY = 'fcs_recent_searches'
@@ -64,7 +70,7 @@ const DEBOUNCE_MS = 200
 const FOCUSABLE =
   'a[href],button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])'
 
-export default function SearchOverlay({ open, onClose, returnFocusTo }: SearchOverlayProps) {
+export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartVoice = false }: SearchOverlayProps) {
   const { t, language } = useLanguage()
   const router = useRouter()
 
@@ -170,6 +176,18 @@ export default function SearchOverlay({ open, onClose, returnFocusTo }: SearchOv
     })()
     return () => controller.abort()
   }, [open, signedIn])
+
+  // Opened by the mobile bar's microphone: start listening immediately rather
+  // than making the shopper find the mic again inside the overlay. Guarded on
+  // `supported` so an unsupported browser just gets a normal open. `start` is
+  // intentionally the only dependency alongside the trigger flags — depending
+  // on the whole voice object would restart recognition on every transcript
+  // fragment.
+  useEffect(() => {
+    if (!open || !autoStartVoice || !voice.supported) return
+    voice.start()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, autoStartVoice, voice.supported])
 
   // Autofocus the field, and lock the page behind the overlay.
   useEffect(() => {

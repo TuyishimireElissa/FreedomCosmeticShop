@@ -29,6 +29,7 @@ import { useStore } from '@/store/useStore'
 import { BUSINESS } from '@/lib/business-config'
 import LowDataToggle from '@/components/settings/LowDataToggle'
 import CategorySoonBadge from '@/components/layout/CategorySoonBadge'
+import MobileSearchBar from '@/components/layout/MobileSearchBar'
 import { liveProductCount, stockedFirst, useCategories } from '@/hooks/use-categories'
 import { categoryLabel } from '@/lib/category-i18n-map'
 
@@ -43,6 +44,9 @@ export default function Navbar() {
   const { categories, loading: categoriesLoading } = useCategories()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  // Set only by the mobile bar's microphone, so the overlay knows to begin
+  // listening. Cleared on close so a later normal open does not start voice.
+  const [searchVoice, setSearchVoice] = useState(false)
   // Focus returns here when the search overlay closes, so a keyboard or
   // screen-reader user is not dumped at the top of the document.
   const searchTriggerRef = useRef<HTMLButtonElement>(null)
@@ -105,9 +109,10 @@ export default function Navbar() {
   }
 
   return (
-    // Flat at rest, elevated once content passes beneath it. The border and
-    // shadow are what change — not the background, which stays opaque so text
-    // scrolling underneath can never show through and fail contrast.
+    <>
+    {/* Flat at rest, elevated once content passes beneath it. The border and
+      * shadow are what change — not the background, which stays opaque so text
+      * scrolling underneath can never show through and fail contrast. */}
     <header
       className={`sticky top-0 z-50 border-b bg-white/95 backdrop-blur-md transition-[border-color,box-shadow] duration-200 ease-fcs-snap motion-reduce:transition-none ${
         scrolled ? 'border-fcs-border-subtle shadow-fcs-2' : 'border-transparent shadow-none'
@@ -298,8 +303,12 @@ export default function Navbar() {
         * dropdown above — it is already a working combobox. */}
       <SearchOverlay
         open={searchOpen}
-        onClose={() => setSearchOpen(false)}
+        onClose={() => {
+          setSearchOpen(false)
+          setSearchVoice(false)
+        }}
         returnFocusTo={searchTriggerRef}
+        autoStartVoice={searchVoice}
       />
 
       {mobileOpen && (
@@ -365,5 +374,21 @@ export default function Navbar() {
         </div>
       )}
     </header>
+
+    {/* Sibling of the header, not a child: the header is the sticky element,
+      * and a sticky box nested inside another sticky box cannot pin itself to
+      * the viewport independently. Phones only — desktop already has the
+      * inline SearchWithSuggestions combobox in the header row. */}
+    <MobileSearchBar
+      onOpen={() => {
+        setSearchVoice(false)
+        setSearchOpen(true)
+      }}
+      onOpenVoice={() => {
+        setSearchVoice(true)
+        setSearchOpen(true)
+      }}
+    />
+    </>
   )
 }

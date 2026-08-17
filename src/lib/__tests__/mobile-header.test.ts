@@ -20,6 +20,9 @@ const read = (path: string) => readFileSync(path, 'utf8')
 
 const selectorRaw = read('src/components/ui/LanguageSelector.tsx')
 const navbarRaw = read('src/components/layout/Navbar.tsx')
+const barRaw = read('src/components/layout/MobileSearchBar.tsx')
+const hookRaw = read('src/hooks/use-scroll-direction.ts')
+const overlayRaw = read('src/components/storefront/SearchOverlay.tsx')
 
 /** Comments in both files legitimately *discuss* the rejected approaches —
  *  .btn-icon-small, the dropdown, the old burger-menu-only path. Assertions
@@ -29,6 +32,9 @@ const stripComments = (source: string) =>
 
 const selector = stripComments(selectorRaw)
 const navbar = stripComments(navbarRaw)
+const bar = stripComments(barRaw)
+const hook = stripComments(hookRaw)
+const overlay = stripComments(overlayRaw)
 
 /** The JSX block for the pills variant only, so a class present on the
  *  dropdown or the mobile grid cannot satisfy a pills assertion. */
@@ -264,5 +270,154 @@ describe('switching language', () => {
       /import \{[^}]*\buseLanguage\b[^}]*\} from '@\/lib\/i18n\/LanguageContext'/,
     )
     expect(countOf(navbarRaw, 'LanguageToggle')).toBe(0)
+  })
+})
+
+describe('the sticky mobile search bar (Phase 3)', () => {
+  it('is mounted from the navbar, phones only', () => {
+    // Matched with a trailing boundary: a bare '<MobileSearchBar' prefix also
+    // matches '<MobileSearchBarAnythingElse', so a renamed or shadowed
+    // component would slip through.
+    expect(navbar).toMatch(/<MobileSearchBar\s/)
+    expect(countOf(navbar, "import MobileSearchBar from '@/components/layout/MobileSearchBar'")).toBe(1)
+    expect(bar).toContain('md:hidden')
+  })
+
+  it('sits below the header rather than under the viewport top', () => {
+    // The header is h-14 (56px) on mobile. Pinning the bar to top:0 would
+    // slide it underneath the header instead of beneath it.
+    expect(bar).toContain('sticky')
+    expect(bar).toContain("top: '3.5rem'")
+  })
+
+  it('is a sibling of the header, not a child of it', () => {
+    // A sticky element nested inside another sticky element cannot pin itself
+    // to the viewport independently.
+    const close = navbar.indexOf('</header>')
+    const mount = navbar.indexOf('<MobileSearchBar')
+    expect(close).toBeGreaterThan(-1)
+    expect(mount).toBeGreaterThan(close)
+  })
+
+  it('opens the existing overlay instead of adding a second text input', () => {
+    // Two real inputs would mean two pieces of query state and, on Android, a
+    // keyboard opening behind the overlay.
+    expect(bar).not.toContain('<input')
+    expect(bar).toContain('aria-haspopup="dialog"')
+    expect(countOf(navbar, '<SearchOverlay')).toBe(1)
+  })
+
+  it('uses the translated placeholder, never hard-coded copy', () => {
+    expect(bar).toContain("t('search.overlay_placeholder')")
+    expect(bar).not.toContain('Shakisha')
+    expect(bar).not.toContain('Search products')
+  })
+
+  it('keeps the placeholder above the AA contrast floor', () => {
+    // A 50% tint of --fcs-text on --fcs-surface is 3.30:1 and fails AA.
+    // --fcs-text-muted is 4.56:1 on the same background.
+    expect(bar).toContain('text-fcs-text-muted')
+    expect(bar).not.toContain('text-fcs-text/50')
+  })
+
+  it('uses solid tokens, because opacity modifiers do not compile here', () => {
+    // The fcs palette maps to bare `var(--x)` with no <alpha-value> channel,
+    // so `border-fcs-text/10` emits no CSS at all. Verified by running the
+    // Tailwind CLI against these exact class names.
+    expect(bar).not.toMatch(/(?:bg|text|border)-fcs-[a-z-]+\/\d/)
+    expect(bar).toContain('border-fcs-border')
+  })
+
+  it('never hard-codes a hex', () => {
+    expect(bar).not.toMatch(/#[0-9A-Fa-f]{6}/)
+  })
+
+  it('keeps both controls at a 44px target', () => {
+    expect(bar).toContain('min-h-11')
+    expect(bar).toContain('h-11 w-11')
+  })
+
+  it('offers voice only when the browser really supports it', () => {
+    expect(bar).toContain('voice.supported &&')
+    // Capability probe, never a user-agent sniff.
+    expect(bar).not.toMatch(/navigator\.userAgent/)
+    expect(bar).toContain("useVoiceSearch")
+  })
+
+  it('puts voice one tap away by auto-starting the overlay microphone', () => {
+    expect(bar).toContain('onOpenVoice')
+    expect(navbar).toContain('autoStartVoice={searchVoice}')
+    expect(overlay).toContain('autoStartVoice')
+    expect(overlay).toContain('voice.start()')
+  })
+
+  it('clears the voice flag on close so a later plain open stays silent', () => {
+    // Two distinct resets are required and counting them matters: asserting
+    // mere presence passes even after one is deleted, because the other
+    // satisfies it. One on overlay close, one on a plain (non-voice) open.
+    expect(countOf(navbar, 'setSearchVoice(false)')).toBe(2)
+    expect(countOf(navbar, 'setSearchVoice(true)')).toBe(1)
+    const close = navbar.slice(navbar.indexOf('<SearchOverlay'))
+    expect(close).toContain('setSearchVoice(false)')
+  })
+
+  it('guards auto-start on capability', () => {
+    expect(overlay).toMatch(/if \(!open \|\| !autoStartVoice \|\| !voice\.supported\) return/)
+  })
+})
+
+describe('scroll-away behaviour (Phase 4)', () => {
+  it('hides on the way down and returns on the way up', () => {
+    expect(bar).toContain('useScrollDirection')
+    expect(bar).toContain('-translate-y-full')
+    expect(bar).toContain('translate-y-0')
+  })
+
+  it('animates in 200ms with the real easing token', () => {
+    // ease-fcs-quick does not exist in tailwind.config.ts; fcs-snap is the
+    // only registered custom easing, so the spec's name would emit nothing.
+    expect(bar).toContain('duration-200')
+    expect(bar).toContain('ease-fcs-snap')
+    expect(bar).not.toContain('ease-fcs-quick')
+  })
+
+  it('respects prefers-reduced-motion by staying put', () => {
+    expect(bar).toContain('motion-reduce:transition-none')
+    expect(bar).toContain('motion-reduce:translate-y-0')
+  })
+
+  it('never hides near the top of the page', () => {
+    expect(hook).toContain('REVEAL_ABOVE = 100')
+    expect(hook).toContain('const past = y > threshold')
+    expect(hook).toContain("hidden: past && lastDirection === 'down'")
+  })
+
+  it('uses hysteresis so a resting finger cannot make it strobe', () => {
+    expect(hook).toContain('DIRECTION_DELTA')
+    expect(hook).toContain('Math.abs(travelled) >= DIRECTION_DELTA')
+  })
+
+  it('throttles with rAF and listens passively', () => {
+    expect(hook).toContain('requestAnimationFrame')
+    expect(hook).toContain('{ passive: true }')
+    expect(hook).toContain('cancelAnimationFrame')
+  })
+
+  it('reads once on mount so a restored scroll position is correct', () => {
+    expect(hook).toMatch(/read\(\)\s*\n\s*window\.addEventListener/)
+  })
+
+  it('bails out of redundant state updates', () => {
+    // Without this a long scroll in one direction re-renders every frame.
+    expect(hook).toContain('return previous')
+  })
+
+  it('removes its listener on unmount', () => {
+    expect(hook).toContain("window.removeEventListener('scroll', onScroll)")
+  })
+
+  it('does not duplicate the existing useScrolled hook', () => {
+    expect(hook).not.toContain('export function useScrolled')
+    expect(read('src/hooks/use-scrolled.ts')).toContain('export function useScrolled')
   })
 })
