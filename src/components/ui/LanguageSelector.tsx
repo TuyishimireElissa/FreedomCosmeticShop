@@ -2,8 +2,9 @@
 
 import { useEffect, useId, useRef, useState } from 'react'
 import { Check, ChevronDown, Globe } from 'lucide-react'
-import { LANGUAGES, type Language } from '@/lib/i18n'
-import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { DEFAULT_LANGUAGE, LANGUAGES, resolveTranslation, type Language } from '@/lib/i18n'
+import { useLanguage, useT } from '@/lib/i18n/LanguageContext'
+import { announce } from '@/components/a11y/LiveAnnouncer'
 
 interface LanguageSelectorProps {
   variant?: 'navbar' | 'footer' | 'mobile' | 'pills'
@@ -12,11 +13,36 @@ interface LanguageSelectorProps {
 
 const AVAILABLE_LANGUAGES = LANGUAGES.filter((language) => language.available)
 
+/**
+ * Pills read left-to-right with the shop's primary language first. The source
+ * LANGUAGES array is alphabetical by code, which would put EN before RW —
+ * wrong for a Kinyarwanda-first storefront where RW is DEFAULT_LANGUAGE.
+ * Sorting here rather than reordering LANGUAGES keeps the dropdown and the
+ * mobile-menu grid exactly as they render today.
+ */
+const PILL_LANGUAGES = [...AVAILABLE_LANGUAGES].sort((a, b) => {
+  if (a.code === DEFAULT_LANGUAGE) return -1
+  if (b.code === DEFAULT_LANGUAGE) return 1
+  return 0
+})
+
+/**
+ * Confirmation copy already reviewed by a fluent speaker. Resolved against the
+ * language being switched *to*, not the hook's `t`, which still holds the old
+ * language on the tick the click fires — announcing the change in the language
+ * the user just left would be the wrong result.
+ */
+const SWITCH_ANNOUNCEMENT: Partial<Record<Language, string>> = {
+  rw: 'nav.kinyarwanda_selected',
+  en: 'nav.english_selected',
+}
+
 export default function LanguageSelector({
   variant = 'navbar',
   className = '',
 }: LanguageSelectorProps) {
   const { language, setLanguage } = useLanguage()
+  const t = useT()
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const menuId = useId()
@@ -41,18 +67,53 @@ export default function LanguageSelector({
   }, [])
 
   const choose = (nextLanguage: Language) => {
-    setLanguage(nextLanguage)
     setOpen(false)
+    // Tapping the language already in use is a no-op. Re-setting it would fire
+    // a redundant announcement and a pointless localStorage write.
+    if (nextLanguage === language) return
+    setLanguage(nextLanguage)
+    const key = SWITCH_ANNOUNCEMENT[nextLanguage]
+    if (key) announce(resolveTranslation(nextLanguage, key))
   }
 
   if (variant === 'pills') {
     return (
-      <div className={`flex items-center gap-1 rounded-full bg-gray-100 p-1 ${className}`} role="group" aria-label="Choose language">
-        {AVAILABLE_LANGUAGES.map((item) => (
-          <button key={item.code} type="button" onClick={() => choose(item.code)} aria-pressed={language === item.code} className={`rounded-full px-3 py-1 text-xs font-bold transition-all ${language === item.code ? 'bg-fcs-brand-strong text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'}`} title={item.nativeName}>
-            {item.code.toUpperCase()}
-          </button>
-        ))}
+      // Two nested boxes on purpose. The <button> is the hit area and is left
+      // at 44x44 — globals.css already forces min-width/min-height 44px on
+      // every button under 768px, so the WCAG 2.5.5 target comes from the
+      // site's own rule rather than from a number repeated here that could
+      // drift. The painted pill is the inner <span> at the specified 36px.
+      // Sizing the button itself to 36px would have meant opting out of that
+      // global rule with .btn-icon-small, which also sets padding:12px and
+      // would have silently overridden the horizontal padding below.
+      <div
+        className={`inline-flex items-center gap-1 rounded-fcs-md border border-fcs-brand-strong bg-fcs-surface px-1 ${className}`}
+        role="group"
+        aria-label={t('nav.language')}
+      >
+        {PILL_LANGUAGES.map((item) => {
+          const active = language === item.code
+          return (
+            <button
+              key={item.code}
+              type="button"
+              onClick={() => choose(item.code)}
+              aria-pressed={active}
+              className="grid h-11 touch-manipulation place-items-center rounded-fcs-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-strong"
+              title={item.nativeName}
+            >
+              <span
+                className={`grid h-9 min-w-[38px] place-items-center rounded-fcs-sm px-2 text-[13px] font-bold leading-none transition-colors duration-200 ease-fcs-snap motion-reduce:transition-none ${
+                  active
+                    ? 'bg-fcs-brand-strong text-white'
+                    : 'text-fcs-brand-text'
+                }`}
+              >
+                {item.code.toUpperCase()}
+              </span>
+            </button>
+          )
+        })}
       </div>
     )
   }

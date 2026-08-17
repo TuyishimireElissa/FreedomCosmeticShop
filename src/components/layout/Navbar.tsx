@@ -154,6 +154,12 @@ export default function Navbar() {
             {searchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
           </button>
 
+          {/* Phones get pills, not the dropdown. The dropdown needs two taps
+            * and opens a floating menu; with only two available languages the
+            * pills show the current choice and switch in one tap. Before this
+            * the header rendered no language control at all under 768px — the
+            * only way to switch was to open the burger menu and scroll. */}
+          <LanguageSelector variant="pills" className="md:hidden" />
           <LanguageSelector variant="navbar" className="hidden md:block" />
 
           <button type="button" onClick={() => router.push('/quiz')} className="hidden min-h-10 items-center gap-1.5 rounded-xl bg-rose-50 px-3 text-xs font-bold text-fcs-brand-text transition-colors hover:bg-fcs-brand-strong hover:text-white lg:flex">
