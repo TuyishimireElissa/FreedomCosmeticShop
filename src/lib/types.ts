@@ -20,6 +20,12 @@ export interface Brand {
 export interface Category {
   id: string
   name: string
+  /**
+   * Owner-editable Kinyarwanda name. `/api/categories` has returned this since
+   * the nameRw column shipped, and categoryLabel() resolves it first, but the
+   * type never declared it — so every consumer had to cast or lose it.
+   */
+  nameRw?: string | null
   slug: string
   description: string | null
   image: string | null

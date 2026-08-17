@@ -439,6 +439,8 @@ export const en = {
     rfq_body: 'We found nothing for “{query}”. Message us on WhatsApp and we will tell you if we can bring it in for you.',
     rfq_whatsapp: 'Message us on WhatsApp',
     rfq_browse: 'Browse all products',
+    quick_jump_title: 'Browse by category ({count})',
+    quick_jump_label: 'Jump to a category',
     clear_search: 'Clear search',
     filter_brand: 'Brand: {brand}',
     filter_by_price: 'Filter by price',

@@ -448,6 +448,9 @@ export const rw = {
     rfq_body: 'Nta bicuruzwa twabonye kuri “{query}”. Twandikire kuri WhatsApp tukubwire niba dushobora kubikuzanira.', // verified-rw
     rfq_whatsapp: 'Twandikire kuri WhatsApp', // verified-rw
     rfq_browse: 'Reba ibicuruzwa byose', // verified-rw
+    // Category quick jumps above search results.
+    quick_jump_title: 'Reba ku byiciro ({count})', // verified-rw
+    quick_jump_label: 'Simbukira ku cyiciro', // verified-rw
     clear_search: 'Siba ibishakishwa', // verified-rw
     filter_brand: 'Ikirango: {brand}', // verified-rw
     filter_by_price: 'Shungura ukurikije igiciro', // verified-rw

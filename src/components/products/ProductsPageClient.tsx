@@ -7,8 +7,10 @@ import ProductGrid from '@/components/products/ProductGrid'
 import FilterSidebar from '@/components/products/FilterSidebar'
 import MobileFilters from '@/components/products/MobileFilters'
 import FilterChips from '@/components/products/FilterChips'
+import CategoryQuickJumps from '@/components/products/CategoryQuickJumps'
 import SearchWithSuggestions from '@/components/storefront/SearchWithSuggestions'
 import { useProductFilters } from '@/hooks/useProductFilters'
+import { useFacets } from '@/hooks/use-facets'
 import { useLanguage, useT } from '@/lib/i18n/LanguageContext'
 import { cn } from '@/lib/utils'
 import { useLowData } from '@/contexts/LowDataContext'
@@ -46,6 +48,9 @@ function ProductsContent() {
   const isWholesale = user?.wholesaleStatus === 'APPROVED'
   const { isLowData } = useLowData()
   const { filters, setFilter, buildApiQuery, clearAllFilters, activeFilterCount } = useProductFilters()
+  // Already fetched for the filter sidebar; reused here so the quick-jump
+  // pills cost no extra request.
+  const { facets } = useFacets()
   const [products, setProducts] = useState<Product[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [brands, setBrands] = useState<Brand[]>([])
@@ -173,6 +178,28 @@ function ProductsContent() {
    */
   const rfqQuery = filters.search && activeFilterCount === 0 ? filters.search.trim() : null
 
+  /**
+   * Categories this search actually hit, for the quick-jump pills.
+   *
+   * Source-gated, per rule 20. Only shown when a search term produced results
+   * across several categories — never for a bare catalogue browse, where the
+   * pills would just duplicate the sidebar, and never on an empty result,
+   * where the Coming Soon or sourcing panel owns the space.
+   *
+   * Facet counts carry id/name/slug/count but NOT nameRw, so the Kinyarwanda
+   * label is joined from the categories already fetched for the sidebar. A
+   * facet with no matching row still renders: categoryLabel falls back to the
+   * i18n key and then to the English name, so a pill can never come out blank.
+   */
+  const quickJumpCategories = filters.search && products.length > 0
+    ? facets.categories
+        .filter((entry) => entry.count > 0 && entry.slug)
+        .map((entry) => {
+          const known = categories.find((category) => category.slug === entry.slug)
+          return { ...entry, slug: entry.slug as string, nameRw: known?.nameRw ?? null }
+        })
+    : []
+
   const breadcrumbItems = [
     { name: t('nav.products'), url: '/products' },
     ...(categoryName && filters.category
@@ -231,6 +258,11 @@ function ProductsContent() {
         <div className="flex items-start gap-5 lg:gap-6">
           <FilterSidebar availableCategories={categories} availableBrands={brands} className={filtersLoading ? 'animate-pulse opacity-60' : ''} />
           <main className="min-w-0 flex-1">
+            <CategoryQuickJumps
+              categories={quickJumpCategories}
+              activeSlug={filters.category}
+              onSelect={(slug) => setFilter('category', filters.category === slug ? '' : slug)}
+            />
             <div id="product-results">
               <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} onClearFilters={clearAllFilters} hasActiveFilters={activeFilterCount > 0 || Boolean(filters.search)} searchQuery={filters.search} onSearchCorrection={(term) => setFilter('search', term)} comingSoonCategory={comingSoonCategory} rfqQuery={rfqQuery} />
             </div>
