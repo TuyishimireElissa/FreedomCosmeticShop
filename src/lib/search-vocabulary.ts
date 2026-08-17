@@ -253,6 +253,61 @@ export const LOCAL_SEARCH_VOCABULARY: Readonly<Record<string, readonly string[]>
   'face mask': ['face mask', 'sheet mask', 'clay mask', 'masque'],
   'eye cream': ['eye cream', 'under eye cream', 'dark circles'],
   'lip balm': ['lip balm', 'chapstick', 'lip moisturizer'],
+
+  /**
+   * Bare ingredient names, which is what shoppers actually type.
+   *
+   * `shea butter` and `coconut oil` were already mapped, but `shea` and
+   * `coconut` on their own matched nothing. Measured against live stock:
+   * coconut 9 products, glycerin 9, argan 4, shea 3. These are pure recall
+   * wins — real products that were unreachable by the shorter word.
+   */
+  shea: ['shea', 'shea butter', 'karite', 'body butter'],
+  coconut: ['coconut', 'coconut oil', 'virgin coconut'],
+  argan: ['argan', 'argan oil', 'moroccan oil'],
+  glycerin: ['glycerin', 'glycerine', 'humectant'],
+  rosehip: ['rosehip', 'rosehip oil', 'rose hip'],
+
+  /**
+   * Makeup terms.
+   *
+   * THE SHOP STOCKS NO MAKEUP — measured 2026-08-15, every term below returns
+   * an empty grid. They are mapped anyway so that a shopper's word reaches the
+   * WhatsApp sourcing panel rather than a bare "no results", and so the demand
+   * shows up in popular-search analytics. If makeup is ever stocked these
+   * mappings start returning products with no further work.
+   */
+  lipstick: ['lipstick', 'lip color', 'lip stick', 'ikaramu', 'makeup'],
+  ikaramu: ['lipstick', 'lip color', 'makeup'],
+  mascara: ['mascara', 'eyelash', 'lash', 'makeup'],
+  foundation: ['foundation', 'base makeup', 'face base', 'makeup'],
+  eyeshadow: ['eyeshadow', 'eye shadow', 'eye palette', 'makeup'],
+  concealer: ['concealer', 'under eye concealer', 'corrector', 'makeup'],
+  eyeliner: ['eyeliner', 'eye liner', 'kohl', 'mchakauzi', 'makeup'],
+  kohl: ['kohl', 'eyeliner', 'mchakauzi', 'makeup'],
+  mchakauzi: ['kohl', 'eyeliner', 'makeup'],
+  mikaro: ['makeup', 'cosmetics'],
+  'lip gloss': ['lip gloss', 'lipgloss', 'gloss', 'makeup'],
+  'makeup remover': ['makeup remover', 'micellar water', 'cleanser'],
+  powder: ['powder', 'face powder', 'setting powder', 'loose powder'],
+
+  /**
+   * Baby, which DOES have stock (7 products in Abana).
+   *
+   * KNOWN LIMITATION, pre-existing and deliberately not fixed here.
+   * "baby oil" still expands broadly — around 60 products — because
+   * `expandSearchQuery` also matches a vocabulary key that appears ANYWHERE in
+   * the query, and `amavuta: ['oil', ...]` therefore fires on the word "oil".
+   * Measured before this change it expanded to 16 terms; after, 15. So the
+   * breadth is the matcher's substring rule, not these entries, and narrowing
+   * it would change recall for every multi-word query in the shop.
+   *
+   * Mapping to brand names rather than bare `baby` at least biases the ranking
+   * toward the actual baby range, since trigram similarity scores the product
+   * name and Zwitsal/Johnson are the two baby brands stocked.
+   */
+  'baby oil': ['baby oil', 'infant oil', 'zwitsal', 'johnson'],
+  'baby lotion': ['baby lotion', 'infant lotion', 'zwitsal', 'johnson'],
 }
 
 export interface PriceSearch {
@@ -503,6 +558,28 @@ export const CONTROLLED_SEARCH_VOCABULARY = [
   'vitamin c', 'retinol', 'collagen', 'aloe vera', 'shea butter',
   'coconut oil', 'castor oil', 'argan oil', 'rose water', 'charcoal',
   'turmeric',
+  /**
+   * Bare ingredient names. `shea butter` and `coconut oil` were already here,
+   * but a shopper types `shea` or `coconut` far more often than the full
+   * phrase, and those matched nothing. Each maps to real stock today:
+   * coconut 9 products, glycerin 9, argan 4, shea 3.
+   */
+  'shea', 'coconut', 'argan', 'glycerin', 'rosehip',
+  /**
+   * Makeup. NOTE: the shop stocks ZERO makeup products — measured 2026-08-15,
+   * every one of these returns an empty grid. They are here as demand capture,
+   * not recall: an empty result now renders the WhatsApp sourcing panel, so
+   * "lipstick" becomes a message the owner can act on instead of a dead end.
+   * Counting them also makes unmet demand visible in /api/search/popular,
+   * which is the signal that would justify stocking the category.
+   */
+  'lipstick', 'mascara', 'foundation', 'eyeshadow', 'blush', 'concealer',
+  'eyeliner', 'lip gloss', 'lip balm', 'powder', 'highlighter', 'bronzer',
+  'makeup remover', 'setting spray', 'primer', 'makeup',
+  // Makeup, Kinyarwanda and East African usage.
+  'ikaramu', 'mchakauzi', 'kohl', 'mikaro',
+  // Baby, which does have stock (7 products).
+  'baby oil', 'baby lotion',
 ] as const
 
 export type ControlledSearchTerm = (typeof CONTROLLED_SEARCH_VOCABULARY)[number]

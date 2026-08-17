@@ -7,6 +7,7 @@ import {
   jaroWinkler,
   parsePriceFromQuery,
   removePriceExpression,
+  matchControlledTerm,
 } from '@/lib/search-vocabulary'
 
 describe('Rwanda local search vocabulary', () => {
@@ -76,6 +77,110 @@ describe('Rwanda local search vocabulary', () => {
     expect(expandSearchQuery('ifarasi')).toContain('nail care')
     expect(expandSearchQuery('isabune')).toContain('soap')
     expect(expandSearchQuery('imibavu')).toContain('fragrance')
+  })
+
+  describe('bare ingredient names reach the products that contain them', () => {
+    // `shea butter` and `coconut oil` were mapped; `shea` and `coconut` alone
+    // were not, so the shorter word a shopper actually types found nothing.
+    // Measured live: coconut 9 products, glycerin 9, argan 4, shea 5.
+    it('expands the short form to the full ingredient', () => {
+      expect(expandSearchQuery('shea')).toContain('shea butter')
+      expect(expandSearchQuery('coconut')).toContain('coconut oil')
+      expect(expandSearchQuery('argan')).toContain('argan oil')
+      expect(expandSearchQuery('glycerin')).toContain('glycerine')
+    })
+
+    it('holds each as its own key, not via a longer sibling', () => {
+      for (const key of ['shea', 'coconut', 'argan', 'glycerin', 'rosehip']) {
+        expect(
+          Object.prototype.hasOwnProperty.call(LOCAL_SEARCH_VOCABULARY, key),
+          `"${key}" must be its own vocabulary key`,
+        ).toBe(true)
+      }
+    })
+  })
+
+  describe('makeup terms reach the sourcing panel', () => {
+    // The shop stocks NO makeup. These exist so a shopper's word lands on the
+    // WhatsApp sourcing panel instead of a bare "no results", and so the
+    // demand becomes visible in popular-search analytics.
+    it('expands the English makeup words', () => {
+      expect(expandSearchQuery('lipstick')).toContain('lip color')
+      expect(expandSearchQuery('mascara')).toContain('eyelash')
+      expect(expandSearchQuery('foundation')).toContain('base makeup')
+      expect(expandSearchQuery('concealer')).toContain('corrector')
+      expect(expandSearchQuery('eyeshadow')).toContain('eye shadow')
+    })
+
+    it('expands the Kinyarwanda and East African words', () => {
+      expect(expandSearchQuery('ikaramu')).toContain('lipstick')
+      expect(expandSearchQuery('mchakauzi')).toContain('eyeliner')
+      expect(expandSearchQuery('kohl')).toContain('eyeliner')
+      expect(expandSearchQuery('mikaro')).toContain('makeup')
+    })
+
+    it('ties every makeup term back to the makeup concept', () => {
+      // So a future makeup category is reachable from any of these words
+      // without further vocabulary work.
+      for (const term of ['lipstick', 'mascara', 'foundation', 'eyeshadow', 'concealer', 'eyeliner']) {
+        expect(expandSearchQuery(term), `${term} should reach "makeup"`).toContain('makeup')
+      }
+    })
+
+    it('holds each makeup term as its own key, not via a sibling', () => {
+      // Pre-existing Kinyarwanda keys already map TO some of these English
+      // words — `lipisitiki -> lipstick`, `masikara -> mascara` — and the
+      // reverse-match rule means expandSearchQuery('lipstick') still resolves
+      // even with the lipstick key deleted. Three mutations survived on
+      // exactly that. Assert the keys themselves so a deletion cannot hide
+      // behind a neighbour.
+      for (const key of ['lipstick', 'mascara', 'foundation', 'eyeshadow', 'concealer', 'eyeliner', 'ikaramu', 'kohl', 'mchakauzi', 'mikaro']) {
+        expect(
+          Object.prototype.hasOwnProperty.call(LOCAL_SEARCH_VOCABULARY, key),
+          `"${key}" must be its own vocabulary key`,
+        ).toBe(true)
+      }
+    })
+
+    it('routes each makeup key through the makeup concept in its own mapping', () => {
+      // Not just reachable via expansion — the entry itself must say "makeup",
+      // otherwise dropping it from one mapping goes unnoticed.
+      for (const key of ['lipstick', 'mascara', 'foundation', 'eyeshadow', 'concealer', 'eyeliner', 'ikaramu', 'kohl', 'mchakauzi', 'mikaro']) {
+        const mapped = LOCAL_SEARCH_VOCABULARY[key as keyof typeof LOCAL_SEARCH_VOCABULARY] as readonly string[]
+        expect(mapped, `${key} mapping missing`).toBeDefined()
+        expect(mapped.join(' '), `${key} should mention makeup or a makeup word`).toMatch(/makeup|lipstick|eyeliner|cosmetics/)
+      }
+    })
+  })
+
+  describe('the analytics vocabulary counts the new demand', () => {
+    // CONTROLLED_SEARCH_VOCABULARY drives /api/search/popular. It is a
+    // DIFFERENT list from LOCAL_SEARCH_VOCABULARY, which drives recall — a
+    // term added to only one of them is half-wired.
+    it('counts makeup searches so unmet demand becomes visible', () => {
+      for (const term of ['lipstick', 'mascara', 'foundation', 'eyeshadow', 'ikaramu', 'kohl']) {
+        expect(matchControlledTerm(term), `${term} must be countable`).toBe(term)
+      }
+    })
+
+    it('counts the bare ingredient names', () => {
+      for (const term of ['shea', 'coconut', 'argan', 'glycerin']) {
+        expect(matchControlledTerm(term)).toBe(term)
+      }
+    })
+
+    it('still prefers the longest match over a bare ingredient', () => {
+      // Adding `shea` and `coconut` must not shadow the existing longer
+      // entries, or "coconut oil" would be reported as plain "coconut".
+      expect(matchControlledTerm('coconut oil')).toBe('coconut oil')
+      expect(matchControlledTerm('shea butter')).toBe('shea butter')
+      expect(matchControlledTerm('argan oil')).toBe('argan oil')
+    })
+
+    it('still records nothing for text that is not catalogue vocabulary', () => {
+      expect(matchControlledTerm('Mukamana 0788123456')).toBeNull()
+      expect(matchControlledTerm('xyzfake')).toBeNull()
+    })
   })
 
   it('holds each category term as its own entry, not via a sibling', () => {
