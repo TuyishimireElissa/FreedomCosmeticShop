@@ -9,6 +9,7 @@ import { thumbnailImageUrl } from '@/lib/cloudinary-images'
 import { getAlternativeSuggestions } from '@/lib/search-vocabulary'
 import { CATEGORY_CHIPS, TRENDING_SEARCHES } from '@/lib/search-trending'
 import { useVoiceSearch } from '@/hooks/use-voice-search'
+import { useStore } from '@/store/useStore'
 
 /**
  * Full-screen search overlay (mobile) / dropdown panel (desktop).
@@ -75,6 +76,22 @@ export default function SearchOverlay({ open, onClose, returnFocusTo }: SearchOv
   const [searched, setSearched] = useState(false)
   const [recent, setRecent] = useState<string[]>([])
 
+  /**
+   * Signed-in shoppers get history that survives closing the tab.
+   *
+   * Anonymous recents live in sessionStorage, so they vanish the moment the
+   * tab closes — a shopper on a shared phone in an internet café keeps nothing
+   * either way, which is the right default. For an authenticated shopper the
+   * same list is mirrored to their own row in UserSearchHistory, so it follows
+   * them to another device.
+   *
+   * sessionStorage is still written in both cases: it makes the list appear
+   * instantly on reopen while the fetch is in flight, and it is the only store
+   * a signed-out shopper has.
+   */
+  const user = useStore((state) => state.user)
+  const signedIn = Boolean(user)
+
   const panelRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const abortRef = useRef<AbortController | null>(null)
@@ -87,7 +104,16 @@ export default function SearchOverlay({ open, onClose, returnFocusTo }: SearchOv
       try { sessionStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(next)) } catch { /* private mode */ }
       return next
     })
-  }, [])
+    // Fire and forget: a failed history write must never delay the search the
+    // shopper just asked for. Signed-out shoppers never reach the server.
+    if (signedIn) {
+      void fetch('/api/user/search-history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: value.slice(0, 100) }),
+      }).catch(() => { /* history is best-effort */ })
+    }
+  }, [signedIn])
 
   const submit = useCallback((term: string, categoryOverride?: string) => {
     const value = term.trim()
@@ -116,13 +142,34 @@ export default function SearchOverlay({ open, onClose, returnFocusTo }: SearchOv
 
   useEffect(() => {
     if (!open) return
+    // Paint the local list first so the panel is never briefly empty on a slow
+    // connection, then let the server's copy replace it for signed-in users.
     try {
       const stored = JSON.parse(sessionStorage.getItem(RECENT_SEARCHES_KEY) || '[]')
       setRecent(Array.isArray(stored) ? stored.filter((v): v is string => typeof v === 'string').slice(0, MAX_RECENT) : [])
     } catch {
       setRecent([])
     }
-  }, [open])
+
+    if (!signedIn) return
+    const controller = new AbortController()
+    void (async () => {
+      try {
+        const response = await fetch('/api/user/search-history', { signal: controller.signal, cache: 'no-store' })
+        if (!response.ok) return
+        const body = await response.json()
+        const items: string[] = Array.isArray(body?.data)
+          ? body.data.map((row: { query?: string }) => row.query).filter((q: unknown): q is string => typeof q === 'string')
+          : []
+        // Only replace when the server actually has something. An empty
+        // response on a first-ever search must not wipe what is on screen.
+        if (items.length > 0) setRecent(items.slice(0, MAX_RECENT))
+      } catch {
+        // Keep the sessionStorage list already rendered.
+      }
+    })()
+    return () => controller.abort()
+  }, [open, signedIn])
 
   // Autofocus the field, and lock the page behind the overlay.
   useEffect(() => {
@@ -230,6 +277,11 @@ export default function SearchOverlay({ open, onClose, returnFocusTo }: SearchOv
   const clearRecent = () => {
     try { sessionStorage.removeItem(RECENT_SEARCHES_KEY) } catch { /* private mode */ }
     setRecent([])
+    // Clear the server copy too, or it would reappear on the next open and
+    // the button would look broken.
+    if (signedIn) {
+      void fetch('/api/user/search-history', { method: 'DELETE' }).catch(() => { /* best-effort */ })
+    }
   }
 
   if (!open) return null

@@ -135,6 +135,7 @@ model User {
   blogPosts            BlogPost[]
   staffProfile         StaffProfile?
   activityLogs         ActivityLog[]
+  searchHistory        UserSearchHistory[]
   authSessions         AuthSession[]
   wholesaleApplication WholesaleApplication?
   wholesaleCredit      WholesaleCredit?
@@ -1680,6 +1681,37 @@ model SearchLog {
   @@index([hasResults])
   @@index([createdAt])
   @@index([sessionId])
+}
+
+/// Search history for a SIGNED-IN shopper, stored as readable text.
+///
+/// This is deliberately different from SearchLog above, and the difference is
+/// the point. SearchLog is anonymous analytics: it HMAC-hashes every query
+/// because it cannot know who typed it, so the text must never be recoverable.
+/// This table is the opposite case — the shopper is authenticated, the row is
+/// their own, and it exists so they can tap a past search again. Storing a
+/// hash here would make the feature impossible.
+///
+/// It is consistent with what the app already keeps per user: Wishlist, Order
+/// and ActivityLog all carry userId. Nothing anonymous is stored here, and a
+/// signed-out shopper never reaches this table — their recents stay in
+/// sessionStorage.
+///
+/// onDelete: Cascade so deleting an account takes the history with it.
+model UserSearchHistory {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// The shopper's own words, trimmed and length-capped at the API boundary.
+  query      String
+  searchedAt DateTime @default(now())
+
+  /// One row per distinct query per user: re-searching updates searchedAt
+  /// instead of appending a duplicate.
+  @@unique([userId, query])
+  /// Serves the only read this table has: newest first, for one user.
+  @@index([userId, searchedAt(sort: Desc)])
 }
 
 // Privacy-minimized 404 analytics. Raw IP addresses, query strings, and full
