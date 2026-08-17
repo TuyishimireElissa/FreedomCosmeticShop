@@ -20,7 +20,13 @@ import { requireAuth } from '@/lib/auth'
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const user = await requireAuth()
-    if (!user) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+    if (!user) {
+      // Not cacheable: a stored 401 would keep being served to this device
+      // after the shopper signs in.
+      const denied = NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+      denied.headers.set('Cache-Control', 'private, no-store')
+      return denied
+    }
 
     const { id } = await params
     if (!id) return NextResponse.json({ success: false, error: 'Missing id' }, { status: 400 })

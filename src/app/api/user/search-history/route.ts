@@ -38,7 +38,15 @@ const SaveSchema = z.object({
 })
 
 function unauthorized() {
-  return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  const response = NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+  /**
+   * The 401 body carries no personal data, so this is not a leak — but it must
+   * not be cached either. A shared proxy that stored this response would keep
+   * serving "Unauthorized" to the same device after the shopper signed in,
+   * and their history would silently never appear.
+   */
+  response.headers.set('Cache-Control', 'private, no-store')
+  return response
 }
 
 export async function GET() {

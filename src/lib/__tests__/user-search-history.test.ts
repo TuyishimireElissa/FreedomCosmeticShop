@@ -71,8 +71,13 @@ describe('one account can never reach another account rows', () => {
     expect(itemRoute).not.toContain('status: 403')
   })
 
-  it('never lets a CDN cache personal data', () => {
-    expect(route).toContain("'Cache-Control', 'private, no-store'")
+  it('never lets a CDN cache personal data, including the refusal', () => {
+    // Counted, not sampled: the 200 path and the 401 path each need it. A
+    // cached 401 would keep being served to a device after the shopper signs
+    // in, so their history would silently never appear.
+    const headers = route.match(/'Cache-Control', 'private, no-store'/g) || []
+    expect(headers.length, 'both the success and the 401 path').toBe(2)
+    expect(itemRoute).toContain("'Cache-Control', 'private, no-store'")
   })
 })
 
