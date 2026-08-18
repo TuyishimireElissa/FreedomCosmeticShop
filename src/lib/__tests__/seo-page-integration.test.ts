@@ -149,3 +149,33 @@ describe('category shelves are described in the server HTML (Phase 4)', () => {
     expect(listPage).toContain('totalItems,')
   })
 })
+
+describe('FAQ markup describes what the page actually shows (Phase 5)', () => {
+  const faqPage = read('src/app/faq/page.tsx')
+  const faqContent = read('src/lib/faq-content.ts')
+
+  it('renders FAQPage markup on the FAQ route', () => {
+    expect(faqPage).toContain('getFAQSchema(')
+    expect(faqPage).toContain('<StructuredData data={faqSchema} />')
+  })
+
+  it('drives the accordion and the markup from one shared list', () => {
+    // Two lists would let the schema claim a question the page never renders,
+    // which Google's structured-data guidelines prohibit.
+    expect(faqPage).toContain("import { FAQ_KEYS } from '@/lib/faq-content'")
+    expect(faqPage).toContain('const questions = FAQ_KEYS')
+    expect(faqPage).toContain('questions.map(([question, answer])')
+    // The literal array must be gone from the page, not merely shadowed.
+    expect(faqPage).not.toContain("['pages.faq_authentic_q', 'pages.faq_authentic_a']")
+  })
+
+  it('resolves both sides through the translator so markup follows language', () => {
+    expect(faqPage).toContain('question: t(question)')
+    expect(faqPage).toContain('answer: t(answer)')
+  })
+
+  it('keeps every question paired with an answer key', () => {
+    const pairs = faqContent.match(/\['pages\.faq_[a-z_]+_q', 'pages\.faq_[a-z_]+_a'\]/g) || []
+    expect(pairs).toHaveLength(8)
+  })
+})
