@@ -41,6 +41,11 @@ export function getOrganizationSchema(): StructuredDataObject {
     ...(organization.legalName ? { legalName: organization.legalName } : {}),
     url: organization.url,
     logo: organization.logo,
+    // The same factual catalogue description the site uses elsewhere. No
+    // "Rwanda's leading cosmetics store" — that is an unprovable superlative,
+    // and the brief's own wording for it would be a claim the owner has not
+    // substantiated.
+    description: BUSINESS.description,
     ...(organization.email ? { email: organization.email } : {}),
     ...(organization.phone ? {
       telephone: organization.phone,
@@ -55,6 +60,11 @@ export function getOrganizationSchema(): StructuredDataObject {
     address: {
       '@type': 'PostalAddress',
       addressLocality: BUSINESS.address.city,
+      // Owner-confirmed sector. Already published on the Store schema; the two
+      // address blocks should not disagree with each other.
+      ...(SEO_CONFIG.localBusiness.address.addressRegion
+        ? { addressRegion: SEO_CONFIG.localBusiness.address.addressRegion }
+        : {}),
       addressCountry: 'RW',
     },
     ...(organization.sameAs.length > 0 ? { sameAs: [...organization.sameAs] } : {}),

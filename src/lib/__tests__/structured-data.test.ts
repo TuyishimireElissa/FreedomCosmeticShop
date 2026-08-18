@@ -11,6 +11,7 @@ import {
   getProductSchema,
   getWebsiteSchema,
 } from '@/lib/structured-data'
+import { BUSINESS } from '@/lib/business-config'
 import { SEO_CONFIG } from '@/lib/seo-config'
 
 const component = readFileSync(resolve(process.cwd(), 'src/components/seo/StructuredData.tsx'), 'utf8')
@@ -210,5 +211,32 @@ describe('product offers carry real shipping, return and validity data', () => {
 
   it('omits the whole offer block when the price is invalid', () => {
     expect(getProductSchema({ ...base, price: Number.NaN })).not.toHaveProperty('offers')
+  })
+})
+
+describe('organization schema describes the business without inventing status', () => {
+  it('publishes the factual catalogue description, not a superlative', () => {
+    const schema = getOrganizationSchema()
+    expect(schema.description).toBe(BUSINESS.description)
+    // "Rwanda's leading cosmetics store" is unprovable and was not used.
+    expect(String(schema.description)).not.toMatch(/leading|best|number one|#1|largest/i)
+  })
+
+  it('agrees with the store schema on the address region', () => {
+    // Two address blocks ship on every page. If they disagree about where the
+    // business is, Google is reading a contradiction.
+    const organization = getOrganizationSchema().address as Record<string, unknown>
+    const store = getLocalBusinessSchema().address as Record<string, unknown>
+    expect(organization.addressRegion).toBe('Nyarugenge')
+    expect(organization.addressRegion).toBe(store.addressRegion)
+    expect(organization.addressLocality).toBe(store.addressLocality)
+    expect(organization.addressCountry).toBe(store.addressCountry)
+  })
+
+  it('keeps the search action on WebSite where Google expects it', () => {
+    // Sitelinks Searchbox is read from WebSite.potentialAction, not from
+    // Organization, so moving it would silently lose the feature.
+    expect(getWebsiteSchema().potentialAction).toBeTruthy()
+    expect(getOrganizationSchema()).not.toHaveProperty('potentialAction')
   })
 })
