@@ -70,6 +70,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const description = post.excerptRw || post.excerpt || title
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Ahabanza', url: '/' }, // verified-rw
+    // The blog index was missing from this trail, so the schema jumped Home →
+    // post and skipped a real, crawlable, 200-returning level.
+    { name: 'Inkuru', url: '/blog' }, // verified-rw
     { name: title, url: `/blog/${post.slug}` },
   ])
   const articleSchema = getArticleSchema({

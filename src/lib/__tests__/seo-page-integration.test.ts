@@ -85,3 +85,33 @@ describe('SEO page metadata integration', () => {
     }
   })
 })
+
+describe('breadcrumb trails match the real crawlable hierarchy', () => {
+  const blogPage = read('src/app/blog/[slug]/page.tsx')
+
+  it('routes a blog post through the blog index, not straight from home', () => {
+    // /blog exists and returns 200, so skipping it published a trail that did
+    // not match the site's own structure.
+    const trail = blogPage.slice(blogPage.indexOf('getBreadcrumbSchema(['))
+    const listed = trail.slice(0, trail.indexOf('])'))
+    expect(listed).toContain("{ name: 'Ahabanza', url: '/' }")
+    expect(listed).toContain("url: '/blog' }")
+    expect(listed.indexOf("url: '/blog' }")).toBeLessThan(listed.indexOf('/blog/${post.slug}'))
+  })
+
+  it('keeps the product trail at four levels through its real category', () => {
+    const trail = productPage.slice(productPage.indexOf('getBreadcrumbSchema(['))
+    const listed = trail.slice(0, trail.indexOf('])'))
+    expect(listed).toContain("{ name: 'Ahabanza', url: '/' }")
+    expect(listed).toContain("{ name: 'Ibicuruzwa', url: '/products' }")
+    expect(listed).toContain('product.category.name')
+    expect(listed).toContain('product.category.slug')
+  })
+
+  it('adds the category level only when the category is real', () => {
+    // An unrecognised ?category= value must not produce a breadcrumb pointing
+    // at a shelf that does not exist.
+    const listPage = read('src/app/products/page.tsx')
+    expect(listPage).toContain('...(categorySEO ? [{ name: categorySEO.label')
+  })
+})
