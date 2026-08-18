@@ -19,6 +19,7 @@ async function getProduct(slug: string) {
       stock: true,
       sku: true,
       barcode: true,
+      size: true,
       images: true,
       productImages: {
         select: { url: true, isPrimary: true, sortOrder: true },
@@ -84,6 +85,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       ? { average, count: reviews.length, source: 'database' }
       : undefined,
     gtin: getKnownGTIN(product.barcode),
+    size: product.size,
   })
   const breadcrumbSchema = getBreadcrumbSchema([
     { name: 'Ahabanza', url: '/' }, // verified-rw

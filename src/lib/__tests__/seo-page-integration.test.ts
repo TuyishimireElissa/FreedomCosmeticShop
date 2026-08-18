@@ -53,6 +53,13 @@ describe('SEO page metadata integration', () => {
     expect(productPage).not.toContain("aggregateRating: reviews.length ? {")
   })
 
+  it('selects and forwards the catalogue size to the product schema', () => {
+    // The builder can only emit `size` if the page selects the column and
+    // passes it. Asserting the builder alone leaves the wiring untested.
+    expect(productPage).toMatch(/select:[\s\S]*?\bsize: true,/)
+    expect(productPage).toContain('size: product.size,')
+  })
+
   it('adds unique honest metadata to wholesale, contact, and legal pages', () => {
     for (const source of [wholesale, contact, terms, privacy]) {
       expect(source).toContain('getPageMetadata({')
