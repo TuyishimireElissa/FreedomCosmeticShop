@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import ProductsPageClient from '@/components/products/ProductsPageClient'
 import StructuredData from '@/components/seo/StructuredData'
 import { getPageMetadata, type LocalizedSEOText } from '@/lib/seo-config'
-import { getBreadcrumbSchema } from '@/lib/structured-data'
+import { prisma } from '@/lib/prisma'
+import { getBreadcrumbSchema, getCollectionPageSchema } from '@/lib/structured-data'
 
 const CATEGORY_SEO: Record<string, { title: LocalizedSEOText; label: string }> = {
   skincare: {
@@ -79,19 +80,101 @@ export async function generateMetadata({ searchParams }: { searchParams: Product
   })
 }
 
+/**
+ * Shelf contents, read on the server.
+ *
+ * ProductsPageClient builds an ItemList too, but it is a client component that
+ * loads through fetch() inside useEffect, so that schema never reaches the
+ * server HTML. Verified on the live category page: zero product names in the
+ * SSR payload. Google's structured-data crawler does not run that JavaScript,
+ * so the client copy is effectively invisible and this server copy is the one
+ * that will actually be read.
+ *
+ * Only the first 20 are listed. The full count still goes out as
+ * numberOfItems, and a several-hundred-entry list would bloat every category
+ * page for readers on 3G.
+ */
+const COLLECTION_SAMPLE_SIZE = 20
+
+async function getCollection(categorySlug: string) {
+  if (!categorySlug) return null
+  const category = await prisma.category.findFirst({
+    where: { slug: categorySlug, isActive: true, isDeleted: false },
+    select: { name: true, nameRw: true, slug: true, description: true },
+  })
+  if (!category) return null
+
+  const where = {
+    isActive: true,
+    isDeleted: false,
+    category: { slug: categorySlug },
+  }
+  const [totalItems, products] = await Promise.all([
+    prisma.product.count({ where }),
+    prisma.product.findMany({
+      where,
+      select: { name: true, slug: true, price: true, images: true },
+      orderBy: { updatedAt: 'desc' },
+      take: COLLECTION_SAMPLE_SIZE,
+    }),
+  ])
+  // An empty shelf gets no CollectionPage: telling Google a collection exists
+  // and then showing nothing is worse than staying quiet.
+  if (totalItems === 0) return null
+
+  return {
+    name: category.nameRw || category.name,
+    description: category.description,
+    url: `/products?category=${encodeURIComponent(category.slug)}`,
+    totalItems,
+    items: products.map((product) => ({
+      name: product.name,
+      url: `/products/${product.slug}`,
+      image: firstImage(product.images),
+      price: product.price,
+    })),
+  }
+}
+
+function firstImage(value: string): string | undefined {
+  try {
+    const parsed = JSON.parse(value)
+    return Array.isArray(parsed) && typeof parsed[0] === 'string' ? parsed[0] : undefined
+  } catch {
+    return undefined
+  }
+}
+
 export default async function ProductsPage({ searchParams }: { searchParams: ProductsSearchParams }) {
   const params = await searchParams
   const category = firstValue(params.category).toLowerCase()
+  const search = firstValue(params.search || params.q)
   const categorySEO = CATEGORY_SEO[category]
+  // Search results are noindex, so schema there would describe a page Google
+  // is told not to keep.
+  const collection = search ? null : await getCollection(category).catch(() => null)
   const breadcrumbs = [
     { name: 'Ahabanza', url: '/' }, // verified-rw
     { name: 'Ibicuruzwa', url: '/products' }, // verified-rw
-    ...(categorySEO ? [{ name: categorySEO.label, url: `/products?category=${encodeURIComponent(category)}` }] : []),
+    // Falls back to the database name so shelves outside the hand-written
+    // CATEGORY_SEO map still get a crumb. Soap is the second-largest category
+    // on the site with 33 live products and was silently missing one.
+    ...(categorySEO || collection
+      ? [{
+        name: categorySEO?.label || collection?.name || category,
+        url: `/products?category=${encodeURIComponent(category)}`,
+      }]
+      : []),
+  ]
+
+  const schemas = [
+    getBreadcrumbSchema(breadcrumbs),
+    ...(collection ? [getCollectionPageSchema(collection)] : []),
   ]
 
   return (
     <>
-      <StructuredData data={getBreadcrumbSchema(breadcrumbs)} />
+      <StructuredData data={schemas} />
       <ProductsPageClient />
     </>
   )

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getArticleSchema,
   getBreadcrumbSchema,
+  getCollectionPageSchema,
   getFAQSchema,
   getItemListSchema,
   getLocalBusinessSchema,
@@ -238,5 +239,50 @@ describe('organization schema describes the business without inventing status', 
     // Organization, so moving it would silently lose the feature.
     expect(getWebsiteSchema().potentialAction).toBeTruthy()
     expect(getOrganizationSchema()).not.toHaveProperty('potentialAction')
+  })
+})
+
+describe('collection page schema for category shelves', () => {
+  const items = [
+    { name: 'A', url: '/products/a', image: '/a.jpg', price: 2000 },
+    { name: 'B', url: '/products/b', price: 3000 },
+  ]
+
+  it('reports the full shelf size while listing only the sample', () => {
+    // numberOfItems is the truth about the shelf; itemListElement is a sample.
+    const schema = getCollectionPageSchema({
+      name: 'Soap', url: '/products?category=soap', totalItems: 33, items,
+    })
+    const list = schema.mainEntity as Record<string, any>
+    expect(list['@type']).toBe('ItemList')
+    expect(list.numberOfItems).toBe(33)
+    expect(list.itemListElement).toHaveLength(2)
+  })
+
+  it('prices every listed product in RWF', () => {
+    const schema = getCollectionPageSchema({
+      name: 'Soap', url: '/products?category=soap', totalItems: 2, items,
+    })
+    const entries = (schema.mainEntity as Record<string, any>).itemListElement
+    for (const entry of entries) {
+      if (entry.item.offers) expect(entry.item.offers.priceCurrency).toBe('RWF')
+    }
+    expect(entries[0].item.offers.price).toBe(2000)
+  })
+
+  it('absolutises its own url and links back to the website node', () => {
+    const schema = getCollectionPageSchema({
+      name: 'Soap', url: '/products?category=soap', totalItems: 1, items: [items[0]],
+    })
+    expect(schema.url).toBe(`${SEO_CONFIG.siteUrl}/products?category=soap`)
+    expect(schema['@id']).toBe(`${SEO_CONFIG.siteUrl}/products?category=soap#collection`)
+    expect(schema.isPartOf).toEqual({ '@id': `${SEO_CONFIG.siteUrl}/#website` })
+  })
+
+  it('omits an absent description rather than emitting an empty string', () => {
+    const schema = getCollectionPageSchema({
+      name: 'Soap', url: '/products?category=soap', totalItems: 1, items: [items[0]], description: null,
+    })
+    expect(schema).not.toHaveProperty('description')
   })
 })

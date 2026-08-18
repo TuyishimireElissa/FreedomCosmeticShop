@@ -110,8 +110,42 @@ describe('breadcrumb trails match the real crawlable hierarchy', () => {
 
   it('adds the category level only when the category is real', () => {
     // An unrecognised ?category= value must not produce a breadcrumb pointing
-    // at a shelf that does not exist.
+    // at a shelf that does not exist. The guard now also accepts a category
+    // resolved from the database, so shelves outside the hand-written
+    // CATEGORY_SEO map (soap, fragrance) still get a crumb.
     const listPage = read('src/app/products/page.tsx')
-    expect(listPage).toContain('...(categorySEO ? [{ name: categorySEO.label')
+    expect(listPage).toContain('...(categorySEO || collection')
+    expect(listPage).toContain('categorySEO?.label || collection?.name')
+  })
+})
+
+describe('category shelves are described in the server HTML (Phase 4)', () => {
+  const listPage = read('src/app/products/page.tsx')
+
+  it('server-renders the CollectionPage instead of leaving it to the client', () => {
+    // ProductsPageClient builds an ItemList too, but it is a client component
+    // fetching in useEffect, so that copy never reaches the crawled HTML.
+    expect(listPage).toContain('getCollectionPageSchema(collection)')
+    expect(listPage).toContain('await getCollection(category)')
+    expect(listPage).toContain("from '@/lib/prisma'")
+  })
+
+  it('stays silent on an empty shelf', () => {
+    // Announcing a collection and then showing nothing is worse than nothing.
+    expect(listPage).toContain('if (totalItems === 0) return null')
+  })
+
+  it('emits no collection schema on noindex search pages', () => {
+    expect(listPage).toContain('const collection = search ? null : await getCollection(category)')
+  })
+
+  it('caps the listed sample so a big shelf cannot bloat the page', () => {
+    expect(listPage).toContain('const COLLECTION_SAMPLE_SIZE = 20')
+    expect(listPage).toContain('take: COLLECTION_SAMPLE_SIZE,')
+  })
+
+  it('sends the true shelf size alongside the capped sample', () => {
+    expect(listPage).toContain('prisma.product.count({ where })')
+    expect(listPage).toContain('totalItems,')
   })
 })

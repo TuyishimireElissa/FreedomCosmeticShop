@@ -360,6 +360,43 @@ export function getArticleSchema(article: {
   }
 }
 
+/**
+ * Category shelf as a CollectionPage wrapping an ItemList.
+ *
+ * Built on the server from the database, unlike the client-side ItemList in
+ * ProductsPageClient, which is assembled inside a useEffect after a fetch and
+ * therefore never appears in the HTML Google crawls.
+ *
+ * `numberOfItems` is the TOTAL live products on the shelf, while
+ * itemListElement carries only the entries passed in. That is the correct
+ * reading of ItemList for a paginated collection: the list is a sample, the
+ * count is the truth.
+ */
+export function getCollectionPageSchema(collection: {
+  name: string
+  url: string
+  description?: string | null
+  totalItems: number
+  items: Array<{ name: string; url: string; image?: string | null; price?: number }>
+}): StructuredDataObject {
+  const url = absoluteUrl(collection.url)
+  const itemList = getItemListSchema(collection.items)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${url}#collection`,
+    name: collection.name,
+    ...(collection.description ? { description: collection.description } : {}),
+    url,
+    isPartOf: { '@id': `${SEO_CONFIG.siteUrl}/#website` },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: collection.totalItems,
+      itemListElement: itemList.itemListElement,
+    },
+  }
+}
+
 export function getItemListSchema(items: Array<{
   name: string
   url: string
