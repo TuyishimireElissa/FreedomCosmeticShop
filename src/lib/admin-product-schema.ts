@@ -27,6 +27,21 @@ export const CreateProductSchema = z.object({
   size: z.string().trim().max(100).optional().nullable(),
   usageInstructions: z.string().trim().max(3000).optional().nullable(),
   warnings: z.string().trim().max(3000).optional().nullable(),
+  // ─── Content infrastructure (23-field project, Phase 2) ──────────────
+  // All optional so existing clients keep working unchanged.
+  nameRw: z.string().trim().max(200).optional().nullable(),
+  shortDescriptionRw: z.string().trim().max(300).optional().nullable(),
+  descriptionRw: z.string().trim().max(5000).optional().nullable(),
+  suitableFor: z.object({
+    skinType: z.array(z.string().trim().min(1).max(50)).max(10).optional(),
+    hairType: z.array(z.string().trim().min(1).max(50)).max(10).optional(),
+    ageRange: z.string().trim().max(50).optional(),
+    gender: z.string().trim().max(50).optional(),
+  }).optional().nullable(),
+  uniqueSellingPoints: z.array(z.string().trim().min(1).max(200)).max(10).optional(),
+  seoKeywords: z.string().trim().max(1000).optional().nullable(),
+  seoKeywordsRw: z.string().trim().max(1000).optional().nullable(),
+  whatsappShareText: z.string().trim().max(2000).optional().nullable(),
   featured: z.boolean().default(false),
   isActive: z.boolean().default(true),
 }).strict().superRefine((value, ctx) => {

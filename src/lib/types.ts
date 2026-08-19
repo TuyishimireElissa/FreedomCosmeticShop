@@ -83,6 +83,20 @@ export interface Product {
   howToUse?: string | null
   howToUseRw?: string | null
   warningsRw?: string | null
+  // ─── Content infrastructure (23-field project, Phase 2) ──────────────
+  nameRw?: string | null
+  shortDescriptionRw?: string | null
+  descriptionRw?: string | null
+  suitableFor?: {
+    skinType?: string[]
+    hairType?: string[]
+    ageRange?: string
+    gender?: string
+  } | null
+  uniqueSellingPoints?: string[]
+  seoKeywords?: string | null
+  seoKeywordsRw?: string | null
+  whatsappShareText?: string | null
   allergens?: string[]
   hairType?: 'NATURAL' | 'RELAXED' | 'WAVY' | 'CURLY' | 'COILY' | 'ALL_HAIR' | null
   shade?: string | null

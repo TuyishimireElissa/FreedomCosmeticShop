@@ -48,9 +48,23 @@ const UpdateProductSchema = z.object({
   size: z.string().optional().nullable(),
   usageInstructions: z.string().optional().nullable(),
   warnings: z.string().optional().nullable(),
+  // ─── Content infrastructure (23-field project, Phase 2) ──────────────
+  nameRw: z.string().max(200).optional().nullable(),
+  shortDescriptionRw: z.string().max(300).optional().nullable(),
+  descriptionRw: z.string().max(5000).optional().nullable(),
+  suitableFor: z.object({
+    skinType: z.array(z.string().min(1).max(50)).max(10).optional(),
+    hairType: z.array(z.string().min(1).max(50)).max(10).optional(),
+    ageRange: z.string().max(50).optional(),
+    gender: z.string().max(50).optional(),
+  }).optional().nullable(),
+  uniqueSellingPoints: z.array(z.string().min(1).max(200)).max(10).optional(),
+  seoKeywords: z.string().max(1000).optional().nullable(),
+  seoKeywordsRw: z.string().max(1000).optional().nullable(),
+  whatsappShareText: z.string().max(2000).optional().nullable(),
   featured: z.boolean().optional(),
   isActive: z.boolean().optional(),
-})
+}).strict()
 
 function serializeProduct(p: {
   images: string
