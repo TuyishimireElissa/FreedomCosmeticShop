@@ -1921,6 +1921,43 @@ export const rw = {
     empty_products: '"products" array irimo ubusa.', //  REVIEW
     too_many_products: 'Ibicuruzwa birenze urugero (ntarengwa 500).', //  REVIEW
   },
+  admin_content: { //  REVIEW
+    title: 'Imiterere y’amakuru y’ibicuruzwa', //  REVIEW
+    subtitle: 'Ibura mu mirima 23 y’amakuru, ubu buryo bwuzuye. Hindura ibicuruzwa, hanyuma wongere winjize kugira ngo ubone imibare igenda.', //  REVIEW
+    stat_total: 'Ibicuruzwa byose', //  REVIEW
+    stat_complete: 'Byujuje byose (23/23)', //  REVIEW
+    stat_partial: 'Byujuje igice', //  REVIEW
+    stat_critical: 'Bibura imirima y’ingenzi', //  REVIEW
+    fields_title: 'Uko imirima yujuje', //  REVIEW
+    field_col: 'Umwanya', //  REVIEW
+    complete_col: 'Byujujwe', //  REVIEW
+    missing_col: 'Bibura', //  REVIEW
+    pct_col: 'Ijanisha', //  REVIEW
+    needs_title: 'Ibicuruzwa bikeneye gukorwaho', //  REVIEW
+    product_col: 'Igicuruzwa', //  REVIEW
+    category_col: 'Icyiciro', //  REVIEW
+    ordered_col: 'Byatumijwe', //  REVIEW
+    name_col: 'Izina', //  REVIEW
+    search_placeholder: 'Shakisha ku izina cyangwa slug…', //  REVIEW
+    filter_category: 'Ibyiciro byose', //  REVIEW
+    filter_field: 'Imirima yose', //  REVIEW
+    matching_products: 'Ibicuruzwa {count} bihuye', //  REVIEW
+    edit: 'Hindura', //  REVIEW
+    complete_label: 'Byujujwe', //  REVIEW
+    missing_badge: '{count} bibura', //  REVIEW
+    rw_badge: '{count} by’ikinyarwanda bibura', //  REVIEW
+    units_sold: 'Ibice {count}', //  REVIEW
+    priority_best: 'Byakunzwe cyane bitujuje amakuru', //  REVIEW
+    priority_critical: 'Bibura imirima y’ingenzi (izina, ibisobanuro, igiciro)', //  REVIEW
+    priority_rw: 'Bibura ibisobanuro by’ikinyarwanda', //  REVIEW
+    export_csv: 'Manura raporo y’ibibura (CSV)', //  REVIEW
+    none: 'Nta kibura — byose byujujwe', //  REVIEW
+    empty_state: 'Nta gicuruzwa gihuye n’iyi nshungura.', //  REVIEW
+    loading: 'Imiterere y’amakuru irimo gufunguka…', //  REVIEW
+    load_failed: 'Imiterere y’amakuru ntiyashoboye gufunguka.', //  REVIEW
+    session_expired: 'Igihe cyawe cyarangiye. Ongera winjire.', //  REVIEW
+    retry: 'Ongera ugerageze', //  REVIEW
+  },
 } satisfies TranslationShape<EnglishTranslations>
 
 //  REVIEW: Owner must obtain a fluent Kinyarwanda speaker’s approval before

@@ -135,7 +135,7 @@ export function splitIngredientsText(value: string): string[] {
     .slice(0, 100)
 }
 
-function isEmptyString(value: unknown) {
+export function isEmptyString(value: unknown) {
   return value === null || value === undefined || String(value).trim() === ''
 }
 
@@ -150,13 +150,13 @@ export function ingredientsArrayIsEmpty(raw: unknown) {
   }
 }
 
-function isEmptySuitableFor(value: unknown) {
+export function isEmptySuitableFor(value: unknown) {
   if (value === null || value === undefined) return true
   if (typeof value !== 'object' || Array.isArray(value)) return true
   return Object.keys(value as Record<string, unknown>).length === 0
 }
 
-function isEmptyWeight(value: unknown) {
+export function isEmptyWeight(value: unknown) {
   if (value === null || value === undefined) return true
   const asNumber = typeof value === 'number'
     ? value
