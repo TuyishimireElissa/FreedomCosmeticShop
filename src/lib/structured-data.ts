@@ -8,6 +8,14 @@ type KnownGTIN = {
   type: 'gtin8' | 'gtin12' | 'gtin13' | 'gtin14'
 }
 
+/** Documented shape of the suitableFor JSONB column (callers may pass JsonValue). */
+export type SuitableForAudience = {
+  skinType?: string[]
+  hairType?: string[]
+  ageRange?: string
+  gender?: string
+}
+
 type DatabaseAggregateRating = {
   average: number
   count: number
@@ -207,6 +215,52 @@ function getReturnPolicy(): StructuredDataObject {
 }
 
 /**
+ * Parse the stored ageRange string ("18+", "18-45") into schema.org bounds.
+ * Anything else returns undefined so no invented range is ever published.
+ */
+function parseAgeRange(value: string | undefined | null): { min?: number; max?: number } | undefined {
+  const text = value?.trim()
+  if (!text) return undefined
+  const minOnly = text.match(/^(\d+)\s*\+$/)
+  if (minOnly) return { min: Number(minOnly[1]) }
+  const range = text.match(/^(\d+)\s*[-–]\s*(\d+)$/)
+  if (range && Number(range[1]) < Number(range[2])) return { min: Number(range[1]), max: Number(range[2]) }
+  return undefined
+}
+
+/**
+ * PeopleAudience from suitableFor — only values schema.org can represent.
+ * Gender is limited to Male/Female URLs ("unisex" has no schema.org gender);
+ * unparseable age strings are omitted rather than guessed at.
+ */
+function getAudienceSchema(suitableFor: unknown): StructuredDataObject | undefined {
+  if (!suitableFor || typeof suitableFor !== 'object' || Array.isArray(suitableFor)) return undefined
+  const raw = suitableFor as Record<string, unknown>
+  const genderValue = raw.gender
+  const gender = typeof genderValue === 'string' ? genderValue.trim().toLowerCase() : ''
+  const suggestedGender = gender === 'male'
+    ? 'https://schema.org/Male'
+    : gender === 'female'
+      ? 'https://schema.org/Female'
+      : undefined
+  const ageValue = raw.ageRange
+  const age = typeof ageValue === 'string' ? parseAgeRange(ageValue) : undefined
+  const suggestedAge = age
+    ? {
+        '@type': 'QuantitativeValue',
+        ...(age.min !== undefined ? { minValue: age.min } : {}),
+        ...(age.max !== undefined ? { maxValue: age.max } : {}),
+      }
+    : undefined
+  if (!suggestedGender && !suggestedAge) return undefined
+  return {
+    '@type': 'PeopleAudience',
+    ...(suggestedGender ? { suggestedGender } : {}),
+    ...(suggestedAge ? { suggestedAge } : {}),
+  }
+}
+
+/**
  * Product schema. Aggregate ratings require an explicit database source marker;
  * callers must pass values calculated from real approved reviews.
  */
@@ -226,6 +280,15 @@ export function getProductSchema(product: {
   size?: string | null
   /** Reference date for priceValidUntil. Injected so tests are deterministic. */
   now?: Date
+  // ─── Content infrastructure (Phase 6) ─────────────────────────────────
+  /** Catalogue category name, e.g. "Soap". Emitted as schema.org category. */
+  category?: string | null
+  /** Shipping weight in grams. Emitted as a GRM QuantitativeValue. */
+  weightGrams?: number | null
+  /** Structured audience info from the suitableFor column (JsonValue tolerant). */
+  suitableFor?: unknown
+  /** Comma-separated English SEO keywords, emitted verbatim when present. */
+  keywords?: string | null
 }): StructuredDataObject {
   const productUrl = `${SEO_CONFIG.siteUrl}/products/${encodeURIComponent(product.slug)}`
   const images = product.images.filter(Boolean).map(absoluteUrl)
@@ -244,6 +307,11 @@ export function getProductSchema(product: {
   const priceValidUntil = validUntil.toISOString().slice(0, 10)
 
   const size = product.size?.trim()
+  const weightGrams = typeof product.weightGrams === 'number' && Number.isFinite(product.weightGrams)
+    ? product.weightGrams
+    : null
+  const keywords = product.keywords?.trim()
+  const audience = getAudienceSchema(product.suitableFor)
 
   return {
     '@context': 'https://schema.org',
@@ -261,6 +329,12 @@ export function getProductSchema(product: {
     url: productUrl,
     ...(product.brand?.name ? { brand: { '@type': 'Brand', name: product.brand.name } } : {}),
     ...(size ? { size } : {}),
+    ...(product.category?.trim() ? { category: product.category } : {}),
+    ...(weightGrams !== null && weightGrams > 0 ? {
+      weight: { '@type': 'QuantitativeValue', value: weightGrams, unitCode: 'GRM' },
+    } : {}),
+    ...(keywords ? { keywords } : {}),
+    ...(audience ? { audience } : {}),
     ...(validPrice(product.price) ? {
       offers: {
         '@type': 'Offer',

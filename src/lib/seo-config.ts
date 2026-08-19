@@ -114,6 +114,7 @@ export function getPageMetadata({
   image,
   language = SEO_CONFIG.defaultLanguage,
   noIndex = false,
+  keywords,
 }: {
   title?: LocalizedSEOText | string
   description?: LocalizedSEOText | string
@@ -121,6 +122,8 @@ export function getPageMetadata({
   image?: string
   language?: SEOLanguage
   noIndex?: boolean
+  /** Per-language keyword overrides (e.g. product seoKeywords columns). */
+  keywords?: Partial<Record<SEOLanguage, string[]>>
 } = {}): Metadata {
   const lang: SEOLanguage = language === 'en' ? 'en' : 'rw'
   const finalTitle = typeof title === 'string'
@@ -129,13 +132,16 @@ export function getPageMetadata({
   const finalDescription = typeof description === 'string'
     ? description
     : description?.[lang] || SEO_CONFIG.defaultDescription[lang]
+  const finalKeywords = keywords?.[lang] && keywords[lang]!.length > 0
+    ? keywords[lang]!
+    : SEO_CONFIG.keywords[lang]
   const canonical = absoluteUrl(SEO_CONFIG.siteUrl, path || '/')
   const socialImage = absoluteUrl(SEO_CONFIG.siteUrl, image || SEO_CONFIG.ogImage)
 
   return {
     title: { absolute: finalTitle },
     description: finalDescription,
-    keywords: [...SEO_CONFIG.keywords[lang]],
+    keywords: [...finalKeywords],
     alternates: {
       canonical,
       // Language alternates are intentionally omitted until distinct crawlable
