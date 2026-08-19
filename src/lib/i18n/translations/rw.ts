@@ -1886,6 +1886,41 @@ export const rw = {
   },
   skin_types: { OILY: 'Uruhu rugira amavuta menshi', DRY: 'Uruhu rwumye', COMBINATION: 'Uruhu ruvanze', NORMAL: 'Uruhu rusanzwe', SENSITIVE: 'Uruhu rworoshye', ALL: 'Ubwoko bwose bw’uruhu' }, //  REVIEW
   hair_types: { NATURAL: 'Umusatsi karemano', RELAXED: 'Umusatsi woroshyijwe', WAVY: 'Umusatsi ufite imiraba', CURLY: 'Umusatsi uzengurutse', COILY: 'Umusatsi wisobekeranye cyane', ALL_HAIR: 'Ubwoko bwose bw’umusatsi' }, // verified-rw
+  admin_import: { //  REVIEW
+    title: 'Kwinjiza ibicuruzwa byinshi', //  REVIEW
+    subtitle: 'Shyiramo JSON y’amakuru y’ibicuruzwa (urugero: yaturutse kuri ChatGPT), urebe ibizahinduka, hanyuma ubikoreshe. Amakuru asanzweho ntasibanganywa keretse ubihisemo.', //  REVIEW
+    paste_label: 'Kwinjiza byinshi', //  REVIEW
+    json_label: 'JSON y’ibicuruzwa', //  REVIEW
+    characters: 'Inyuguti {count}', //  REVIEW
+    products_parsed: 'Ibicuruzwa {count} byasomwe', //  REVIEW
+    invalid_json_hint: 'JSON ntirasomwa neza', //  REVIEW
+    overwrite_label: 'Simbuza amakuru asanzweho', //  REVIEW
+    overwrite_hint: 'Ikirazimye: imirima ifite ubusa yuzuzwa gusa. Cyaka: amakuru mashya asimbura asanzweho — byitonde.', //  REVIEW
+    process: 'Kuvugurura', //  REVIEW
+    preview_title: 'Ibyo bizahinduka — ntacyanditswe', //  REVIEW
+    confirm_warning: 'Ntakintu cyanditswe kugeza ubu. Suzuza urutonde, hanyuma wemeze. Ibicuruzwa bitahuye birasimbukwa, kandi imirima ifite amakuru ntikorwaho keretse wasimbuye.', //  REVIEW
+    confirm_import: 'Emeza & winjize ibicuruzwa {count}', //  REVIEW
+    back: 'Subira ku byanditse', //  REVIEW
+    results_title: 'Kwinjiza byarangiye', //  REVIEW
+    new_import: 'Kwinjiza bishya', //  REVIEW
+    total: 'Byose', //  REVIEW
+    will_update: 'Bizarugururwa', //  REVIEW
+    updated: 'Byaruguruwe', //  REVIEW
+    no_changes: 'Nta mpinduka', //  REVIEW
+    not_found: 'Ntibyahuye', //  REVIEW
+    failed: 'Byanze', //  REVIEW
+    updated_fields: 'Imirima izandikwa', //  REVIEW
+    skipped_fields: 'Imirima yasizwe (ifite amakuru)', //  REVIEW
+    matched_by: 'Byahuye binyuze', //  REVIEW
+    session_expired: 'Igihe cyawe cyarangiye. Injira ukongere ugerageze.', //  REVIEW
+    import_error: 'Kwinjiza byanze. Genzura umurongo w’urubuga wongere ugerageze.', //  REVIEW
+    invalid_json: 'Ibyanditse si JSON yemewe.', //  REVIEW
+    invalid_item: 'Igicuruzwa kiri ku mwanya wa {index} nticyemewe ({field}). Gikosore wongere ugerageze.', //  REVIEW
+    expected_object: 'Hakenewe JSON igizwe na "products" array.', //  REVIEW
+    missing_products: '"products" array ibura muri JSON.', //  REVIEW
+    empty_products: '"products" array irimo ubusa.', //  REVIEW
+    too_many_products: 'Ibicuruzwa birenze urugero (ntarengwa 500).', //  REVIEW
+  },
 } satisfies TranslationShape<EnglishTranslations>
 
 //  REVIEW: Owner must obtain a fluent Kinyarwanda speaker’s approval before
