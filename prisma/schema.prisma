@@ -269,9 +269,15 @@ model Brand {
 model Product {
   id               String  @id @default(cuid())
   name             String
+  /// Kinyarwanda product name. Nullable: display falls back to `name` until filled.
+  nameRw           String?
   slug             String  @unique
   description      String
+  /// Kinyarwanda full description. Nullable: falls back to `description`.
+  descriptionRw    String? @db.Text
   shortDescription String? // For product cards (max ~150 chars)
+  /// Kinyarwanda short description. Nullable: falls back to `shortDescription`.
+  shortDescriptionRw String?
 
   // Pricing (RWF)
   price          Int
@@ -328,6 +334,9 @@ model Product {
 
   // Additional cosmetic attributes.
   hairType          HairType?
+  /// Structured audience info: { skinType?: string[], hairType?: string[], ageRange?: string, gender?: string }
+  /// JSONB, nullable. Display merges this with the legacy skinType/hairType columns.
+  suitableFor       Json?
   shade             String?
   shadeHex          String?
   undertone         String?
@@ -344,6 +353,14 @@ model Product {
   countryOfOrigin   String?
   importedBy        String?
   // ─── End cosmetics-specific fields ───────────────────────────────
+
+  // ─── Content infrastructure: SEO, sharing, selling points ────────
+  // All nullable so existing rows are untouched until content is imported.
+  seoKeywords        String? // Comma-separated English keywords
+  seoKeywordsRw      String? // Comma-separated Kinyarwanda keywords
+  whatsappShareText  String? @db.Text // Ready-to-share promotion text
+  // 3-5 bullets. Mirrors the `allergens` column shape (TEXT[] default '{}').
+  uniqueSellingPoints String[] @default([])
 
   // Ratings (denormalized for quick display)
   rating       Float @default(0)
