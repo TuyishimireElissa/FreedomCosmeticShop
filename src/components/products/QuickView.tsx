@@ -22,7 +22,7 @@ interface QuickViewProps {
 interface DeliveryResult { deliveryTime?: string; feeFormatted?: string; message?: string }
 
 export default function QuickView({ product, isOpen, onClose }: QuickViewProps) {
-  const { t, language } = useLanguage()
+  const { t, language, isRW } = useLanguage()
   const user = useStore((state) => state.user)
   const addToCart = useStore((state) => state.addToCart)
   const { toast } = useToast()
@@ -200,7 +200,7 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
 
       <section className="ub-scroll flex-1 overflow-y-auto px-5 pb-[calc(24px+env(safe-area-inset-bottom))] pt-5 md:w-[55%] md:px-8 md:py-8">
         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-fcs-text-muted">{product.brand?.name || product.category?.name || t('product.beauty')}</p>
-        <h2 id={`quick-view-title-${product.id}`} className="mt-1 pr-10 text-2xl font-black leading-tight text-gray-950 md:text-3xl">{product.name}</h2>
+        <h2 id={`quick-view-title-${product.id}`} className="mt-1 pr-10 text-2xl font-black leading-tight text-gray-950 md:text-3xl">{isRW && product.nameRw?.trim() ? product.nameRw : product.name}</h2>
         {product.reviewsCount > 0 && <div className="mt-3 flex items-center gap-2" aria-label={t('product.rating_label', { rating: product.rating, count: product.reviewsCount })}><span className="flex gap-0.5">{[1, 2, 3, 4, 5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= Math.round(product.rating) ? 'fill-amber-400 text-amber-400' : 'fill-gray-200 text-gray-200'}`} />)}</span><span className="text-xs text-gray-500">{product.rating.toFixed(1)} ({product.reviewsCount})</span></div>}
         <div className="my-5 h-px bg-gray-100" />
 
@@ -209,7 +209,7 @@ export default function QuickView({ product, isOpen, onClose }: QuickViewProps) 
         {isWholesale && <span className="mt-3 inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-800">{t('nav.wholesale')}</span>}
 
         <div className="mt-4 flex flex-wrap gap-2">{size && <span className="rounded-full bg-gray-100 px-3 py-1.5 text-xs font-bold text-gray-700">{size}</span>}{product.skinType?.slice(0, 3).map((skin) => <span key={skin} className="rounded-full bg-rose-50 px-3 py-1.5 text-xs font-semibold text-[#9B5A64]">{skin.replaceAll('_', ' ')}</span>)}</div>
-        {product.shortDescription && <p id={`quick-view-description-${product.id}`} className="mt-4 line-clamp-3 text-sm leading-6 text-gray-600">{product.shortDescription}</p>}
+        {product.shortDescription && <p id={`quick-view-description-${product.id}`} className="mt-4 line-clamp-3 text-sm leading-6 text-gray-600">{isRW && product.shortDescriptionRw?.trim() ? product.shortDescriptionRw : product.shortDescription}</p>}
 
         <div className="mt-5 flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-wider text-gray-500">{t('cart.quantity')}</p><div className="mt-1 flex h-12 items-center overflow-hidden rounded-xl border border-gray-200"><IconButton label={t('product.decrease_quantity')} icon={<Minus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity <= 1} className="h-full rounded-none" /><span className="grid h-full min-w-12 place-items-center border-x text-sm font-black" aria-live="polite">{quantity}</span><IconButton label={t('product.increase_quantity')} icon={<Plus className="h-4 w-4" />} onClick={() => setQuantity((value) => Math.min(maxQuantity, value + 1))} disabled={quantity >= maxQuantity} className="h-full rounded-none" /></div></div><div className="text-right"><p className="text-xs font-bold uppercase tracking-wider text-gray-500">{t('cart.total')}</p><p className="mt-1 text-xl font-black text-gray-950" aria-live="polite">{formatRWF(total)}</p></div></div>
 

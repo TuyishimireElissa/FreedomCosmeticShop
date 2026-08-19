@@ -60,7 +60,7 @@ export function getImageUrl(product: ProductWithImageFallbacks): string | null {
 
 
 export function ProductCard({ product, wishlisted = false, onToggleWishlist }: ProductCardProps) {
-  const { t } = useLanguage()
+  const { t, isRW } = useLanguage()
   const addToCart = useStore((state) => state.addToCart)
   const user = useStore((state) => state.user)
   const { toast } = useToast()
@@ -88,6 +88,8 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
   const discount = comparePrice && comparePrice > displayPrice ? Math.round((1 - displayPrice / comparePrice) * 100) : 0
   const size = product.volume || product.size
   const activeWishlisted = onToggleWishlist ? wishlisted : localWishlisted
+  // Bilingual card name (Phase 5): Kinyarwanda wins when set, EN falls back.
+  const displayName = isRW && product.nameRw?.trim() ? product.nameRw : product.name
 
   const addProduct = () => {
     if (outOfStock) return
@@ -134,13 +136,13 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
     <>
     <article className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
       <div className={`relative aspect-[4/5] overflow-hidden bg-gradient-to-b from-gray-50 to-white ${imageUrl && !imageLoaded && !imageFailed ? 'animate-pulse motion-reduce:animate-none' : ''}`}>
-        <Link href={`/products/${product.slug}`} prefetch={true} className="block h-full w-full rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fcs-brand" aria-label={t('product.view_product', { product: product.name })}>
+        <Link href={`/products/${product.slug}`} prefetch={true} className="block h-full w-full rounded-t-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fcs-brand" aria-label={t('product.view_product', { product: displayName })}>
           {imageUrl && !imageFailed ? (
             <img
               src={productCardImageUrl(imageUrl, 500)}
               srcSet={productCardSrcSet(imageUrl, [300, 400, 500])}
               sizes="(max-width: 767px) 50vw, (max-width: 1023px) 33vw, 25vw"
-              alt={product.name}
+              alt={displayName}
               loading="lazy"
               decoding="async"
               onLoad={() => setImageLoaded(true)}
@@ -148,8 +150,8 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
               className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100 ${outOfStock ? 'opacity-60' : ''}`}
             />
           ) : (
-            <span role="img" aria-label={product.name} className="flex h-full w-full items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4 text-center">
-              <span><ImageIcon className="mx-auto h-12 w-12 text-gray-300" strokeWidth={1.25} aria-hidden="true" /><span className="mt-2 line-clamp-2 text-xs text-fcs-text-muted">{product.name}</span></span>
+            <span role="img" aria-label={displayName} className="flex h-full w-full items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4 text-center">
+              <span><ImageIcon className="mx-auto h-12 w-12 text-gray-300" strokeWidth={1.25} aria-hidden="true" /><span className="mt-2 line-clamp-2 text-xs text-fcs-text-muted">{displayName}</span></span>
             </span>
           )}
         </Link>
@@ -204,7 +206,7 @@ export function ProductCard({ product, wishlisted = false, onToggleWishlist }: P
         <Link href={`/products/${product.slug}`} prefetch={true} className="rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand">
           {/* 15px minimum: 13px was unreadable for low-literacy shoppers on a
               small Android screen, which is most of this catalogue's traffic. */}
-          <h2 className="mb-1.5 line-clamp-2 min-h-11 text-[15px] font-semibold leading-snug text-gray-900 transition-colors duration-200 group-hover:text-fcs-brand-text md:text-sm">{product.name}</h2>
+          <h2 className="mb-1.5 line-clamp-2 min-h-11 text-[15px] font-semibold leading-snug text-gray-900 transition-colors duration-200 group-hover:text-fcs-brand-text md:text-sm">{displayName}</h2>
         </Link>
 
         {product.reviewsCount > 0 && (

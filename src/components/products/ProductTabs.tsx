@@ -31,7 +31,9 @@ export default function ProductTabs({ product }: { product: Product }) {
   const { t, isRW } = useLanguage()
   const [active, setActive] = useState<Tab>('description')
 
-  const description = product.description
+  const description = isRW && hasText(product.descriptionRw)
+    ? product.descriptionRw
+    : product.description
   const howToUse = isRW && hasText(product.howToUseRw)
     ? product.howToUseRw
     : product.howToUse || product.usageInstructions

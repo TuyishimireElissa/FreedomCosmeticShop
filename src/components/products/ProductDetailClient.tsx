@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, Heart, Minus, Plus, RefreshCw, ShieldCheck, ShoppingBag, Star } from 'lucide-react'
+import { Check, ChevronLeft, Heart, Minus, Plus, RefreshCw, Share2, ShieldCheck, ShoppingBag, Star } from 'lucide-react'
 import type { Product } from '@/lib/types'
 import { formatRWF } from '@/lib/format'
 import { useStore } from '@/store/useStore'
@@ -12,7 +12,9 @@ import ProductTabs from '@/components/products/ProductTabs'
 import RoutineRail from '@/components/products/RoutineRail'
 import DeliveryEstimator from '@/components/products/DeliveryEstimator'
 import OrderViaWhatsApp from '@/components/products/OrderViaWhatsApp'
-import { useT } from '@/lib/i18n/LanguageContext'
+import { useLanguage } from '@/lib/i18n/LanguageContext'
+import { categoryLabel } from '@/lib/category-i18n-map'
+import { buildProductShareText, buildWhatsAppShareUrl } from '@/lib/whatsapp/product-share'
 import IconButton from '@/components/a11y/IconButton'
 import StockStatus from '@/components/a11y/StockStatus'
 import { getProductPrimaryImage } from '@/lib/cloudinary-images'
@@ -20,8 +22,12 @@ import { useAnalytics } from '@/hooks/useAnalytics'
 
 interface ProductResponse { product: Product; related: Product[] }
 
+function hasText(value: string | null | undefined) {
+  return Boolean(value?.trim())
+}
+
 export default function ProductDetailClient({ slug }: { slug: string }) {
-  const t = useT()
+  const { t, isRW, language } = useLanguage()
   const router = useRouter()
   const addToCart = useStore((state) => state.addToCart)
   const user = useStore((state) => state.user)
@@ -113,6 +119,17 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
   const discount = product.compareAt && product.compareAt > product.price ? Math.round((1 - product.price / product.compareAt) * 100) : 0
   const primaryImage = getProductPrimaryImage(product)
 
+  // ─── Content infrastructure (Phase 5): bilingual display values ────────
+  // Kinyarwanda wins when set; English is the never-blank fallback.
+  const displayName = isRW && hasText(product.nameRw) ? product.nameRw : product.name
+  const shortDescription = isRW && hasText(product.shortDescriptionRw) ? product.shortDescriptionRw : product.shortDescription
+  const expectedResults = isRW && hasText(product.expectedResultsRw) ? product.expectedResultsRw : product.expectedResults
+  const shareUrl = buildWhatsAppShareUrl(buildProductShareText(
+    { name: product.name, slug: product.slug, price: displayPrice, whatsappShareText: product.whatsappShareText },
+    isRW,
+    typeof window !== 'undefined' ? window.location.origin : '',
+  ))
+
   const add = () => {
     if (outOfStock) return
     addToCart({ productId: product.id, slug: product.slug, name: product.name, price: displayPrice, retailPrice: product.price, wholesalePrice: product.wholesalePrice || undefined, image: primaryImage?.url || '', volume: product.volume || product.size || undefined, stock: product.stock }, quantity)
@@ -128,13 +145,40 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
           <ProductImageGallery productImages={product.productImages || []} legacyImages={product.images || []} productName={product.name} videoUrl={product.videoUrl} discount={discount} outOfStock={outOfStock} isAuthentic={product.isAuthentic === true} />
 
           <div className="min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-fcs-brand-text">{product.brand?.name || t('product.beauty')}</p>
-            <h1 className="mt-2 font-display text-3xl font-normal leading-tight tracking-tight text-fcs-text sm:text-4xl">{product.name}</h1>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-fcs-brand-text">
+              {product.brand?.name || t('product.beauty')}
+              {product.category && (
+                <span className="text-fcs-text-muted">
+                  {' · '}
+                  {categoryLabel(
+                    { slug: product.category.slug, name: product.category.name, nameRw: product.category.nameRw },
+                    t,
+                    language,
+                  )}
+                </span>
+              )}
+            </p>
+            <h1 className="mt-2 font-display text-3xl font-normal leading-tight tracking-tight text-fcs-text sm:text-4xl">{displayName}</h1>
             {product.reviewsCount > 0 && <button type="button" onClick={() => document.getElementById('product-details')?.scrollIntoView({ behavior: 'smooth' })} className="mt-3 flex items-center gap-2"><span className="flex">{[1,2,3,4,5].map((star) => <Star key={star} className={`h-4 w-4 ${star <= Math.round(product.rating) ? 'fill-[#FFD700] text-[#FFD700]' : 'fill-gray-200 text-gray-200'}`} />)}</span><span className="text-sm font-bold">{product.rating.toFixed(1)}</span><span className="text-xs text-fcs-text-muted">{t('product.reviews_count', { count: product.reviewsCount })}</span></button>}
 
             {wholesalePrice ? <div className="mt-5 rounded-xl border border-violet-200 bg-violet-50 p-4"><p className="text-xs font-bold uppercase tracking-wider text-violet-700">Wholesale pricing</p><div className="mt-2 flex items-baseline gap-3"><span className="text-3xl font-bold text-fcs-brand-text">{formatRWF(wholesalePrice)}</span><span className="text-base text-fcs-text-muted line-through">{formatRWF(product.price)}</span></div><p className="mt-1 text-sm font-semibold text-emerald-700">Save {formatRWF(wholesaleSavings)} per unit</p><div className="mt-3 grid grid-cols-3 gap-2 text-xs text-gray-600">{[12,24,48].map((units) => <span key={units} className="rounded-lg bg-white p-2">Buy {units}: save {formatRWF(wholesaleSavings * units)}</span>)}</div></div> : <div className="mt-5 flex flex-wrap items-baseline gap-3"><span className="text-3xl font-bold text-fcs-brand-text">{formatRWF(product.price)}</span>{product.compareAt && product.compareAt > product.price && <span className="text-base text-fcs-text-muted line-through">{formatRWF(product.compareAt)}</span>}{discount > 0 && <span className="rounded-full bg-red-50 px-2.5 py-1 text-xs font-bold text-red-600">{t('product.save_percent', { percent: discount })}</span>}</div>}
             <div className="mt-3 flex flex-wrap gap-2"><StockStatus stock={product.stock} lowStockThreshold={product.lowStockThreshold} className="rounded-full border border-current/20 px-3 py-1" />{product.isAuthentic === true && <span className="flex items-center gap-1 rounded-full border border-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"><ShieldCheck className="h-3.5 w-3.5" />{t('common.authentic')}</span>}</div>
-            {product.shortDescription && <p className="mt-5 text-sm leading-7 text-gray-600">{product.shortDescription}</p>}
+            {shortDescription && <p className="mt-5 text-sm leading-7 text-gray-600">{shortDescription}</p>}
+
+            {/* Unique selling points: only when content exists (Phase 5). */}
+            {product.uniqueSellingPoints && product.uniqueSellingPoints.length > 0 && (
+              <div className="mt-5">
+                <h2 className="text-xs font-bold uppercase tracking-wider text-fcs-text-muted">{t('product.why_love')}</h2>
+                <ul className="mt-3 space-y-2">
+                  {product.uniqueSellingPoints.map((point) => (
+                    <li key={point} className="flex items-start gap-2 text-sm leading-6 text-gray-600">
+                      <Check className="mt-1 h-4 w-4 shrink-0 text-fcs-success" aria-hidden="true" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {product.shades && product.shades.length > 0 && <div className="mt-6"><p className="text-xs font-bold uppercase tracking-wider text-gray-500">{t('product.select_shade')} <span className="ml-1 normal-case text-fcs-brand-text">{shade}</span></p><div className="mt-2 flex flex-wrap gap-2">{product.shades.map((value) => <button key={value} type="button" onClick={() => setShade(value)} className={`rounded-xl border-2 px-3 py-2 text-sm font-bold ${shade === value ? 'border-fcs-brand bg-rose-50 text-fcs-brand-text' : 'border-gray-200 text-gray-600'}`}>{value}</button>)}</div></div>}
 
@@ -148,6 +192,38 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
         </div>
 
         <div id="product-details"><ProductTabs product={product} /></div>
+
+        {/* ─── Content infrastructure (Phase 5): Suitable For ────────────── */}
+        <SuitableForSection product={product} />
+
+        {/* ─── Content infrastructure (Phase 5): Expected Results ────────── */}
+        {(hasText(expectedResults) || hasText(product.resultsTimeframe)) && (
+          <section className="mt-8 rounded-xl border border-fcs-border-subtle bg-fcs-surface-secondary p-5 sm:p-6">
+            <h2 className="flex items-center gap-2 text-lg font-bold text-fcs-text">
+              <Star className="h-5 w-5 text-fcs-brand-text" aria-hidden="true" />
+              {t('product.expected_results')}
+            </h2>
+            {hasText(expectedResults) && <p className="mt-3 whitespace-pre-line leading-7 text-gray-600">{expectedResults}</p>}
+            {hasText(product.resultsTimeframe) && (
+              <p className="mt-4 inline-block rounded-full border border-fcs-border-subtle bg-white px-4 py-1.5 text-sm font-semibold text-fcs-brand-text">
+                {t('product.results_timeframe')}: {product.resultsTimeframe}
+              </p>
+            )}
+          </section>
+        )}
+
+        {/* ─── Content infrastructure (Phase 5): Share on WhatsApp ───────── */}
+        <div className="mt-8 flex justify-center">
+          <a
+            href={shareUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex min-h-12 w-full max-w-md items-center justify-center gap-2 rounded-xl bg-fcs-whatsapp-pill px-6 text-sm font-bold text-white shadow-fcs-2 transition-colors hover:bg-fcs-whatsapp-pill-hover motion-reduce:transition-none"
+          >
+            <Share2 className="h-4 w-4" aria-hidden="true" />
+            {t('product.share_whatsapp')}
+          </a>
+        </div>
 
         {/* Similarity-scored, with the server's category list as the
           * fallback. /api/products/similar ranks on category + shared skin
@@ -192,3 +268,60 @@ export default function ProductDetailClient({ slug }: { slug: string }) {
 }
 
 function DetailSkeleton() { return <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><div className="grid gap-8 lg:grid-cols-2"><div className="aspect-square animate-pulse rounded-xl bg-gray-100" /><div className="space-y-4"><div className="h-3 w-24 animate-pulse rounded bg-rose-100" /><div className="h-12 w-4/5 animate-pulse rounded bg-gray-100" /><div className="h-8 w-40 animate-pulse rounded bg-rose-100" /><div className="h-24 animate-pulse rounded bg-gray-100" /><div className="h-12 animate-pulse rounded-xl bg-gray-100" /><div className="h-40 animate-pulse rounded-xl bg-gray-100" /></div></div></div> }
+
+/**
+ * "Suitable for" badges (Phase 5). Merges the structured `suitableFor`
+ * column with the legacy `skinType` / `hairType` channels the tabs already
+ * render, so one product never shows two conflicting audiences. Hides
+ * entirely when no channel has data.
+ */
+function SuitableForSection({ product }: { product: Product }) {
+  const { t } = useLanguage()
+  const skinTypes = [...new Set([
+    ...(product.suitableFor?.skinType ?? []),
+    ...(product.skinType ?? []),
+  ])]
+  const hairTypes = [...new Set([
+    ...(product.suitableFor?.hairType ?? []),
+    ...(product.hairType ? [product.hairType] : []),
+  ])]
+  const ageRange = product.suitableFor?.ageRange?.trim()
+  const gender = product.suitableFor?.gender?.trim()
+  if (skinTypes.length === 0 && hairTypes.length === 0 && !ageRange && !gender) return null
+
+  // Import data may use lowercase values; the i18n keys are uppercase.
+  // Unknown values render as-is instead of a raw key.
+  const badgeLabel = (namespace: 'skin_types' | 'hair_types', value: string) => {
+    const key = `${namespace}.${value.toUpperCase()}`
+    const label = t(key)
+    return label !== key ? label : value
+  }
+
+  return (
+    <section className="mt-8 rounded-xl border border-fcs-border-subtle bg-white p-5 sm:p-6">
+      <h2 className="text-xs font-bold uppercase tracking-wider text-fcs-text-muted">{t('product.suitable_for')}</h2>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {skinTypes.map((value) => (
+          <span key={`skin-${value}`} className="rounded-full border border-fcs-border-subtle bg-fcs-surface-secondary px-3 py-1.5 text-xs font-semibold text-fcs-text">
+            {badgeLabel('skin_types', value)}
+          </span>
+        ))}
+        {hairTypes.map((value) => (
+          <span key={`hair-${value}`} className="rounded-full border border-fcs-border-subtle bg-fcs-surface-secondary px-3 py-1.5 text-xs font-semibold text-fcs-text">
+            {badgeLabel('hair_types', value)}
+          </span>
+        ))}
+        {ageRange && (
+          <span className="rounded-full border border-fcs-border-subtle bg-fcs-surface-secondary px-3 py-1.5 text-xs font-semibold text-fcs-text">
+            {ageRange}
+          </span>
+        )}
+        {gender && (
+          <span className="rounded-full border border-fcs-border-subtle bg-fcs-surface-secondary px-3 py-1.5 text-xs font-semibold text-fcs-text">
+            {gender}
+          </span>
+        )}
+      </div>
+    </section>
+  )
+}
