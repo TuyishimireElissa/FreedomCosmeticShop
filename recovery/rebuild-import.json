@@ -1,0 +1,2592 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "scripts/recovery-to-import.ts",
+  "generatedAt": "2026-08-20T08:24:02.790Z",
+  "reviewThese": [
+    {
+      "slug": "soap",
+      "name": "Dettol Fresh Antibacterial Soap (Pack of 4)",
+      "why": "This product slug is identical to a category slug. It is what production actually had, so it is preserved. Confirm the URL still behaves before enabling."
+    }
+  ],
+  "instructions": [
+    "These are the 107 products recovered from a git snapshot after the 2026-08-20 database loss.",
+    "Names, slugs and categories are REAL and were verified from production.",
+    "Every REPLACE_* value is unknown and must be filled from the physical product or supplier invoice.",
+    "KEEP THE SLUG EXACTLY AS IT IS. Google has these URLs indexed; changing one loses that page its ranking.",
+    "Upload images through the admin Cloudinary manager, then paste the URL and publicId here.",
+    "Set \"enabled\": true ONLY for rows you have fully completed. Rows left false are ignored by the importer.",
+    "Run: ./node_modules/.bin/tsx scripts/import-real-products.ts <this-file>",
+    "After importing, add the long-form content through /admin/products/import."
+  ],
+  "products": [
+    {
+      "enabled": false,
+      "name": "Dettol Fresh Antibacterial Soap (Pack of 4)",
+      "slug": "soap",
+      "categorySlug": "soap",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Rinju Beauté Réelle Body & Hand Cream",
+      "slug": "rinju-beaut-r-elle-body-hand-cream",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Rinju Beauté Réelle Body & Hand Cream",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Kojie San Classic Skin Lightening Soap",
+      "slug": "kojie-san-classic-skin-lightening-soap",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Kojie San Classic Skin Lightening Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Asantee Papaya & Honey Soap 125g",
+      "slug": "asantee-papaya-honey-soap-125g",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Asantee Papaya & Honey Soap 125g",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Pyary Ayurvedic Turmeric Soap",
+      "slug": "pyary-ayurvedic-turmeric-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Pyary Ayurvedic Turmeric Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dove Original Beauty Cream Bar 100g",
+      "slug": "dove-original-beauty-cream-bar-100g",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dove Original Beauty Cream Bar 100g",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Carambola Black Spots Herbal Soap with Honey",
+      "slug": "carambola-black-spots-herbal-soap-with-honey",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Carambola Black Spots Herbal Soap with Honey",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dalan Glycerin Soap with Organic Argan Oil",
+      "slug": "dalan-glycerin-soap-with-organic-argan-oil",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dalan Glycerin Soap with Organic Argan Oil",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Duru Natural Olive Soap with Olive Oil Extract",
+      "slug": "duru-natural-olive-soap-with-olive-oil-extract",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Duru Natural Olive Soap with Olive Oil Extract",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
+      "slug": "bouchou-soft-soap-moisturizing-soothing-gentle-baby-family-bar",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dettol Original Antibacterial Soap 100g",
+      "slug": "dettol-original-antibacterial-soap-100g",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dettol Original Antibacterial Soap 100g",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dettol Juniors Glycerine Soap",
+      "slug": "dettol-juniors-glycerine-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dettol Juniors Glycerine Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ)",
+      "slug": "asantee-tamarind-goat-milk-herbal-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dalan Glycerin Soap Organic Lime",
+      "slug": "dalan-glycerin-soap-organic-lime",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dalan Glycerin Soap Organic Lime",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dalan Glycerin Soap Organic Olive Oil",
+      "slug": "dalan-glycerin-soap-organic-olive-oil",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dalan Glycerin Soap Organic Olive Oil",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Imperial Leather Timeless Classic Bathing Bar Soap",
+      "slug": "imperial-leather-timeless-classic-bathing-bar-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Imperial Leather Timeless Classic Bathing Bar Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Extract Whitening Herbal Soap Papaya Calaman",
+      "slug": "extract-whitening-herbal-soap-papaya-calaman",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Extract Whitening Herbal Soap Papaya Calaman",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Protex Gentle Anti-Germ Bar Soap",
+      "slug": "protex-gentle-anti-germ-bar-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Protex Gentle Anti-Germ Bar Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "EVA Bathing Soap Refresh (Coconut & Lavender)",
+      "slug": "eva-bathing-soap-refresh-coconut-lavender",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "EVA Bathing Soap Refresh (Coconut & Lavender)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dalan Citron Frais Classic Multipurpose Soap",
+      "slug": "dalan-citron-frais-classic-multipurpose-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dalan Citron Frais Classic Multipurpose Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "MPYA Rungu-Medi Anti-Bacterial Soap",
+      "slug": "mpya-rungu-medi-anti-bacterial-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "MPYA Rungu-Medi Anti-Bacterial Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "NINA Family Soap Bathing Bar (Rose & Peach)",
+      "slug": "nina-family-soap-bathing-bar-rose-peach",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "NINA Family Soap Bathing Bar (Rose & Peach)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Turmeric Super Whitening Soap (Body Repair, Anti Dark Spots & Anti-aging)",
+      "slug": "turmeric-super-whitening-soap-body-repair-anti-dark-spots-anti-aging",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Turmeric Super Whitening Soap (Body Repair, Anti Dark Spots & Anti-aging)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Duru Fresh Sensations Beauty Soap – Ocean Breeze (Pack of 4)",
+      "slug": "duru-fresh-sensations-beauty-soap-ocean-breeze-pack-of-4",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Duru Fresh Sensations Beauty Soap – Ocean Breeze (Pack of 4)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Duru Perfume Beauties Beauty Soap – Orchid Charm (Pack of 4)",
+      "slug": "duru-perfume-beauties-beauty-soap-orchid-charm-pack-of-4",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Duru Perfume Beauties Beauty Soap – Orchid Charm (Pack of 4)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Duru Fresh Sensations Beauty Soap – Floral Infusion (Pack of 4)",
+      "slug": "duru-fresh-sensations-beauty-soap-floral-infusion-pack-of-4",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Duru Fresh Sensations Beauty Soap – Floral Infusion (Pack of 4)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Papaya Carrot Gluta Soap Scrub Beads",
+      "slug": "papaya-carrot-gluta-soap-scrub-beads",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Papaya Carrot Gluta Soap Scrub Beads",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Geisha Caring Coconut & Honey Soap",
+      "slug": "geisha-caring-coconut-honey-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Geisha Caring Coconut & Honey Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Victoria Super Colorful (VSC) Carrot 7 Days Extra Whitening Soap",
+      "slug": "victoria-super-colorful-vsc-carrot-7-days-extra-whitening-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Victoria Super Colorful (VSC) Carrot 7 Days Extra Whitening Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Veet Gold Vitamin C Body Corrector Soap (7 Days Whitening and Glowing Soap SPF15)",
+      "slug": "veet-gold-vitamin-c-body-corrector-soap-7-days-whitening-and-glowing-soap-spf15",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Veet Gold Vitamin C Body Corrector Soap (7 Days Whitening and Glowing Soap SPF15)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Geisha Soothing Aloe Vera & Honey Soap (Strong & Long Lasting Daily Bathing Bar)",
+      "slug": "geisha-soothing-aloe-vera-honey-soap-strong-long-lasting-daily-bathing-bar",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Geisha Soothing Aloe Vera & Honey Soap (Strong & Long Lasting Daily Bathing Bar)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "KOJIC WHITE X2 Double Whitening Suite Soap (By Nano D-ne)",
+      "slug": "kojic-white-x2-double-whitening-suite-soap-by-nano-d-ne",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "KOJIC WHITE X2 Double Whitening Suite Soap (By Nano D-ne)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
+      "slug": "touch-me-please-whitening-soap-for-oily-skin-with-natural-extracts",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Original Pure Egyptian Magic Whitening Gold Soap (With Egg Yolk & L-Glutathione)",
+      "slug": "original-pure-egyptian-magic-whitening-gold-soap-with-egg-yolk-l-glutathione",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Original Pure Egyptian Magic Whitening Gold Soap (With Egg Yolk & L-Glutathione)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Lab White Atom Whitening Egg Yolk Soap",
+      "slug": "lab-white-atom-whitening-egg-yolk-soap",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Lab White Atom Whitening Egg Yolk Soap",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Barakkat Rouge 540 Eau De Parfum",
+      "slug": "barakkat-rouge-540-eau-de-parfum",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Barakkat Rouge 540 Eau De Parfum",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "MAYORA Eau De Parfum 2-Piece Luxury Gift Set",
+      "slug": "mayora-eau-de-parfum-2-piece-luxury-gift-set",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "MAYORA Eau De Parfum 2-Piece Luxury Gift Set",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Super Love Eau De Parfum 2-Piece Gift Set",
+      "slug": "super-love-eau-de-parfum-2-piece-gift-set",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Super Love Eau De Parfum 2-Piece Gift Set",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "BARA Eau De Parfum 2-Piece Luxury Gift Set",
+      "slug": "bara-eau-de-parfum-2-piece-luxury-gift-set",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "BARA Eau De Parfum 2-Piece Luxury Gift Set",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "SUPER LOVE' RED Eau de Parfum 2PCS Gift Set",
+      "slug": "super-love-red-eau-de-parfum-2pcs-gift-set",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "SUPER LOVE' RED Eau de Parfum 2PCS Gift Set",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "BLEU DE PARFUM Paris 50ml Eau de Parfum Set",
+      "slug": "bleu-de-parfum-paris-50ml-eau-de-parfum-set",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "BLEU DE PARFUM Paris 50ml Eau de Parfum Set",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "777 MEN Super Love Perfume Set (2 Pcs)",
+      "slug": "777-men-super-love-perfume-set-2-pcs-1",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "777 MEN Super Love Perfume Set (2 Pcs)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Sweet Rose Eau de Parfum Spray for Women",
+      "slug": "sweet-rose-eau-de-parfum-spray-for-women",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Sweet Rose Eau de Parfum Spray for Women",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "SCANOAL A PARIS Eau de Parfum Spray Set (2 Pcs)",
+      "slug": "scanoal-a-paris-eau-de-parfum-spray-set-2-pcs",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "SCANOAL A PARIS Eau de Parfum Spray Set (2 Pcs)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dear Body Be Myself Fine Fragrance Mist",
+      "slug": "dear-body-be-myself-fine-fragrance-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dear Body Be Myself Fine Fragrance Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dear Body Border Girl Fine Fragrance Mist",
+      "slug": "dear-body-border-girl-fine-fragrance-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dear Body Border Girl Fine Fragrance Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
+      "slug": "dear-body-brilliant-sunflower-fine-fragrance-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Coconut Fantasy Fine Fragrance Mist",
+      "slug": "coconut-fantasy-fine-fragrance-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Coconut Fantasy Fine Fragrance Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dear Body Autumn Cicada Fine Fragrance Mist",
+      "slug": "dear-body-autumn-cicada-fine-fragrance-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dear Body Autumn Cicada Fine Fragrance Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dear Body Sweet Vanilla Fine Fragrance Mist",
+      "slug": "dear-body-sweet-vanilla-fine-fragrance-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dear Body Sweet Vanilla Fine Fragrance Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dear Body SCARLET for Men Body Mist",
+      "slug": "dear-body-scarlet-for-men-body-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dear Body SCARLET for Men Body Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dear Body NOIR for men Body Mist",
+      "slug": "dear-body-noir-for-men-body-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dear Body NOIR for men Body Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
+      "slug": "bath-body-week-les-floraux-lune-smell-body-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Bath & Baby Week Beauty Summery Body Mist",
+      "slug": "bath-baby-week-beauty-summery-body-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Bath & Baby Week Beauty Summery Body Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Verlorna World Fantsly",
+      "slug": "verlorna-world-fantsly",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Verlorna World Fantsly",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Verlorna World For Away Body Mist",
+      "slug": "verlorna-world-for-away-body-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Verlorna World For Away Body Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Verlorna World Barakkat Rouge 540 Body Mist",
+      "slug": "verlorna-world-barakkat-rouge-540-body-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Verlorna World Barakkat Rouge 540 Body Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Verlorna World Ideal Fragrance Mist",
+      "slug": "verlorna-world-ideal-fragrance-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Verlorna World Ideal Fragrance Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dear Body Noir Fragrance Mist",
+      "slug": "dear-body-noir-fragrance-mist",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dear Body Noir Fragrance Mist",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Kristal Fragrance Mist (Brume Parfumée)",
+      "slug": "kristal-fragrance-mist-brume-parfum-e",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Kristal Fragrance Mist (Brume Parfumée)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
+      "slug": "barakkat-rouge-540-fragrance-mist-brume-parfum-e",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Oud For Glory (Bade'e Al Oud) Fragrance Mist (Brume Parfumée)",
+      "slug": "oud-for-glory-bade-e-al-oud-fragrance-mist-brume-parfum-e",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Oud For Glory (Bade'e Al Oud) Fragrance Mist (Brume Parfumée)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "ONIRO Fragrance Mist (Brume Parfumée)",
+      "slug": "oniro-fragrance-mist-brume-parfum-e",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "ONIRO Fragrance Mist (Brume Parfumée)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Intense Wood Fragrance Mist (Brume Parfumée)",
+      "slug": "intense-wood-fragrance-mist-brume-parfum-e",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Intense Wood Fragrance Mist (Brume Parfumée)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Yara Pink Fragrance Mist (Brume Parfumée)",
+      "slug": "yara-pink-fragrance-mist-brume-parfum-e",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Yara Pink Fragrance Mist (Brume Parfumée)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Change De Canal Fragrance Mist (Brume Parfumée)",
+      "slug": "change-de-canal-fragrance-mist-brume-parfum-e",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Change De Canal Fragrance Mist (Brume Parfumée)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Baby Line Perfumed Baby Petroleum Jelly",
+      "slug": "baby-line-perfumed-baby-petroleum-jelly",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Baby Line Perfumed Baby Petroleum Jelly",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Johnson's Baby Aqueous Cream Lightly Fragranced 350ml",
+      "slug": "johnson-s-baby-aqueous-cream-lightly-fragranced-350ml",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Johnson's Baby Aqueous Cream Lightly Fragranced 350ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
+      "slug": "vaseline-blue-seal-original-100-pure-petroleum-jelly-240ml",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Vaseline Blue Seal Aloe Vera Perfumed Petroleum Jelly 240ml",
+      "slug": "vaseline-blue-seal-aloe-vera-perfumed-petroleum-jelly-240ml",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Vaseline Blue Seal Aloe Vera Perfumed Petroleum Jelly 240ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Vaseline Blue Seal Men Cooling Perfumed Petroleum Jelly 240ml",
+      "slug": "vaseline-blue-seal-men-cooling-perfumed-petroleum-jelly-240ml",
+      "categorySlug": "mens-grooming",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Vaseline Blue Seal Men Cooling Perfumed Petroleum Jelly 240ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Vaseline Blue Seal Baby Perfumed Petroleum Jelly",
+      "slug": "vaseline-blue-seal-baby-perfumed-petroleum-jelly",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Vaseline Blue Seal Baby Perfumed Petroleum Jelly",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Vaseline Blue Seal Cocoa Butter Perfumed Petroleum Jelly",
+      "slug": "vaseline-blue-seal-cocoa-butter-perfumed-petroleum-jelly",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Vaseline Blue Seal Cocoa Butter Perfumed Petroleum Jelly",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Boudchou Baby Ointment (Pommade Bébé)",
+      "slug": "boudchou-baby-ointment-pommade-b-b",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Boudchou Baby Ointment (Pommade Bébé)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Boudchou Baby Petroleum Jelly / Crème Onctueuse Protectrice",
+      "slug": "boudchou-baby-petroleum-jelly-cr-me-onctueuse-protectrice",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Boudchou Baby Petroleum Jelly / Crème Onctueuse Protectrice",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "More Up Aloe Vera & Vitamin E 2-in-1 Pure Petroleum Jelly",
+      "slug": "more-up-aloe-vera-vitamin-e-2-in-1-pure-petroleum-jelly",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "More Up Aloe Vera & Vitamin E 2-in-1 Pure Petroleum Jelly",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dabur Herbolene Aloe Jelly",
+      "slug": "dabur-herbolene-aloe-jelly",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dabur Herbolene Aloe Jelly",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Dabur Herbolene Aloe Jelly",
+      "slug": "dabur-herbolene-aloe-jelly-1",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Dabur Herbolene Aloe Jelly",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Roushun Turmeric with Vitamin C Lighten Body Lotion",
+      "slug": "roushun-turmeric-with-vitamin-c-lighten-body-lotion",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Roushun Turmeric with Vitamin C Lighten Body Lotion",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Purec Egyptian Gold 14Days Face & Body Lotion",
+      "slug": "purec-egyptian-gold-14days-face-body-lotion",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Purec Egyptian Gold 14Days Face & Body Lotion",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Vaseline Intensive Care Cocoa Radiant Vitalizing Body Oil",
+      "slug": "vaseline-intensive-care-cocoa-radiant-vitalizing-body-oil",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Vaseline Intensive Care Cocoa Radiant Vitalizing Body Oil",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
+      "slug": "zwitsal-baby-body-lotion-with-avocado-oil-400ml",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "RDL Papaya Extract Whitening Hand & Body Lotion + Vitamin E",
+      "slug": "rdl-papaya-extract-whitening-hand-body-lotion-vitamin-e",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "RDL Papaya Extract Whitening Hand & Body Lotion + Vitamin E",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "DRODAVEN Whitening Papaya + Milk Body Lotion",
+      "slug": "drodaven-whitening-papaya-milk-body-lotion",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "DRODAVEN Whitening Papaya + Milk Body Lotion",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "LA TCHADIENNE Whitening Lotion Super White Face & Body Lotion",
+      "slug": "la-tchadienne-whitening-lotion-super-white-face-body-lotion",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "LA TCHADIENNE Whitening Lotion Super White Face & Body Lotion",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Piment Doux 5 Days Extra Whitening Milk (Lait Traitant)",
+      "slug": "piment-doux-5-days-extra-whitening-milk-lait-traitant",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Piment Doux 5 Days Extra Whitening Milk (Lait Traitant)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "White Express Lait Éclaircissant – Complexe Duo-Éclat",
+      "slug": "white-express-lait-claircissant-complexe-duo-clat",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "White Express Lait Éclaircissant – Complexe Duo-Éclat",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "White Express Lait Éclaircissant – Extra Whitening Lotion 500ml",
+      "slug": "white-express-lait-claircissant-extra-whitening-lotion-500ml",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "White Express Lait Éclaircissant – Extra Whitening Lotion 500ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "MIADI Hair Curl Activator Gel",
+      "slug": "miadi-hair-curl-activator-gel",
+      "categorySlug": "haircare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "MIADI Hair Curl Activator Gel",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "MIADI Hair Mouldin' Gel Wax (With Olive Oil)",
+      "slug": "miadi-hair-mouldin-gel-wax-with-olive-oil",
+      "categorySlug": "haircare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "MIADI Hair Mouldin' Gel Wax (With Olive Oil)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Exfoliating Gold Face & Body Scrub (With Natural Exfoliating Fruit Shells & Gold Pearl)",
+      "slug": "exfoliating-gold-face-body-scrub-with-natural-exfoliating-fruit-shells-gold-pearl",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Exfoliating Gold Face & Body Scrub (With Natural Exfoliating Fruit Shells & Gold Pearl)",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "DAX Pomade Now With Lanolin",
+      "slug": "dax-pomade-now-with-lanolin",
+      "categorySlug": "haircare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "DAX Pomade Now With Lanolin",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Silky Cool Milk Face and Body Scrub",
+      "slug": "silky-cool-milk-face-and-body-scrub",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Silky Cool Milk Face and Body Scrub",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Silky Cool Cucumber Face and Body Scrub Cream",
+      "slug": "silky-cool-cucumber-face-and-body-scrub-cream",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Silky Cool Cucumber Face and Body Scrub Cream",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Mega Growth Break-Free Hair & Scalp Food",
+      "slug": "mega-growth-break-free-hair-scalp-food",
+      "categorySlug": "haircare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Mega Growth Break-Free Hair & Scalp Food",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
+      "slug": "cantu-shea-butter-for-natural-hair-coconut-curling-cream",
+      "categorySlug": "haircare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "American Dream Cocoa Butter Lemon Cream",
+      "slug": "american-dream-cocoa-butter-lemon-cream",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "American Dream Cocoa Butter Lemon Cream",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Veet Gold Turmeric Super Whitening Oil 500ml",
+      "slug": "veet-gold-turmeric-super-whitening-oil",
+      "categorySlug": "body-oil",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Veet Gold Turmeric Super Whitening Oil 500ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Veet Gold Turmeric Super Whitening Oil 300ml",
+      "slug": "veet-gold-turmeric-super-whitening-oil-1",
+      "categorySlug": "body-oil",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Veet Gold Turmeric Super Whitening Oil 300ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Veet Gold Turmeric Super Whitening Oil 200ml",
+      "slug": "veet-gold-turmeric-super-whitening-oil-2",
+      "categorySlug": "body-oil",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Veet Gold Turmeric Super Whitening Oil 200ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Movit Sheen Hair Spray Olive & Argan Oil",
+      "slug": "movit-sheen-hair-spray-olive-argan-oil",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Movit Sheen Hair Spray Olive & Argan Oil",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Pure Egyptian Magic Whitening Serum Gold 14 Days Face & Body Serum",
+      "slug": "pure-egyptian-magic-whitening-serum-gold-14-days-face-body-serum",
+      "categorySlug": "skincare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Pure Egyptian Magic Whitening Serum Gold 14 Days Face & Body Serum",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "Bismid Skin Glowing Bath with Carrot Oil",
+      "slug": "bismid-skin-glowing-bath-with-carrot-oil",
+      "categorySlug": "body-care",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "Bismid Skin Glowing Bath with Carrot Oil",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+      "slug": "verlorna-la-vaid-east-bellah-fragrance-mist-250ml",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "VERLORNA MY LOVE Fragrance Mist – 250ml",
+      "slug": "verlorna-my-love-fragrance-mist-250ml",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "VERLORNA MY LOVE Fragrance Mist – 250ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "VERLORNA SUAWACE Fragrance Mist – 250ml",
+      "slug": "verlorna-suawace-fragrance-mist-250ml",
+      "categorySlug": "fragrance",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "VERLORNA SUAWACE Fragrance Mist – 250ml",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "enabled": false,
+      "name": "The Original Sunny Isle Jamaican Black Castor Oil",
+      "slug": "the-original-sunny-isle-jamaican-black-castor-oil",
+      "categorySlug": "haircare",
+      "brandSlug": null,
+      "shortDescription": "REPLACE_SHORT_DESCRIPTION",
+      "description": "REPLACE_FULL_DESCRIPTION",
+      "price": 0,
+      "stock": 0,
+      "lowStockThreshold": 5,
+      "sku": null,
+      "size": null,
+      "volume": null,
+      "images": [
+        {
+          "url": "REPLACE_CLOUDINARY_URL",
+          "publicId": "REPLACE_CLOUDINARY_PUBLIC_ID",
+          "altText": "The Original Sunny Isle Jamaican Black Castor Oil",
+          "isPrimary": true,
+          "sortOrder": 0
+        }
+      ]
+    }
+  ]
+}

@@ -61,3 +61,8 @@ db/
 /FreedomCosmeticShop-*-files.zip
 /*_RECOVERY_REPORT.md
 /*_COMPLETION_REPORT.md
+
+# Catalogue backups. The timestamped copies are local working files; only
+# catalogue-latest.json / .csv are committed, so the repo always carries one
+# restorable snapshot without accumulating hundreds of near-identical blobs.
+/backups/catalogue-*T*.json

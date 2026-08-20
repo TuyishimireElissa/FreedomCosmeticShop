@@ -1,0 +1,306 @@
+{
+ "backupAt": "2026-08-20T08:22:59.284Z",
+ "generatedBy": "scripts/backup-catalogue.ts",
+ "contains": "Catalogue only: categories, brands, products, delivery zones, store settings, coupons.",
+ "excludes": "Orders, users, reviews, addresses and payments are deliberately excluded (customer personal data).",
+ "counts": {
+  "categories": 17,
+  "brands": 6,
+  "products": 0,
+  "liveProducts": 0,
+  "deliveryZones": 5,
+  "coupons": 2
+ },
+ "categories": [
+  {
+   "slug": "skincare",
+   "name": "Skincare",
+   "nameRw": null,
+   "description": null,
+   "image": null,
+   "sortOrder": 1,
+   "isActive": true
+  },
+  {
+   "slug": "makeup",
+   "name": "Makeup",
+   "nameRw": null,
+   "description": null,
+   "image": null,
+   "sortOrder": 2,
+   "isActive": true
+  },
+  {
+   "slug": "soap",
+   "name": "Soap",
+   "nameRw": "Isabune",
+   "description": null,
+   "image": null,
+   "sortOrder": 3,
+   "isActive": true
+  },
+  {
+   "slug": "haircare",
+   "name": "Haircare",
+   "nameRw": null,
+   "description": null,
+   "image": null,
+   "sortOrder": 3,
+   "isActive": true
+  },
+  {
+   "slug": "hair-care",
+   "name": "Hair Care",
+   "nameRw": null,
+   "description": null,
+   "image": null,
+   "sortOrder": 4,
+   "isActive": true
+  },
+  {
+   "slug": "fragrance",
+   "name": "Fragrance",
+   "nameRw": null,
+   "description": null,
+   "image": null,
+   "sortOrder": 5,
+   "isActive": true
+  },
+  {
+   "slug": "whitening",
+   "name": "Whitening & Brightening",
+   "nameRw": "Kwera no Kurangaza",
+   "description": null,
+   "image": null,
+   "sortOrder": 5,
+   "isActive": true
+  },
+  {
+   "slug": "body-care",
+   "name": "Body Care",
+   "nameRw": null,
+   "description": null,
+   "image": null,
+   "sortOrder": 6,
+   "isActive": true
+  },
+  {
+   "slug": "mens-grooming",
+   "name": "Men's Grooming",
+   "nameRw": null,
+   "description": null,
+   "image": null,
+   "sortOrder": 7,
+   "isActive": true
+  },
+  {
+   "slug": "baby-kids",
+   "name": "Baby & Kids",
+   "nameRw": "Abana",
+   "description": null,
+   "image": null,
+   "sortOrder": 9,
+   "isActive": true
+  },
+  {
+   "slug": "body-oil",
+   "name": "Body Oil",
+   "nameRw": "Amavuta y’Umubiri",
+   "description": null,
+   "image": null,
+   "sortOrder": 10,
+   "isActive": true
+  },
+  {
+   "slug": "petroleum-jelly",
+   "name": "Petroleum Jelly",
+   "nameRw": "Vaseline",
+   "description": null,
+   "image": null,
+   "sortOrder": 11,
+   "isActive": true
+  },
+  {
+   "slug": "hair-growth",
+   "name": "Hair Growth",
+   "nameRw": "Gukura Umusatsi",
+   "description": null,
+   "image": null,
+   "sortOrder": 12,
+   "isActive": true
+  },
+  {
+   "slug": "natural-organic",
+   "name": "Natural & Organic",
+   "nameRw": "Kamere",
+   "description": null,
+   "image": null,
+   "sortOrder": 13,
+   "isActive": true
+  },
+  {
+   "slug": "nail-care",
+   "name": "Nail Care",
+   "nameRw": "Ifarasi",
+   "description": null,
+   "image": null,
+   "sortOrder": 14,
+   "isActive": true
+  },
+  {
+   "slug": "deodorant",
+   "name": "Deodorant",
+   "nameRw": "Deodorante",
+   "description": null,
+   "image": null,
+   "sortOrder": 15,
+   "isActive": true
+  },
+  {
+   "slug": "shampoo",
+   "name": "Shampoo",
+   "nameRw": "Shampoo",
+   "description": null,
+   "image": null,
+   "sortOrder": 16,
+   "isActive": true
+  }
+ ],
+ "brands": [
+  {
+   "slug": "freedom-color",
+   "name": "Freedom Color",
+   "logo": null,
+   "isActive": true
+  },
+  {
+   "slug": "freedom-glow",
+   "name": "Freedom Glow",
+   "logo": null,
+   "isActive": true
+  },
+  {
+   "slug": "freedom-mane",
+   "name": "Freedom Mane",
+   "logo": null,
+   "isActive": true
+  },
+  {
+   "slug": "freedom-pure",
+   "name": "Freedom Pure",
+   "logo": null,
+   "isActive": true
+  },
+  {
+   "slug": "loreal",
+   "name": "L'Oreal",
+   "logo": null,
+   "isActive": true
+  },
+  {
+   "slug": "nivea",
+   "name": "Nivea",
+   "logo": null,
+   "isActive": true
+  }
+ ],
+ "deliveryZones": [
+  {
+   "zoneCode": "KIGALI_SAME_DAY",
+   "zoneName": "Kigali Same Day",
+   "baseFee": 1000,
+   "freeThreshold": 50000,
+   "estimatedDays": 1,
+   "isSameDay": true,
+   "sameDayCutoff": "14:00",
+   "isActive": true
+  },
+  {
+   "zoneCode": "NORTHERN",
+   "zoneName": "Northern Province",
+   "baseFee": 3000,
+   "freeThreshold": 50000,
+   "estimatedDays": 3,
+   "isSameDay": false,
+   "sameDayCutoff": null,
+   "isActive": true
+  },
+  {
+   "zoneCode": "SOUTHERN",
+   "zoneName": "Southern Province",
+   "baseFee": 3000,
+   "freeThreshold": 50000,
+   "estimatedDays": 3,
+   "isSameDay": false,
+   "sameDayCutoff": null,
+   "isActive": true
+  },
+  {
+   "zoneCode": "EASTERN",
+   "zoneName": "Eastern Province",
+   "baseFee": 3500,
+   "freeThreshold": 50000,
+   "estimatedDays": 3,
+   "isSameDay": false,
+   "sameDayCutoff": null,
+   "isActive": true
+  },
+  {
+   "zoneCode": "WESTERN",
+   "zoneName": "Western Province",
+   "baseFee": 4000,
+   "freeThreshold": 50000,
+   "estimatedDays": 4,
+   "isSameDay": false,
+   "sameDayCutoff": null,
+   "isActive": true
+  }
+ ],
+ "storeSettings": {
+  "id": "cmt185ojl000j13ft7convtvj",
+  "storeName": "FreedomCosmeticShop",
+  "storeShortName": "Freedom Cosmetic",
+  "storeTagline": "Rwanda's Beauty Freedom",
+  "storeEmail": "hello@freedomcosmeticshop.rw",
+  "storePhone": "+250788123456",
+  "storeWhatsApp": "+250788123456",
+  "storeAddress": "Kigali, Rwanda",
+  "logoUrl": null,
+  "logoPublicId": null,
+  "faviconUrl": null,
+  "logoUpdatedAt": null,
+  "primaryColor": "#B76E79",
+  "secondaryColor": "#1a1a1a",
+  "accentColor": "#FFD700",
+  "metaTitle": null,
+  "metaDescription": null,
+  "socialInstagram": null,
+  "socialFacebook": null,
+  "socialTikTok": null,
+  "socialYoutube": null,
+  "socialTwitter": null,
+  "currency": "RWF",
+  "timezone": "Africa/Kigali",
+  "language": "rw",
+  "updatedAt": "2026-08-20T07:54:26.050Z"
+ },
+ "coupons": [
+  {
+   "code": "BEAUTY20",
+   "description": "20% off qualifying orders",
+   "type": "PERCENTAGE",
+   "value": 20,
+   "minOrderAmount": 10000,
+   "maxDiscountAmount": 15000
+  },
+  {
+   "code": "FREEDOM10",
+   "description": "10% off qualifying orders",
+   "type": "PERCENTAGE",
+   "value": 10,
+   "minOrderAmount": 5000,
+   "maxDiscountAmount": null
+  }
+ ],
+ "products": []
+}

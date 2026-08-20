@@ -13,6 +13,8 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx scripts/seed.ts",
     "catalog:import": "tsx scripts/import-real-products.ts",
+    "catalog:backup": "tsx scripts/backup-catalogue.ts",
+    "catalog:rebuild-file": "tsx scripts/recovery-to-import.ts",
     "blog:seed": "tsx src/scripts/seed-blog-starters.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
