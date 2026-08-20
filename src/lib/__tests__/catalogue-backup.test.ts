@@ -165,3 +165,72 @@ describe('the tooling is runnable without remembering paths', () => {
     expect(countOf(JSON.stringify(pkg.scripts), 'import-real-products')).toBe(1)
   })
 })
+
+describe('image recovery tooling', () => {
+  const apply = stripComments(read('scripts/apply-image-matches.ts'))
+  const picker = read('recovery/build-picker.py')
+  const html = read('recovery/image-picker.html')
+
+  it('only ever fills the images array, never price or stock', () => {
+    // Photos can be matched by eye. A price cannot be recovered from a photo,
+    // and a plausible-looking guess is worse than an obvious blank.
+    expect(apply).toContain('product.images = images')
+    expect(apply).not.toMatch(/product\.price\s*=/)
+    expect(apply).not.toMatch(/product\.stock\s*=/)
+    expect(apply).not.toMatch(/product\.description\s*=/)
+  })
+
+  it('forces exactly one primary image', () => {
+    // The importer rejects a set with more than one primary.
+    expect(apply).toContain('isPrimary: index === 0')
+  })
+
+  it('reports matches whose slug is not in the rebuild file', () => {
+    // Silent drops would let the two files drift apart unnoticed. Asserting
+    // the identifier alone is weak: renaming the variable leaves the warning
+    // string in place while the value reported becomes undefined. Pin the
+    // computation and the reference together.
+    expect(apply).toMatch(/const orphans = \[\.\.\.bySlug\.keys\(\)\]\.filter/)
+    expect(apply).toContain('orphans.length')
+    expect(apply).toContain('WARNING unmatched slugs')
+  })
+
+  it('refuses to run without the hand-made match file', () => {
+    expect(apply).toContain('existsSync(MATCHES)')
+    expect(apply).toContain('process.exit(1)')
+  })
+
+  it('ships the picker as one self-contained offline file', () => {
+    // The owner is on a Rwandan connection; a tool that needs a build step or
+    // a CDN is a tool that does not get used.
+    expect(html.startsWith('<!DOCTYPE html>')).toBe(true)
+    expect(html).not.toContain('__DATA__')
+    expect(html).not.toMatch(/<script[^>]+src=/)
+    expect(html).not.toMatch(/<link[^>]+stylesheet/)
+  })
+
+  it('uses fcs design tokens rather than arbitrary colour', () => {
+    expect(html).toContain('--brand-strong: #A85D68')
+    expect(html).toContain('--brand-text: #9B545F')
+    // #C77B85 is 3.18:1 and banned outright.
+    expect(html).not.toContain('#C77B85')
+  })
+
+  it('keeps 44px touch targets in the picker', () => {
+    expect(html).toContain('min-height: 44px')
+  })
+
+  it('requests Cloudinary thumbnails instead of full-size images', () => {
+    // 488 full-size photos would be tens of megabytes on a 3G connection.
+    expect(picker).toContain('w_200,h_200,c_fill,q_auto,f_auto')
+  })
+
+  it('documents why matching is manual', () => {
+    // The reasoning must survive in the file, or someone will "improve" this
+    // later by adding automatic matching that is wrong most of the time.
+    // Read RAW here: this reasoning lives in the header comment, which the
+    // stripped copy deliberately removes.
+    expect(picker).toContain('255 clusters')
+    expect(read('scripts/apply-image-matches.ts')).toContain('255 clusters')
+  })
+})
