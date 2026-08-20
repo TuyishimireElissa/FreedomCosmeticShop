@@ -1,0 +1,543 @@
+{
+ "recoveredFrom": "git commit 74595fd PRODUCT_CATEGORY_SNAPSHOT_20260814T222207Z.json",
+ "snapshotAt": "2026-08-14T22:22:09.488Z",
+ "note": "Names, slugs and category ONLY. No price, description, stock, images or SKU were captured in this snapshot.",
+ "liveProductCount": 107,
+ "products": [
+  {
+   "name": "Dettol Fresh Antibacterial Soap (Pack of 4)",
+   "slug": "soap",
+   "category": "soap"
+  },
+  {
+   "name": "Rinju Beauté Réelle Body & Hand Cream",
+   "slug": "rinju-beaut-r-elle-body-hand-cream",
+   "category": "skincare"
+  },
+  {
+   "name": "Kojie San Classic Skin Lightening Soap",
+   "slug": "kojie-san-classic-skin-lightening-soap",
+   "category": "skincare"
+  },
+  {
+   "name": "Asantee Papaya & Honey Soap 125g",
+   "slug": "asantee-papaya-honey-soap-125g",
+   "category": "body-care"
+  },
+  {
+   "name": "Pyary Ayurvedic Turmeric Soap",
+   "slug": "pyary-ayurvedic-turmeric-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "Dove Original Beauty Cream Bar 100g",
+   "slug": "dove-original-beauty-cream-bar-100g",
+   "category": "body-care"
+  },
+  {
+   "name": "Carambola Black Spots Herbal Soap with Honey",
+   "slug": "carambola-black-spots-herbal-soap-with-honey",
+   "category": "body-care"
+  },
+  {
+   "name": "Dalan Glycerin Soap with Organic Argan Oil",
+   "slug": "dalan-glycerin-soap-with-organic-argan-oil",
+   "category": "body-care"
+  },
+  {
+   "name": "Duru Natural Olive Soap with Olive Oil Extract",
+   "slug": "duru-natural-olive-soap-with-olive-oil-extract",
+   "category": "body-care"
+  },
+  {
+   "name": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
+   "slug": "bouchou-soft-soap-moisturizing-soothing-gentle-baby-family-bar",
+   "category": "skincare"
+  },
+  {
+   "name": "Dettol Original Antibacterial Soap 100g",
+   "slug": "dettol-original-antibacterial-soap-100g",
+   "category": "body-care"
+  },
+  {
+   "name": "Dettol Juniors Glycerine Soap",
+   "slug": "dettol-juniors-glycerine-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ)",
+   "slug": "asantee-tamarind-goat-milk-herbal-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "Dalan Glycerin Soap Organic Lime",
+   "slug": "dalan-glycerin-soap-organic-lime",
+   "category": "skincare"
+  },
+  {
+   "name": "Dalan Glycerin Soap Organic Olive Oil",
+   "slug": "dalan-glycerin-soap-organic-olive-oil",
+   "category": "skincare"
+  },
+  {
+   "name": "Imperial Leather Timeless Classic Bathing Bar Soap",
+   "slug": "imperial-leather-timeless-classic-bathing-bar-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "Extract Whitening Herbal Soap Papaya Calaman",
+   "slug": "extract-whitening-herbal-soap-papaya-calaman",
+   "category": "body-care"
+  },
+  {
+   "name": "Protex Gentle Anti-Germ Bar Soap",
+   "slug": "protex-gentle-anti-germ-bar-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "EVA Bathing Soap Refresh (Coconut & Lavender)",
+   "slug": "eva-bathing-soap-refresh-coconut-lavender",
+   "category": "body-care"
+  },
+  {
+   "name": "Dalan Citron Frais Classic Multipurpose Soap",
+   "slug": "dalan-citron-frais-classic-multipurpose-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "MPYA Rungu-Medi Anti-Bacterial Soap",
+   "slug": "mpya-rungu-medi-anti-bacterial-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "NINA Family Soap Bathing Bar (Rose & Peach)",
+   "slug": "nina-family-soap-bathing-bar-rose-peach",
+   "category": "body-care"
+  },
+  {
+   "name": "Turmeric Super Whitening Soap (Body Repair, Anti Dark Spots & Anti-aging)",
+   "slug": "turmeric-super-whitening-soap-body-repair-anti-dark-spots-anti-aging",
+   "category": "body-care"
+  },
+  {
+   "name": "Duru Fresh Sensations Beauty Soap – Ocean Breeze (Pack of 4)",
+   "slug": "duru-fresh-sensations-beauty-soap-ocean-breeze-pack-of-4",
+   "category": "body-care"
+  },
+  {
+   "name": "Duru Perfume Beauties Beauty Soap – Orchid Charm (Pack of 4)",
+   "slug": "duru-perfume-beauties-beauty-soap-orchid-charm-pack-of-4",
+   "category": "body-care"
+  },
+  {
+   "name": "Duru Fresh Sensations Beauty Soap – Floral Infusion (Pack of 4)",
+   "slug": "duru-fresh-sensations-beauty-soap-floral-infusion-pack-of-4",
+   "category": "body-care"
+  },
+  {
+   "name": "Papaya Carrot Gluta Soap Scrub Beads",
+   "slug": "papaya-carrot-gluta-soap-scrub-beads",
+   "category": "body-care"
+  },
+  {
+   "name": "Geisha Caring Coconut & Honey Soap",
+   "slug": "geisha-caring-coconut-honey-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "Victoria Super Colorful (VSC) Carrot 7 Days Extra Whitening Soap",
+   "slug": "victoria-super-colorful-vsc-carrot-7-days-extra-whitening-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "Veet Gold Vitamin C Body Corrector Soap (7 Days Whitening and Glowing Soap SPF15)",
+   "slug": "veet-gold-vitamin-c-body-corrector-soap-7-days-whitening-and-glowing-soap-spf15",
+   "category": "body-care"
+  },
+  {
+   "name": "Geisha Soothing Aloe Vera & Honey Soap (Strong & Long Lasting Daily Bathing Bar)",
+   "slug": "geisha-soothing-aloe-vera-honey-soap-strong-long-lasting-daily-bathing-bar",
+   "category": "body-care"
+  },
+  {
+   "name": "KOJIC WHITE X2 Double Whitening Suite Soap (By Nano D-ne)",
+   "slug": "kojic-white-x2-double-whitening-suite-soap-by-nano-d-ne",
+   "category": "skincare"
+  },
+  {
+   "name": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
+   "slug": "touch-me-please-whitening-soap-for-oily-skin-with-natural-extracts",
+   "category": "body-care"
+  },
+  {
+   "name": "Original Pure Egyptian Magic Whitening Gold Soap (With Egg Yolk & L-Glutathione)",
+   "slug": "original-pure-egyptian-magic-whitening-gold-soap-with-egg-yolk-l-glutathione",
+   "category": "body-care"
+  },
+  {
+   "name": "Lab White Atom Whitening Egg Yolk Soap",
+   "slug": "lab-white-atom-whitening-egg-yolk-soap",
+   "category": "body-care"
+  },
+  {
+   "name": "Barakkat Rouge 540 Eau De Parfum",
+   "slug": "barakkat-rouge-540-eau-de-parfum",
+   "category": "fragrance"
+  },
+  {
+   "name": "MAYORA Eau De Parfum 2-Piece Luxury Gift Set",
+   "slug": "mayora-eau-de-parfum-2-piece-luxury-gift-set",
+   "category": "fragrance"
+  },
+  {
+   "name": "Super Love Eau De Parfum 2-Piece Gift Set",
+   "slug": "super-love-eau-de-parfum-2-piece-gift-set",
+   "category": "fragrance"
+  },
+  {
+   "name": "BARA Eau De Parfum 2-Piece Luxury Gift Set",
+   "slug": "bara-eau-de-parfum-2-piece-luxury-gift-set",
+   "category": "fragrance"
+  },
+  {
+   "name": "SUPER LOVE' RED Eau de Parfum 2PCS Gift Set",
+   "slug": "super-love-red-eau-de-parfum-2pcs-gift-set",
+   "category": "fragrance"
+  },
+  {
+   "name": "BLEU DE PARFUM Paris 50ml Eau de Parfum Set",
+   "slug": "bleu-de-parfum-paris-50ml-eau-de-parfum-set",
+   "category": "fragrance"
+  },
+  {
+   "name": "777 MEN Super Love Perfume Set (2 Pcs)",
+   "slug": "777-men-super-love-perfume-set-2-pcs-1",
+   "category": "fragrance"
+  },
+  {
+   "name": "Sweet Rose Eau de Parfum Spray for Women",
+   "slug": "sweet-rose-eau-de-parfum-spray-for-women",
+   "category": "fragrance"
+  },
+  {
+   "name": "SCANOAL A PARIS Eau de Parfum Spray Set (2 Pcs)",
+   "slug": "scanoal-a-paris-eau-de-parfum-spray-set-2-pcs",
+   "category": "fragrance"
+  },
+  {
+   "name": "Dear Body Be Myself Fine Fragrance Mist",
+   "slug": "dear-body-be-myself-fine-fragrance-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Dear Body Border Girl Fine Fragrance Mist",
+   "slug": "dear-body-border-girl-fine-fragrance-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
+   "slug": "dear-body-brilliant-sunflower-fine-fragrance-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Coconut Fantasy Fine Fragrance Mist",
+   "slug": "coconut-fantasy-fine-fragrance-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Dear Body Autumn Cicada Fine Fragrance Mist",
+   "slug": "dear-body-autumn-cicada-fine-fragrance-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Dear Body Sweet Vanilla Fine Fragrance Mist",
+   "slug": "dear-body-sweet-vanilla-fine-fragrance-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Dear Body SCARLET for Men Body Mist",
+   "slug": "dear-body-scarlet-for-men-body-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Dear Body NOIR for men Body Mist",
+   "slug": "dear-body-noir-for-men-body-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
+   "slug": "bath-body-week-les-floraux-lune-smell-body-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Bath & Baby Week Beauty Summery Body Mist",
+   "slug": "bath-baby-week-beauty-summery-body-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Verlorna World Fantsly",
+   "slug": "verlorna-world-fantsly",
+   "category": "fragrance"
+  },
+  {
+   "name": "Verlorna World For Away Body Mist",
+   "slug": "verlorna-world-for-away-body-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Verlorna World Barakkat Rouge 540 Body Mist",
+   "slug": "verlorna-world-barakkat-rouge-540-body-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Verlorna World Ideal Fragrance Mist",
+   "slug": "verlorna-world-ideal-fragrance-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Dear Body Noir Fragrance Mist",
+   "slug": "dear-body-noir-fragrance-mist",
+   "category": "fragrance"
+  },
+  {
+   "name": "Kristal Fragrance Mist (Brume Parfumée)",
+   "slug": "kristal-fragrance-mist-brume-parfum-e",
+   "category": "body-care"
+  },
+  {
+   "name": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
+   "slug": "barakkat-rouge-540-fragrance-mist-brume-parfum-e",
+   "category": "fragrance"
+  },
+  {
+   "name": "Oud For Glory (Bade'e Al Oud) Fragrance Mist (Brume Parfumée)",
+   "slug": "oud-for-glory-bade-e-al-oud-fragrance-mist-brume-parfum-e",
+   "category": "fragrance"
+  },
+  {
+   "name": "ONIRO Fragrance Mist (Brume Parfumée)",
+   "slug": "oniro-fragrance-mist-brume-parfum-e",
+   "category": "fragrance"
+  },
+  {
+   "name": "Intense Wood Fragrance Mist (Brume Parfumée)",
+   "slug": "intense-wood-fragrance-mist-brume-parfum-e",
+   "category": "fragrance"
+  },
+  {
+   "name": "Yara Pink Fragrance Mist (Brume Parfumée)",
+   "slug": "yara-pink-fragrance-mist-brume-parfum-e",
+   "category": "fragrance"
+  },
+  {
+   "name": "Change De Canal Fragrance Mist (Brume Parfumée)",
+   "slug": "change-de-canal-fragrance-mist-brume-parfum-e",
+   "category": "fragrance"
+  },
+  {
+   "name": "Baby Line Perfumed Baby Petroleum Jelly",
+   "slug": "baby-line-perfumed-baby-petroleum-jelly",
+   "category": "skincare"
+  },
+  {
+   "name": "Johnson's Baby Aqueous Cream Lightly Fragranced 350ml",
+   "slug": "johnson-s-baby-aqueous-cream-lightly-fragranced-350ml",
+   "category": "skincare"
+  },
+  {
+   "name": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
+   "slug": "vaseline-blue-seal-original-100-pure-petroleum-jelly-240ml",
+   "category": "skincare"
+  },
+  {
+   "name": "Vaseline Blue Seal Aloe Vera Perfumed Petroleum Jelly 240ml",
+   "slug": "vaseline-blue-seal-aloe-vera-perfumed-petroleum-jelly-240ml",
+   "category": "skincare"
+  },
+  {
+   "name": "Vaseline Blue Seal Men Cooling Perfumed Petroleum Jelly 240ml",
+   "slug": "vaseline-blue-seal-men-cooling-perfumed-petroleum-jelly-240ml",
+   "category": "mens-grooming"
+  },
+  {
+   "name": "Vaseline Blue Seal Baby Perfumed Petroleum Jelly",
+   "slug": "vaseline-blue-seal-baby-perfumed-petroleum-jelly",
+   "category": "skincare"
+  },
+  {
+   "name": "Vaseline Blue Seal Cocoa Butter Perfumed Petroleum Jelly",
+   "slug": "vaseline-blue-seal-cocoa-butter-perfumed-petroleum-jelly",
+   "category": "skincare"
+  },
+  {
+   "name": "Boudchou Baby Ointment (Pommade Bébé)",
+   "slug": "boudchou-baby-ointment-pommade-b-b",
+   "category": "skincare"
+  },
+  {
+   "name": "Boudchou Baby Petroleum Jelly / Crème Onctueuse Protectrice",
+   "slug": "boudchou-baby-petroleum-jelly-cr-me-onctueuse-protectrice",
+   "category": "body-care"
+  },
+  {
+   "name": "More Up Aloe Vera & Vitamin E 2-in-1 Pure Petroleum Jelly",
+   "slug": "more-up-aloe-vera-vitamin-e-2-in-1-pure-petroleum-jelly",
+   "category": "skincare"
+  },
+  {
+   "name": "Dabur Herbolene Aloe Jelly",
+   "slug": "dabur-herbolene-aloe-jelly",
+   "category": "skincare"
+  },
+  {
+   "name": "Dabur Herbolene Aloe Jelly",
+   "slug": "dabur-herbolene-aloe-jelly-1",
+   "category": "skincare"
+  },
+  {
+   "name": "Roushun Turmeric with Vitamin C Lighten Body Lotion",
+   "slug": "roushun-turmeric-with-vitamin-c-lighten-body-lotion",
+   "category": "skincare"
+  },
+  {
+   "name": "Purec Egyptian Gold 14Days Face & Body Lotion",
+   "slug": "purec-egyptian-gold-14days-face-body-lotion",
+   "category": "skincare"
+  },
+  {
+   "name": "Vaseline Intensive Care Cocoa Radiant Vitalizing Body Oil",
+   "slug": "vaseline-intensive-care-cocoa-radiant-vitalizing-body-oil",
+   "category": "body-care"
+  },
+  {
+   "name": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
+   "slug": "zwitsal-baby-body-lotion-with-avocado-oil-400ml",
+   "category": "body-care"
+  },
+  {
+   "name": "RDL Papaya Extract Whitening Hand & Body Lotion + Vitamin E",
+   "slug": "rdl-papaya-extract-whitening-hand-body-lotion-vitamin-e",
+   "category": "body-care"
+  },
+  {
+   "name": "DRODAVEN Whitening Papaya + Milk Body Lotion",
+   "slug": "drodaven-whitening-papaya-milk-body-lotion",
+   "category": "body-care"
+  },
+  {
+   "name": "LA TCHADIENNE Whitening Lotion Super White Face & Body Lotion",
+   "slug": "la-tchadienne-whitening-lotion-super-white-face-body-lotion",
+   "category": "body-care"
+  },
+  {
+   "name": "Piment Doux 5 Days Extra Whitening Milk (Lait Traitant)",
+   "slug": "piment-doux-5-days-extra-whitening-milk-lait-traitant",
+   "category": "body-care"
+  },
+  {
+   "name": "White Express Lait Éclaircissant – Complexe Duo-Éclat",
+   "slug": "white-express-lait-claircissant-complexe-duo-clat",
+   "category": "body-care"
+  },
+  {
+   "name": "White Express Lait Éclaircissant – Extra Whitening Lotion 500ml",
+   "slug": "white-express-lait-claircissant-extra-whitening-lotion-500ml",
+   "category": "body-care"
+  },
+  {
+   "name": "MIADI Hair Curl Activator Gel",
+   "slug": "miadi-hair-curl-activator-gel",
+   "category": "haircare"
+  },
+  {
+   "name": "MIADI Hair Mouldin' Gel Wax (With Olive Oil)",
+   "slug": "miadi-hair-mouldin-gel-wax-with-olive-oil",
+   "category": "haircare"
+  },
+  {
+   "name": "Exfoliating Gold Face & Body Scrub (With Natural Exfoliating Fruit Shells & Gold Pearl)",
+   "slug": "exfoliating-gold-face-body-scrub-with-natural-exfoliating-fruit-shells-gold-pearl",
+   "category": "skincare"
+  },
+  {
+   "name": "DAX Pomade Now With Lanolin",
+   "slug": "dax-pomade-now-with-lanolin",
+   "category": "haircare"
+  },
+  {
+   "name": "Silky Cool Milk Face and Body Scrub",
+   "slug": "silky-cool-milk-face-and-body-scrub",
+   "category": "body-care"
+  },
+  {
+   "name": "Silky Cool Cucumber Face and Body Scrub Cream",
+   "slug": "silky-cool-cucumber-face-and-body-scrub-cream",
+   "category": "body-care"
+  },
+  {
+   "name": "Mega Growth Break-Free Hair & Scalp Food",
+   "slug": "mega-growth-break-free-hair-scalp-food",
+   "category": "haircare"
+  },
+  {
+   "name": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
+   "slug": "cantu-shea-butter-for-natural-hair-coconut-curling-cream",
+   "category": "haircare"
+  },
+  {
+   "name": "American Dream Cocoa Butter Lemon Cream",
+   "slug": "american-dream-cocoa-butter-lemon-cream",
+   "category": "body-care"
+  },
+  {
+   "name": "Veet Gold Turmeric Super Whitening Oil 500ml",
+   "slug": "veet-gold-turmeric-super-whitening-oil",
+   "category": "body-oil"
+  },
+  {
+   "name": "Veet Gold Turmeric Super Whitening Oil 300ml",
+   "slug": "veet-gold-turmeric-super-whitening-oil-1",
+   "category": "body-oil"
+  },
+  {
+   "name": "Veet Gold Turmeric Super Whitening Oil 200ml",
+   "slug": "veet-gold-turmeric-super-whitening-oil-2",
+   "category": "body-oil"
+  },
+  {
+   "name": "Movit Sheen Hair Spray Olive & Argan Oil",
+   "slug": "movit-sheen-hair-spray-olive-argan-oil",
+   "category": "body-care"
+  },
+  {
+   "name": "Pure Egyptian Magic Whitening Serum Gold 14 Days Face & Body Serum",
+   "slug": "pure-egyptian-magic-whitening-serum-gold-14-days-face-body-serum",
+   "category": "skincare"
+  },
+  {
+   "name": "Bismid Skin Glowing Bath with Carrot Oil",
+   "slug": "bismid-skin-glowing-bath-with-carrot-oil",
+   "category": "body-care"
+  },
+  {
+   "name": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+   "slug": "verlorna-la-vaid-east-bellah-fragrance-mist-250ml",
+   "category": "fragrance"
+  },
+  {
+   "name": "VERLORNA MY LOVE Fragrance Mist – 250ml",
+   "slug": "verlorna-my-love-fragrance-mist-250ml",
+   "category": "fragrance"
+  },
+  {
+   "name": "VERLORNA SUAWACE Fragrance Mist – 250ml",
+   "slug": "verlorna-suawace-fragrance-mist-250ml",
+   "category": "fragrance"
+  },
+  {
+   "name": "The Original Sunny Isle Jamaican Black Castor Oil",
+   "slug": "the-original-sunny-isle-jamaican-black-castor-oil",
+   "category": "haircare"
+  }
+ ]
+}
