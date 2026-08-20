@@ -12,6 +12,10 @@
     {
       "path": "/api/cron/retention-reminders",
       "schedule": "15 7 * * *"
+    },
+    {
+      "path": "/api/health",
+      "schedule": "30 8 * * *"
     }
   ]
 }
