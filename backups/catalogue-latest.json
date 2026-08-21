@@ -1,5 +1,5 @@
 {
- "backupAt": "2026-08-21T15:30:12.711Z",
+ "backupAt": "2026-08-21T16:54:10.973Z",
  "generatedBy": "scripts/backup-catalogue.ts",
  "contains": "Catalogue only: categories, brands, products, delivery zones, store settings, coupons.",
  "excludes": "Orders, users, reviews, addresses and payments are deliberately excluded (customer personal data).",
@@ -366,22 +366,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785526939/freedomcosmeticshop/products/vwj4mnnahfjk8pm9hsxk.jpg",
-     "publicId": "freedomcosmeticshop/products/vwj4mnnahfjk8pm9hsxk",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785615477/freedomcosmeticshop/products/ntinu75c2ltvhj4lq7hd.jpg",
+     "publicId": "freedomcosmeticshop/products/ntinu75c2ltvhj4lq7hd",
      "altText": "777 MEN Super Love Perfume Set (2 Pcs)",
      "altTextRw": "777 MEN Super Love Set y'Imibavu 2",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785525101/freedomcosmeticshop/products/swremuw2eeql3hqjisrl.jpg",
-     "publicId": "freedomcosmeticshop/products/swremuw2eeql3hqjisrl",
-     "altText": "777 MEN Super Love Perfume Set (2 Pcs)",
-     "altTextRw": "777 MEN Super Love Set y'Imibavu 2",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -454,8 +445,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785948571/freedomcosmeticshop/products/mbol7eywlmb1fh6q9esl.jpg",
-     "publicId": "freedomcosmeticshop/products/mbol7eywlmb1fh6q9esl",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785322636/freedomcosmeticshop/products/srqkt2gusrk7bb6cquwj.jpg",
+     "publicId": "freedomcosmeticshop/products/srqkt2gusrk7bb6cquwj",
      "altText": "American Dream Cocoa Butter Lemon Cream",
      "altTextRw": "American Dream Cocoa Butter Lemon Cream",
      "imageType": "PRODUCT",
@@ -463,12 +454,21 @@
      "isPrimary": true
     },
     {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785322292/freedomcosmeticshop/products/vmyrbt8uzlnliyhati39.jpg",
+     "publicId": "freedomcosmeticshop/products/vmyrbt8uzlnliyhati39",
+     "altText": "American Dream Cocoa Butter Lemon Cream",
+     "altTextRw": "American Dream Cocoa Butter Lemon Cream",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
      "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785948546/freedomcosmeticshop/products/mtyrsltztbxtuhbmaafk.jpg",
      "publicId": "freedomcosmeticshop/products/mtyrsltztbxtuhbmaafk",
      "altText": "American Dream Cocoa Butter Lemon Cream",
      "altTextRw": "American Dream Cocoa Butter Lemon Cream",
      "imageType": "PRODUCT",
-     "sortOrder": 1,
+     "sortOrder": 2,
      "isPrimary": false
     },
     {
@@ -477,7 +477,7 @@
      "altText": "American Dream Cocoa Butter Lemon Cream",
      "altTextRw": "American Dream Cocoa Butter Lemon Cream",
      "imageType": "PRODUCT",
-     "sortOrder": 2,
+     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -552,8 +552,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785328080/freedomcosmeticshop/products/mqizskrjx7g1hv7baw97.jpg",
-     "publicId": "freedomcosmeticshop/products/mqizskrjx7g1hv7baw97",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785946637/freedomcosmeticshop/products/mwkzptbaktbvonnehds4.jpg",
+     "publicId": "freedomcosmeticshop/products/mwkzptbaktbvonnehds4",
      "altText": "Asantee Papaya & Honey Soap 125g",
      "altTextRw": "Asantee Papaya & Honey Soap 125g",
      "imageType": "PRODUCT",
@@ -561,12 +561,21 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785328057/freedomcosmeticshop/products/ezbkrseul7p1plnszdro.jpg",
-     "publicId": "freedomcosmeticshop/products/ezbkrseul7p1plnszdro",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785774910/freedomcosmeticshop/products/cvlithts94wulomrqqry.jpg",
+     "publicId": "freedomcosmeticshop/products/cvlithts94wulomrqqry",
      "altText": "Asantee Papaya & Honey Soap 125g",
      "altTextRw": "Asantee Papaya & Honey Soap 125g",
      "imageType": "PRODUCT",
      "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785328080/freedomcosmeticshop/products/mqizskrjx7g1hv7baw97.jpg",
+     "publicId": "freedomcosmeticshop/products/mqizskrjx7g1hv7baw97",
+     "altText": "Asantee Papaya & Honey Soap 125g",
+     "altTextRw": "Asantee Papaya & Honey Soap 125g",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -646,7 +655,25 @@
      "altTextRw": "ASANTEE Isabune y'Imbuto za Tamarind n'Amata y'ihene",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785774761/freedomcosmeticshop/products/nzpcaepszj8y4u7sqreq.jpg",
+     "publicId": "freedomcosmeticshop/products/nzpcaepszj8y4u7sqreq",
+     "altText": "ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ)",
+     "altTextRw": "ASANTEE Isabune y'Imbuto za Tamarind n'Amata y'ihene",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785775077/freedomcosmeticshop/products/gmtzfdhqwjwatwkh1ugj.jpg",
+     "publicId": "freedomcosmeticshop/products/gmtzfdhqwjwatwkh1ugj",
+     "altText": "ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ)",
+     "altTextRw": "ASANTEE Isabune y'Imbuto za Tamarind n'Amata y'ihene",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
     }
    ],
    "categorySlug": "soap",
@@ -716,17 +743,7 @@
     "slug": "baby-kids"
    },
    "brand": null,
-   "productImages": [
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785615477/freedomcosmeticshop/products/ntinu75c2ltvhj4lq7hd.jpg",
-     "publicId": "freedomcosmeticshop/products/ntinu75c2ltvhj4lq7hd",
-     "altText": "Baby Line Perfumed Baby Petroleum Jelly",
-     "altTextRw": "Baby Line Petroleum Jelly y'Abana Irimo Impumuro Nziza",
-     "imageType": "PRODUCT",
-     "sortOrder": 0,
-     "isPrimary": true
-    }
-   ],
+   "productImages": [],
    "categorySlug": "baby-kids",
    "brandSlug": null,
    "imageUrls": [
@@ -841,39 +858,12 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785594756/freedomcosmeticshop/products/aomubkwawgiyhwzwsnez.jpg",
-     "publicId": "freedomcosmeticshop/products/aomubkwawgiyhwzwsnez",
-     "altText": "BARA Eau De Parfum 2-Piece Luxury Gift Set",
-     "altTextRw": "BARA Eau De Parfum Set y'Imibavu 2 y'Impano",
-     "imageType": "PRODUCT",
-     "sortOrder": 5,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785589411/freedomcosmeticshop/products/akyxgke1u4dpegsklnip.jpg",
-     "publicId": "freedomcosmeticshop/products/akyxgke1u4dpegsklnip",
-     "altText": "BARA Eau De Parfum 2-Piece Luxury Gift Set",
-     "altTextRw": "BARA Eau De Parfum Set y'Imibavu 2 y'Impano",
-     "imageType": "PRODUCT",
-     "sortOrder": 6,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785589375/freedomcosmeticshop/products/iw0aiplphjry38h7vyg1.jpg",
-     "publicId": "freedomcosmeticshop/products/iw0aiplphjry38h7vyg1",
-     "altText": "BARA Eau De Parfum 2-Piece Luxury Gift Set",
-     "altTextRw": "BARA Eau De Parfum Set y'Imibavu 2 y'Impano",
-     "imageType": "PRODUCT",
-     "sortOrder": 7,
-     "isPrimary": false
-    },
-    {
      "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785589235/freedomcosmeticshop/products/byrnubc350egzwgmjvxz.jpg",
      "publicId": "freedomcosmeticshop/products/byrnubc350egzwgmjvxz",
      "altText": "BARA Eau De Parfum 2-Piece Luxury Gift Set",
      "altTextRw": "BARA Eau De Parfum Set y'Imibavu 2 y'Impano",
      "imageType": "PRODUCT",
-     "sortOrder": 8,
+     "sortOrder": 5,
      "isPrimary": false
     }
    ],
@@ -959,6 +949,15 @@
      "altTextRw": "Barakkat Rouge 540 Eau De Parfum",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785596793/freedomcosmeticshop/products/l3u1dx0nvggviml2j4wf.jpg",
+     "publicId": "freedomcosmeticshop/products/l3u1dx0nvggviml2j4wf",
+     "altText": "Barakkat Rouge 540 Eau De Parfum",
+     "altTextRw": "Barakkat Rouge 540 Eau De Parfum",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
      "isPrimary": true
     },
     {
@@ -967,7 +966,7 @@
      "altText": "Barakkat Rouge 540 Eau De Parfum",
      "altTextRw": "Barakkat Rouge 540 Eau De Parfum",
      "imageType": "PRODUCT",
-     "sortOrder": 1,
+     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -1041,8 +1040,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785594756/freedomcosmeticshop/products/aomubkwawgiyhwzwsnez.jpg",
-     "publicId": "freedomcosmeticshop/products/aomubkwawgiyhwzwsnez",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582922/freedomcosmeticshop/products/b71ez8tgplz58gfuk21f.jpg",
+     "publicId": "freedomcosmeticshop/products/b71ez8tgplz58gfuk21f",
      "altText": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
      "altTextRw": "Barakkat Rouge 540 Fragrance Mist",
      "imageType": "PRODUCT",
@@ -1050,12 +1049,39 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785589411/freedomcosmeticshop/products/akyxgke1u4dpegsklnip.jpg",
-     "publicId": "freedomcosmeticshop/products/akyxgke1u4dpegsklnip",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582865/freedomcosmeticshop/products/ex5chlbfmtr3xt5deopu.jpg",
+     "publicId": "freedomcosmeticshop/products/ex5chlbfmtr3xt5deopu",
      "altText": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
      "altTextRw": "Barakkat Rouge 540 Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785587131/freedomcosmeticshop/products/sbsspbm6ilwtintqqhtr.jpg",
+     "publicId": "freedomcosmeticshop/products/sbsspbm6ilwtintqqhtr",
+     "altText": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
+     "altTextRw": "Barakkat Rouge 540 Fragrance Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785587162/freedomcosmeticshop/products/eyxbuptycx34u36ziafw.jpg",
+     "publicId": "freedomcosmeticshop/products/eyxbuptycx34u36ziafw",
+     "altText": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
+     "altTextRw": "Barakkat Rouge 540 Fragrance Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582895/freedomcosmeticshop/products/bdo67pyy7razvkz2i8tb.jpg",
+     "publicId": "freedomcosmeticshop/products/bdo67pyy7razvkz2i8tb",
+     "altText": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
+     "altTextRw": "Barakkat Rouge 540 Fragrance Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 4,
      "isPrimary": false
     }
    ],
@@ -1129,13 +1155,31 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785586590/freedomcosmeticshop/products/c3vzmzplrw2g0u2jxumw.jpg",
-     "publicId": "freedomcosmeticshop/products/c3vzmzplrw2g0u2jxumw",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785581453/freedomcosmeticshop/products/ovfigvrreven6qehcoot.jpg",
+     "publicId": "freedomcosmeticshop/products/ovfigvrreven6qehcoot",
      "altText": "Bath & Baby Week Beauty Summery Body Mist",
      "altTextRw": "Bath & Baby Week Beauty Summery Body Mist",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785581436/freedomcosmeticshop/products/vfwy0ovduwgqdfyopgli.jpg",
+     "publicId": "freedomcosmeticshop/products/vfwy0ovduwgqdfyopgli",
+     "altText": "Bath & Baby Week Beauty Summery Body Mist",
+     "altTextRw": "Bath & Baby Week Beauty Summery Body Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785579026/freedomcosmeticshop/products/fz3bna7aebbaiklumwod.jpg",
+     "publicId": "freedomcosmeticshop/products/fz3bna7aebbaiklumwod",
+     "altText": "Bath & Baby Week Beauty Summery Body Mist",
+     "altTextRw": "Bath & Baby Week Beauty Summery Body Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -1207,8 +1251,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785585706/freedomcosmeticshop/products/dyhwjtotfwvddfh5cjen.jpg",
-     "publicId": "freedomcosmeticshop/products/dyhwjtotfwvddfh5cjen",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785578104/freedomcosmeticshop/products/fyart8pdmz4dv92qxjbs.jpg",
+     "publicId": "freedomcosmeticshop/products/fyart8pdmz4dv92qxjbs",
      "altText": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
      "altTextRw": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
      "imageType": "PRODUCT",
@@ -1216,8 +1260,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785585645/freedomcosmeticshop/products/gwvjwzrueh9rrgquyquz.jpg",
-     "publicId": "freedomcosmeticshop/products/gwvjwzrueh9rrgquyquz",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785578994/freedomcosmeticshop/products/l1l9grlmi4vk3h0oei89.jpg",
+     "publicId": "freedomcosmeticshop/products/l1l9grlmi4vk3h0oei89",
      "altText": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
      "altTextRw": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
      "imageType": "PRODUCT",
@@ -1225,8 +1269,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785585536/freedomcosmeticshop/products/revb3hepcks7nhkhvrsj.jpg",
-     "publicId": "freedomcosmeticshop/products/revb3hepcks7nhkhvrsj",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785578852/freedomcosmeticshop/products/fwmqcutpk7h02p3ngzv4.jpg",
+     "publicId": "freedomcosmeticshop/products/fwmqcutpk7h02p3ngzv4",
      "altText": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
      "altTextRw": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
      "imageType": "PRODUCT",
@@ -1305,8 +1349,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786452927/freedomcosmeticshop/products/t8ol2s2lqpdyyuot1d3z.jpg",
-     "publicId": "freedomcosmeticshop/products/t8ol2s2lqpdyyuot1d3z",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785260898/freedomcosmeticshop/products/ishxav7pcgojefj2szff.jpg",
+     "publicId": "freedomcosmeticshop/products/ishxav7pcgojefj2szff",
      "altText": "Bismid Skin Glowing Bath with Carrot Oil",
      "altTextRw": "Bismid Isabune yo Kwiyuhagira Irimo Amavuta ya Karoti",
      "imageType": "PRODUCT",
@@ -1314,8 +1358,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786452916/freedomcosmeticshop/products/jhma72feyc1a3oqiilvw.jpg",
-     "publicId": "freedomcosmeticshop/products/jhma72feyc1a3oqiilvw",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785260887/freedomcosmeticshop/products/cpspgdykyto0j2epnzpm.jpg",
+     "publicId": "freedomcosmeticshop/products/cpspgdykyto0j2epnzpm",
      "altText": "Bismid Skin Glowing Bath with Carrot Oil",
      "altTextRw": "Bismid Isabune yo Kwiyuhagira Irimo Amavuta ya Karoti",
      "imageType": "PRODUCT",
@@ -1323,8 +1367,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786452236/freedomcosmeticshop/products/x1o3lprjy91zhjnjyj8i.jpg",
-     "publicId": "freedomcosmeticshop/products/x1o3lprjy91zhjnjyj8i",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785260874/freedomcosmeticshop/products/axnzaxqj6kqdxmgwcxhr.jpg",
+     "publicId": "freedomcosmeticshop/products/axnzaxqj6kqdxmgwcxhr",
      "altText": "Bismid Skin Glowing Bath with Carrot Oil",
      "altTextRw": "Bismid Isabune yo Kwiyuhagira Irimo Amavuta ya Karoti",
      "imageType": "PRODUCT",
@@ -1332,8 +1376,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786451890/freedomcosmeticshop/products/mmwc8xuxmxtvc5qsstuq.jpg",
-     "publicId": "freedomcosmeticshop/products/mmwc8xuxmxtvc5qsstuq",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785259903/freedomcosmeticshop/products/f5dulshqhxjeardwlkdf.jpg",
+     "publicId": "freedomcosmeticshop/products/f5dulshqhxjeardwlkdf",
      "altText": "Bismid Skin Glowing Bath with Carrot Oil",
      "altTextRw": "Bismid Isabune yo Kwiyuhagira Irimo Amavuta ya Karoti",
      "imageType": "PRODUCT",
@@ -1413,22 +1457,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785524412/freedomcosmeticshop/products/hjegznygrggvblcqnezg.jpg",
-     "publicId": "freedomcosmeticshop/products/hjegznygrggvblcqnezg",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785599011/freedomcosmeticshop/products/t0gyf8kxgfh2ufp1wjxu.jpg",
+     "publicId": "freedomcosmeticshop/products/t0gyf8kxgfh2ufp1wjxu",
      "altText": "BLEU DE PARFUM Paris 50ml Eau de Parfum Set",
      "altTextRw": "BLEU DE PARFUM Paris 50ml Eau de Parfum Set",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785509778/freedomcosmeticshop/products/fzfbupsa7odnxkboyzwb.jpg",
-     "publicId": "freedomcosmeticshop/products/fzfbupsa7odnxkboyzwb",
-     "altText": "BLEU DE PARFUM Paris 50ml Eau de Parfum Set",
-     "altTextRw": "BLEU DE PARFUM Paris 50ml Eau de Parfum Set",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -1501,17 +1536,17 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785275785/freedomcosmeticshop/products/vm4nax7zrwv5r5xifku2.jpg",
-     "publicId": "freedomcosmeticshop/products/vm4nax7zrwv5r5xifku2",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786452927/freedomcosmeticshop/products/t8ol2s2lqpdyyuot1d3z.jpg",
+     "publicId": "freedomcosmeticshop/products/t8ol2s2lqpdyyuot1d3z",
      "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
      "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
      "imageType": "PRODUCT",
      "sortOrder": 0,
-     "isPrimary": true
+     "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785275765/freedomcosmeticshop/products/jljcs8zjugls8u69vxos.jpg",
-     "publicId": "freedomcosmeticshop/products/jljcs8zjugls8u69vxos",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786606710/freedomcosmeticshop/products/cqc3sv1r65bqbfrbhdn2.jpg",
+     "publicId": "freedomcosmeticshop/products/cqc3sv1r65bqbfrbhdn2",
      "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
      "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
      "imageType": "PRODUCT",
@@ -1519,8 +1554,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785274829/freedomcosmeticshop/products/suwrhetbtlzrxyxzztus.jpg",
-     "publicId": "freedomcosmeticshop/products/suwrhetbtlzrxyxzztus",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786452939/freedomcosmeticshop/products/slba4m6ilqkwi1aosavl.jpg",
+     "publicId": "freedomcosmeticshop/products/slba4m6ilqkwi1aosavl",
      "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
      "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
      "imageType": "PRODUCT",
@@ -1528,12 +1563,48 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785274679/freedomcosmeticshop/products/cgolni8giz5m3djpt0qt.jpg",
-     "publicId": "freedomcosmeticshop/products/cgolni8giz5m3djpt0qt",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786609149/freedomcosmeticshop/products/vgfdpakakcfrxwwlfxmt.jpg",
+     "publicId": "freedomcosmeticshop/products/vgfdpakakcfrxwwlfxmt",
      "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
      "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
      "imageType": "PRODUCT",
      "sortOrder": 3,
+     "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786609118/freedomcosmeticshop/products/imrl6bq1pg9yirzpi7za.jpg",
+     "publicId": "freedomcosmeticshop/products/imrl6bq1pg9yirzpi7za",
+     "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
+     "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
+     "imageType": "PRODUCT",
+     "sortOrder": 4,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786606794/freedomcosmeticshop/products/pyltdl4fmy1cbkxvnjhb.jpg",
+     "publicId": "freedomcosmeticshop/products/pyltdl4fmy1cbkxvnjhb",
+     "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
+     "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
+     "imageType": "PRODUCT",
+     "sortOrder": 5,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786606689/freedomcosmeticshop/products/kvriposqxadzrs5d3yfj.jpg",
+     "publicId": "freedomcosmeticshop/products/kvriposqxadzrs5d3yfj",
+     "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
+     "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
+     "imageType": "PRODUCT",
+     "sortOrder": 6,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786609380/freedomcosmeticshop/products/zspugcku7i1xmiot1etn.jpg",
+     "publicId": "freedomcosmeticshop/products/zspugcku7i1xmiot1etn",
+     "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
+     "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
+     "imageType": "PRODUCT",
+     "sortOrder": 7,
      "isPrimary": false
     },
     {
@@ -1542,7 +1613,7 @@
      "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
      "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
      "imageType": "PRODUCT",
-     "sortOrder": 4,
+     "sortOrder": 8,
      "isPrimary": false
     },
     {
@@ -1551,7 +1622,7 @@
      "altText": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
      "altTextRw": "Bouchou Soft Soap Yoroheje yo Gutunganya no Gutuza Uruhu rw'Abana n'Umuryango",
      "imageType": "PRODUCT",
-     "sortOrder": 5,
+     "sortOrder": 9,
      "isPrimary": false
     }
    ],
@@ -1688,8 +1759,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785752095/freedomcosmeticshop/products/ylzv8vli0cr1vetohest.jpg",
-     "publicId": "freedomcosmeticshop/products/ylzv8vli0cr1vetohest",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785344294/freedomcosmeticshop/products/rb86tdqypx3ft3j4fn7v.jpg",
+     "publicId": "freedomcosmeticshop/products/rb86tdqypx3ft3j4fn7v",
      "altText": "Boudchou Baby Petroleum Jelly / Crème Onctueuse Protectrice",
      "altTextRw": "Boudchou Baby Petroleum Jelly / Cream Irinda Uruhu rw'Umwana",
      "imageType": "PRODUCT",
@@ -1697,12 +1768,30 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785751884/freedomcosmeticshop/products/p0pzudq0ndt6qvqw9rys.jpg",
-     "publicId": "freedomcosmeticshop/products/p0pzudq0ndt6qvqw9rys",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785344281/freedomcosmeticshop/products/frqiufbvl68otvywdidc.jpg",
+     "publicId": "freedomcosmeticshop/products/frqiufbvl68otvywdidc",
      "altText": "Boudchou Baby Petroleum Jelly / Crème Onctueuse Protectrice",
      "altTextRw": "Boudchou Baby Petroleum Jelly / Cream Irinda Uruhu rw'Umwana",
      "imageType": "PRODUCT",
      "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785342959/freedomcosmeticshop/products/mefwlzqxjozxc6lxwmtp.jpg",
+     "publicId": "freedomcosmeticshop/products/mefwlzqxjozxc6lxwmtp",
+     "altText": "Boudchou Baby Petroleum Jelly / Crème Onctueuse Protectrice",
+     "altTextRw": "Boudchou Baby Petroleum Jelly / Cream Irinda Uruhu rw'Umwana",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785342947/freedomcosmeticshop/products/kalyf8o7k7clypuvqso5.jpg",
+     "publicId": "freedomcosmeticshop/products/kalyf8o7k7clypuvqso5",
+     "altText": "Boudchou Baby Petroleum Jelly / Crème Onctueuse Protectrice",
+     "altTextRw": "Boudchou Baby Petroleum Jelly / Cream Irinda Uruhu rw'Umwana",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -1776,12 +1865,48 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785946637/freedomcosmeticshop/products/mwkzptbaktbvonnehds4.jpg",
-     "publicId": "freedomcosmeticshop/products/mwkzptbaktbvonnehds4",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785318266/freedomcosmeticshop/products/faywvpwll78gwxifrgm6.jpg",
+     "publicId": "freedomcosmeticshop/products/faywvpwll78gwxifrgm6",
      "altText": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
      "altTextRw": "Cantu Shea Butter Coconut Curling Cream y'Imisatsi Kamere",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785318301/freedomcosmeticshop/products/uab3ykszkn9uu8u3tmub.jpg",
+     "publicId": "freedomcosmeticshop/products/uab3ykszkn9uu8u3tmub",
+     "altText": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
+     "altTextRw": "Cantu Shea Butter Coconut Curling Cream y'Imisatsi Kamere",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785318280/freedomcosmeticshop/products/bh7qt5gxkgf6px0esibx.jpg",
+     "publicId": "freedomcosmeticshop/products/bh7qt5gxkgf6px0esibx",
+     "altText": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
+     "altTextRw": "Cantu Shea Butter Coconut Curling Cream y'Imisatsi Kamere",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785317410/freedomcosmeticshop/products/nyeuf9p3b20i2enengvy.jpg",
+     "publicId": "freedomcosmeticshop/products/nyeuf9p3b20i2enengvy",
+     "altText": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
+     "altTextRw": "Cantu Shea Butter Coconut Curling Cream y'Imisatsi Kamere",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785317393/freedomcosmeticshop/products/gdlfiey5cbj9jwu1lmkt.jpg",
+     "publicId": "freedomcosmeticshop/products/gdlfiey5cbj9jwu1lmkt",
+     "altText": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
+     "altTextRw": "Cantu Shea Butter Coconut Curling Cream y'Imisatsi Kamere",
+     "imageType": "PRODUCT",
+     "sortOrder": 4,
      "isPrimary": true
     },
     {
@@ -1790,7 +1915,7 @@
      "altText": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
      "altTextRw": "Cantu Shea Butter Coconut Curling Cream y'Imisatsi Kamere",
      "imageType": "PRODUCT",
-     "sortOrder": 1,
+     "sortOrder": 5,
      "isPrimary": false
     }
    ],
@@ -1864,8 +1989,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785257384/freedomcosmeticshop/products/juyah8hwgekq9za7r8ev.jpg",
-     "publicId": "freedomcosmeticshop/products/juyah8hwgekq9za7r8ev",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785948571/freedomcosmeticshop/products/mbol7eywlmb1fh6q9esl.jpg",
+     "publicId": "freedomcosmeticshop/products/mbol7eywlmb1fh6q9esl",
      "altText": "Carambola Black Spots Herbal Soap with Honey",
      "altTextRw": "Carambola Isabune y'Ibimera Irimo Ubuki yo Kwita ku Utubara Twijimye",
      "imageType": "PRODUCT",
@@ -1873,12 +1998,39 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785257375/freedomcosmeticshop/products/gvxgtgbl5gk2v7zqfjua.jpg",
-     "publicId": "freedomcosmeticshop/products/gvxgtgbl5gk2v7zqfjua",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785950599/freedomcosmeticshop/products/oavr51tzhxyl8gu0junq.jpg",
+     "publicId": "freedomcosmeticshop/products/oavr51tzhxyl8gu0junq",
      "altText": "Carambola Black Spots Herbal Soap with Honey",
      "altTextRw": "Carambola Isabune y'Ibimera Irimo Ubuki yo Kwita ku Utubara Twijimye",
      "imageType": "PRODUCT",
      "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785949523/freedomcosmeticshop/products/szfcltk9t0ujkfztqi3y.jpg",
+     "publicId": "freedomcosmeticshop/products/szfcltk9t0ujkfztqi3y",
+     "altText": "Carambola Black Spots Herbal Soap with Honey",
+     "altTextRw": "Carambola Isabune y'Ibimera Irimo Ubuki yo Kwita ku Utubara Twijimye",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785949513/freedomcosmeticshop/products/xu3lwg3bftzrquihmd4p.jpg",
+     "publicId": "freedomcosmeticshop/products/xu3lwg3bftzrquihmd4p",
+     "altText": "Carambola Black Spots Herbal Soap with Honey",
+     "altTextRw": "Carambola Isabune y'Ibimera Irimo Ubuki yo Kwita ku Utubara Twijimye",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785949338/freedomcosmeticshop/products/doktrqfsz049rjyorolh.jpg",
+     "publicId": "freedomcosmeticshop/products/doktrqfsz049rjyorolh",
+     "altText": "Carambola Black Spots Herbal Soap with Honey",
+     "altTextRw": "Carambola Isabune y'Ibimera Irimo Ubuki yo Kwita ku Utubara Twijimye",
+     "imageType": "PRODUCT",
+     "sortOrder": 4,
      "isPrimary": false
     }
    ],
@@ -1952,8 +2104,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785599011/freedomcosmeticshop/products/t0gyf8kxgfh2ufp1wjxu.jpg",
-     "publicId": "freedomcosmeticshop/products/t0gyf8kxgfh2ufp1wjxu",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785595765/freedomcosmeticshop/products/rbsmzd272lkxm5xphqem.jpg",
+     "publicId": "freedomcosmeticshop/products/rbsmzd272lkxm5xphqem",
      "altText": "Change De Canal Fragrance Mist (Brume Parfumée)",
      "altTextRw": "Change De Canal Fragrance Mist",
      "imageType": "PRODUCT",
@@ -1961,8 +2113,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785598862/freedomcosmeticshop/products/wvc3fmkb8tjsukbstn4s.jpg",
-     "publicId": "freedomcosmeticshop/products/wvc3fmkb8tjsukbstn4s",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785595633/freedomcosmeticshop/products/fdolvtiiznqsqem64l5t.jpg",
+     "publicId": "freedomcosmeticshop/products/fdolvtiiznqsqem64l5t",
      "altText": "Change De Canal Fragrance Mist (Brume Parfumée)",
      "altTextRw": "Change De Canal Fragrance Mist",
      "imageType": "PRODUCT",
@@ -1970,8 +2122,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785598695/freedomcosmeticshop/products/l9svacgfc1rzggjzplkc.jpg",
-     "publicId": "freedomcosmeticshop/products/l9svacgfc1rzggjzplkc",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785595563/freedomcosmeticshop/products/baccv2dpi9voa3fnwsmz.jpg",
+     "publicId": "freedomcosmeticshop/products/baccv2dpi9voa3fnwsmz",
      "altText": "Change De Canal Fragrance Mist (Brume Parfumée)",
      "altTextRw": "Change De Canal Fragrance Mist",
      "imageType": "PRODUCT",
@@ -2050,8 +2202,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785578104/freedomcosmeticshop/products/fyart8pdmz4dv92qxjbs.jpg",
-     "publicId": "freedomcosmeticshop/products/fyart8pdmz4dv92qxjbs",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785526939/freedomcosmeticshop/products/vwj4mnnahfjk8pm9hsxk.jpg",
+     "publicId": "freedomcosmeticshop/products/vwj4mnnahfjk8pm9hsxk",
      "altText": "Coconut Fantasy Fine Fragrance Mist",
      "altTextRw": "Coconut Fantasy Fine Fragrance Mist",
      "imageType": "PRODUCT",
@@ -2059,30 +2211,12 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785577941/freedomcosmeticshop/products/cpsncht2ygt2w5dvln6j.jpg",
-     "publicId": "freedomcosmeticshop/products/cpsncht2ygt2w5dvln6j",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785571993/freedomcosmeticshop/products/vfxlcelzagrnmi9w46mu.jpg",
+     "publicId": "freedomcosmeticshop/products/vfxlcelzagrnmi9w46mu",
      "altText": "Coconut Fantasy Fine Fragrance Mist",
      "altTextRw": "Coconut Fantasy Fine Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785577847/freedomcosmeticshop/products/vrmf8krsie9ppmvvlsnq.jpg",
-     "publicId": "freedomcosmeticshop/products/vrmf8krsie9ppmvvlsnq",
-     "altText": "Coconut Fantasy Fine Fragrance Mist",
-     "altTextRw": "Coconut Fantasy Fine Fragrance Mist",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785577732/freedomcosmeticshop/products/fu0ecup6fsdfnnt5csbf.jpg",
-     "publicId": "freedomcosmeticshop/products/fu0ecup6fsdfnnt5csbf",
-     "altText": "Coconut Fantasy Fine Fragrance Mist",
-     "altTextRw": "Coconut Fantasy Fine Fragrance Mist",
-     "imageType": "PRODUCT",
-     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -2158,39 +2292,21 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785763854/freedomcosmeticshop/products/zloae5pmydk4t1x5dirw.jpg",
-     "publicId": "freedomcosmeticshop/products/zloae5pmydk4t1x5dirw",
-     "altText": "Dabur Herbolene Aloe Jelly",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785348999/freedomcosmeticshop/products/rmeoc1owo0waw4mhu1hp.jpg",
+     "publicId": "freedomcosmeticshop/products/rmeoc1owo0waw4mhu1hp",
+     "altText": "Dabur Herbolene Aloe Jelly 225ml",
      "altTextRw": "Dabur Herbolene Aloe Jelly 225ml",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785763714/freedomcosmeticshop/products/hwecpb742wlsm9lmzihk.jpg",
-     "publicId": "freedomcosmeticshop/products/hwecpb742wlsm9lmzihk",
-     "altText": "Dabur Herbolene Aloe Jelly",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785348981/freedomcosmeticshop/products/rhdyp2cjl3cp7ptmc0ru.jpg",
+     "publicId": "freedomcosmeticshop/products/rhdyp2cjl3cp7ptmc0ru",
+     "altText": "Dabur Herbolene Aloe Jelly 225ml",
      "altTextRw": "Dabur Herbolene Aloe Jelly 225ml",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785758505/freedomcosmeticshop/products/usuxyldvp2efl1rcdscy.jpg",
-     "publicId": "freedomcosmeticshop/products/usuxyldvp2efl1rcdscy",
-     "altText": "Dabur Herbolene Aloe Jelly",
-     "altTextRw": "Dabur Herbolene Aloe Jelly 225ml",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785758283/freedomcosmeticshop/products/wrewu5rm7df49byaiiue.jpg",
-     "publicId": "freedomcosmeticshop/products/wrewu5rm7df49byaiiue",
-     "altText": "Dabur Herbolene Aloe Jelly",
-     "altTextRw": "Dabur Herbolene Aloe Jelly 225ml",
-     "imageType": "PRODUCT",
-     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -2261,39 +2377,21 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785763854/freedomcosmeticshop/products/zloae5pmydk4t1x5dirw.jpg",
-     "publicId": "freedomcosmeticshop/products/zloae5pmydk4t1x5dirw",
-     "altText": "Dabur Herbolene Aloe Jelly",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785348999/freedomcosmeticshop/products/rmeoc1owo0waw4mhu1hp.jpg",
+     "publicId": "freedomcosmeticshop/products/rmeoc1owo0waw4mhu1hp",
+     "altText": "Dabur Herbolene Aloe Jelly 425ml",
      "altTextRw": "Dabur Herbolene Aloe Jelly 425ml",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785758505/freedomcosmeticshop/products/usuxyldvp2efl1rcdscy.jpg",
-     "publicId": "freedomcosmeticshop/products/usuxyldvp2efl1rcdscy",
-     "altText": "Dabur Herbolene Aloe Jelly",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785348981/freedomcosmeticshop/products/rhdyp2cjl3cp7ptmc0ru.jpg",
+     "publicId": "freedomcosmeticshop/products/rhdyp2cjl3cp7ptmc0ru",
+     "altText": "Dabur Herbolene Aloe Jelly 425ml",
      "altTextRw": "Dabur Herbolene Aloe Jelly 425ml",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785758283/freedomcosmeticshop/products/wrewu5rm7df49byaiiue.jpg",
-     "publicId": "freedomcosmeticshop/products/wrewu5rm7df49byaiiue",
-     "altText": "Dabur Herbolene Aloe Jelly",
-     "altTextRw": "Dabur Herbolene Aloe Jelly 425ml",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785763714/freedomcosmeticshop/products/hwecpb742wlsm9lmzihk.jpg",
-     "publicId": "freedomcosmeticshop/products/hwecpb742wlsm9lmzihk",
-     "altText": "Dabur Herbolene Aloe Jelly",
-     "altTextRw": "Dabur Herbolene Aloe Jelly 425ml",
-     "imageType": "PRODUCT",
-     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -2368,8 +2466,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785344294/freedomcosmeticshop/products/rb86tdqypx3ft3j4fn7v.jpg",
-     "publicId": "freedomcosmeticshop/products/rb86tdqypx3ft3j4fn7v",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785930038/freedomcosmeticshop/products/h3xwsizcaytznciqsdyo.jpg",
+     "publicId": "freedomcosmeticshop/products/h3xwsizcaytznciqsdyo",
      "altText": "Dalan Citron Frais Classic Multipurpose Soap",
      "altTextRw": "Dalan Citron Frais Classic Isabune ya Lemon Ikoreshwa Ahantu Hatandukanye",
      "imageType": "PRODUCT",
@@ -2377,12 +2475,21 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785344281/freedomcosmeticshop/products/frqiufbvl68otvywdidc.jpg",
-     "publicId": "freedomcosmeticshop/products/frqiufbvl68otvywdidc",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785929844/freedomcosmeticshop/products/uwvt63jtcwsabt2bcbs6.jpg",
+     "publicId": "freedomcosmeticshop/products/uwvt63jtcwsabt2bcbs6",
      "altText": "Dalan Citron Frais Classic Multipurpose Soap",
      "altTextRw": "Dalan Citron Frais Classic Isabune ya Lemon Ikoreshwa Ahantu Hatandukanye",
      "imageType": "PRODUCT",
      "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785930066/freedomcosmeticshop/products/zp4zqoagt0d7yqhl2cbc.jpg",
+     "publicId": "freedomcosmeticshop/products/zp4zqoagt0d7yqhl2cbc",
+     "altText": "Dalan Citron Frais Classic Multipurpose Soap",
+     "altTextRw": "Dalan Citron Frais Classic Isabune ya Lemon Ikoreshwa Ahantu Hatandukanye",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -2540,25 +2647,16 @@
      "altTextRw": "Dalan Isabune ya Glycerin irimo Amavuta ya Olive Organic",
      "imageType": "PRODUCT",
      "sortOrder": 0,
-     "isPrimary": true
+     "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785336294/freedomcosmeticshop/products/fv46tgfsddlcpytbnjos.jpg",
-     "publicId": "freedomcosmeticshop/products/fv46tgfsddlcpytbnjos",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785777737/freedomcosmeticshop/products/jmlmcphaei4ddsld4qyj.jpg",
+     "publicId": "freedomcosmeticshop/products/jmlmcphaei4ddsld4qyj",
      "altText": "Dalan Glycerin Soap Organic Olive Oil",
      "altTextRw": "Dalan Isabune ya Glycerin irimo Amavuta ya Olive Organic",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785336272/freedomcosmeticshop/products/ibcwqdew2rpxdoc7wxwc.jpg",
-     "publicId": "freedomcosmeticshop/products/ibcwqdew2rpxdoc7wxwc",
-     "altText": "Dalan Glycerin Soap Organic Olive Oil",
-     "altTextRw": "Dalan Isabune ya Glycerin irimo Amavuta ya Olive Organic",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
+     "isPrimary": true
     }
    ],
    "categorySlug": "soap",
@@ -2632,8 +2730,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785260898/freedomcosmeticshop/products/ishxav7pcgojefj2szff.jpg",
-     "publicId": "freedomcosmeticshop/products/ishxav7pcgojefj2szff",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785951185/freedomcosmeticshop/products/kh2hsv66usjl7poxqx2n.jpg",
+     "publicId": "freedomcosmeticshop/products/kh2hsv66usjl7poxqx2n",
      "altText": "Dalan Glycerin Soap with Organic Argan Oil",
      "altTextRw": "Dalan Isabune ya Glycerin irimo Amavuta ya Argan Organic",
      "imageType": "PRODUCT",
@@ -2641,8 +2739,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785260887/freedomcosmeticshop/products/cpspgdykyto0j2epnzpm.jpg",
-     "publicId": "freedomcosmeticshop/products/cpspgdykyto0j2epnzpm",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785951173/freedomcosmeticshop/products/k7ngjkh6ojqs5mvaxhqe.jpg",
+     "publicId": "freedomcosmeticshop/products/k7ngjkh6ojqs5mvaxhqe",
      "altText": "Dalan Glycerin Soap with Organic Argan Oil",
      "altTextRw": "Dalan Isabune ya Glycerin irimo Amavuta ya Argan Organic",
      "imageType": "PRODUCT",
@@ -2650,8 +2748,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785260874/freedomcosmeticshop/products/axnzaxqj6kqdxmgwcxhr.jpg",
-     "publicId": "freedomcosmeticshop/products/axnzaxqj6kqdxmgwcxhr",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785951103/freedomcosmeticshop/products/l1sqi0hmfft54whvgtnn.jpg",
+     "publicId": "freedomcosmeticshop/products/l1sqi0hmfft54whvgtnn",
      "altText": "Dalan Glycerin Soap with Organic Argan Oil",
      "altTextRw": "Dalan Isabune ya Glycerin irimo Amavuta ya Argan Organic",
      "imageType": "PRODUCT",
@@ -2659,8 +2757,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785259903/freedomcosmeticshop/products/f5dulshqhxjeardwlkdf.jpg",
-     "publicId": "freedomcosmeticshop/products/f5dulshqhxjeardwlkdf",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785950924/freedomcosmeticshop/products/tdemuctfbq3ibajegvj6.jpg",
+     "publicId": "freedomcosmeticshop/products/tdemuctfbq3ibajegvj6",
      "altText": "Dalan Glycerin Soap with Organic Argan Oil",
      "altTextRw": "Dalan Isabune ya Glycerin irimo Amavuta ya Argan Organic",
      "imageType": "PRODUCT",
@@ -2668,8 +2766,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785259849/freedomcosmeticshop/products/hsepjn9aooe4cizsyi3v.jpg",
-     "publicId": "freedomcosmeticshop/products/hsepjn9aooe4cizsyi3v",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785950912/freedomcosmeticshop/products/e5upxa9xu82hwk7xmhvy.jpg",
+     "publicId": "freedomcosmeticshop/products/e5upxa9xu82hwk7xmhvy",
      "altText": "Dalan Glycerin Soap with Organic Argan Oil",
      "altTextRw": "Dalan Isabune ya Glycerin irimo Amavuta ya Argan Organic",
      "imageType": "PRODUCT",
@@ -2677,8 +2775,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785259823/freedomcosmeticshop/products/fvvpjrbsugd7c7ypknav.jpg",
-     "publicId": "freedomcosmeticshop/products/fvvpjrbsugd7c7ypknav",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785950874/freedomcosmeticshop/products/ljf4fi2bzfonfnslqdbv.jpg",
+     "publicId": "freedomcosmeticshop/products/ljf4fi2bzfonfnslqdbv",
      "altText": "Dalan Glycerin Soap with Organic Argan Oil",
      "altTextRw": "Dalan Isabune ya Glycerin irimo Amavuta ya Argan Organic",
      "imageType": "PRODUCT",
@@ -2760,8 +2858,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785930066/freedomcosmeticshop/products/zp4zqoagt0d7yqhl2cbc.jpg",
-     "publicId": "freedomcosmeticshop/products/zp4zqoagt0d7yqhl2cbc",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785274829/freedomcosmeticshop/products/suwrhetbtlzrxyxzztus.jpg",
+     "publicId": "freedomcosmeticshop/products/suwrhetbtlzrxyxzztus",
      "altText": "DAX Pomade Now With Lanolin",
      "altTextRw": "DAX Pomade irimo Lanolin",
      "imageType": "PRODUCT",
@@ -2769,21 +2867,12 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785930038/freedomcosmeticshop/products/h3xwsizcaytznciqsdyo.jpg",
-     "publicId": "freedomcosmeticshop/products/h3xwsizcaytznciqsdyo",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785274950/freedomcosmeticshop/products/kho900vlnmny9kx2f30h.jpg",
+     "publicId": "freedomcosmeticshop/products/kho900vlnmny9kx2f30h",
      "altText": "DAX Pomade Now With Lanolin",
      "altTextRw": "DAX Pomade irimo Lanolin",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785929844/freedomcosmeticshop/products/uwvt63jtcwsabt2bcbs6.jpg",
-     "publicId": "freedomcosmeticshop/products/uwvt63jtcwsabt2bcbs6",
-     "altText": "DAX Pomade Now With Lanolin",
-     "altTextRw": "DAX Pomade irimo Lanolin",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -2858,8 +2947,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785579026/freedomcosmeticshop/products/fz3bna7aebbaiklumwod.jpg",
-     "publicId": "freedomcosmeticshop/products/fz3bna7aebbaiklumwod",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785572005/freedomcosmeticshop/products/rdrdaalgmv1dcthpeoqn.jpg",
+     "publicId": "freedomcosmeticshop/products/rdrdaalgmv1dcthpeoqn",
      "altText": "Dear Body Autumn Cicada Fine Fragrance Mist",
      "altTextRw": "Dear Body Autumn Cicada Fine Fragrance Mist",
      "imageType": "PRODUCT",
@@ -2867,21 +2956,12 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785578994/freedomcosmeticshop/products/l1l9grlmi4vk3h0oei89.jpg",
-     "publicId": "freedomcosmeticshop/products/l1l9grlmi4vk3h0oei89",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785574931/freedomcosmeticshop/products/iwwnabehqimy9qae5qqf.jpg",
+     "publicId": "freedomcosmeticshop/products/iwwnabehqimy9qae5qqf",
      "altText": "Dear Body Autumn Cicada Fine Fragrance Mist",
      "altTextRw": "Dear Body Autumn Cicada Fine Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785578852/freedomcosmeticshop/products/fwmqcutpk7h02p3ngzv4.jpg",
-     "publicId": "freedomcosmeticshop/products/fwmqcutpk7h02p3ngzv4",
-     "altText": "Dear Body Autumn Cicada Fine Fragrance Mist",
-     "altTextRw": "Dear Body Autumn Cicada Fine Fragrance Mist",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -2956,13 +3036,22 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785574931/freedomcosmeticshop/products/iwwnabehqimy9qae5qqf.jpg",
-     "publicId": "freedomcosmeticshop/products/iwwnabehqimy9qae5qqf",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785506299/freedomcosmeticshop/products/qdngvdg5pelyz27l7cva.jpg",
+     "publicId": "freedomcosmeticshop/products/qdngvdg5pelyz27l7cva",
      "altText": "Dear Body Be Myself Fine Fragrance Mist",
      "altTextRw": "Dear Body Be Myself Fine Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785506086/freedomcosmeticshop/products/mahx3p4ivh2qqg1708uc.jpg",
+     "publicId": "freedomcosmeticshop/products/mahx3p4ivh2qqg1708uc",
+     "altText": "Dear Body Be Myself Fine Fragrance Mist",
+     "altTextRw": "Dear Body Be Myself Fine Fragrance Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -3034,13 +3123,22 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785576115/freedomcosmeticshop/products/m0jlqidgvgvrqfkygr5o.jpg",
-     "publicId": "freedomcosmeticshop/products/m0jlqidgvgvrqfkygr5o",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785508368/freedomcosmeticshop/products/kewpcx1yrujv19tvxjgv.jpg",
+     "publicId": "freedomcosmeticshop/products/kewpcx1yrujv19tvxjgv",
      "altText": "Dear Body Border Girl Fine Fragrance Mist",
      "altTextRw": "Dear Body Border Girl Fine Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785508337/freedomcosmeticshop/products/oji0e5jbresppyzaxb9a.jpg",
+     "publicId": "freedomcosmeticshop/products/oji0e5jbresppyzaxb9a",
+     "altText": "Dear Body Border Girl Fine Fragrance Mist",
+     "altTextRw": "Dear Body Border Girl Fine Fragrance Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -3112,8 +3210,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785576780/freedomcosmeticshop/products/uqquhadpfokkzajiabfu.jpg",
-     "publicId": "freedomcosmeticshop/products/uqquhadpfokkzajiabfu",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785525101/freedomcosmeticshop/products/swremuw2eeql3hqjisrl.jpg",
+     "publicId": "freedomcosmeticshop/products/swremuw2eeql3hqjisrl",
      "altText": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
      "altTextRw": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
      "imageType": "PRODUCT",
@@ -3121,8 +3219,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785576764/freedomcosmeticshop/products/p4b07nmrtwvotes9569b.jpg",
-     "publicId": "freedomcosmeticshop/products/p4b07nmrtwvotes9569b",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785524412/freedomcosmeticshop/products/hjegznygrggvblcqnezg.jpg",
+     "publicId": "freedomcosmeticshop/products/hjegznygrggvblcqnezg",
      "altText": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
      "altTextRw": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
      "imageType": "PRODUCT",
@@ -3130,8 +3228,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785576729/freedomcosmeticshop/products/gnqwpgi21yt7ma3uub4n.jpg",
-     "publicId": "freedomcosmeticshop/products/gnqwpgi21yt7ma3uub4n",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785509778/freedomcosmeticshop/products/fzfbupsa7odnxkboyzwb.jpg",
+     "publicId": "freedomcosmeticshop/products/fzfbupsa7odnxkboyzwb",
      "altText": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
      "altTextRw": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
      "imageType": "PRODUCT",
@@ -3210,22 +3308,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582939/freedomcosmeticshop/products/o8bx5bk69hhzh0b0snev.jpg",
-     "publicId": "freedomcosmeticshop/products/o8bx5bk69hhzh0b0snev",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785577941/freedomcosmeticshop/products/cpsncht2ygt2w5dvln6j.jpg",
+     "publicId": "freedomcosmeticshop/products/cpsncht2ygt2w5dvln6j",
      "altText": "Dear Body NOIR for men Body Mist",
      "altTextRw": "Dear Body NOIR for Men Body Mist",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582922/freedomcosmeticshop/products/b71ez8tgplz58gfuk21f.jpg",
-     "publicId": "freedomcosmeticshop/products/b71ez8tgplz58gfuk21f",
-     "altText": "Dear Body NOIR for men Body Mist",
-     "altTextRw": "Dear Body NOIR for Men Body Mist",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -3304,6 +3393,15 @@
      "altTextRw": "Dear Body Noir Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785577847/freedomcosmeticshop/products/vrmf8krsie9ppmvvlsnq.jpg",
+     "publicId": "freedomcosmeticshop/products/vrmf8krsie9ppmvvlsnq",
+     "altText": "Dear Body Noir Fragrance Mist",
+     "altTextRw": "Dear Body Noir Fragrance Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
      "isPrimary": true
     },
     {
@@ -3312,34 +3410,7 @@
      "altText": "Dear Body Noir Fragrance Mist",
      "altTextRw": "Dear Body Noir Fragrance Mist",
      "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785590725/freedomcosmeticshop/products/p13jaadygdsnrp93zeao.jpg",
-     "publicId": "freedomcosmeticshop/products/p13jaadygdsnrp93zeao",
-     "altText": "Dear Body Noir Fragrance Mist",
-     "altTextRw": "Dear Body Noir Fragrance Mist",
-     "imageType": "PRODUCT",
      "sortOrder": 2,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582895/freedomcosmeticshop/products/bdo67pyy7razvkz2i8tb.jpg",
-     "publicId": "freedomcosmeticshop/products/bdo67pyy7razvkz2i8tb",
-     "altText": "Dear Body Noir Fragrance Mist",
-     "altTextRw": "Dear Body Noir Fragrance Mist",
-     "imageType": "PRODUCT",
-     "sortOrder": 3,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582865/freedomcosmeticshop/products/ex5chlbfmtr3xt5deopu.jpg",
-     "publicId": "freedomcosmeticshop/products/ex5chlbfmtr3xt5deopu",
-     "altText": "Dear Body Noir Fragrance Mist",
-     "altTextRw": "Dear Body Noir Fragrance Mist",
-     "imageType": "PRODUCT",
-     "sortOrder": 4,
      "isPrimary": false
     }
    ],
@@ -3416,8 +3487,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582361/freedomcosmeticshop/products/svfcuz6agnuqc3orkdx1.jpg",
-     "publicId": "freedomcosmeticshop/products/svfcuz6agnuqc3orkdx1",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785576780/freedomcosmeticshop/products/uqquhadpfokkzajiabfu.jpg",
+     "publicId": "freedomcosmeticshop/products/uqquhadpfokkzajiabfu",
      "altText": "Dear Body SCARLET for Men Body Mist",
      "altTextRw": "Dear Body SCARLET for Men Body Mist",
      "imageType": "PRODUCT",
@@ -3425,8 +3496,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582321/freedomcosmeticshop/products/fuauzrwd5ivt3bc3aa4s.jpg",
-     "publicId": "freedomcosmeticshop/products/fuauzrwd5ivt3bc3aa4s",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785576764/freedomcosmeticshop/products/p4b07nmrtwvotes9569b.jpg",
+     "publicId": "freedomcosmeticshop/products/p4b07nmrtwvotes9569b",
      "altText": "Dear Body SCARLET for Men Body Mist",
      "altTextRw": "Dear Body SCARLET for Men Body Mist",
      "imageType": "PRODUCT",
@@ -3434,8 +3505,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582222/freedomcosmeticshop/products/vt7gs7n9plezodws2vx5.jpg",
-     "publicId": "freedomcosmeticshop/products/vt7gs7n9plezodws2vx5",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785576729/freedomcosmeticshop/products/gnqwpgi21yt7ma3uub4n.jpg",
+     "publicId": "freedomcosmeticshop/products/gnqwpgi21yt7ma3uub4n",
      "altText": "Dear Body SCARLET for Men Body Mist",
      "altTextRw": "Dear Body SCARLET for Men Body Mist",
      "imageType": "PRODUCT",
@@ -3443,21 +3514,12 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582071/freedomcosmeticshop/products/gpc8c2qe7nwr7orgoqdf.jpg",
-     "publicId": "freedomcosmeticshop/products/gpc8c2qe7nwr7orgoqdf",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785577732/freedomcosmeticshop/products/fu0ecup6fsdfnnt5csbf.jpg",
+     "publicId": "freedomcosmeticshop/products/fu0ecup6fsdfnnt5csbf",
      "altText": "Dear Body SCARLET for Men Body Mist",
      "altTextRw": "Dear Body SCARLET for Men Body Mist",
      "imageType": "PRODUCT",
      "sortOrder": 3,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582029/freedomcosmeticshop/products/vkrfnikreanbscbmxw5n.jpg",
-     "publicId": "freedomcosmeticshop/products/vkrfnikreanbscbmxw5n",
-     "altText": "Dear Body SCARLET for Men Body Mist",
-     "altTextRw": "Dear Body SCARLET for Men Body Mist",
-     "imageType": "PRODUCT",
-     "sortOrder": 4,
      "isPrimary": false
     }
    ],
@@ -3534,22 +3596,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785581453/freedomcosmeticshop/products/ovfigvrreven6qehcoot.jpg",
-     "publicId": "freedomcosmeticshop/products/ovfigvrreven6qehcoot",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785576115/freedomcosmeticshop/products/m0jlqidgvgvrqfkygr5o.jpg",
+     "publicId": "freedomcosmeticshop/products/m0jlqidgvgvrqfkygr5o",
      "altText": "Dear Body Sweet Vanilla Fine Fragrance Mist",
      "altTextRw": "Dear Body Sweet Vanilla Fine Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785581436/freedomcosmeticshop/products/vfwy0ovduwgqdfyopgli.jpg",
-     "publicId": "freedomcosmeticshop/products/vfwy0ovduwgqdfyopgli",
-     "altText": "Dear Body Sweet Vanilla Fine Fragrance Mist",
-     "altTextRw": "Dear Body Sweet Vanilla Fine Fragrance Mist",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -3622,21 +3675,66 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785323290/freedomcosmeticshop/products/xa805xjk9dderv0y6n3o.jpg",
-     "publicId": "freedomcosmeticshop/products/xa805xjk9dderv0y6n3o",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785773754/freedomcosmeticshop/products/ipsquzptkhbvzfiyl1mq.jpg",
+     "publicId": "freedomcosmeticshop/products/ipsquzptkhbvzfiyl1mq",
      "altText": "Dettol Juniors Glycerine Soap",
      "altTextRw": "Dettol Juniors Glycerine Soap",
      "imageType": "PRODUCT",
      "sortOrder": 0,
-     "isPrimary": true
+     "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785323255/freedomcosmeticshop/products/klowqrnfyzjm9oa6ibw8.jpg",
-     "publicId": "freedomcosmeticshop/products/klowqrnfyzjm9oa6ibw8",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785774100/freedomcosmeticshop/products/zrq1mupfuflbohpgszbb.jpg",
+     "publicId": "freedomcosmeticshop/products/zrq1mupfuflbohpgszbb",
      "altText": "Dettol Juniors Glycerine Soap",
      "altTextRw": "Dettol Juniors Glycerine Soap",
      "imageType": "PRODUCT",
      "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785773915/freedomcosmeticshop/products/yluaimusgvyzoekhlfbv.jpg",
+     "publicId": "freedomcosmeticshop/products/yluaimusgvyzoekhlfbv",
+     "altText": "Dettol Juniors Glycerine Soap",
+     "altTextRw": "Dettol Juniors Glycerine Soap",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785772074/freedomcosmeticshop/products/kfv0a51tij72yjolyknh.jpg",
+     "publicId": "freedomcosmeticshop/products/kfv0a51tij72yjolyknh",
+     "altText": "Dettol Juniors Glycerine Soap",
+     "altTextRw": "Dettol Juniors Glycerine Soap",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
+     "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785771889/freedomcosmeticshop/products/d943esljqieexdiw1coj.jpg",
+     "publicId": "freedomcosmeticshop/products/d943esljqieexdiw1coj",
+     "altText": "Dettol Juniors Glycerine Soap",
+     "altTextRw": "Dettol Juniors Glycerine Soap",
+     "imageType": "PRODUCT",
+     "sortOrder": 4,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785771667/freedomcosmeticshop/products/vxku4numk2rkcj5xkcit.jpg",
+     "publicId": "freedomcosmeticshop/products/vxku4numk2rkcj5xkcit",
+     "altText": "Dettol Juniors Glycerine Soap",
+     "altTextRw": "Dettol Juniors Glycerine Soap",
+     "imageType": "PRODUCT",
+     "sortOrder": 5,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785774111/freedomcosmeticshop/products/rsdralpsie1kch0cpxr0.jpg",
+     "publicId": "freedomcosmeticshop/products/rsdralpsie1kch0cpxr0",
+     "altText": "Dettol Juniors Glycerine Soap",
+     "altTextRw": "Dettol Juniors Glycerine Soap",
+     "imageType": "PRODUCT",
+     "sortOrder": 6,
      "isPrimary": false
     },
     {
@@ -3645,34 +3743,7 @@
      "altText": "Dettol Juniors Glycerine Soap",
      "altTextRw": "Dettol Juniors Glycerine Soap",
      "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785322698/freedomcosmeticshop/products/qupg4n1ozi4g2gu9mln4.jpg",
-     "publicId": "freedomcosmeticshop/products/qupg4n1ozi4g2gu9mln4",
-     "altText": "Dettol Juniors Glycerine Soap",
-     "altTextRw": "Dettol Juniors Glycerine Soap",
-     "imageType": "PRODUCT",
-     "sortOrder": 3,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785322636/freedomcosmeticshop/products/srqkt2gusrk7bb6cquwj.jpg",
-     "publicId": "freedomcosmeticshop/products/srqkt2gusrk7bb6cquwj",
-     "altText": "Dettol Juniors Glycerine Soap",
-     "altTextRw": "Dettol Juniors Glycerine Soap",
-     "imageType": "PRODUCT",
-     "sortOrder": 4,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785322292/freedomcosmeticshop/products/vmyrbt8uzlnliyhati39.jpg",
-     "publicId": "freedomcosmeticshop/products/vmyrbt8uzlnliyhati39",
-     "altText": "Dettol Juniors Glycerine Soap",
-     "altTextRw": "Dettol Juniors Glycerine Soap",
-     "imageType": "PRODUCT",
-     "sortOrder": 5,
+     "sortOrder": 7,
      "isPrimary": false
     },
     {
@@ -3681,7 +3752,7 @@
      "altText": "Dettol Juniors Glycerine Soap",
      "altTextRw": "Dettol Juniors Glycerine Soap",
      "imageType": "PRODUCT",
-     "sortOrder": 6,
+     "sortOrder": 8,
      "isPrimary": false
     }
    ],
@@ -3760,8 +3831,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785318301/freedomcosmeticshop/products/uab3ykszkn9uu8u3tmub.jpg",
-     "publicId": "freedomcosmeticshop/products/uab3ykszkn9uu8u3tmub",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785771248/freedomcosmeticshop/products/ia1tgjskruceumqnhmxl.jpg",
+     "publicId": "freedomcosmeticshop/products/ia1tgjskruceumqnhmxl",
      "altText": "Dettol Original Antibacterial Soap 100g",
      "altTextRw": "Dettol Original Antibacterial Soap 100g",
      "imageType": "PRODUCT",
@@ -3769,8 +3840,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785318280/freedomcosmeticshop/products/bh7qt5gxkgf6px0esibx.jpg",
-     "publicId": "freedomcosmeticshop/products/bh7qt5gxkgf6px0esibx",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785771081/freedomcosmeticshop/products/zhxfnpohte7h0y2szqom.jpg",
+     "publicId": "freedomcosmeticshop/products/zhxfnpohte7h0y2szqom",
      "altText": "Dettol Original Antibacterial Soap 100g",
      "altTextRw": "Dettol Original Antibacterial Soap 100g",
      "imageType": "PRODUCT",
@@ -3778,8 +3849,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785318266/freedomcosmeticshop/products/faywvpwll78gwxifrgm6.jpg",
-     "publicId": "freedomcosmeticshop/products/faywvpwll78gwxifrgm6",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785770928/freedomcosmeticshop/products/fwscxijeldgcwnw6wfco.jpg",
+     "publicId": "freedomcosmeticshop/products/fwscxijeldgcwnw6wfco",
      "altText": "Dettol Original Antibacterial Soap 100g",
      "altTextRw": "Dettol Original Antibacterial Soap 100g",
      "imageType": "PRODUCT",
@@ -3787,30 +3858,12 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785317410/freedomcosmeticshop/products/nyeuf9p3b20i2enengvy.jpg",
-     "publicId": "freedomcosmeticshop/products/nyeuf9p3b20i2enengvy",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785770766/freedomcosmeticshop/products/jnmm4h3kg564pcnkkbt9.jpg",
+     "publicId": "freedomcosmeticshop/products/jnmm4h3kg564pcnkkbt9",
      "altText": "Dettol Original Antibacterial Soap 100g",
      "altTextRw": "Dettol Original Antibacterial Soap 100g",
      "imageType": "PRODUCT",
      "sortOrder": 3,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785317393/freedomcosmeticshop/products/gdlfiey5cbj9jwu1lmkt.jpg",
-     "publicId": "freedomcosmeticshop/products/gdlfiey5cbj9jwu1lmkt",
-     "altText": "Dettol Original Antibacterial Soap 100g",
-     "altTextRw": "Dettol Original Antibacterial Soap 100g",
-     "imageType": "PRODUCT",
-     "sortOrder": 4,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785317377/freedomcosmeticshop/products/pcl72cg2l2iogvqcobn3.jpg",
-     "publicId": "freedomcosmeticshop/products/pcl72cg2l2iogvqcobn3",
-     "altText": "Dettol Original Antibacterial Soap 100g",
-     "altTextRw": "Dettol Original Antibacterial Soap 100g",
-     "imageType": "PRODUCT",
-     "sortOrder": 5,
      "isPrimary": false
     }
    ],
@@ -3888,22 +3941,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1784801868/freedomcosmeticshop/products/mi8iahdcfaewqx9ihzbq.jpg",
-     "publicId": "freedomcosmeticshop/products/mi8iahdcfaewqx9ihzbq",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785948232/freedomcosmeticshop/products/uskfr85sip4etgnvppxy.jpg",
+     "publicId": "freedomcosmeticshop/products/uskfr85sip4etgnvppxy",
      "altText": "Dove Original Beauty Cream Bar 100g",
      "altTextRw": "Dove Original Beauty Cream Bar 100g",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785255622/freedomcosmeticshop/products/beaixnotmdz9os7uwq6r.jpg",
-     "publicId": "freedomcosmeticshop/products/beaixnotmdz9os7uwq6r",
-     "altText": "Dove Original Beauty Cream Bar 100g",
-     "altTextRw": "Dove Original Beauty Cream Bar 100g",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "soap",
@@ -3974,7 +4018,17 @@
     "slug": "whitening"
    },
    "brand": null,
-   "productImages": [],
+   "productImages": [
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785416037/freedomcosmeticshop/products/rewc1luelzne0boapvll.jpg",
+     "publicId": "freedomcosmeticshop/products/rewc1luelzne0boapvll",
+     "altText": "DRODAVEN Whitening Papaya + Milk Body Lotion",
+     "altTextRw": "DRODAVEN Amavuta yo ku mubiri arimo Papaya n’Amata",
+     "imageType": "PRODUCT",
+     "sortOrder": 0,
+     "isPrimary": true
+    }
+   ],
    "categorySlug": "whitening",
    "brandSlug": null,
    "imageUrls": []
@@ -4048,16 +4102,16 @@
      "altTextRw": "Duru Fresh Sensations Isabune y’Ubwiza ya Floral Infusion – Ipaki y’Imisabune 4",
      "imageType": "PRODUCT",
      "sortOrder": 0,
-     "isPrimary": true
+     "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785406717/freedomcosmeticshop/products/axv8wwlt2daoafot22w5.jpg",
-     "publicId": "freedomcosmeticshop/products/axv8wwlt2daoafot22w5",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786446686/freedomcosmeticshop/products/tvyrxbbzeiaxfsorblik.jpg",
+     "publicId": "freedomcosmeticshop/products/tvyrxbbzeiaxfsorblik",
      "altText": "Duru Fresh Sensations Beauty Soap – Floral Infusion (Pack of 4)",
      "altTextRw": "Duru Fresh Sensations Isabune y’Ubwiza ya Floral Infusion – Ipaki y’Imisabune 4",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
+     "isPrimary": true
     }
    ],
    "categorySlug": "soap",
@@ -4130,8 +4184,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785403724/freedomcosmeticshop/products/elm4bunf7lvydbq4uz1x.jpg",
-     "publicId": "freedomcosmeticshop/products/elm4bunf7lvydbq4uz1x",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785666379/freedomcosmeticshop/products/epooo6zcjrff5jkjpf3a.jpg",
+     "publicId": "freedomcosmeticshop/products/epooo6zcjrff5jkjpf3a",
      "altText": "Duru Fresh Sensations Beauty Soap – Ocean Breeze (Pack of 4)",
      "altTextRw": "Duru Fresh Sensations Isabune y’Ubwiza ya Ocean Breeze – Ipaki y’Imisabune 4",
      "imageType": "PRODUCT",
@@ -4218,17 +4272,17 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785266659/freedomcosmeticshop/products/t8bccqgdc0wvxfb2gyqj.jpg",
-     "publicId": "freedomcosmeticshop/products/t8bccqgdc0wvxfb2gyqj",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786451890/freedomcosmeticshop/products/mmwc8xuxmxtvc5qsstuq.jpg",
+     "publicId": "freedomcosmeticshop/products/mmwc8xuxmxtvc5qsstuq",
      "altText": "Duru Natural Olive Soap with Olive Oil Extract",
      "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
      "imageType": "PRODUCT",
      "sortOrder": 0,
-     "isPrimary": true
+     "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785266643/freedomcosmeticshop/products/wrqnlb7jh3d6i2plxdjl.jpg",
-     "publicId": "freedomcosmeticshop/products/wrqnlb7jh3d6i2plxdjl",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785954997/freedomcosmeticshop/products/kkbihw6zmhffbgko4rhv.jpg",
+     "publicId": "freedomcosmeticshop/products/kkbihw6zmhffbgko4rhv",
      "altText": "Duru Natural Olive Soap with Olive Oil Extract",
      "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
      "imageType": "PRODUCT",
@@ -4236,21 +4290,48 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785266618/freedomcosmeticshop/products/vkse1zhsb9wc0kinuqv0.jpg",
-     "publicId": "freedomcosmeticshop/products/vkse1zhsb9wc0kinuqv0",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785955264/freedomcosmeticshop/products/wj30xdhxdknywjnzyq4c.jpg",
+     "publicId": "freedomcosmeticshop/products/wj30xdhxdknywjnzyq4c",
      "altText": "Duru Natural Olive Soap with Olive Oil Extract",
      "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
      "imageType": "PRODUCT",
      "sortOrder": 2,
-     "isPrimary": false
+     "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785266562/freedomcosmeticshop/products/v1cjgond5h3g9ufzjknl.jpg",
-     "publicId": "freedomcosmeticshop/products/v1cjgond5h3g9ufzjknl",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786446710/freedomcosmeticshop/products/lua9yui5vjib5mfi5vyf.jpg",
+     "publicId": "freedomcosmeticshop/products/lua9yui5vjib5mfi5vyf",
      "altText": "Duru Natural Olive Soap with Olive Oil Extract",
      "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
      "imageType": "PRODUCT",
      "sortOrder": 3,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786442189/freedomcosmeticshop/products/foxaihv8a6ukjpiflfvp.jpg",
+     "publicId": "freedomcosmeticshop/products/foxaihv8a6ukjpiflfvp",
+     "altText": "Duru Natural Olive Soap with Olive Oil Extract",
+     "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
+     "imageType": "PRODUCT",
+     "sortOrder": 4,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786452236/freedomcosmeticshop/products/x1o3lprjy91zhjnjyj8i.jpg",
+     "publicId": "freedomcosmeticshop/products/x1o3lprjy91zhjnjyj8i",
+     "altText": "Duru Natural Olive Soap with Olive Oil Extract",
+     "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
+     "imageType": "PRODUCT",
+     "sortOrder": 5,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785266643/freedomcosmeticshop/products/wrqnlb7jh3d6i2plxdjl.jpg",
+     "publicId": "freedomcosmeticshop/products/wrqnlb7jh3d6i2plxdjl",
+     "altText": "Duru Natural Olive Soap with Olive Oil Extract",
+     "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
+     "imageType": "PRODUCT",
+     "sortOrder": 6,
      "isPrimary": false
     },
     {
@@ -4259,7 +4340,7 @@
      "altText": "Duru Natural Olive Soap with Olive Oil Extract",
      "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
      "imageType": "PRODUCT",
-     "sortOrder": 4,
+     "sortOrder": 7,
      "isPrimary": false
     },
     {
@@ -4268,7 +4349,7 @@
      "altText": "Duru Natural Olive Soap with Olive Oil Extract",
      "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
      "imageType": "PRODUCT",
-     "sortOrder": 5,
+     "sortOrder": 8,
      "isPrimary": false
     },
     {
@@ -4277,7 +4358,7 @@
      "altText": "Duru Natural Olive Soap with Olive Oil Extract",
      "altTextRw": "Duru Natural Olive Isabune irimo Amavuta y’Imyelayo",
      "imageType": "PRODUCT",
-     "sortOrder": 6,
+     "sortOrder": 9,
      "isPrimary": false
     }
    ],
@@ -4356,8 +4437,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785405550/freedomcosmeticshop/products/asspz0qq78bvj9sh2o4d.jpg",
-     "publicId": "freedomcosmeticshop/products/asspz0qq78bvj9sh2o4d",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786452916/freedomcosmeticshop/products/jhma72feyc1a3oqiilvw.jpg",
+     "publicId": "freedomcosmeticshop/products/jhma72feyc1a3oqiilvw",
      "altText": "Duru Perfume Beauties Beauty Soap – Orchid Charm (Pack of 4)",
      "altTextRw": "Duru Perfume Beauties Isabune y’Ubwiza ya Orchid Charm – Ipaki y’Imisabune 4",
      "imageType": "PRODUCT",
@@ -4432,35 +4513,7 @@
     "slug": "soap"
    },
    "brand": null,
-   "productImages": [
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785342959/freedomcosmeticshop/products/mefwlzqxjozxc6lxwmtp.jpg",
-     "publicId": "freedomcosmeticshop/products/mefwlzqxjozxc6lxwmtp",
-     "altText": "EVA Bathing Soap Refresh (Coconut & Lavender)",
-     "altTextRw": "EVA Bathing Soap Refresh irimo Coconut na Lavender",
-     "imageType": "PRODUCT",
-     "sortOrder": 0,
-     "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785342947/freedomcosmeticshop/products/kalyf8o7k7clypuvqso5.jpg",
-     "publicId": "freedomcosmeticshop/products/kalyf8o7k7clypuvqso5",
-     "altText": "EVA Bathing Soap Refresh (Coconut & Lavender)",
-     "altTextRw": "EVA Bathing Soap Refresh irimo Coconut na Lavender",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786817950/freedomcosmeticshop/products/vzuzvxvq3hbapzxocuqw.jpg",
-     "publicId": "freedomcosmeticshop/products/vzuzvxvq3hbapzxocuqw",
-     "altText": "EVA Bathing Soap Refresh (Coconut & Lavender)",
-     "altTextRw": "EVA Bathing Soap Refresh irimo Coconut na Lavender",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
-    }
-   ],
+   "productImages": [],
    "categorySlug": "soap",
    "brandSlug": null,
    "imageUrls": [
@@ -4611,8 +4664,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785339369/freedomcosmeticshop/products/c1ypkwpamdkvo8iscs1i.jpg",
-     "publicId": "freedomcosmeticshop/products/c1ypkwpamdkvo8iscs1i",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786737366/freedomcosmeticshop/products/vorurbktlne1klknshek.jpg",
+     "publicId": "freedomcosmeticshop/products/vorurbktlne1klknshek",
      "altText": "Extract Whitening Herbal Soap Papaya Calaman",
      "altTextRw": "Extract Herbal Soap ya Papaya Calaman yo Kwita ku Isura y’Uruhu",
      "imageType": "PRODUCT",
@@ -4620,12 +4673,21 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785339357/freedomcosmeticshop/products/ddrnxehtml0jzpxbkqif.jpg",
-     "publicId": "freedomcosmeticshop/products/ddrnxehtml0jzpxbkqif",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786737237/freedomcosmeticshop/products/pymtqersir53bsjulfnm.jpg",
+     "publicId": "freedomcosmeticshop/products/pymtqersir53bsjulfnm",
      "altText": "Extract Whitening Herbal Soap Papaya Calaman",
      "altTextRw": "Extract Herbal Soap ya Papaya Calaman yo Kwita ku Isura y’Uruhu",
      "imageType": "PRODUCT",
      "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786737895/freedomcosmeticshop/products/brnx4tvukuej2r1kdhf3.jpg",
+     "publicId": "freedomcosmeticshop/products/brnx4tvukuej2r1kdhf3",
+     "altText": "Extract Whitening Herbal Soap Papaya Calaman",
+     "altTextRw": "Extract Herbal Soap ya Papaya Calaman yo Kwita ku Isura y’Uruhu",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -4699,8 +4761,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785411414/freedomcosmeticshop/products/iror38wjidbjullcnq5i.jpg",
-     "publicId": "freedomcosmeticshop/products/iror38wjidbjullcnq5i",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785743842/freedomcosmeticshop/products/jwmldyeua5frcd5smmlh.jpg",
+     "publicId": "freedomcosmeticshop/products/jwmldyeua5frcd5smmlh",
      "altText": "Geisha Caring Coconut & Honey Soap",
      "altTextRw": "Geisha Caring Coconut & Honey Soap",
      "imageType": "PRODUCT",
@@ -4777,8 +4839,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785419804/freedomcosmeticshop/products/rf8dkt3la8kjhn1ho4vr.jpg",
-     "publicId": "freedomcosmeticshop/products/rf8dkt3la8kjhn1ho4vr",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785752206/freedomcosmeticshop/products/qpzgalkf5np5v4g6hhky.jpg",
+     "publicId": "freedomcosmeticshop/products/qpzgalkf5np5v4g6hhky",
      "altText": "Geisha Soothing Aloe Vera & Honey Soap (Strong & Long Lasting Daily Bathing Bar)",
      "altTextRw": "Geisha Soothing Aloe Vera & Honey Soap – Isabune Iramba yo Kwiyuhagira Buri Munsi",
      "imageType": "PRODUCT",
@@ -4786,8 +4848,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785419704/freedomcosmeticshop/products/s9fjizpzku9vkkiwxt1g.jpg",
-     "publicId": "freedomcosmeticshop/products/s9fjizpzku9vkkiwxt1g",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785752095/freedomcosmeticshop/products/ylzv8vli0cr1vetohest.jpg",
+     "publicId": "freedomcosmeticshop/products/ylzv8vli0cr1vetohest",
      "altText": "Geisha Soothing Aloe Vera & Honey Soap (Strong & Long Lasting Daily Bathing Bar)",
      "altTextRw": "Geisha Soothing Aloe Vera & Honey Soap – Isabune Iramba yo Kwiyuhagira Buri Munsi",
      "imageType": "PRODUCT",
@@ -4795,12 +4857,21 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785411423/freedomcosmeticshop/products/n7d02cmfmoupp15ufjna.jpg",
-     "publicId": "freedomcosmeticshop/products/n7d02cmfmoupp15ufjna",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785751884/freedomcosmeticshop/products/p0pzudq0ndt6qvqw9rys.jpg",
+     "publicId": "freedomcosmeticshop/products/p0pzudq0ndt6qvqw9rys",
      "altText": "Geisha Soothing Aloe Vera & Honey Soap (Strong & Long Lasting Daily Bathing Bar)",
      "altTextRw": "Geisha Soothing Aloe Vera & Honey Soap – Isabune Iramba yo Kwiyuhagira Buri Munsi",
      "imageType": "PRODUCT",
      "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785744063/freedomcosmeticshop/products/a8zjpyicndi9u6smyvxg.jpg",
+     "publicId": "freedomcosmeticshop/products/a8zjpyicndi9u6smyvxg",
+     "altText": "Geisha Soothing Aloe Vera & Honey Soap (Strong & Long Lasting Daily Bathing Bar)",
+     "altTextRw": "Geisha Soothing Aloe Vera & Honey Soap – Isabune Iramba yo Kwiyuhagira Buri Munsi",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -4873,31 +4944,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785338412/freedomcosmeticshop/products/mjh8zobcsle2drbkwqui.jpg",
-     "publicId": "freedomcosmeticshop/products/mjh8zobcsle2drbkwqui",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/fetch/f_auto,q_auto/https://m.media-amazon.com/images/I/81LM9+7HqJL.jpg",
+     "publicId": "proxy-imperial-leather-timeless-classic",
      "altText": "Imperial Leather Timeless Classic Bathing Bar Soap",
      "altTextRw": "Imperial Leather Timeless Classic Isabune yo Kwiyuhagira",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785338390/freedomcosmeticshop/products/l47cnwxf4uyiuq2zv7yi.jpg",
-     "publicId": "freedomcosmeticshop/products/l47cnwxf4uyiuq2zv7yi",
-     "altText": "Imperial Leather Timeless Classic Bathing Bar Soap",
-     "altTextRw": "Imperial Leather Timeless Classic Isabune yo Kwiyuhagira",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785338369/freedomcosmeticshop/products/dvon4wtmgva41apxc5ym.jpg",
-     "publicId": "freedomcosmeticshop/products/dvon4wtmgva41apxc5ym",
-     "altText": "Imperial Leather Timeless Classic Bathing Bar Soap",
-     "altTextRw": "Imperial Leather Timeless Classic Isabune yo Kwiyuhagira",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
     }
    ],
    "categorySlug": "soap",
@@ -4969,17 +5022,7 @@
     "slug": "fragrance"
    },
    "brand": null,
-   "productImages": [
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785596793/freedomcosmeticshop/products/l3u1dx0nvggviml2j4wf.jpg",
-     "publicId": "freedomcosmeticshop/products/l3u1dx0nvggviml2j4wf",
-     "altText": "Intense Wood Fragrance Mist (Brume Parfumée)",
-     "altTextRw": "Intense Wood Fragrance Mist – Impumuro ya Wood",
-     "imageType": "PRODUCT",
-     "sortOrder": 0,
-     "isPrimary": true
-    }
-   ],
+   "productImages": [],
    "categorySlug": "fragrance",
    "brandSlug": null,
    "imageUrls": [
@@ -5047,17 +5090,7 @@
     "slug": "baby-kids"
    },
    "brand": null,
-   "productImages": [
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785666379/freedomcosmeticshop/products/epooo6zcjrff5jkjpf3a.jpg",
-     "publicId": "freedomcosmeticshop/products/epooo6zcjrff5jkjpf3a",
-     "altText": "Johnson's Baby Aqueous Cream Lightly Fragranced 350ml",
-     "altTextRw": "Johnson's Baby Aqueous Cream Ifite Impumuro Ntoya 350ml",
-     "imageType": "PRODUCT",
-     "sortOrder": 0,
-     "isPrimary": true
-    }
-   ],
+   "productImages": [],
    "categorySlug": "baby-kids",
    "brandSlug": null,
    "imageUrls": [
@@ -5133,7 +5166,34 @@
      "altTextRw": "KOJIC WHITE X2 Double Whitening Suite Soap – Nano D-ne",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785758283/freedomcosmeticshop/products/wrewu5rm7df49byaiiue.jpg",
+     "publicId": "freedomcosmeticshop/products/wrewu5rm7df49byaiiue",
+     "altText": "KOJIC WHITE X2 Double Whitening Suite Soap (By Nano D-ne)",
+     "altTextRw": "KOJIC WHITE X2 Double Whitening Suite Soap – Nano D-ne",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785753426/freedomcosmeticshop/products/lsoqjmvjzqgkxocptbvy.jpg",
+     "publicId": "freedomcosmeticshop/products/lsoqjmvjzqgkxocptbvy",
+     "altText": "KOJIC WHITE X2 Double Whitening Suite Soap (By Nano D-ne)",
+     "altTextRw": "KOJIC WHITE X2 Double Whitening Suite Soap – Nano D-ne",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785753463/freedomcosmeticshop/products/b31zwnnqrkkhggd0c5et.jpg",
+     "publicId": "freedomcosmeticshop/products/b31zwnnqrkkhggd0c5et",
+     "altText": "KOJIC WHITE X2 Double Whitening Suite Soap (By Nano D-ne)",
+     "altTextRw": "KOJIC WHITE X2 Double Whitening Suite Soap – Nano D-ne",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
+     "isPrimary": false
     },
     {
      "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785422131/freedomcosmeticshop/products/artiai3nbyjqpzqy8m9i.jpg",
@@ -5141,7 +5201,7 @@
      "altText": "KOJIC WHITE X2 Double Whitening Suite Soap (By Nano D-ne)",
      "altTextRw": "KOJIC WHITE X2 Double Whitening Suite Soap – Nano D-ne",
      "imageType": "PRODUCT",
-     "sortOrder": 1,
+     "sortOrder": 4,
      "isPrimary": false
     }
    ],
@@ -5215,8 +5275,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785251484/freedomcosmeticshop/products/jjedlroklxezidgfgwje.jpg",
-     "publicId": "freedomcosmeticshop/products/jjedlroklxezidgfgwje",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785938439/freedomcosmeticshop/products/gdrz2hkir6xvqatbogvt.jpg",
+     "publicId": "freedomcosmeticshop/products/gdrz2hkir6xvqatbogvt",
      "altText": "Kojie San Classic Skin Lightening Soap",
      "altTextRw": "Kojie San Classic Isabune yo Kwita ku Ruhu Rusa Neza",
      "imageType": "PRODUCT",
@@ -5224,21 +5284,12 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785251472/freedomcosmeticshop/products/i9rddmg0czrutkzf2efn.jpg",
-     "publicId": "freedomcosmeticshop/products/i9rddmg0czrutkzf2efn",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785938414/freedomcosmeticshop/products/pr8iq2cgdizh2lovwglx.jpg",
+     "publicId": "freedomcosmeticshop/products/pr8iq2cgdizh2lovwglx",
      "altText": "Kojie San Classic Skin Lightening Soap",
      "altTextRw": "Kojie San Classic Isabune yo Kwita ku Ruhu Rusa Neza",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785251459/freedomcosmeticshop/products/wjlwowmoogepalc9q7se.jpg",
-     "publicId": "freedomcosmeticshop/products/wjlwowmoogepalc9q7se",
-     "altText": "Kojie San Classic Skin Lightening Soap",
-     "altTextRw": "Kojie San Classic Isabune yo Kwita ku Ruhu Rusa Neza",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -5313,8 +5364,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785593849/freedomcosmeticshop/products/e3dyl4jqwcdl4a8ygjpl.jpg",
-     "publicId": "freedomcosmeticshop/products/e3dyl4jqwcdl4a8ygjpl",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785586590/freedomcosmeticshop/products/c3vzmzplrw2g0u2jxumw.jpg",
+     "publicId": "freedomcosmeticshop/products/c3vzmzplrw2g0u2jxumw",
      "altText": "Kristal Fragrance Mist (Brume Parfumée)",
      "altTextRw": "Spray ya Kristo ya Brume Parfumée",
      "imageType": "PRODUCT",
@@ -5391,8 +5442,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785774111/freedomcosmeticshop/products/rsdralpsie1kch0cpxr0.jpg",
-     "publicId": "freedomcosmeticshop/products/rsdralpsie1kch0cpxr0",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785418158/freedomcosmeticshop/products/wd1regvqfymw8gzulket.jpg",
+     "publicId": "freedomcosmeticshop/products/wd1regvqfymw8gzulket",
      "altText": "LA TCHADIENNE Whitening Lotion Super White Face & Body Lotion",
      "altTextRw": "Amavuta ya LA Tchadienne yo Kuzamura Umweru ku Isura n'Umubiri",
      "imageType": "PRODUCT",
@@ -5400,30 +5451,12 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785774100/freedomcosmeticshop/products/zrq1mupfuflbohpgszbb.jpg",
-     "publicId": "freedomcosmeticshop/products/zrq1mupfuflbohpgszbb",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785417968/freedomcosmeticshop/products/yo1cj8bqg3ucfafthmkp.jpg",
+     "publicId": "freedomcosmeticshop/products/yo1cj8bqg3ucfafthmkp",
      "altText": "LA TCHADIENNE Whitening Lotion Super White Face & Body Lotion",
      "altTextRw": "Amavuta ya LA Tchadienne yo Kuzamura Umweru ku Isura n'Umubiri",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785773915/freedomcosmeticshop/products/yluaimusgvyzoekhlfbv.jpg",
-     "publicId": "freedomcosmeticshop/products/yluaimusgvyzoekhlfbv",
-     "altText": "LA TCHADIENNE Whitening Lotion Super White Face & Body Lotion",
-     "altTextRw": "Amavuta ya LA Tchadienne yo Kuzamura Umweru ku Isura n'Umubiri",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785773754/freedomcosmeticshop/products/ipsquzptkhbvzfiyl1mq.jpg",
-     "publicId": "freedomcosmeticshop/products/ipsquzptkhbvzfiyl1mq",
-     "altText": "LA TCHADIENNE Whitening Lotion Super White Face & Body Lotion",
-     "altTextRw": "Amavuta ya LA Tchadienne yo Kuzamura Umweru ku Isura n'Umubiri",
-     "imageType": "PRODUCT",
-     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -5505,7 +5538,25 @@
      "altTextRw": "Isabune ya Lab White Atom Whitening Egg Yolk",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785769032/freedomcosmeticshop/products/pwt9y1qajj8t2bq9gii7.jpg",
+     "publicId": "freedomcosmeticshop/products/pwt9y1qajj8t2bq9gii7",
+     "altText": "Lab White Atom Whitening Egg Yolk Soap",
+     "altTextRw": "Isabune ya Lab White Atom Whitening Egg Yolk",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785769918/freedomcosmeticshop/products/q4ryrfcks8gfnuepeysc.jpg",
+     "publicId": "freedomcosmeticshop/products/q4ryrfcks8gfnuepeysc",
+     "altText": "Lab White Atom Whitening Egg Yolk Soap",
+     "altTextRw": "Isabune ya Lab White Atom Whitening Egg Yolk",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
     },
     {
      "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785428898/freedomcosmeticshop/products/kykmgtuumtgw02rylnr6.jpg",
@@ -5513,7 +5564,7 @@
      "altText": "Lab White Atom Whitening Egg Yolk Soap",
      "altTextRw": "Isabune ya Lab White Atom Whitening Egg Yolk",
      "imageType": "PRODUCT",
-     "sortOrder": 1,
+     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -5588,31 +5639,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785505042/freedomcosmeticshop/products/xno2k8fygel4mj9evtqd.jpg",
-     "publicId": "freedomcosmeticshop/products/xno2k8fygel4mj9evtqd",
-     "altText": "MAYORA Eau De Parfum 2-Piece Luxury Gift Set",
-     "altTextRw": "Agasanduku ka presenti Mayora Eau De Parfum (Ibice 2)",
-     "imageType": "PRODUCT",
-     "sortOrder": 0,
-     "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785505005/freedomcosmeticshop/products/wbn9wrnw8cxujscunut8.jpg",
-     "publicId": "freedomcosmeticshop/products/wbn9wrnw8cxujscunut8",
-     "altText": "MAYORA Eau De Parfum 2-Piece Luxury Gift Set",
-     "altTextRw": "Agasanduku ka presenti Mayora Eau De Parfum (Ibice 2)",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
      "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785504671/freedomcosmeticshop/products/ub5ka1ftyasmfxqt9hj0.jpg",
      "publicId": "freedomcosmeticshop/products/ub5ka1ftyasmfxqt9hj0",
      "altText": "MAYORA Eau De Parfum 2-Piece Luxury Gift Set",
      "altTextRw": "Agasanduku ka presenti Mayora Eau De Parfum (Ibice 2)",
      "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
+     "sortOrder": 0,
+     "isPrimary": true
     }
    ],
    "categorySlug": "fragrance",
@@ -5686,8 +5719,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785938439/freedomcosmeticshop/products/gdrz2hkir6xvqatbogvt.jpg",
-     "publicId": "freedomcosmeticshop/products/gdrz2hkir6xvqatbogvt",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785317377/freedomcosmeticshop/products/pcl72cg2l2iogvqcobn3.jpg",
+     "publicId": "freedomcosmeticshop/products/pcl72cg2l2iogvqcobn3",
      "altText": "Mega Growth Break-Free Hair & Scalp Food",
      "altTextRw": "Mega Growth Cream yo Kurimburira Ibisatsi n'Ubwoya",
      "imageType": "PRODUCT",
@@ -5695,8 +5728,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785938414/freedomcosmeticshop/products/pr8iq2cgdizh2lovwglx.jpg",
-     "publicId": "freedomcosmeticshop/products/pr8iq2cgdizh2lovwglx",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785278456/freedomcosmeticshop/products/di91cs8he75jqxgqrath.jpg",
+     "publicId": "freedomcosmeticshop/products/di91cs8he75jqxgqrath",
      "altText": "Mega Growth Break-Free Hair & Scalp Food",
      "altTextRw": "Mega Growth Cream yo Kurimburira Ibisatsi n'Ubwoya",
      "imageType": "PRODUCT",
@@ -5704,12 +5737,21 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785937840/freedomcosmeticshop/products/lgnd8fr668dcjk5jedin.jpg",
-     "publicId": "freedomcosmeticshop/products/lgnd8fr668dcjk5jedin",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785278433/freedomcosmeticshop/products/moajlhrgueaz10yu0eto.jpg",
+     "publicId": "freedomcosmeticshop/products/moajlhrgueaz10yu0eto",
      "altText": "Mega Growth Break-Free Hair & Scalp Food",
      "altTextRw": "Mega Growth Cream yo Kurimburira Ibisatsi n'Ubwoya",
      "imageType": "PRODUCT",
      "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785278415/freedomcosmeticshop/products/cgyyj1dmzjslrd51whm5.jpg",
+     "publicId": "freedomcosmeticshop/products/cgyyj1dmzjslrd51whm5",
+     "altText": "Mega Growth Break-Free Hair & Scalp Food",
+     "altTextRw": "Mega Growth Cream yo Kurimburira Ibisatsi n'Ubwoya",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -5784,8 +5826,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785921107/freedomcosmeticshop/products/flu0mlrt5uzqlskif2xv.jpg",
-     "publicId": "freedomcosmeticshop/products/flu0mlrt5uzqlskif2xv",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785266562/freedomcosmeticshop/products/v1cjgond5h3g9ufzjknl.jpg",
+     "publicId": "freedomcosmeticshop/products/v1cjgond5h3g9ufzjknl",
      "altText": "MIADI Hair Curl Activator Gel",
      "altTextRw": "MIADI Gel ikoreshwa gutera uturavuta tw'inkwigore",
      "imageType": "PRODUCT",
@@ -5860,13 +5902,22 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785923213/freedomcosmeticshop/products/bh9qqhnkwyipnwjfbz7k.jpg",
-     "publicId": "freedomcosmeticshop/products/bh9qqhnkwyipnwjfbz7k",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785266618/freedomcosmeticshop/products/vkse1zhsb9wc0kinuqv0.jpg",
+     "publicId": "freedomcosmeticshop/products/vkse1zhsb9wc0kinuqv0",
      "altText": "MIADI Hair Mouldin' Gel Wax (With Olive Oil)",
      "altTextRw": "MIADI Gel Wax yo Gutunganya Umusatsi (na Olive Oil)",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785266659/freedomcosmeticshop/products/t8bccqgdc0wvxfb2gyqj.jpg",
+     "publicId": "freedomcosmeticshop/products/t8bccqgdc0wvxfb2gyqj",
+     "altText": "MIADI Hair Mouldin' Gel Wax (With Olive Oil)",
+     "altTextRw": "MIADI Gel Wax yo Gutunganya Umusatsi (na Olive Oil)",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
     }
    ],
    "categorySlug": "haircare",
@@ -5934,26 +5985,7 @@
     "slug": "petroleum-jelly"
    },
    "brand": null,
-   "productImages": [
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785753463/freedomcosmeticshop/products/b31zwnnqrkkhggd0c5et.jpg",
-     "publicId": "freedomcosmeticshop/products/b31zwnnqrkkhggd0c5et",
-     "altText": "More Up Aloe Vera & Vitamin E 2-in-1 Pure Petroleum Jelly",
-     "altTextRw": "More Up Petroleum Jelly na Aloe Vera na Vitamin E",
-     "imageType": "PRODUCT",
-     "sortOrder": 0,
-     "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785753426/freedomcosmeticshop/products/lsoqjmvjzqgkxocptbvy.jpg",
-     "publicId": "freedomcosmeticshop/products/lsoqjmvjzqgkxocptbvy",
-     "altText": "More Up Aloe Vera & Vitamin E 2-in-1 Pure Petroleum Jelly",
-     "altTextRw": "More Up Petroleum Jelly na Aloe Vera na Vitamin E",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
-    }
-   ],
+   "productImages": [],
    "categorySlug": "petroleum-jelly",
    "brandSlug": null,
    "imageUrls": [
@@ -6024,22 +6056,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785955264/freedomcosmeticshop/products/wj30xdhxdknywjnzyq4c.jpg",
-     "publicId": "freedomcosmeticshop/products/wj30xdhxdknywjnzyq4c",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785336272/freedomcosmeticshop/products/ibcwqdew2rpxdoc7wxwc.jpg",
+     "publicId": "freedomcosmeticshop/products/ibcwqdew2rpxdoc7wxwc",
      "altText": "Movit Sheen Hair Spray Olive & Argan Oil",
      "altTextRw": "Movit Sheen Spray y'Umusatsi (Olive & Argan Oil)",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785954997/freedomcosmeticshop/products/kkbihw6zmhffbgko4rhv.jpg",
-     "publicId": "freedomcosmeticshop/products/kkbihw6zmhffbgko4rhv",
-     "altText": "Movit Sheen Hair Spray Olive & Argan Oil",
-     "altTextRw": "Movit Sheen Spray y'Umusatsi (Olive & Argan Oil)",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "haircare",
@@ -6118,7 +6141,34 @@
      "altTextRw": "Isabune y'Antibateri MPYA Rungu-Medi",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785931223/freedomcosmeticshop/products/fauq8rqq1czqr7hmavwh.jpg",
+     "publicId": "freedomcosmeticshop/products/fauq8rqq1czqr7hmavwh",
+     "altText": "MPYA Rungu-Medi Anti-Bacterial Soap",
+     "altTextRw": "Isabune y'Antibateri MPYA Rungu-Medi",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785930888/freedomcosmeticshop/products/zprddemfjaqtzxfq4ggg.jpg",
+     "publicId": "freedomcosmeticshop/products/zprddemfjaqtzxfq4ggg",
+     "altText": "MPYA Rungu-Medi Anti-Bacterial Soap",
+     "altTextRw": "Isabune y'Antibateri MPYA Rungu-Medi",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785931210/freedomcosmeticshop/products/a1kd4wp9s0qw9cqedoeg.jpg",
+     "publicId": "freedomcosmeticshop/products/a1kd4wp9s0qw9cqedoeg",
+     "altText": "MPYA Rungu-Medi Anti-Bacterial Soap",
+     "altTextRw": "Isabune y'Antibateri MPYA Rungu-Medi",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
+     "isPrimary": false
     }
    ],
    "categorySlug": "soap",
@@ -6188,8 +6238,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785349016/freedomcosmeticshop/products/pbrufrzyhbzr5s7uhhk8.jpg",
-     "publicId": "freedomcosmeticshop/products/pbrufrzyhbzr5s7uhhk8",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785931275/freedomcosmeticshop/products/zllnynqtwbwuftsoizqk.jpg",
+     "publicId": "freedomcosmeticshop/products/zllnynqtwbwuftsoizqk",
      "altText": "NINA Family Soap Bathing Bar (Rose & Peach)",
      "altTextRw": "Isabune ya NINA Family (Indabyo & Pichu)",
      "imageType": "PRODUCT",
@@ -6197,8 +6247,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785348999/freedomcosmeticshop/products/rmeoc1owo0waw4mhu1hp.jpg",
-     "publicId": "freedomcosmeticshop/products/rmeoc1owo0waw4mhu1hp",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785349016/freedomcosmeticshop/products/pbrufrzyhbzr5s7uhhk8.jpg",
+     "publicId": "freedomcosmeticshop/products/pbrufrzyhbzr5s7uhhk8",
      "altText": "NINA Family Soap Bathing Bar (Rose & Peach)",
      "altTextRw": "Isabune ya NINA Family (Indabyo & Pichu)",
      "imageType": "PRODUCT",
@@ -6206,21 +6256,12 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785348981/freedomcosmeticshop/products/rhdyp2cjl3cp7ptmc0ru.jpg",
-     "publicId": "freedomcosmeticshop/products/rhdyp2cjl3cp7ptmc0ru",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785931238/freedomcosmeticshop/products/cyavhtp9h0hn3gsc5bs5.jpg",
+     "publicId": "freedomcosmeticshop/products/cyavhtp9h0hn3gsc5bs5",
      "altText": "NINA Family Soap Bathing Bar (Rose & Peach)",
      "altTextRw": "Isabune ya NINA Family (Indabyo & Pichu)",
      "imageType": "PRODUCT",
      "sortOrder": 2,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785931210/freedomcosmeticshop/products/a1kd4wp9s0qw9cqedoeg.jpg",
-     "publicId": "freedomcosmeticshop/products/a1kd4wp9s0qw9cqedoeg",
-     "altText": "NINA Family Soap Bathing Bar (Rose & Peach)",
-     "altTextRw": "Isabune ya NINA Family (Indabyo & Pichu)",
-     "imageType": "PRODUCT",
-     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -6303,15 +6344,6 @@
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785596103/freedomcosmeticshop/products/mcfltbkrbngpvqswc8qu.jpg",
-     "publicId": "freedomcosmeticshop/products/mcfltbkrbngpvqswc8qu",
-     "altText": "ONIRO Fragrance Mist (Brume Parfumée)",
-     "altTextRw": "Spray ya ONIRO (Brume Parfumée)",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -6384,8 +6416,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785427126/freedomcosmeticshop/products/dmulx5tjg2ozzyjamygo.jpg",
-     "publicId": "freedomcosmeticshop/products/dmulx5tjg2ozzyjamygo",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785768844/freedomcosmeticshop/products/fn5wrssf1yb1fp0rz8ki.jpg",
+     "publicId": "freedomcosmeticshop/products/fn5wrssf1yb1fp0rz8ki",
      "altText": "Original Pure Egyptian Magic Whitening Gold Soap (With Egg Yolk & L-Glutathione)",
      "altTextRw": "Isabune ya Original Pure Egyptian Magic Whitening Gold (na Egg Yolk & L-Glutathione)",
      "imageType": "PRODUCT",
@@ -6393,21 +6425,12 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785427014/freedomcosmeticshop/products/t733hi75jkwtvmodfm3v.jpg",
-     "publicId": "freedomcosmeticshop/products/t733hi75jkwtvmodfm3v",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785427126/freedomcosmeticshop/products/dmulx5tjg2ozzyjamygo.jpg",
+     "publicId": "freedomcosmeticshop/products/dmulx5tjg2ozzyjamygo",
      "altText": "Original Pure Egyptian Magic Whitening Gold Soap (With Egg Yolk & L-Glutathione)",
      "altTextRw": "Isabune ya Original Pure Egyptian Magic Whitening Gold (na Egg Yolk & L-Glutathione)",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785426856/freedomcosmeticshop/products/d1wqzzqvawc5nwi8yv7v.jpg",
-     "publicId": "freedomcosmeticshop/products/d1wqzzqvawc5nwi8yv7v",
-     "altText": "Original Pure Egyptian Magic Whitening Gold Soap (With Egg Yolk & L-Glutathione)",
-     "altTextRw": "Isabune ya Original Pure Egyptian Magic Whitening Gold (na Egg Yolk & L-Glutathione)",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -6482,40 +6505,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785595765/freedomcosmeticshop/products/rbsmzd272lkxm5xphqem.jpg",
-     "publicId": "freedomcosmeticshop/products/rbsmzd272lkxm5xphqem",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785589411/freedomcosmeticshop/products/akyxgke1u4dpegsklnip.jpg",
+     "publicId": "freedomcosmeticshop/products/akyxgke1u4dpegsklnip",
      "altText": "Oud For Glory (Bade'e Al Oud) Fragrance Mist (Brume Parfumée)",
      "altTextRw": "Spray ya OUD for Glory (Bade'e Al Oud) Brume Parfumée",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785595633/freedomcosmeticshop/products/fdolvtiiznqsqem64l5t.jpg",
-     "publicId": "freedomcosmeticshop/products/fdolvtiiznqsqem64l5t",
-     "altText": "Oud For Glory (Bade'e Al Oud) Fragrance Mist (Brume Parfumée)",
-     "altTextRw": "Spray ya OUD for Glory (Bade'e Al Oud) Brume Parfumée",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785595563/freedomcosmeticshop/products/baccv2dpi9voa3fnwsmz.jpg",
-     "publicId": "freedomcosmeticshop/products/baccv2dpi9voa3fnwsmz",
-     "altText": "Oud For Glory (Bade'e Al Oud) Fragrance Mist (Brume Parfumée)",
-     "altTextRw": "Spray ya OUD for Glory (Bade'e Al Oud) Brume Parfumée",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785752206/freedomcosmeticshop/products/qpzgalkf5np5v4g6hhky.jpg",
-     "publicId": "freedomcosmeticshop/products/qpzgalkf5np5v4g6hhky",
-     "altText": "Oud For Glory (Bade'e Al Oud) Fragrance Mist (Brume Parfumée)",
-     "altTextRw": "Spray ya OUD for Glory (Bade'e Al Oud) Brume Parfumée",
-     "imageType": "PRODUCT",
-     "sortOrder": 3,
-     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -6594,22 +6590,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785410411/freedomcosmeticshop/products/fq74l4dcnposbhohnqt8.jpg",
-     "publicId": "freedomcosmeticshop/products/fq74l4dcnposbhohnqt8",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785743501/freedomcosmeticshop/products/ypdn9peqizrjvy5lpaom.jpg",
+     "publicId": "freedomcosmeticshop/products/ypdn9peqizrjvy5lpaom",
      "altText": "Papaya Carrot Gluta Soap Scrub Beads",
      "altTextRw": "Isabune Scrub Papaya Carrot Gluta",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785410389/freedomcosmeticshop/products/hqu4ojjcnp03s5wirp1b.jpg",
-     "publicId": "freedomcosmeticshop/products/hqu4ojjcnp03s5wirp1b",
-     "altText": "Papaya Carrot Gluta Soap Scrub Beads",
-     "altTextRw": "Isabune Scrub Papaya Carrot Gluta",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "soap",
@@ -6682,8 +6669,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785775077/freedomcosmeticshop/products/gmtzfdhqwjwatwkh1ugj.jpg",
-     "publicId": "freedomcosmeticshop/products/gmtzfdhqwjwatwkh1ugj",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785419804/freedomcosmeticshop/products/rf8dkt3la8kjhn1ho4vr.jpg",
+     "publicId": "freedomcosmeticshop/products/rf8dkt3la8kjhn1ho4vr",
      "altText": "Piment Doux 5 Days Extra Whitening Milk (Lait Traitant)",
      "altTextRw": "Piment Doux 5 Days Extra Whitening Milk",
      "imageType": "PRODUCT",
@@ -6691,21 +6678,12 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785774910/freedomcosmeticshop/products/cvlithts94wulomrqqry.jpg",
-     "publicId": "freedomcosmeticshop/products/cvlithts94wulomrqqry",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785419704/freedomcosmeticshop/products/s9fjizpzku9vkkiwxt1g.jpg",
+     "publicId": "freedomcosmeticshop/products/s9fjizpzku9vkkiwxt1g",
      "altText": "Piment Doux 5 Days Extra Whitening Milk (Lait Traitant)",
      "altTextRw": "Piment Doux 5 Days Extra Whitening Milk",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785774761/freedomcosmeticshop/products/nzpcaepszj8y4u7sqreq.jpg",
-     "publicId": "freedomcosmeticshop/products/nzpcaepszj8y4u7sqreq",
-     "altText": "Piment Doux 5 Days Extra Whitening Milk (Lait Traitant)",
-     "altTextRw": "Piment Doux 5 Days Extra Whitening Milk",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -6780,8 +6758,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785340701/freedomcosmeticshop/products/cowefrellnnncgu1qzkk.jpg",
-     "publicId": "freedomcosmeticshop/products/cowefrellnnncgu1qzkk",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785923213/freedomcosmeticshop/products/bh9qqhnkwyipnwjfbz7k.jpg",
+     "publicId": "freedomcosmeticshop/products/bh9qqhnkwyipnwjfbz7k",
      "altText": "Protex Gentle Anti-Germ Bar Soap",
      "altTextRw": "Protex Gentle Anti-Germ Isabune yo Gusukura Uruhu",
      "imageType": "PRODUCT",
@@ -6789,8 +6767,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785340687/freedomcosmeticshop/products/je8fncbmxeyjl0zglnda.jpg",
-     "publicId": "freedomcosmeticshop/products/je8fncbmxeyjl0zglnda",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785924477/freedomcosmeticshop/products/nxdj2vpqyvpqwk7dp4ls.jpg",
+     "publicId": "freedomcosmeticshop/products/nxdj2vpqyvpqwk7dp4ls",
      "altText": "Protex Gentle Anti-Germ Bar Soap",
      "altTextRw": "Protex Gentle Anti-Germ Isabune yo Gusukura Uruhu",
      "imageType": "PRODUCT",
@@ -6878,8 +6856,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786446710/freedomcosmeticshop/products/lua9yui5vjib5mfi5vyf.jpg",
-     "publicId": "freedomcosmeticshop/products/lua9yui5vjib5mfi5vyf",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785259849/freedomcosmeticshop/products/hsepjn9aooe4cizsyi3v.jpg",
+     "publicId": "freedomcosmeticshop/products/hsepjn9aooe4cizsyi3v",
      "altText": "Pure Egyptian Magic Whitening Serum Gold 14 Days Face & Body Serum",
      "altTextRw": "Pure Egyptian Magic Whitening Serum Gold y'Iminsi 14 yo mu Maso no ku Mubiri",
      "imageType": "PRODUCT",
@@ -6887,8 +6865,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786446686/freedomcosmeticshop/products/tvyrxbbzeiaxfsorblik.jpg",
-     "publicId": "freedomcosmeticshop/products/tvyrxbbzeiaxfsorblik",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785259823/freedomcosmeticshop/products/fvvpjrbsugd7c7ypknav.jpg",
+     "publicId": "freedomcosmeticshop/products/fvvpjrbsugd7c7ypknav",
      "altText": "Pure Egyptian Magic Whitening Serum Gold 14 Days Face & Body Serum",
      "altTextRw": "Pure Egyptian Magic Whitening Serum Gold y'Iminsi 14 yo mu Maso no ku Mubiri",
      "imageType": "PRODUCT",
@@ -6896,8 +6874,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786442189/freedomcosmeticshop/products/foxaihv8a6ukjpiflfvp.jpg",
-     "publicId": "freedomcosmeticshop/products/foxaihv8a6ukjpiflfvp",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785257415/freedomcosmeticshop/products/djhhjg63rolrycr8ttgy.jpg",
+     "publicId": "freedomcosmeticshop/products/djhhjg63rolrycr8ttgy",
      "altText": "Pure Egyptian Magic Whitening Serum Gold 14 Days Face & Body Serum",
      "altTextRw": "Pure Egyptian Magic Whitening Serum Gold y'Iminsi 14 yo mu Maso no ku Mubiri",
      "imageType": "PRODUCT",
@@ -6976,12 +6954,21 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785769032/freedomcosmeticshop/products/pwt9y1qajj8t2bq9gii7.jpg",
-     "publicId": "freedomcosmeticshop/products/pwt9y1qajj8t2bq9gii7",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785403724/freedomcosmeticshop/products/elm4bunf7lvydbq4uz1x.jpg",
+     "publicId": "freedomcosmeticshop/products/elm4bunf7lvydbq4uz1x",
      "altText": "Purec Egyptian Gold 14Days Face & Body Lotion",
      "altTextRw": "Purec Egyptian Gold Amavuta yo mu maso no ku mubiri y'iminsi 14",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785405550/freedomcosmeticshop/products/asspz0qq78bvj9sh2o4d.jpg",
+     "publicId": "freedomcosmeticshop/products/asspz0qq78bvj9sh2o4d",
+     "altText": "Purec Egyptian Gold 14Days Face & Body Lotion",
+     "altTextRw": "Purec Egyptian Gold Amavuta yo mu maso no ku mubiri y'iminsi 14",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
      "isPrimary": true
     }
    ],
@@ -7132,8 +7119,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785772074/freedomcosmeticshop/products/kfv0a51tij72yjolyknh.jpg",
-     "publicId": "freedomcosmeticshop/products/kfv0a51tij72yjolyknh",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785411414/freedomcosmeticshop/products/iror38wjidbjullcnq5i.jpg",
+     "publicId": "freedomcosmeticshop/products/iror38wjidbjullcnq5i",
      "altText": "RDL Papaya Extract Whitening Hand & Body Lotion + Vitamin E",
      "altTextRw": "RDL Papaya Extract Amavuta yo ku biganza no ku mubiri arimo Vitamin E",
      "imageType": "PRODUCT",
@@ -7141,8 +7128,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785771889/freedomcosmeticshop/products/d943esljqieexdiw1coj.jpg",
-     "publicId": "freedomcosmeticshop/products/d943esljqieexdiw1coj",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785411423/freedomcosmeticshop/products/n7d02cmfmoupp15ufjna.jpg",
+     "publicId": "freedomcosmeticshop/products/n7d02cmfmoupp15ufjna",
      "altText": "RDL Papaya Extract Whitening Hand & Body Lotion + Vitamin E",
      "altTextRw": "RDL Papaya Extract Amavuta yo ku biganza no ku mubiri arimo Vitamin E",
      "imageType": "PRODUCT",
@@ -7150,8 +7137,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785771667/freedomcosmeticshop/products/vxku4numk2rkcj5xkcit.jpg",
-     "publicId": "freedomcosmeticshop/products/vxku4numk2rkcj5xkcit",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785743795/freedomcosmeticshop/products/orzvf7yaes3w6wc1inh2.jpg",
+     "publicId": "freedomcosmeticshop/products/orzvf7yaes3w6wc1inh2",
      "altText": "RDL Papaya Extract Whitening Hand & Body Lotion + Vitamin E",
      "altTextRw": "RDL Papaya Extract Amavuta yo ku biganza no ku mubiri arimo Vitamin E",
      "imageType": "PRODUCT",
@@ -7229,24 +7216,6 @@
    },
    "brand": null,
    "productImages": [
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785177428/freedomcosmeticshop/products/krdbzxftrbwkkeklvjkk.jpg",
-     "publicId": "freedomcosmeticshop/products/krdbzxftrbwkkeklvjkk",
-     "altText": "Rinju Beauté Réelle Body & Hand Cream",
-     "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
-     "imageType": "PRODUCT",
-     "sortOrder": 0,
-     "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785177402/freedomcosmeticshop/products/eitudx0lnpcnk9bnfrjy.jpg",
-     "publicId": "freedomcosmeticshop/products/eitudx0lnpcnk9bnfrjy",
-     "altText": "Rinju Beauté Réelle Body & Hand Cream",
-     "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
-    },
     {
      "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785177381/freedomcosmeticshop/products/p3ft7xm2gdlfkvzbzbox.jpg",
      "publicId": "freedomcosmeticshop/products/p3ft7xm2gdlfkvzbzbox",
@@ -7414,13 +7383,22 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/fetch/f_auto,q_auto/https://bcute-kw.com/wp-content/uploads/2024/01/114.jpg",
-     "publicId": "proxy-cmt1ddn3b004",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785351372/freedomcosmeticshop/products/uvnimtjggc0qwfwsqjjn.jpg",
+     "publicId": "freedomcosmeticshop/products/uvnimtjggc0qwfwsqjjn",
      "altText": "Roushun Turmeric with Vitamin C Lighten Body Lotion",
      "altTextRw": "Roushun Turmeric na Vitamin C Body Lotion",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/fetch/f_auto,q_auto/https://bcute-kw.com/wp-content/uploads/2024/01/114.jpg",
+     "publicId": "proxy-cmt1ddn3b004",
+     "altText": "Roushun Turmeric with Vitamin C Lighten Body Lotion",
+     "altTextRw": "Roushun Turmeric na Vitamin C Body Lotion",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
     }
    ],
    "categorySlug": "whitening",
@@ -7492,8 +7470,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785572005/freedomcosmeticshop/products/rdrdaalgmv1dcthpeoqn.jpg",
-     "publicId": "freedomcosmeticshop/products/rdrdaalgmv1dcthpeoqn",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785505042/freedomcosmeticshop/products/xno2k8fygel4mj9evtqd.jpg",
+     "publicId": "freedomcosmeticshop/products/xno2k8fygel4mj9evtqd",
      "altText": "SCANOAL A PARIS Eau de Parfum Spray Set (2 Pcs)",
      "altTextRw": "SCANOAL A PARIS Eau de Parfum Seti y'amacupa 2",
      "imageType": "PRODUCT",
@@ -7501,8 +7479,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785571993/freedomcosmeticshop/products/vfxlcelzagrnmi9w46mu.jpg",
-     "publicId": "freedomcosmeticshop/products/vfxlcelzagrnmi9w46mu",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785505005/freedomcosmeticshop/products/wbn9wrnw8cxujscunut8.jpg",
+     "publicId": "freedomcosmeticshop/products/wbn9wrnw8cxujscunut8",
      "altText": "SCANOAL A PARIS Eau de Parfum Spray Set (2 Pcs)",
      "altTextRw": "SCANOAL A PARIS Eau de Parfum Seti y'amacupa 2",
      "imageType": "PRODUCT",
@@ -7580,8 +7558,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785933355/freedomcosmeticshop/products/pcsjhdxi7nzann9qsopq.jpg",
-     "publicId": "freedomcosmeticshop/products/pcsjhdxi7nzann9qsopq",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785276289/freedomcosmeticshop/products/aapzqdorosywwbvtqhyb.jpg",
+     "publicId": "freedomcosmeticshop/products/aapzqdorosywwbvtqhyb",
      "altText": "Silky Cool Cucumber Face and Body Scrub Cream",
      "altTextRw": "Silky Cool Cucumber Scrub yo mu maso no ku mubiri",
      "imageType": "PRODUCT",
@@ -7589,8 +7567,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785933307/freedomcosmeticshop/products/srk8en8klwsnwl6k5tnc.jpg",
-     "publicId": "freedomcosmeticshop/products/srk8en8klwsnwl6k5tnc",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785278393/freedomcosmeticshop/products/iiuo7jgnsaalrqj3rzta.jpg",
+     "publicId": "freedomcosmeticshop/products/iiuo7jgnsaalrqj3rzta",
      "altText": "Silky Cool Cucumber Face and Body Scrub Cream",
      "altTextRw": "Silky Cool Cucumber Scrub yo mu maso no ku mubiri",
      "imageType": "PRODUCT",
@@ -7598,8 +7576,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785924477/freedomcosmeticshop/products/nxdj2vpqyvpqwk7dp4ls.jpg",
-     "publicId": "freedomcosmeticshop/products/nxdj2vpqyvpqwk7dp4ls",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785266672/freedomcosmeticshop/products/egmwwxk2sbjug9ncetqb.jpg",
+     "publicId": "freedomcosmeticshop/products/egmwwxk2sbjug9ncetqb",
      "altText": "Silky Cool Cucumber Face and Body Scrub Cream",
      "altTextRw": "Silky Cool Cucumber Scrub yo mu maso no ku mubiri",
      "imageType": "PRODUCT",
@@ -7678,8 +7656,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785931275/freedomcosmeticshop/products/zllnynqtwbwuftsoizqk.jpg",
-     "publicId": "freedomcosmeticshop/products/zllnynqtwbwuftsoizqk",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785275765/freedomcosmeticshop/products/jljcs8zjugls8u69vxos.jpg",
+     "publicId": "freedomcosmeticshop/products/jljcs8zjugls8u69vxos",
      "altText": "Silky Cool Milk Face and Body Scrub",
      "altTextRw": "Silky Cool Milk Scrub yo mu maso no ku mubiri",
      "imageType": "PRODUCT",
@@ -7687,8 +7665,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785931238/freedomcosmeticshop/products/cyavhtp9h0hn3gsc5bs5.jpg",
-     "publicId": "freedomcosmeticshop/products/cyavhtp9h0hn3gsc5bs5",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785275785/freedomcosmeticshop/products/vm4nax7zrwv5r5xifku2.jpg",
+     "publicId": "freedomcosmeticshop/products/vm4nax7zrwv5r5xifku2",
      "altText": "Silky Cool Milk Face and Body Scrub",
      "altTextRw": "Silky Cool Milk Scrub yo mu maso no ku mubiri",
      "imageType": "PRODUCT",
@@ -7696,8 +7674,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785931223/freedomcosmeticshop/products/fauq8rqq1czqr7hmavwh.jpg",
-     "publicId": "freedomcosmeticshop/products/fauq8rqq1czqr7hmavwh",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785276216/freedomcosmeticshop/products/bygxnohadkh26ntu3lbc.jpg",
+     "publicId": "freedomcosmeticshop/products/bygxnohadkh26ntu3lbc",
      "altText": "Silky Cool Milk Face and Body Scrub",
      "altTextRw": "Silky Cool Milk Scrub yo mu maso no ku mubiri",
      "imageType": "PRODUCT",
@@ -7705,12 +7683,21 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785930888/freedomcosmeticshop/products/zprddemfjaqtzxfq4ggg.jpg",
-     "publicId": "freedomcosmeticshop/products/zprddemfjaqtzxfq4ggg",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785275822/freedomcosmeticshop/products/ljgps3gtfamglrhvvahz.jpg",
+     "publicId": "freedomcosmeticshop/products/ljgps3gtfamglrhvvahz",
      "altText": "Silky Cool Milk Face and Body Scrub",
      "altTextRw": "Silky Cool Milk Scrub yo mu maso no ku mubiri",
      "imageType": "PRODUCT",
      "sortOrder": 3,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785275803/freedomcosmeticshop/products/ygkqzn8zhh0jddu23pnp.jpg",
+     "publicId": "freedomcosmeticshop/products/ygkqzn8zhh0jddu23pnp",
+     "altText": "Silky Cool Milk Face and Body Scrub",
+     "altTextRw": "Silky Cool Milk Scrub yo mu maso no ku mubiri",
+     "imageType": "PRODUCT",
+     "sortOrder": 4,
      "isPrimary": false
     }
    ],
@@ -7788,8 +7775,8 @@
    },
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1784821673/freedomcosmeticshop/products/hzdvbgszvvllxn61zuhj.jpg",
-     "publicId": "freedomcosmeticshop/products/hzdvbgszvvllxn61zuhj",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786888585/freedomcosmeticshop/products/xjcim3ulwsch5rmskjsy.jpg",
+     "publicId": "freedomcosmeticshop/products/xjcim3ulwsch5rmskjsy",
      "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
      "altTextRw": "Dettol Fresh Isabune Irwanya Udukoko (Udutambaro 4)",
      "imageType": "PRODUCT",
@@ -7797,8 +7784,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1784821480/freedomcosmeticshop/products/nbbaw3ciurejnr9eie7s.jpg",
-     "publicId": "freedomcosmeticshop/products/nbbaw3ciurejnr9eie7s",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786886996/freedomcosmeticshop/products/ps8cyltk8nkmndmpkf17.jpg",
+     "publicId": "freedomcosmeticshop/products/ps8cyltk8nkmndmpkf17",
      "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
      "altTextRw": "Dettol Fresh Isabune Irwanya Udukoko (Udutambaro 4)",
      "imageType": "PRODUCT",
@@ -7806,8 +7793,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1784818904/freedomcosmeticshop/products/ysoeldht71tawzcy8hjd.jpg",
-     "publicId": "freedomcosmeticshop/products/ysoeldht71tawzcy8hjd",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786886382/freedomcosmeticshop/products/uambta0ou19tml9tgcsa.jpg",
+     "publicId": "freedomcosmeticshop/products/uambta0ou19tml9tgcsa",
      "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
      "altTextRw": "Dettol Fresh Isabune Irwanya Udukoko (Udutambaro 4)",
      "imageType": "PRODUCT",
@@ -7815,57 +7802,12 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1784818478/freedomcosmeticshop/products/zllkiha2ti7tknayolmr.jpg",
-     "publicId": "freedomcosmeticshop/products/zllkiha2ti7tknayolmr",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786885811/freedomcosmeticshop/products/fkct2mcki1qtqpkxlqbn.jpg",
+     "publicId": "freedomcosmeticshop/products/fkct2mcki1qtqpkxlqbn",
      "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
      "altTextRw": "Dettol Fresh Isabune Irwanya Udukoko (Udutambaro 4)",
      "imageType": "PRODUCT",
      "sortOrder": 3,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785333292/freedomcosmeticshop/products/myawhljby6f1ca2gigee.jpg",
-     "publicId": "freedomcosmeticshop/products/myawhljby6f1ca2gigee",
-     "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
-     "altTextRw": "Dettol Fresh Isabune Irwanya Udukoko (Udutambaro 4)",
-     "imageType": "PRODUCT",
-     "sortOrder": 4,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785323267/freedomcosmeticshop/products/x4vzydsjtxohawrqqalc.jpg",
-     "publicId": "freedomcosmeticshop/products/x4vzydsjtxohawrqqalc",
-     "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
-     "altTextRw": "Dettol Fresh Isabune Irwanya Udukoko (Udutambaro 4)",
-     "imageType": "PRODUCT",
-     "sortOrder": 5,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785322679/freedomcosmeticshop/products/xgdpr7ksvk8vaeqbv75c.jpg",
-     "publicId": "freedomcosmeticshop/products/xgdpr7ksvk8vaeqbv75c",
-     "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
-     "altTextRw": "Dettol Fresh Isabune Irwanya Udukoko (Udutambaro 4)",
-     "imageType": "PRODUCT",
-     "sortOrder": 6,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785322653/freedomcosmeticshop/products/sjjcnvcyerayagq74hhz.jpg",
-     "publicId": "freedomcosmeticshop/products/sjjcnvcyerayagq74hhz",
-     "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
-     "altTextRw": "Dettol Fresh Isabune Irwanya Udukoko (Udutambaro 4)",
-     "imageType": "PRODUCT",
-     "sortOrder": 7,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785322277/freedomcosmeticshop/products/vtqqp0ieu9hrtmjxvqwf.jpg",
-     "publicId": "freedomcosmeticshop/products/vtqqp0ieu9hrtmjxvqwf",
-     "altText": "Dettol Fresh Antibacterial Soap (Pack of 4)",
-     "altTextRw": "Dettol Fresh Isabune Irwanya Udukoko (Udutambaro 4)",
-     "imageType": "PRODUCT",
-     "sortOrder": 8,
      "isPrimary": false
     }
    ],
@@ -7945,22 +7887,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785506299/freedomcosmeticshop/products/qdngvdg5pelyz27l7cva.jpg",
-     "publicId": "freedomcosmeticshop/products/qdngvdg5pelyz27l7cva",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785597885/freedomcosmeticshop/products/i8x0nepoybsux7hzvppt.jpg",
+     "publicId": "freedomcosmeticshop/products/i8x0nepoybsux7hzvppt",
      "altText": "Super Love Eau De Parfum 2-Piece Gift Set",
      "altTextRw": "Super Love Eau De Parfum Seti y'Impano y'ibice 2",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785506086/freedomcosmeticshop/products/mahx3p4ivh2qqg1708uc.jpg",
-     "publicId": "freedomcosmeticshop/products/mahx3p4ivh2qqg1708uc",
-     "altText": "Super Love Eau De Parfum 2-Piece Gift Set",
-     "altTextRw": "Super Love Eau De Parfum Seti y'Impano y'ibice 2",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "fragrance",
@@ -8033,8 +7966,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785508368/freedomcosmeticshop/products/kewpcx1yrujv19tvxjgv.jpg",
-     "publicId": "freedomcosmeticshop/products/kewpcx1yrujv19tvxjgv",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785598862/freedomcosmeticshop/products/wvc3fmkb8tjsukbstn4s.jpg",
+     "publicId": "freedomcosmeticshop/products/wvc3fmkb8tjsukbstn4s",
      "altText": "SUPER LOVE' RED Eau de Parfum 2PCS Gift Set",
      "altTextRw": "SUPER LOVE' RED Eau de Parfum Seti y'Impano y'ibice 2",
      "imageType": "PRODUCT",
@@ -8042,8 +7975,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785508337/freedomcosmeticshop/products/oji0e5jbresppyzaxb9a.jpg",
-     "publicId": "freedomcosmeticshop/products/oji0e5jbresppyzaxb9a",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785598695/freedomcosmeticshop/products/l9svacgfc1rzggjzplkc.jpg",
+     "publicId": "freedomcosmeticshop/products/l9svacgfc1rzggjzplkc",
      "altText": "SUPER LOVE' RED Eau de Parfum 2PCS Gift Set",
      "altTextRw": "SUPER LOVE' RED Eau de Parfum Seti y'Impano y'ibice 2",
      "imageType": "PRODUCT",
@@ -8200,8 +8133,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786737895/freedomcosmeticshop/products/brnx4tvukuej2r1kdhf3.jpg",
-     "publicId": "freedomcosmeticshop/products/brnx4tvukuej2r1kdhf3",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785237322/freedomcosmeticshop/products/g2cxbcr0jdi4590dfa7c.jpg",
+     "publicId": "freedomcosmeticshop/products/g2cxbcr0jdi4590dfa7c",
      "altText": "The Original Sunny Isle Jamaican Black Castor Oil",
      "altTextRw": "Sunny Isle Jamaican Black Castor Oil Original",
      "imageType": "PRODUCT",
@@ -8209,8 +8142,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786737366/freedomcosmeticshop/products/vorurbktlne1klknshek.jpg",
-     "publicId": "freedomcosmeticshop/products/vorurbktlne1klknshek",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785177471/freedomcosmeticshop/products/vvgglnetycyo6ksg2hbr.jpg",
+     "publicId": "freedomcosmeticshop/products/vvgglnetycyo6ksg2hbr",
      "altText": "The Original Sunny Isle Jamaican Black Castor Oil",
      "altTextRw": "Sunny Isle Jamaican Black Castor Oil Original",
      "imageType": "PRODUCT",
@@ -8218,8 +8151,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786737237/freedomcosmeticshop/products/pymtqersir53bsjulfnm.jpg",
-     "publicId": "freedomcosmeticshop/products/pymtqersir53bsjulfnm",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785177428/freedomcosmeticshop/products/krdbzxftrbwkkeklvjkk.jpg",
+     "publicId": "freedomcosmeticshop/products/krdbzxftrbwkkeklvjkk",
      "altText": "The Original Sunny Isle Jamaican Black Castor Oil",
      "altTextRw": "Sunny Isle Jamaican Black Castor Oil Original",
      "imageType": "PRODUCT",
@@ -8227,12 +8160,30 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786736908/freedomcosmeticshop/products/adx8tdfqovhprsmv72vl.jpg",
-     "publicId": "freedomcosmeticshop/products/adx8tdfqovhprsmv72vl",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785177402/freedomcosmeticshop/products/eitudx0lnpcnk9bnfrjy.jpg",
+     "publicId": "freedomcosmeticshop/products/eitudx0lnpcnk9bnfrjy",
      "altText": "The Original Sunny Isle Jamaican Black Castor Oil",
      "altTextRw": "Sunny Isle Jamaican Black Castor Oil Original",
      "imageType": "PRODUCT",
      "sortOrder": 3,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785251459/freedomcosmeticshop/products/wjlwowmoogepalc9q7se.jpg",
+     "publicId": "freedomcosmeticshop/products/wjlwowmoogepalc9q7se",
+     "altText": "The Original Sunny Isle Jamaican Black Castor Oil",
+     "altTextRw": "Sunny Isle Jamaican Black Castor Oil Original",
+     "imageType": "PRODUCT",
+     "sortOrder": 4,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785246283/freedomcosmeticshop/products/swzxoyfm2vxawiyepxni.jpg",
+     "publicId": "freedomcosmeticshop/products/swzxoyfm2vxawiyepxni",
+     "altText": "The Original Sunny Isle Jamaican Black Castor Oil",
+     "altTextRw": "Sunny Isle Jamaican Black Castor Oil Original",
+     "imageType": "PRODUCT",
+     "sortOrder": 5,
      "isPrimary": false
     },
     {
@@ -8241,16 +8192,7 @@
      "altText": "The Original Sunny Isle Jamaican Black Castor Oil",
      "altTextRw": "Sunny Isle Jamaican Black Castor Oil Original",
      "imageType": "PRODUCT",
-     "sortOrder": 4,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786736211/freedomcosmeticshop/products/hdviin33tdnuozuwaomf.jpg",
-     "publicId": "freedomcosmeticshop/products/hdviin33tdnuozuwaomf",
-     "altText": "The Original Sunny Isle Jamaican Black Castor Oil",
-     "altTextRw": "Sunny Isle Jamaican Black Castor Oil Original",
-     "imageType": "PRODUCT",
-     "sortOrder": 5,
+     "sortOrder": 6,
      "isPrimary": false
     }
    ],
@@ -8334,7 +8276,34 @@
      "altTextRw": "Touch Me! PLEASE Isabune yo ku ruhu rufite amavuta menshi irimo ibimera",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785763854/freedomcosmeticshop/products/zloae5pmydk4t1x5dirw.jpg",
+     "publicId": "freedomcosmeticshop/products/zloae5pmydk4t1x5dirw",
+     "altText": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
+     "altTextRw": "Touch Me! PLEASE Isabune yo ku ruhu rufite amavuta menshi irimo ibimera",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785763714/freedomcosmeticshop/products/hwecpb742wlsm9lmzihk.jpg",
+     "publicId": "freedomcosmeticshop/products/hwecpb742wlsm9lmzihk",
+     "altText": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
+     "altTextRw": "Touch Me! PLEASE Isabune yo ku ruhu rufite amavuta menshi irimo ibimera",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785758505/freedomcosmeticshop/products/usuxyldvp2efl1rcdscy.jpg",
+     "publicId": "freedomcosmeticshop/products/usuxyldvp2efl1rcdscy",
+     "altText": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
+     "altTextRw": "Touch Me! PLEASE Isabune yo ku ruhu rufite amavuta menshi irimo ibimera",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
+     "isPrimary": false
     },
     {
      "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785423751/freedomcosmeticshop/products/fljvuoy3kt7rdahaqa0x.jpg",
@@ -8342,16 +8311,7 @@
      "altText": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
      "altTextRw": "Touch Me! PLEASE Isabune yo ku ruhu rufite amavuta menshi irimo ibimera",
      "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785423738/freedomcosmeticshop/products/p4qmw1tifjgal8zuzuuc.jpg",
-     "publicId": "freedomcosmeticshop/products/p4qmw1tifjgal8zuzuuc",
-     "altText": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
-     "altTextRw": "Touch Me! PLEASE Isabune yo ku ruhu rufite amavuta menshi irimo ibimera",
-     "imageType": "PRODUCT",
-     "sortOrder": 2,
+     "sortOrder": 4,
      "isPrimary": false
     }
    ],
@@ -8427,22 +8387,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785351372/freedomcosmeticshop/products/uvnimtjggc0qwfwsqjjn.jpg",
-     "publicId": "freedomcosmeticshop/products/uvnimtjggc0qwfwsqjjn",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785933307/freedomcosmeticshop/products/srk8en8klwsnwl6k5tnc.jpg",
+     "publicId": "freedomcosmeticshop/products/srk8en8klwsnwl6k5tnc",
      "altText": "Turmeric Super Whitening Soap (Body Repair, Anti Dark Spots & Anti-aging)",
      "altTextRw": "Turmeric Super Whitening Soap yo gusukura no kwita ku ruhu",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785351356/freedomcosmeticshop/products/mnjwnp6lwcs2apo3pnuc.jpg",
-     "publicId": "freedomcosmeticshop/products/mnjwnp6lwcs2apo3pnuc",
-     "altText": "Turmeric Super Whitening Soap (Body Repair, Anti Dark Spots & Anti-aging)",
-     "altTextRw": "Turmeric Super Whitening Soap yo gusukura no kwita ku ruhu",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "soap",
@@ -8518,22 +8469,13 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785743842/freedomcosmeticshop/products/jwmldyeua5frcd5smmlh.jpg",
-     "publicId": "freedomcosmeticshop/products/jwmldyeua5frcd5smmlh",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785338412/freedomcosmeticshop/products/mjh8zobcsle2drbkwqui.jpg",
+     "publicId": "freedomcosmeticshop/products/mjh8zobcsle2drbkwqui",
      "altText": "Vaseline Blue Seal Aloe Vera Perfumed Petroleum Jelly 240ml",
      "altTextRw": "Vaseline Blue Seal Aloe Vera Petroleum Jelly 240ml",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785743795/freedomcosmeticshop/products/orzvf7yaes3w6wc1inh2.jpg",
-     "publicId": "freedomcosmeticshop/products/orzvf7yaes3w6wc1inh2",
-     "altText": "Vaseline Blue Seal Aloe Vera Perfumed Petroleum Jelly 240ml",
-     "altTextRw": "Vaseline Blue Seal Aloe Vera Petroleum Jelly 240ml",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
     }
    ],
    "categorySlug": "petroleum-jelly",
@@ -8606,8 +8548,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785744458/freedomcosmeticshop/products/o6siclqupvyrrqste10z.jpg",
-     "publicId": "freedomcosmeticshop/products/o6siclqupvyrrqste10z",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785596103/freedomcosmeticshop/products/mcfltbkrbngpvqswc8qu.jpg",
+     "publicId": "freedomcosmeticshop/products/mcfltbkrbngpvqswc8qu",
      "altText": "Vaseline Blue Seal Baby Perfumed Petroleum Jelly",
      "altTextRw": "Vaseline Blue Seal Baby Petroleum Jelly",
      "imageType": "PRODUCT",
@@ -8615,8 +8557,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785744297/freedomcosmeticshop/products/orgj5i1srimo9tqkx4vu.jpg",
-     "publicId": "freedomcosmeticshop/products/orgj5i1srimo9tqkx4vu",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785744458/freedomcosmeticshop/products/o6siclqupvyrrqste10z.jpg",
+     "publicId": "freedomcosmeticshop/products/o6siclqupvyrrqste10z",
      "altText": "Vaseline Blue Seal Baby Perfumed Petroleum Jelly",
      "altTextRw": "Vaseline Blue Seal Baby Petroleum Jelly",
      "imageType": "PRODUCT",
@@ -8694,13 +8636,22 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785746983/freedomcosmeticshop/products/yp0xwblxlxlzdxo7c6je.jpg",
-     "publicId": "freedomcosmeticshop/products/yp0xwblxlxlzdxo7c6je",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785340701/freedomcosmeticshop/products/cowefrellnnncgu1qzkk.jpg",
+     "publicId": "freedomcosmeticshop/products/cowefrellnnncgu1qzkk",
      "altText": "Vaseline Blue Seal Cocoa Butter Perfumed Petroleum Jelly",
      "altTextRw": "Vaseline Blue Seal Cocoa Butter Petroleum Jelly",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785746983/freedomcosmeticshop/products/yp0xwblxlxlzdxo7c6je.jpg",
+     "publicId": "freedomcosmeticshop/products/yp0xwblxlxlzdxo7c6je",
+     "altText": "Vaseline Blue Seal Cocoa Butter Perfumed Petroleum Jelly",
+     "altTextRw": "Vaseline Blue Seal Cocoa Butter Petroleum Jelly",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
     }
    ],
    "categorySlug": "petroleum-jelly",
@@ -8772,8 +8723,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785744236/freedomcosmeticshop/products/fqnuuzmyhyflpg05uequ.jpg",
-     "publicId": "freedomcosmeticshop/products/fqnuuzmyhyflpg05uequ",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785339357/freedomcosmeticshop/products/ddrnxehtml0jzpxbkqif.jpg",
+     "publicId": "freedomcosmeticshop/products/ddrnxehtml0jzpxbkqif",
      "altText": "Vaseline Blue Seal Men Cooling Perfumed Petroleum Jelly 240ml",
      "altTextRw": "Vaseline Blue Seal Men Cooling Petroleum Jelly 240ml",
      "imageType": "PRODUCT",
@@ -8781,12 +8732,21 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785744063/freedomcosmeticshop/products/a8zjpyicndi9u6smyvxg.jpg",
-     "publicId": "freedomcosmeticshop/products/a8zjpyicndi9u6smyvxg",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785339369/freedomcosmeticshop/products/c1ypkwpamdkvo8iscs1i.jpg",
+     "publicId": "freedomcosmeticshop/products/c1ypkwpamdkvo8iscs1i",
      "altText": "Vaseline Blue Seal Men Cooling Perfumed Petroleum Jelly 240ml",
      "altTextRw": "Vaseline Blue Seal Men Cooling Petroleum Jelly 240ml",
      "imageType": "PRODUCT",
      "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785340687/freedomcosmeticshop/products/je8fncbmxeyjl0zglnda.jpg",
+     "publicId": "freedomcosmeticshop/products/je8fncbmxeyjl0zglnda",
+     "altText": "Vaseline Blue Seal Men Cooling Perfumed Petroleum Jelly 240ml",
+     "altTextRw": "Vaseline Blue Seal Men Cooling Petroleum Jelly 240ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -8860,22 +8820,31 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785743501/freedomcosmeticshop/products/ypdn9peqizrjvy5lpaom.jpg",
-     "publicId": "freedomcosmeticshop/products/ypdn9peqizrjvy5lpaom",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785338369/freedomcosmeticshop/products/dvon4wtmgva41apxc5ym.jpg",
+     "publicId": "freedomcosmeticshop/products/dvon4wtmgva41apxc5ym",
      "altText": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
      "altTextRw": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
      "imageType": "PRODUCT",
      "sortOrder": 0,
-     "isPrimary": true
+     "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785743141/freedomcosmeticshop/products/kigxrp9ziumgprnzaqiv.jpg",
-     "publicId": "freedomcosmeticshop/products/kigxrp9ziumgprnzaqiv",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785338390/freedomcosmeticshop/products/l47cnwxf4uyiuq2zv7yi.jpg",
+     "publicId": "freedomcosmeticshop/products/l47cnwxf4uyiuq2zv7yi",
      "altText": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
      "altTextRw": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
      "imageType": "PRODUCT",
      "sortOrder": 1,
      "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785336294/freedomcosmeticshop/products/fv46tgfsddlcpytbnjos.jpg",
+     "publicId": "freedomcosmeticshop/products/fv46tgfsddlcpytbnjos",
+     "altText": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
+     "altTextRw": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": true
     }
    ],
    "categorySlug": "petroleum-jelly",
@@ -8948,8 +8917,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785769918/freedomcosmeticshop/products/q4ryrfcks8gfnuepeysc.jpg",
-     "publicId": "freedomcosmeticshop/products/q4ryrfcks8gfnuepeysc",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785406717/freedomcosmeticshop/products/axv8wwlt2daoafot22w5.jpg",
+     "publicId": "freedomcosmeticshop/products/axv8wwlt2daoafot22w5",
      "altText": "Vaseline Intensive Care Cocoa Radiant Vitalizing Body Oil",
      "altTextRw": "Vaseline Intensive Care Cocoa Radiant Body Oil",
      "imageType": "PRODUCT",
@@ -9026,13 +8995,31 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785253875/freedomcosmeticshop/products/ptt2zb4lf7obprxbqocp.jpg",
-     "publicId": "freedomcosmeticshop/products/ptt2zb4lf7obprxbqocp",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785323290/freedomcosmeticshop/products/xa805xjk9dderv0y6n3o.jpg",
+     "publicId": "freedomcosmeticshop/products/xa805xjk9dderv0y6n3o",
      "altText": "Veet Gold Turmeric Super Whitening Oil 500ml",
      "altTextRw": "Veet Gold Turmeric Super Whitening Oil 500ml",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785323255/freedomcosmeticshop/products/klowqrnfyzjm9oa6ibw8.jpg",
+     "publicId": "freedomcosmeticshop/products/klowqrnfyzjm9oa6ibw8",
+     "altText": "Veet Gold Turmeric Super Whitening Oil 500ml",
+     "altTextRw": "Veet Gold Turmeric Super Whitening Oil 500ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785322698/freedomcosmeticshop/products/qupg4n1ozi4g2gu9mln4.jpg",
+     "publicId": "freedomcosmeticshop/products/qupg4n1ozi4g2gu9mln4",
+     "altText": "Veet Gold Turmeric Super Whitening Oil 500ml",
+     "altTextRw": "Veet Gold Turmeric Super Whitening Oil 500ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
     }
    ],
    "categorySlug": "body-oil",
@@ -9112,6 +9099,15 @@
      "altTextRw": "Veet Gold Turmeric Super Whitening Oil 300ml",
      "imageType": "PRODUCT",
      "sortOrder": 0,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785323267/freedomcosmeticshop/products/x4vzydsjtxohawrqqalc.jpg",
+     "publicId": "freedomcosmeticshop/products/x4vzydsjtxohawrqqalc",
+     "altText": "Veet Gold Turmeric Super Whitening Oil 300ml",
+     "altTextRw": "Veet Gold Turmeric Super Whitening Oil 300ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
      "isPrimary": true
     }
    ],
@@ -9184,8 +9180,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785950874/freedomcosmeticshop/products/ljf4fi2bzfonfnslqdbv.jpg",
-     "publicId": "freedomcosmeticshop/products/ljf4fi2bzfonfnslqdbv",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785333292/freedomcosmeticshop/products/myawhljby6f1ca2gigee.jpg",
+     "publicId": "freedomcosmeticshop/products/myawhljby6f1ca2gigee",
      "altText": "Veet Gold Turmeric Super Whitening Oil 200ml",
      "altTextRw": "Veet Gold Turmeric Super Whitening Oil 200ml",
      "imageType": "PRODUCT",
@@ -9260,26 +9256,7 @@
     "slug": "soap"
    },
    "brand": null,
-   "productImages": [
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785418158/freedomcosmeticshop/products/wd1regvqfymw8gzulket.jpg",
-     "publicId": "freedomcosmeticshop/products/wd1regvqfymw8gzulket",
-     "altText": "Veet Gold Vitamin C Body Corrector Soap (7 Days Whitening and Glowing Soap SPF15)",
-     "altTextRw": "Veet Gold Vitamin C Body Corrector Soap SPF15",
-     "imageType": "PRODUCT",
-     "sortOrder": 0,
-     "isPrimary": true
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785417968/freedomcosmeticshop/products/yo1cj8bqg3ucfafthmkp.jpg",
-     "publicId": "freedomcosmeticshop/products/yo1cj8bqg3ucfafthmkp",
-     "altText": "Veet Gold Vitamin C Body Corrector Soap (7 Days Whitening and Glowing Soap SPF15)",
-     "altTextRw": "Veet Gold Vitamin C Body Corrector Soap SPF15",
-     "imageType": "PRODUCT",
-     "sortOrder": 1,
-     "isPrimary": false
-    }
-   ],
+   "productImages": [],
    "categorySlug": "soap",
    "brandSlug": null,
    "imageUrls": [
@@ -9350,8 +9327,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786606794/freedomcosmeticshop/products/pyltdl4fmy1cbkxvnjhb.jpg",
-     "publicId": "freedomcosmeticshop/products/pyltdl4fmy1cbkxvnjhb",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785251484/freedomcosmeticshop/products/jjedlroklxezidgfgwje.jpg",
+     "publicId": "freedomcosmeticshop/products/jjedlroklxezidgfgwje",
      "altText": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
@@ -9359,8 +9336,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786606765/freedomcosmeticshop/products/bqievr3jea40pbe65qdw.jpg",
-     "publicId": "freedomcosmeticshop/products/bqievr3jea40pbe65qdw",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785251472/freedomcosmeticshop/products/i9rddmg0czrutkzf2efn.jpg",
+     "publicId": "freedomcosmeticshop/products/i9rddmg0czrutkzf2efn",
      "altText": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
@@ -9368,12 +9345,39 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786606689/freedomcosmeticshop/products/kvriposqxadzrs5d3yfj.jpg",
-     "publicId": "freedomcosmeticshop/products/kvriposqxadzrs5d3yfj",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785252896/freedomcosmeticshop/products/byg9ni9hjgf7e2zcp4gr.jpg",
+     "publicId": "freedomcosmeticshop/products/byg9ni9hjgf7e2zcp4gr",
      "altText": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
      "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785251505/freedomcosmeticshop/products/pvkq9lrbobwbkd17h7du.jpg",
+     "publicId": "freedomcosmeticshop/products/pvkq9lrbobwbkd17h7du",
+     "altText": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+     "altTextRw": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785251494/freedomcosmeticshop/products/jestm68bguka3l6kxlbn.jpg",
+     "publicId": "freedomcosmeticshop/products/jestm68bguka3l6kxlbn",
+     "altText": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+     "altTextRw": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 4,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786606765/freedomcosmeticshop/products/bqievr3jea40pbe65qdw.jpg",
+     "publicId": "freedomcosmeticshop/products/bqievr3jea40pbe65qdw",
+     "altText": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+     "altTextRw": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 5,
      "isPrimary": false
     },
     {
@@ -9382,7 +9386,7 @@
      "altText": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
-     "sortOrder": 3,
+     "sortOrder": 6,
      "isPrimary": false
     }
    ],
@@ -9458,8 +9462,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786609433/freedomcosmeticshop/products/sdaa6qnnfykwpoq4lmuy.jpg",
-     "publicId": "freedomcosmeticshop/products/sdaa6qnnfykwpoq4lmuy",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785253875/freedomcosmeticshop/products/ptt2zb4lf7obprxbqocp.jpg",
+     "publicId": "freedomcosmeticshop/products/ptt2zb4lf7obprxbqocp",
      "altText": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
@@ -9467,8 +9471,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786609411/freedomcosmeticshop/products/noahifrnjdw29upjssl7.jpg",
-     "publicId": "freedomcosmeticshop/products/noahifrnjdw29upjssl7",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785255622/freedomcosmeticshop/products/beaixnotmdz9os7uwq6r.jpg",
+     "publicId": "freedomcosmeticshop/products/beaixnotmdz9os7uwq6r",
      "altText": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
@@ -9476,8 +9480,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786609397/freedomcosmeticshop/products/jzwzr3xrzyzpzlrsmkvm.jpg",
-     "publicId": "freedomcosmeticshop/products/jzwzr3xrzyzpzlrsmkvm",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785255659/freedomcosmeticshop/products/v7edt5xtatrtx3xjd9vn.jpg",
+     "publicId": "freedomcosmeticshop/products/v7edt5xtatrtx3xjd9vn",
      "altText": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
@@ -9485,8 +9489,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786609380/freedomcosmeticshop/products/zspugcku7i1xmiot1etn.jpg",
-     "publicId": "freedomcosmeticshop/products/zspugcku7i1xmiot1etn",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785255651/freedomcosmeticshop/products/wcr3jcce4ymvuihcadpm.jpg",
+     "publicId": "freedomcosmeticshop/products/wcr3jcce4ymvuihcadpm",
      "altText": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
@@ -9494,8 +9498,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786609149/freedomcosmeticshop/products/vgfdpakakcfrxwwlfxmt.jpg",
-     "publicId": "freedomcosmeticshop/products/vgfdpakakcfrxwwlfxmt",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785255632/freedomcosmeticshop/products/s6aa9yfhhidcpx3p84dz.jpg",
+     "publicId": "freedomcosmeticshop/products/s6aa9yfhhidcpx3p84dz",
      "altText": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
@@ -9503,12 +9507,21 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786609118/freedomcosmeticshop/products/imrl6bq1pg9yirzpi7za.jpg",
-     "publicId": "freedomcosmeticshop/products/imrl6bq1pg9yirzpi7za",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785253887/freedomcosmeticshop/products/qtq1fkaoff3g8i7ecqy1.jpg",
+     "publicId": "freedomcosmeticshop/products/qtq1fkaoff3g8i7ecqy1",
      "altText": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA MY LOVE Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
      "sortOrder": 5,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785252908/freedomcosmeticshop/products/tfqlgrudycpeuwr7ikdg.jpg",
+     "publicId": "freedomcosmeticshop/products/tfqlgrudycpeuwr7ikdg",
+     "altText": "VERLORNA MY LOVE Fragrance Mist – 250ml",
+     "altTextRw": "VERLORNA MY LOVE Fragrance Mist – 250ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 6,
      "isPrimary": false
     }
    ],
@@ -9586,8 +9599,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786612568/freedomcosmeticshop/products/tenqfiqyshrw2z4jnc4v.jpg",
-     "publicId": "freedomcosmeticshop/products/tenqfiqyshrw2z4jnc4v",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785257384/freedomcosmeticshop/products/juyah8hwgekq9za7r8ev.jpg",
+     "publicId": "freedomcosmeticshop/products/juyah8hwgekq9za7r8ev",
      "altText": "VERLORNA SUAWACE Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA SUAWACE Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
@@ -9595,8 +9608,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786612549/freedomcosmeticshop/products/lmcxi7qotiuztgppf9ak.jpg",
-     "publicId": "freedomcosmeticshop/products/lmcxi7qotiuztgppf9ak",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785257375/freedomcosmeticshop/products/gvxgtgbl5gk2v7zqfjua.jpg",
+     "publicId": "freedomcosmeticshop/products/gvxgtgbl5gk2v7zqfjua",
      "altText": "VERLORNA SUAWACE Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA SUAWACE Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
@@ -9604,12 +9617,21 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786612330/freedomcosmeticshop/products/gvrbnys1envh6qhu2t6v.jpg",
-     "publicId": "freedomcosmeticshop/products/gvrbnys1envh6qhu2t6v",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785257405/freedomcosmeticshop/products/g9cu1fqxgcgago4jqvhb.jpg",
+     "publicId": "freedomcosmeticshop/products/g9cu1fqxgcgago4jqvhb",
      "altText": "VERLORNA SUAWACE Fragrance Mist – 250ml",
      "altTextRw": "VERLORNA SUAWACE Fragrance Mist – 250ml",
      "imageType": "PRODUCT",
      "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785257395/freedomcosmeticshop/products/srtzutpkzpkdlvgba3zm.jpg",
+     "publicId": "freedomcosmeticshop/products/srtzutpkzpkdlvgba3zm",
+     "altText": "VERLORNA SUAWACE Fragrance Mist – 250ml",
+     "altTextRw": "VERLORNA SUAWACE Fragrance Mist – 250ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -9761,21 +9783,30 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785587162/freedomcosmeticshop/products/eyxbuptycx34u36ziafw.jpg",
-     "publicId": "freedomcosmeticshop/products/eyxbuptycx34u36ziafw",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785593849/freedomcosmeticshop/products/e3dyl4jqwcdl4a8ygjpl.jpg",
+     "publicId": "freedomcosmeticshop/products/e3dyl4jqwcdl4a8ygjpl",
      "altText": "Verlorna World Fantsly",
      "altTextRw": "Verlorna World Fantsly Fragrance",
      "imageType": "PRODUCT",
      "sortOrder": 0,
-     "isPrimary": true
+     "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785587131/freedomcosmeticshop/products/sbsspbm6ilwtintqqhtr.jpg",
-     "publicId": "freedomcosmeticshop/products/sbsspbm6ilwtintqqhtr",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582071/freedomcosmeticshop/products/gpc8c2qe7nwr7orgoqdf.jpg",
+     "publicId": "freedomcosmeticshop/products/gpc8c2qe7nwr7orgoqdf",
      "altText": "Verlorna World Fantsly",
      "altTextRw": "Verlorna World Fantsly Fragrance",
      "imageType": "PRODUCT",
      "sortOrder": 1,
+     "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582029/freedomcosmeticshop/products/vkrfnikreanbscbmxw5n.jpg",
+     "publicId": "freedomcosmeticshop/products/vkrfnikreanbscbmxw5n",
+     "altText": "Verlorna World Fantsly",
+     "altTextRw": "Verlorna World Fantsly Fragrance",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
      "isPrimary": false
     }
    ],
@@ -9847,7 +9878,35 @@
     "slug": "fragrance"
    },
    "brand": null,
-   "productImages": [],
+   "productImages": [
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582361/freedomcosmeticshop/products/svfcuz6agnuqc3orkdx1.jpg",
+     "publicId": "freedomcosmeticshop/products/svfcuz6agnuqc3orkdx1",
+     "altText": "Verlorna World For Away Body Mist",
+     "altTextRw": "Verlorna World For Away Body Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 0,
+     "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582321/freedomcosmeticshop/products/fuauzrwd5ivt3bc3aa4s.jpg",
+     "publicId": "freedomcosmeticshop/products/fuauzrwd5ivt3bc3aa4s",
+     "altText": "Verlorna World For Away Body Mist",
+     "altTextRw": "Verlorna World For Away Body Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582222/freedomcosmeticshop/products/vt7gs7n9plezodws2vx5.jpg",
+     "publicId": "freedomcosmeticshop/products/vt7gs7n9plezodws2vx5",
+     "altText": "Verlorna World For Away Body Mist",
+     "altTextRw": "Verlorna World For Away Body Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
+    }
+   ],
    "categorySlug": "fragrance",
    "brandSlug": null,
    "imageUrls": []
@@ -9915,8 +9974,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785590016/freedomcosmeticshop/products/jcugu99bdidzat7nzfda.jpg",
-     "publicId": "freedomcosmeticshop/products/jcugu99bdidzat7nzfda",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785585645/freedomcosmeticshop/products/gwvjwzrueh9rrgquyquz.jpg",
+     "publicId": "freedomcosmeticshop/products/gwvjwzrueh9rrgquyquz",
      "altText": "Verlorna World Ideal Fragrance Mist",
      "altTextRw": "Verlorna World Ideal Fragrance Mist",
      "imageType": "PRODUCT",
@@ -9924,8 +9983,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785589993/freedomcosmeticshop/products/obtn2a0ndft9q2xlnidz.jpg",
-     "publicId": "freedomcosmeticshop/products/obtn2a0ndft9q2xlnidz",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785585536/freedomcosmeticshop/products/revb3hepcks7nhkhvrsj.jpg",
+     "publicId": "freedomcosmeticshop/products/revb3hepcks7nhkhvrsj",
      "altText": "Verlorna World Ideal Fragrance Mist",
      "altTextRw": "Verlorna World Ideal Fragrance Mist",
      "imageType": "PRODUCT",
@@ -9933,12 +9992,21 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785589868/freedomcosmeticshop/products/kmka85aanqegdjnsw4nc.jpg",
-     "publicId": "freedomcosmeticshop/products/kmka85aanqegdjnsw4nc",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785582939/freedomcosmeticshop/products/o8bx5bk69hhzh0b0snev.jpg",
+     "publicId": "freedomcosmeticshop/products/o8bx5bk69hhzh0b0snev",
      "altText": "Verlorna World Ideal Fragrance Mist",
      "altTextRw": "Verlorna World Ideal Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 2,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785589993/freedomcosmeticshop/products/obtn2a0ndft9q2xlnidz.jpg",
+     "publicId": "freedomcosmeticshop/products/obtn2a0ndft9q2xlnidz",
+     "altText": "Verlorna World Ideal Fragrance Mist",
+     "altTextRw": "Verlorna World Ideal Fragrance Mist",
+     "imageType": "PRODUCT",
+     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -10013,8 +10081,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785416037/freedomcosmeticshop/products/rewc1luelzne0boapvll.jpg",
-     "publicId": "freedomcosmeticshop/products/rewc1luelzne0boapvll",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785744297/freedomcosmeticshop/products/orgj5i1srimo9tqkx4vu.jpg",
+     "publicId": "freedomcosmeticshop/products/orgj5i1srimo9tqkx4vu",
      "altText": "Victoria Super Colorful (VSC) Carrot 7 Days Extra Whitening Soap",
      "altTextRw": "Victoria Super Colorful Carrot 7 Days Soap",
      "imageType": "PRODUCT",
@@ -10022,8 +10090,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785410445/freedomcosmeticshop/products/r2xh9u9mdk2x6non7ih3.jpg",
-     "publicId": "freedomcosmeticshop/products/r2xh9u9mdk2x6non7ih3",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785744236/freedomcosmeticshop/products/fqnuuzmyhyflpg05uequ.jpg",
+     "publicId": "freedomcosmeticshop/products/fqnuuzmyhyflpg05uequ",
      "altText": "Victoria Super Colorful (VSC) Carrot 7 Days Extra Whitening Soap",
      "altTextRw": "Victoria Super Colorful Carrot 7 Days Soap",
      "imageType": "PRODUCT",
@@ -10031,21 +10099,12 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785410428/freedomcosmeticshop/products/q16bhstahj1kqylpqjex.jpg",
-     "publicId": "freedomcosmeticshop/products/q16bhstahj1kqylpqjex",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785410445/freedomcosmeticshop/products/r2xh9u9mdk2x6non7ih3.jpg",
+     "publicId": "freedomcosmeticshop/products/r2xh9u9mdk2x6non7ih3",
      "altText": "Victoria Super Colorful (VSC) Carrot 7 Days Extra Whitening Soap",
      "altTextRw": "Victoria Super Colorful Carrot 7 Days Soap",
      "imageType": "PRODUCT",
      "sortOrder": 2,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785768844/freedomcosmeticshop/products/fn5wrssf1yb1fp0rz8ki.jpg",
-     "publicId": "freedomcosmeticshop/products/fn5wrssf1yb1fp0rz8ki",
-     "altText": "Victoria Super Colorful (VSC) Carrot 7 Days Extra Whitening Soap",
-     "altTextRw": "Victoria Super Colorful Carrot 7 Days Soap",
-     "imageType": "PRODUCT",
-     "sortOrder": 3,
      "isPrimary": false
     }
    ],
@@ -10124,8 +10183,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785777737/freedomcosmeticshop/products/jmlmcphaei4ddsld4qyj.jpg",
-     "publicId": "freedomcosmeticshop/products/jmlmcphaei4ddsld4qyj",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785427014/freedomcosmeticshop/products/t733hi75jkwtvmodfm3v.jpg",
+     "publicId": "freedomcosmeticshop/products/t733hi75jkwtvmodfm3v",
      "altText": "White Express Lait Éclaircissant – Complexe Duo-Éclat",
      "altTextRw": "White Express Lait Éclaircissant Complexe Duo-Éclat",
      "imageType": "PRODUCT",
@@ -10202,13 +10261,31 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785778463/freedomcosmeticshop/products/fmq9pmjvodwuui4eq5sd.jpg",
-     "publicId": "freedomcosmeticshop/products/fmq9pmjvodwuui4eq5sd",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785426856/freedomcosmeticshop/products/d1wqzzqvawc5nwi8yv7v.jpg",
+     "publicId": "freedomcosmeticshop/products/d1wqzzqvawc5nwi8yv7v",
      "altText": "White Express Lait Éclaircissant – Extra Whitening Lotion 500ml",
      "altTextRw": "White Express Lait Éclaircissant Extra Whitening Lotion 500ml",
      "imageType": "PRODUCT",
      "sortOrder": 0,
      "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785423738/freedomcosmeticshop/products/p4qmw1tifjgal8zuzuuc.jpg",
+     "publicId": "freedomcosmeticshop/products/p4qmw1tifjgal8zuzuuc",
+     "altText": "White Express Lait Éclaircissant – Extra Whitening Lotion 500ml",
+     "altTextRw": "White Express Lait Éclaircissant Extra Whitening Lotion 500ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785778463/freedomcosmeticshop/products/fmq9pmjvodwuui4eq5sd.jpg",
+     "publicId": "freedomcosmeticshop/products/fmq9pmjvodwuui4eq5sd",
+     "altText": "White Express Lait Éclaircissant – Extra Whitening Lotion 500ml",
+     "altTextRw": "White Express Lait Éclaircissant Extra Whitening Lotion 500ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 2,
+     "isPrimary": false
     }
    ],
    "categorySlug": "whitening",
@@ -10286,16 +10363,16 @@
      "altTextRw": "Yara Pink Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 0,
-     "isPrimary": true
+     "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785597885/freedomcosmeticshop/products/i8x0nepoybsux7hzvppt.jpg",
-     "publicId": "freedomcosmeticshop/products/i8x0nepoybsux7hzvppt",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785594756/freedomcosmeticshop/products/aomubkwawgiyhwzwsnez.jpg",
+     "publicId": "freedomcosmeticshop/products/aomubkwawgiyhwzwsnez",
      "altText": "Yara Pink Fragrance Mist (Brume Parfumée)",
      "altTextRw": "Yara Pink Fragrance Mist",
      "imageType": "PRODUCT",
      "sortOrder": 1,
-     "isPrimary": false
+     "isPrimary": true
     }
    ],
    "categorySlug": "fragrance",
@@ -10368,8 +10445,8 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1784977077/freedomcosmeticshop/products/dyt0k3wkdsyijkwgbvog.jpg",
-     "publicId": "freedomcosmeticshop/products/dyt0k3wkdsyijkwgbvog",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786884136/freedomcosmeticshop/products/vssmwbusfeuzpvaczepk.jpg",
+     "publicId": "freedomcosmeticshop/products/vssmwbusfeuzpvaczepk",
      "altText": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
      "altTextRw": "Zwitsal Baby Body Lotion irimo Avocado Oil 400ml",
      "imageType": "PRODUCT",
@@ -10377,8 +10454,8 @@
      "isPrimary": true
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1784976991/freedomcosmeticshop/products/tlcgz61bse6i6dbvrpgy.jpg",
-     "publicId": "freedomcosmeticshop/products/tlcgz61bse6i6dbvrpgy",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786884092/freedomcosmeticshop/products/frk0mwqnzfx2dtd485dh.jpg",
+     "publicId": "freedomcosmeticshop/products/frk0mwqnzfx2dtd485dh",
      "altText": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
      "altTextRw": "Zwitsal Baby Body Lotion irimo Avocado Oil 400ml",
      "imageType": "PRODUCT",
@@ -10386,8 +10463,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1784976912/freedomcosmeticshop/products/shikdxtxzisraqsenxqi.jpg",
-     "publicId": "freedomcosmeticshop/products/shikdxtxzisraqsenxqi",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786883857/freedomcosmeticshop/products/w2vvburzp4e5g5bqm5ls.jpg",
+     "publicId": "freedomcosmeticshop/products/w2vvburzp4e5g5bqm5ls",
      "altText": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
      "altTextRw": "Zwitsal Baby Body Lotion irimo Avocado Oil 400ml",
      "imageType": "PRODUCT",
@@ -10395,8 +10472,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785771248/freedomcosmeticshop/products/ia1tgjskruceumqnhmxl.jpg",
-     "publicId": "freedomcosmeticshop/products/ia1tgjskruceumqnhmxl",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785410411/freedomcosmeticshop/products/fq74l4dcnposbhohnqt8.jpg",
+     "publicId": "freedomcosmeticshop/products/fq74l4dcnposbhohnqt8",
      "altText": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
      "altTextRw": "Zwitsal Baby Body Lotion irimo Avocado Oil 400ml",
      "imageType": "PRODUCT",
@@ -10404,8 +10481,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785771081/freedomcosmeticshop/products/zhxfnpohte7h0y2szqom.jpg",
-     "publicId": "freedomcosmeticshop/products/zhxfnpohte7h0y2szqom",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785410389/freedomcosmeticshop/products/hqu4ojjcnp03s5wirp1b.jpg",
+     "publicId": "freedomcosmeticshop/products/hqu4ojjcnp03s5wirp1b",
      "altText": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
      "altTextRw": "Zwitsal Baby Body Lotion irimo Avocado Oil 400ml",
      "imageType": "PRODUCT",
@@ -10413,21 +10490,12 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785770928/freedomcosmeticshop/products/fwscxijeldgcwnw6wfco.jpg",
-     "publicId": "freedomcosmeticshop/products/fwscxijeldgcwnw6wfco",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785410428/freedomcosmeticshop/products/q16bhstahj1kqylpqjex.jpg",
+     "publicId": "freedomcosmeticshop/products/q16bhstahj1kqylpqjex",
      "altText": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
      "altTextRw": "Zwitsal Baby Body Lotion irimo Avocado Oil 400ml",
      "imageType": "PRODUCT",
      "sortOrder": 5,
-     "isPrimary": false
-    },
-    {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785770766/freedomcosmeticshop/products/jnmm4h3kg564pcnkkbt9.jpg",
-     "publicId": "freedomcosmeticshop/products/jnmm4h3kg564pcnkkbt9",
-     "altText": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
-     "altTextRw": "Zwitsal Baby Body Lotion irimo Avocado Oil 400ml",
-     "imageType": "PRODUCT",
-     "sortOrder": 6,
      "isPrimary": false
     }
    ],
