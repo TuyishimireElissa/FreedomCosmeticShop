@@ -1,5 +1,5 @@
 {
- "backupAt": "2026-08-21T17:11:00.492Z",
+ "backupAt": "2026-08-21T17:13:33.744Z",
  "generatedBy": "scripts/backup-catalogue.ts",
  "contains": "Catalogue only: categories, brands, products, delivery zones, store settings, coupons.",
  "excludes": "Orders, users, reviews, addresses and payments are deliberately excluded (customer personal data).",
@@ -743,7 +743,17 @@
     "slug": "baby-kids"
    },
    "brand": null,
-   "productImages": [],
+   "productImages": [
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/fetch/f_auto,q_auto/https://francky.com.au/cdn/shop/files/Baby_Line_Perfumed_Petroleum_Jelly_500ml..png?v=1726676912&width=1946",
+     "publicId": "proxy-baby-line-perfumed-petroleum-jelly",
+     "altText": "Baby Line Perfumed Baby Petroleum Jelly",
+     "altTextRw": "Baby Line Petroleum Jelly y'Abana Irimo Impumuro Nziza",
+     "imageType": "PRODUCT",
+     "sortOrder": 0,
+     "isPrimary": true
+    }
+   ],
    "categorySlug": "baby-kids",
    "brandSlug": null,
    "imageUrls": [
