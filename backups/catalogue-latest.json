@@ -1,5 +1,5 @@
 {
- "backupAt": "2026-08-21T17:13:33.744Z",
+ "backupAt": "2026-08-21T17:20:51.407Z",
  "generatedBy": "scripts/backup-catalogue.ts",
  "contains": "Catalogue only: categories, brands, products, delivery zones, store settings, coupons.",
  "excludes": "Orders, users, reviews, addresses and payments are deliberately excluded (customer personal data).",
@@ -7247,8 +7247,26 @@
    "brand": null,
    "productImages": [
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785177381/freedomcosmeticshop/products/p3ft7xm2gdlfkvzbzbox.jpg",
-     "publicId": "freedomcosmeticshop/products/p3ft7xm2gdlfkvzbzbox",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786612568/freedomcosmeticshop/products/tenqfiqyshrw2z4jnc4v.jpg",
+     "publicId": "freedomcosmeticshop/products/tenqfiqyshrw2z4jnc4v",
+     "altText": "Rinju Beauté Réelle Body & Hand Cream",
+     "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
+     "imageType": "PRODUCT",
+     "sortOrder": 0,
+     "isPrimary": true
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786883012/freedomcosmeticshop/products/lpzxpt8jznih9wqnywu1.jpg",
+     "publicId": "freedomcosmeticshop/products/lpzxpt8jznih9wqnywu1",
+     "altText": "Rinju Beauté Réelle Body & Hand Cream",
+     "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
+     "imageType": "PRODUCT",
+     "sortOrder": 1,
+     "isPrimary": false
+    },
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786882789/freedomcosmeticshop/products/thegyci1cgkksdqnp9sw.jpg",
+     "publicId": "freedomcosmeticshop/products/thegyci1cgkksdqnp9sw",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
@@ -7256,8 +7274,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785174886/freedomcosmeticshop/products/djhajjbx0vedgjm5besz.jpg",
-     "publicId": "freedomcosmeticshop/products/djhajjbx0vedgjm5besz",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786881800/freedomcosmeticshop/products/kpbhsnrkwmkwwzgneiqh.jpg",
+     "publicId": "freedomcosmeticshop/products/kpbhsnrkwmkwwzgneiqh",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
@@ -7265,8 +7283,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785174868/freedomcosmeticshop/products/s5bksrjnjuzs9tgxc8mo.jpg",
-     "publicId": "freedomcosmeticshop/products/s5bksrjnjuzs9tgxc8mo",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786881609/freedomcosmeticshop/products/bn9zlhtp6sgrxj68tokc.jpg",
+     "publicId": "freedomcosmeticshop/products/bn9zlhtp6sgrxj68tokc",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
@@ -7274,8 +7292,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785174841/freedomcosmeticshop/products/otczg3ncu6xa6gfgwxzu.jpg",
-     "publicId": "freedomcosmeticshop/products/otczg3ncu6xa6gfgwxzu",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786818038/freedomcosmeticshop/products/wgslzdruf5rmnnydhhse.jpg",
+     "publicId": "freedomcosmeticshop/products/wgslzdruf5rmnnydhhse",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
@@ -7283,8 +7301,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785174764/freedomcosmeticshop/products/kunk0hgkutni3zjnffgi.jpg",
-     "publicId": "freedomcosmeticshop/products/kunk0hgkutni3zjnffgi",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786816798/freedomcosmeticshop/products/ph58jw0zsfbbzdouid7f.jpg",
+     "publicId": "freedomcosmeticshop/products/ph58jw0zsfbbzdouid7f",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
@@ -7292,8 +7310,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785174729/freedomcosmeticshop/products/ohjo4z1nvtdbbdf9xmnr.jpg",
-     "publicId": "freedomcosmeticshop/products/ohjo4z1nvtdbbdf9xmnr",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786816592/freedomcosmeticshop/products/qynx5jsbekgnnuhrmwyj.jpg",
+     "publicId": "freedomcosmeticshop/products/qynx5jsbekgnnuhrmwyj",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
@@ -7301,8 +7319,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785174710/freedomcosmeticshop/products/ldo1pjymxsw4uvkzckie.jpg",
-     "publicId": "freedomcosmeticshop/products/ldo1pjymxsw4uvkzckie",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786815867/freedomcosmeticshop/products/qa4yjfr2z8opqmhriakq.jpg",
+     "publicId": "freedomcosmeticshop/products/qa4yjfr2z8opqmhriakq",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
@@ -7310,8 +7328,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785174428/freedomcosmeticshop/products/asnoxlrascexboln5x0x.jpg",
-     "publicId": "freedomcosmeticshop/products/asnoxlrascexboln5x0x",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786815550/freedomcosmeticshop/products/qfg2xxvyd81ztzltmre8.jpg",
+     "publicId": "freedomcosmeticshop/products/qfg2xxvyd81ztzltmre8",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
@@ -7319,8 +7337,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785174401/freedomcosmeticshop/products/ycqcrwpvwbh4tql5gij1.jpg",
-     "publicId": "freedomcosmeticshop/products/ycqcrwpvwbh4tql5gij1",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786736908/freedomcosmeticshop/products/adx8tdfqovhprsmv72vl.jpg",
+     "publicId": "freedomcosmeticshop/products/adx8tdfqovhprsmv72vl",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
@@ -7328,8 +7346,8 @@
      "isPrimary": false
     },
     {
-     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1785174356/freedomcosmeticshop/products/qdtdfqb2c7rhejgachw0.jpg",
-     "publicId": "freedomcosmeticshop/products/qdtdfqb2c7rhejgachw0",
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/upload/v1786882373/freedomcosmeticshop/products/jbktpspamw7wka2klplz.jpg",
+     "publicId": "freedomcosmeticshop/products/jbktpspamw7wka2klplz",
      "altText": "Rinju Beauté Réelle Body & Hand Cream",
      "altTextRw": "Rinju Beauté Réelle Cream yo ku mubiri no ku biganza",
      "imageType": "PRODUCT",
