@@ -1,5 +1,5 @@
 {
- "backupAt": "2026-08-21T16:54:10.973Z",
+ "backupAt": "2026-08-21T17:11:00.492Z",
  "generatedBy": "scripts/backup-catalogue.ts",
  "contains": "Catalogue only: categories, brands, products, delivery zones, store settings, coupons.",
  "excludes": "Orders, users, reviews, addresses and payments are deliberately excluded (customer personal data).",
@@ -4513,7 +4513,17 @@
     "slug": "soap"
    },
    "brand": null,
-   "productImages": [],
+   "productImages": [
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/fetch/f_auto,q_auto/https://murukali.com/cdn/shop/files/EVA-Refresh-100g-Bathing-Soap-Murukali.com-57388754_1200x1200.jpg?v=1755344823",
+     "publicId": "proxy-eva-refresh-bathing-soap",
+     "altText": "EVA Bathing Soap Refresh (Coconut & Lavender)",
+     "altTextRw": "EVA Bathing Soap Refresh irimo Coconut na Lavender",
+     "imageType": "PRODUCT",
+     "sortOrder": 0,
+     "isPrimary": true
+    }
+   ],
    "categorySlug": "soap",
    "brandSlug": null,
    "imageUrls": [
@@ -5090,7 +5100,17 @@
     "slug": "baby-kids"
    },
    "brand": null,
-   "productImages": [],
+   "productImages": [
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/fetch/f_auto,q_auto/https://pharmily.co.ke/storage/files/2024/05/13/Johnsons-baby-aqueous-cream-lightly-fragranced-350ml.jpg",
+     "publicId": "proxy-johnsons-baby-aqueous-cream-350ml",
+     "altText": "Johnson's Baby Aqueous Cream Lightly Fragranced 350ml",
+     "altTextRw": "Johnson's Baby Aqueous Cream Ifite Impumuro Ntoya 350ml",
+     "imageType": "PRODUCT",
+     "sortOrder": 0,
+     "isPrimary": true
+    }
+   ],
    "categorySlug": "baby-kids",
    "brandSlug": null,
    "imageUrls": [
@@ -9256,7 +9276,17 @@
     "slug": "soap"
    },
    "brand": null,
-   "productImages": [],
+   "productImages": [
+    {
+     "url": "https://res.cloudinary.com/dohoc0tmp/image/fetch/f_auto,q_auto/https://serinacosmetics.com/wp-content/uploads/2024/02/Veet-Gold-100-Nature-Essential-Oil-Body-Corrector-Vitamin-C-Soap-Whitening-Glowing-SPF15-250g.jpg",
+     "publicId": "proxy-veet-gold-vitamin-c-body-corrector-soap",
+     "altText": "Veet Gold Vitamin C Body Corrector Soap (7 Days Whitening and Glowing Soap SPF15)",
+     "altTextRw": "Veet Gold Vitamin C Body Corrector Soap SPF15",
+     "imageType": "PRODUCT",
+     "sortOrder": 0,
+     "isPrimary": true
+    }
+   ],
    "categorySlug": "soap",
    "brandSlug": null,
    "imageUrls": [
