@@ -102,7 +102,12 @@ describe('durable consent-gated retention cron', () => {
   it('adds one daily Kigali-morning retention job without removing review cron', () => {
     expect(vercel.crons).toContainEqual({ path: '/api/cron/review-requests', schedule: '0 8 * * *' })
     expect(vercel.crons).toContainEqual({ path: '/api/cron/retention-reminders', schedule: '15 7 * * *' })
-    expect(vercel.crons).toHaveLength(2)
+    // Third entry is the Supabase keep-alive added in 15e2b06: a daily ping to
+    // /api/health so a free-tier project cannot idle-pause the way the previous
+    // database did. Counting the jobs is what stops an unreviewed cron being
+    // added silently, so the number is asserted rather than dropped.
+    expect(vercel.crons).toContainEqual({ path: '/api/health', schedule: '30 8 * * *' })
+    expect(vercel.crons).toHaveLength(3)
   })
 
   it('does not invent birthday, wishlist, reward, or segment cron policies', () => {
