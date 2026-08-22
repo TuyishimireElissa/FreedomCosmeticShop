@@ -21,7 +21,8 @@
     "test:a11y": "tsx src/scripts/test-accessibility.ts",
     "test:low-data": "vitest run src/lib/__tests__/low-data-infrastructure.test.ts src/lib/__tests__/low-data-toggle.test.ts src/lib/__tests__/low-data-images.test.ts src/lib/__tests__/low-data-hero-media.test.ts src/lib/__tests__/low-data-pagination-lazy.test.ts src/lib/__tests__/offline-cart.test.ts src/lib/__tests__/resilient-fetch.test.ts src/lib/__tests__/low-data-testing-tools.test.ts",
     "catalog:apply-images": "tsx scripts/apply-image-matches.ts",
-    "catalog:picker": "python3 recovery/build-picker.py"
+    "catalog:picker": "python3 recovery/build-picker.py",
+    "catalog:missing-prices": "tsx scripts/export-missing-prices.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

@@ -1,0 +1,835 @@
+{
+  "generatedAt": "2026-08-22T20:20:58.531Z",
+  "instructions": [
+    "Fill the price_RWF column with the real selling price in Rwandan Francs.",
+    "Whole numbers only, no commas, no \"RWF\" text. Example: 4500",
+    "Leave a row blank if you are unsure — blank rows are skipped, never guessed.",
+    "Do not change the slug column. It is how each price is matched to its product.",
+    "Save the file and hand it back, then run: npm run catalog:apply-prices"
+  ],
+  "missingCount": 97,
+  "pricedReference": [
+    {
+      "name": "Dettol Fresh Antibacterial Soap (Pack of 4)",
+      "price": 2300
+    },
+    {
+      "name": "Dabur Herbolene Aloe Jelly 225ml",
+      "price": 3500
+    },
+    {
+      "name": "Dabur Herbolene Aloe Jelly 425ml",
+      "price": 5800
+    },
+    {
+      "name": "VERLORNA MY LOVE Fragrance Mist – 250ml",
+      "price": 6500
+    },
+    {
+      "name": "VERLORNA SUAWACE Fragrance Mist – 250ml",
+      "price": 6500
+    },
+    {
+      "name": "VERLORNA La Vaid East Bellah Fragrance Mist – 250ml",
+      "price": 6500
+    },
+    {
+      "name": "Pure Egyptian Magic Whitening Serum Gold 14 Days Face & Body Serum",
+      "price": 7000
+    },
+    {
+      "name": "Veet Gold Turmeric Super Whitening Oil 200ml",
+      "price": 7000
+    },
+    {
+      "name": "Veet Gold Turmeric Super Whitening Oil 300ml",
+      "price": 8000
+    },
+    {
+      "name": "Veet Gold Turmeric Super Whitening Oil 500ml",
+      "price": 10000
+    },
+    {
+      "name": "Bismid Skin Glowing Bath with Carrot Oil",
+      "price": 17000
+    }
+  ],
+  "products": [
+    {
+      "slug": "baby-line-perfumed-baby-petroleum-jelly",
+      "name": "Baby Line Perfumed Baby Petroleum Jelly",
+      "category": "baby-kids",
+      "sku": "FCS-31E52C",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "bouchou-soft-soap-moisturizing-soothing-gentle-baby-family-bar",
+      "name": "Bouchou Soft Soap Moisturizing & Soothing (Gentle Baby & Family Bar)",
+      "category": "baby-kids",
+      "sku": "FCS-7E7C6A",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "boudchou-baby-ointment-pommade-b-b",
+      "name": "Boudchou Baby Ointment (Pommade Bébé)",
+      "category": "baby-kids",
+      "sku": "FCS-84736B",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "boudchou-baby-petroleum-jelly-cr-me-onctueuse-protectrice",
+      "name": "Boudchou Baby Petroleum Jelly / Crème Onctueuse Protectrice",
+      "category": "baby-kids",
+      "sku": "FCS-A5D052",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "johnson-s-baby-aqueous-cream-lightly-fragranced-350ml",
+      "name": "Johnson's Baby Aqueous Cream Lightly Fragranced 350ml",
+      "category": "baby-kids",
+      "sku": "FCS-F88C1B",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "vaseline-blue-seal-baby-perfumed-petroleum-jelly",
+      "name": "Vaseline Blue Seal Baby Perfumed Petroleum Jelly",
+      "category": "baby-kids",
+      "sku": "FCS-C85D65",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "zwitsal-baby-body-lotion-with-avocado-oil-400ml",
+      "name": "Zwitsal Baby Body Lotion with Avocado Oil – 400ml",
+      "category": "baby-kids",
+      "sku": "FCS-414D9E",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "american-dream-cocoa-butter-lemon-cream",
+      "name": "American Dream Cocoa Butter Lemon Cream",
+      "category": "body-care",
+      "sku": "FCS-C6032B",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "rinju-beaut-r-elle-body-hand-cream",
+      "name": "Rinju Beauté Réelle Body & Hand Cream",
+      "category": "body-care",
+      "sku": "FCS-31676E",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "vaseline-intensive-care-cocoa-radiant-vitalizing-body-oil",
+      "name": "Vaseline Intensive Care Cocoa Radiant Vitalizing Body Oil",
+      "category": "body-oil",
+      "sku": "FCS-51D6FF",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "777-men-super-love-perfume-set-2-pcs-1",
+      "name": "777 MEN Super Love Perfume Set (2 Pcs)",
+      "category": "fragrance",
+      "sku": "FCS-790880",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "bara-eau-de-parfum-2-piece-luxury-gift-set",
+      "name": "BARA Eau De Parfum 2-Piece Luxury Gift Set",
+      "category": "fragrance",
+      "sku": "FCS-3504D9",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "barakkat-rouge-540-eau-de-parfum",
+      "name": "Barakkat Rouge 540 Eau De Parfum",
+      "category": "fragrance",
+      "sku": "FCS-679852",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "barakkat-rouge-540-fragrance-mist-brume-parfum-e",
+      "name": "Barakkat Rouge 540 Fragrance Mist (Brume Parfumée)",
+      "category": "fragrance",
+      "sku": "FCS-66AE6E",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "bath-baby-week-beauty-summery-body-mist",
+      "name": "Bath & Baby Week Beauty Summery Body Mist",
+      "category": "fragrance",
+      "sku": "FCS-B978D3",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "bath-body-week-les-floraux-lune-smell-body-mist",
+      "name": "Bath & Body Week LES FLORAUX Lune Smell Body Mist",
+      "category": "fragrance",
+      "sku": "FCS-E429D5",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "bleu-de-parfum-paris-50ml-eau-de-parfum-set",
+      "name": "BLEU DE PARFUM Paris 50ml Eau de Parfum Set",
+      "category": "fragrance",
+      "sku": "FCS-FF9EA0",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "change-de-canal-fragrance-mist-brume-parfum-e",
+      "name": "Change De Canal Fragrance Mist (Brume Parfumée)",
+      "category": "fragrance",
+      "sku": "FCS-A3624C",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "coconut-fantasy-fine-fragrance-mist",
+      "name": "Coconut Fantasy Fine Fragrance Mist",
+      "category": "fragrance",
+      "sku": "FCS-7B4597",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dear-body-autumn-cicada-fine-fragrance-mist",
+      "name": "Dear Body Autumn Cicada Fine Fragrance Mist",
+      "category": "fragrance",
+      "sku": "FCS-81C0BD",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dear-body-be-myself-fine-fragrance-mist",
+      "name": "Dear Body Be Myself Fine Fragrance Mist",
+      "category": "fragrance",
+      "sku": "FCS-F3F3B3",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dear-body-border-girl-fine-fragrance-mist",
+      "name": "Dear Body Border Girl Fine Fragrance Mist",
+      "category": "fragrance",
+      "sku": "FCS-DC00B0",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dear-body-brilliant-sunflower-fine-fragrance-mist",
+      "name": "Dear Body Brilliant Sunflower Fine Fragrance Mist",
+      "category": "fragrance",
+      "sku": "FCS-4A9672",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dear-body-noir-for-men-body-mist",
+      "name": "Dear Body NOIR for men Body Mist",
+      "category": "fragrance",
+      "sku": "FCS-4371B1",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dear-body-noir-fragrance-mist",
+      "name": "Dear Body Noir Fragrance Mist",
+      "category": "fragrance",
+      "sku": "FCS-3F5612",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dear-body-scarlet-for-men-body-mist",
+      "name": "Dear Body SCARLET for Men Body Mist",
+      "category": "fragrance",
+      "sku": "FCS-03E07E",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dear-body-sweet-vanilla-fine-fragrance-mist",
+      "name": "Dear Body Sweet Vanilla Fine Fragrance Mist",
+      "category": "fragrance",
+      "sku": "FCS-39B312",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "intense-wood-fragrance-mist-brume-parfum-e",
+      "name": "Intense Wood Fragrance Mist (Brume Parfumée)",
+      "category": "fragrance",
+      "sku": "FCS-27EC6D",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "kristal-fragrance-mist-brume-parfum-e",
+      "name": "Kristal Fragrance Mist (Brume Parfumée)",
+      "category": "fragrance",
+      "sku": "FCS-136B40",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "mayora-eau-de-parfum-2-piece-luxury-gift-set",
+      "name": "MAYORA Eau De Parfum 2-Piece Luxury Gift Set",
+      "category": "fragrance",
+      "sku": "FCS-29363F",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "oniro-fragrance-mist-brume-parfum-e",
+      "name": "ONIRO Fragrance Mist (Brume Parfumée)",
+      "category": "fragrance",
+      "sku": "FCS-D6A94C",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "oud-for-glory-bade-e-al-oud-fragrance-mist-brume-parfum-e",
+      "name": "Oud For Glory (Bade'e Al Oud) Fragrance Mist (Brume Parfumée)",
+      "category": "fragrance",
+      "sku": "FCS-9360CB",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "scanoal-a-paris-eau-de-parfum-spray-set-2-pcs",
+      "name": "SCANOAL A PARIS Eau de Parfum Spray Set (2 Pcs)",
+      "category": "fragrance",
+      "sku": "FCS-1002E9",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "super-love-eau-de-parfum-2-piece-gift-set",
+      "name": "Super Love Eau De Parfum 2-Piece Gift Set",
+      "category": "fragrance",
+      "sku": "FCS-2E7A51",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "super-love-red-eau-de-parfum-2pcs-gift-set",
+      "name": "SUPER LOVE' RED Eau de Parfum 2PCS Gift Set",
+      "category": "fragrance",
+      "sku": "FCS-97CCA1",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "sweet-rose-eau-de-parfum-spray-for-women",
+      "name": "Sweet Rose Eau de Parfum Spray for Women",
+      "category": "fragrance",
+      "sku": "FCS-B9FF14",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "verlorna-world-barakkat-rouge-540-body-mist",
+      "name": "Verlorna World Barakkat Rouge 540 Body Mist",
+      "category": "fragrance",
+      "sku": "FCS-16E1CE",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "verlorna-world-fantsly",
+      "name": "Verlorna World Fantsly",
+      "category": "fragrance",
+      "sku": "FCS-A23DD9",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "verlorna-world-for-away-body-mist",
+      "name": "Verlorna World For Away Body Mist",
+      "category": "fragrance",
+      "sku": "FCS-2410B8",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "verlorna-world-ideal-fragrance-mist",
+      "name": "Verlorna World Ideal Fragrance Mist",
+      "category": "fragrance",
+      "sku": "FCS-DE5FB1",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "yara-pink-fragrance-mist-brume-parfum-e",
+      "name": "Yara Pink Fragrance Mist (Brume Parfumée)",
+      "category": "fragrance",
+      "sku": "FCS-6032E8",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "cantu-shea-butter-for-natural-hair-coconut-curling-cream",
+      "name": "Cantu Shea Butter for Natural Hair Coconut Curling Cream",
+      "category": "haircare",
+      "sku": "FCS-3CE9F7",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dax-pomade-now-with-lanolin",
+      "name": "DAX Pomade Now With Lanolin",
+      "category": "haircare",
+      "sku": "FCS-46F915",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "mega-growth-break-free-hair-scalp-food",
+      "name": "Mega Growth Break-Free Hair & Scalp Food",
+      "category": "haircare",
+      "sku": "FCS-080E75",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "miadi-hair-curl-activator-gel",
+      "name": "MIADI Hair Curl Activator Gel",
+      "category": "haircare",
+      "sku": "FCS-A6311A",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "miadi-hair-mouldin-gel-wax-with-olive-oil",
+      "name": "MIADI Hair Mouldin' Gel Wax (With Olive Oil)",
+      "category": "haircare",
+      "sku": "FCS-FD701B",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "movit-blow-out-creme-hair-relaxer-150g",
+      "name": "Movit Blow Out Creme Hair Relaxer (150g)",
+      "category": "haircare",
+      "sku": "MOVIT-BLOWOUT-RELAXER",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "movit-sheen-hair-spray-olive-argan-oil",
+      "name": "Movit Sheen Hair Spray Olive & Argan Oil",
+      "category": "haircare",
+      "sku": "FCS-E7DCB3",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "the-original-sunny-isle-jamaican-black-castor-oil",
+      "name": "The Original Sunny Isle Jamaican Black Castor Oil",
+      "category": "haircare",
+      "sku": "FCS-59C791",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "more-up-aloe-vera-vitamin-e-2-in-1-pure-petroleum-jelly",
+      "name": "More Up Aloe Vera & Vitamin E 2-in-1 Pure Petroleum Jelly",
+      "category": "petroleum-jelly",
+      "sku": "FCS-5F7E35",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "vaseline-blue-seal-aloe-vera-perfumed-petroleum-jelly-240ml",
+      "name": "Vaseline Blue Seal Aloe Vera Perfumed Petroleum Jelly 240ml",
+      "category": "petroleum-jelly",
+      "sku": "FCS-0C1239",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "vaseline-blue-seal-cocoa-butter-perfumed-petroleum-jelly",
+      "name": "Vaseline Blue Seal Cocoa Butter Perfumed Petroleum Jelly",
+      "category": "petroleum-jelly",
+      "sku": "FCS-45C7BC",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "vaseline-blue-seal-men-cooling-perfumed-petroleum-jelly-240ml",
+      "name": "Vaseline Blue Seal Men Cooling Perfumed Petroleum Jelly 240ml",
+      "category": "petroleum-jelly",
+      "sku": "FCS-472305",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "vaseline-blue-seal-original-100-pure-petroleum-jelly-240ml",
+      "name": "Vaseline Blue Seal Original 100% Pure Petroleum Jelly 240ml",
+      "category": "petroleum-jelly",
+      "sku": "FCS-546E4D",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "exfoliating-gold-face-body-scrub-with-natural-exfoliating-fruit-shells-gold-pearl",
+      "name": "Exfoliating Gold Face & Body Scrub (With Natural Exfoliating Fruit Shells & Gold Pearl)",
+      "category": "skincare",
+      "sku": "FCS-02BE2B",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "silky-cool-cucumber-face-and-body-scrub-cream",
+      "name": "Silky Cool Cucumber Face and Body Scrub Cream",
+      "category": "skincare",
+      "sku": "FCS-011B85",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "silky-cool-milk-face-and-body-scrub",
+      "name": "Silky Cool Milk Face and Body Scrub",
+      "category": "skincare",
+      "sku": "FCS-661231",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "asantee-papaya-honey-soap-125g",
+      "name": "Asantee Papaya & Honey Soap 125g",
+      "category": "soap",
+      "sku": "FCS-191AB8",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "asantee-tamarind-goat-milk-herbal-soap",
+      "name": "ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ)",
+      "category": "soap",
+      "sku": "FCS-6E8935",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "carambola-black-spots-herbal-soap-with-honey",
+      "name": "Carambola Black Spots Herbal Soap with Honey",
+      "category": "soap",
+      "sku": "FCS-2DA2CC",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dalan-citron-frais-classic-multipurpose-soap",
+      "name": "Dalan Citron Frais Classic Multipurpose Soap",
+      "category": "soap",
+      "sku": "FCS-656D15",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dalan-glycerin-soap-organic-lime",
+      "name": "Dalan Glycerin Soap Organic Lime",
+      "category": "soap",
+      "sku": "FCS-9B7C30",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dalan-glycerin-soap-organic-olive-oil",
+      "name": "Dalan Glycerin Soap Organic Olive Oil",
+      "category": "soap",
+      "sku": "FCS-B5A5AC",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dalan-glycerin-soap-with-organic-argan-oil",
+      "name": "Dalan Glycerin Soap with Organic Argan Oil",
+      "category": "soap",
+      "sku": "FCS-18904A",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dettol-juniors-glycerine-soap",
+      "name": "Dettol Juniors Glycerine Soap",
+      "category": "soap",
+      "sku": "FCS-304E40",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dettol-original-antibacterial-soap-100g",
+      "name": "Dettol Original Antibacterial Soap 100g",
+      "category": "soap",
+      "sku": "FCS-2A73AA",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "dove-original-beauty-cream-bar-100g",
+      "name": "Dove Original Beauty Cream Bar 100g",
+      "category": "soap",
+      "sku": "FCS-0AB055",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "duru-fresh-sensations-beauty-soap-floral-infusion-pack-of-4",
+      "name": "Duru Fresh Sensations Beauty Soap – Floral Infusion (Pack of 4)",
+      "category": "soap",
+      "sku": "FCS-B65FC8",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "duru-fresh-sensations-beauty-soap-ocean-breeze-pack-of-4",
+      "name": "Duru Fresh Sensations Beauty Soap – Ocean Breeze (Pack of 4)",
+      "category": "soap",
+      "sku": "FCS-9AEDB0",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "duru-natural-olive-soap-with-olive-oil-extract",
+      "name": "Duru Natural Olive Soap with Olive Oil Extract",
+      "category": "soap",
+      "sku": "FCS-1139D6",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "duru-perfume-beauties-beauty-soap-orchid-charm-pack-of-4",
+      "name": "Duru Perfume Beauties Beauty Soap – Orchid Charm (Pack of 4)",
+      "category": "soap",
+      "sku": "FCS-AAC8D1",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "eva-bathing-soap-refresh-coconut-lavender",
+      "name": "EVA Bathing Soap Refresh (Coconut & Lavender)",
+      "category": "soap",
+      "sku": "FCS-21AAFA",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "extract-whitening-herbal-soap-papaya-calaman",
+      "name": "Extract Whitening Herbal Soap Papaya Calaman",
+      "category": "soap",
+      "sku": "FCS-2641FD",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "geisha-caring-coconut-honey-soap",
+      "name": "Geisha Caring Coconut & Honey Soap",
+      "category": "soap",
+      "sku": "FCS-165BC6",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "geisha-soothing-aloe-vera-honey-soap-strong-long-lasting-daily-bathing-bar",
+      "name": "Geisha Soothing Aloe Vera & Honey Soap (Strong & Long Lasting Daily Bathing Bar)",
+      "category": "soap",
+      "sku": "FCS-A33C05",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "imperial-leather-timeless-classic-bathing-bar-soap",
+      "name": "Imperial Leather Timeless Classic Bathing Bar Soap",
+      "category": "soap",
+      "sku": "FCS-30477D",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "kojic-white-x2-double-whitening-suite-soap-by-nano-d-ne",
+      "name": "KOJIC WHITE X2 Double Whitening Suite Soap (By Nano D-ne)",
+      "category": "soap",
+      "sku": "FCS-BB3B66",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "kojie-san-classic-skin-lightening-soap",
+      "name": "Kojie San Classic Skin Lightening Soap",
+      "category": "soap",
+      "sku": "FCS-4B508D",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "lab-white-atom-whitening-egg-yolk-soap",
+      "name": "Lab White Atom Whitening Egg Yolk Soap",
+      "category": "soap",
+      "sku": "FCS-56F90F",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "mpya-rungu-medi-anti-bacterial-soap",
+      "name": "MPYA Rungu-Medi Anti-Bacterial Soap",
+      "category": "soap",
+      "sku": "FCS-05DB91",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "nina-family-soap-bathing-bar-rose-peach",
+      "name": "NINA Family Soap Bathing Bar (Rose & Peach)",
+      "category": "soap",
+      "sku": "FCS-DC4BD4",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "original-pure-egyptian-magic-whitening-gold-soap-with-egg-yolk-l-glutathione",
+      "name": "Original Pure Egyptian Magic Whitening Gold Soap (With Egg Yolk & L-Glutathione)",
+      "category": "soap",
+      "sku": "FCS-5E2CD5",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "papaya-carrot-gluta-soap-scrub-beads",
+      "name": "Papaya Carrot Gluta Soap Scrub Beads",
+      "category": "soap",
+      "sku": "FCS-169EBE",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "protex-gentle-anti-germ-bar-soap",
+      "name": "Protex Gentle Anti-Germ Bar Soap",
+      "category": "soap",
+      "sku": "FCS-ABD506",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "pyary-ayurvedic-turmeric-soap",
+      "name": "Pyary Ayurvedic Turmeric Soap",
+      "category": "soap",
+      "sku": "FCS-5E3382",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "touch-me-please-whitening-soap-for-oily-skin-with-natural-extracts",
+      "name": "Touch Me! PLEASE Whitening Soap for Oily Skin (With Natural Extracts)",
+      "category": "soap",
+      "sku": "FCS-C8D70A",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "turmeric-super-whitening-soap-body-repair-anti-dark-spots-anti-aging",
+      "name": "Turmeric Super Whitening Soap (Body Repair, Anti Dark Spots & Anti-aging)",
+      "category": "soap",
+      "sku": "FCS-2DEBCC",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "veet-gold-vitamin-c-body-corrector-soap-7-days-whitening-and-glowing-soap-spf15",
+      "name": "Veet Gold Vitamin C Body Corrector Soap (7 Days Whitening and Glowing Soap SPF15)",
+      "category": "soap",
+      "sku": "FCS-45AD1C",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "victoria-super-colorful-vsc-carrot-7-days-extra-whitening-soap",
+      "name": "Victoria Super Colorful (VSC) Carrot 7 Days Extra Whitening Soap",
+      "category": "soap",
+      "sku": "FCS-341EDE",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "drodaven-whitening-papaya-milk-body-lotion",
+      "name": "DRODAVEN Whitening Papaya + Milk Body Lotion",
+      "category": "whitening",
+      "sku": "FCS-D1146F",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "la-tchadienne-whitening-lotion-super-white-face-body-lotion",
+      "name": "LA TCHADIENNE Whitening Lotion Super White Face & Body Lotion",
+      "category": "whitening",
+      "sku": "FCS-BDA17B",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "piment-doux-5-days-extra-whitening-milk-lait-traitant",
+      "name": "Piment Doux 5 Days Extra Whitening Milk (Lait Traitant)",
+      "category": "whitening",
+      "sku": "FCS-08EF2C",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "purec-egyptian-gold-14days-face-body-lotion",
+      "name": "Purec Egyptian Gold 14Days Face & Body Lotion",
+      "category": "whitening",
+      "sku": "FCS-9F13C5",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "rdl-papaya-extract-whitening-hand-body-lotion-vitamin-e",
+      "name": "RDL Papaya Extract Whitening Hand & Body Lotion + Vitamin E",
+      "category": "whitening",
+      "sku": "FCS-92C530",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "roushun-turmeric-with-vitamin-c-lighten-body-lotion",
+      "name": "Roushun Turmeric with Vitamin C Lighten Body Lotion",
+      "category": "whitening",
+      "sku": "FCS-B4EAC2",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "white-express-lait-claircissant-complexe-duo-clat",
+      "name": "White Express Lait Éclaircissant – Complexe Duo-Éclat",
+      "category": "whitening",
+      "sku": "FCS-A922E0",
+      "stock": 300,
+      "price_RWF": null
+    },
+    {
+      "slug": "white-express-lait-claircissant-extra-whitening-lotion-500ml",
+      "name": "White Express Lait Éclaircissant – Extra Whitening Lotion 500ml",
+      "category": "whitening",
+      "sku": "FCS-88AF67",
+      "stock": 300,
+      "price_RWF": null
+    }
+  ]
+}
