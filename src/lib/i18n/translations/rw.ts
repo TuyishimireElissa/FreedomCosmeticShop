@@ -415,6 +415,47 @@ export const rw = {
     reviews_unavailable: 'Ibitekerezo ntibiboneka by’akanya.', // verified-rw
     delivery_exact_fee: 'Hitamo akarere kawe urebe ikiguzi cyo kukugezaho n’igihe giteganyijwe. Ikiguzi cya nyuma cyemezwa mu gihe cyo kwishyura.', // verified-rw
   },
+  pricing: {
+    nav: 'Ibiciro kuri WhatsApp', // verified-rw
+    title: 'Ibiciro kuri WhatsApp', // verified-rw
+    subtitle: 'Ibicuruzwa {count} biracyakeneye igiciro.', // verified-rw
+    all_done: 'Ibicuruzwa byose bifite igiciro. Nta cyo koherezwa.', // verified-rw
+    step1_title: '1. Ohereza ubusabe bw’ibiciro', // verified-rw
+    batch_label: 'Urutonde', // verified-rw
+    batch_option: 'Urutonde {index} kuri {total} (ibintu {count})', // verified-rw
+    open_whatsapp: 'Fungura muri WhatsApp', // verified-rw
+    copy_message: 'Koporora ubutumwa', // verified-rw
+    copied: 'Ubutumwa bwakoporowe', // verified-rw
+    copy_failed: 'Ntibyashobotse gukoporora ubutumwa', // verified-rw
+    too_long: 'Ubu butumwa ni burebure cyane kuri WhatsApp, bushobora guhagarara hagati. Ohereza ibintu bike.', // verified-rw
+    step2_title: '2. Omeka igisubizo hanyuma ubigenzure', // verified-rw
+    paste_label: 'Omeka igisubizo cya WhatsApp', // verified-rw
+    paste_placeholder: 'Omeka igisubizo hano, urugero:\n1. 2500 / 2000\n2. 3000', // verified-rw
+    parse: 'Genzura ibiciro', // verified-rw
+    parse_none: 'Nta giciro cyabashije gusomwa muri icyo gisubizo', // verified-rw
+    preview_caption: 'Ibiciro byasomwe mu gisubizo', // verified-rw
+    col_product: 'Igicuruzwa', // verified-rw
+    col_retail: 'Igiciro', // verified-rw
+    col_wholesale: 'Kurangura', // verified-rw
+    unchanged: 'ntibyahindutse', // verified-rw
+    issues_title: 'Imirongo {count} ikeneye kurebwa', // verified-rw
+    save_all: 'Bika ibiciro {count}', // verified-rw
+    saved: 'Ibiciro {count} byabitswe', // verified-rw
+    save_failed: 'Ntibyashobotse kubika ibiciro', // verified-rw
+    load_failed: 'Ntibyashobotse gukuramo ibicuruzwa', // verified-rw
+    step3_title: '3. Cyangwa umwoherereze umurongo yuzuzamo ubwe', // verified-rw
+    step3_hint: 'Bikora umurongo wihariye uhagarara nyuma y’iminsi 7. Nta kwinjira bisaba.', // verified-rw
+    make_link: 'Kora umurongo', // verified-rw
+    link_ready: 'Umurongo witeguye. Uzarangira mu minsi {days}.', // verified-rw
+    link_failed: 'Ntibyashobotse gukora umurongo', // verified-rw
+    link_expired: 'Uyu murongo warangiye cyangwa ntukora. Saba undi mushya.', // verified-rw
+    thanks: 'Murakoze. Iduka ryavuguruwe.', // verified-rw
+    quick_title: 'Ibiciro by’ibicuruzwa', // verified-rw
+    quick_hint: 'Andika igiciro cy’igicuruzwa uzi. Ibindi ubisige ubusa.', // verified-rw
+    no_photo: 'Nta foto', // verified-rw
+    optional: 'si ngombwa', // verified-rw
+    send_prices: 'Ohereza ibiciro {count}', // verified-rw
+  },
   search: {
     quick_view: 'Reba vuba', // verified-rw
     stock_kigali: 'Biri i Kigali', // verified-rw
