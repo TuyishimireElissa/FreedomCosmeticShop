@@ -20,6 +20,7 @@ import { broadcastProductEvent } from "@/lib/realtime"
 import { logActivity } from "@/server/services/activity"
 import { z } from "zod"
 import { indexProduct, unindexProduct } from '@/server/services/search'
+import { serializeProductJsonColumns } from '@/lib/product-json'
 
 const UpdateProductSchema = z.object({
   name: z.string().min(2).max(200).optional(),
@@ -73,13 +74,9 @@ function serializeProduct(p: {
   ingredients: string | null
   [key: string]: unknown
 }) {
-  return {
-    ...p,
-    images: JSON.parse(p.images),
-    skinType: p.skinType ? JSON.parse(p.skinType) : null,
-    shades: p.shades ? JSON.parse(p.shades) : null,
-    ingredients: p.ingredients ? JSON.parse(p.ingredients) : null,
-  }
+  // Parsed defensively so one malformed legacy JSON column cannot 500 the
+  // whole edit screen. See src/lib/product-json.ts.
+  return serializeProductJsonColumns(p)
 }
 
 export async function GET(

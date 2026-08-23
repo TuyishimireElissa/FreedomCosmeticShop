@@ -62,6 +62,7 @@ import {
   Copy,
   Download,
   Tag,
+  AlertTriangle,
 } from "lucide-react"
 import { WholesalePricingPanel } from "./WholesalePricingPanel"
 import { optimizedImageUrl } from "@/lib/cloudinary-images"
@@ -172,6 +173,7 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
   const [referenceLoading, setReferenceLoading] = useState(true)
   const [referenceError, setReferenceError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [search, setSearch] = useState("")
   const [productPage, setProductPage] = useState(1)
   const [pagination, setPagination] = useState({ page: 1, total: 0, totalPages: 1 })
@@ -245,6 +247,8 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
       params.set("pageSize", "20")
       const res = await fetch(`/api/admin/products?${params.toString()}`)
       if (res.status === 401 || res.status === 403) {
+        setLoadError("You need admin access to manage products.")
+        setProducts([])
         toast({
           title: "Access denied",
           description: "You need admin access to manage products.",
@@ -252,11 +256,19 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
         })
         return
       }
+      // Any other failure (500, 429, network hiccup) used to fall through and
+      // render the "No products" empty state, which wrongly told the owner the
+      // catalogue was gone. Surface it instead.
+      if (!res.ok) throw new Error(`Server returned ${res.status}`)
       const data = await res.json()
-      setProducts(data.products || [])
+      if (!Array.isArray(data.products)) throw new Error("Unexpected response from the server")
+      setLoadError(null)
+      setProducts(data.products)
       setPagination({ page: data.pagination?.page || productPage, total: data.pagination?.total || 0, totalPages: Math.max(1, data.pagination?.totalPages || 1) })
     } catch (e) {
       console.error(e)
+      setLoadError("Products could not be loaded. Your catalogue is safe — this is a loading problem.")
+      setProducts([])
     } finally {
       setLoading(false)
     }
@@ -818,6 +830,20 @@ export function AdminProductManager({ onStatsUpdate }: AdminProductManagerProps)
             {[0, 1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="h-16 w-full" />
             ))}
+          </div>
+        ) : loadError ? (
+          <div className="grid place-items-center px-4 py-16 text-center" role="alert">
+            <AlertTriangle className="h-10 w-10 text-fcs-umber" />
+            <h3 className="mt-3 font-semibold text-fcs-text">Products could not be loaded</h3>
+            <p className="mt-1 max-w-sm text-sm text-fcs-text-muted">{loadError}</p>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-4 min-h-11"
+              onClick={() => void loadProducts()}
+            >
+              Try again
+            </Button>
           </div>
         ) : products.length === 0 ? (
           <div className="grid place-items-center py-16 text-center">

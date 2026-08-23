@@ -19,6 +19,7 @@ import { broadcastProductEvent } from "@/lib/realtime"
 import { logActivity } from "@/server/services/activity"
 import { indexProduct } from '@/server/services/search'
 import { CreateProductSchema } from '@/lib/admin-product-schema'
+import { serializeProductJsonColumns } from '@/lib/product-json'
 
 function addProfitInfo<T extends { price: number; costPrice: number | null }>(product: T) {
   if (product.costPrice === null || product.price <= 0) return product
@@ -78,13 +79,9 @@ export async function GET(req: Request) {
       prisma.product.count({ where }),
     ])
 
-    const serialized = products.map((p) => addProfitInfo({
-      ...p,
-      images: JSON.parse(p.images) as string[],
-      skinType: p.skinType ? JSON.parse(p.skinType) : null,
-      shades: p.shades ? JSON.parse(p.shades) : null,
-      ingredients: p.ingredients ? JSON.parse(p.ingredients) : null,
-    }))
+    // Parsed defensively: a single row with a malformed JSON column must never
+    // abort the map and blank the whole page. See src/lib/product-json.ts.
+    const serialized = products.map((p) => addProfitInfo(serializeProductJsonColumns(p)))
 
     return NextResponse.json({
       success: true,
@@ -203,13 +200,7 @@ export async function POST(req: Request) {
       include: { category: true, brand: true },
     })
 
-    const serializedProduct = {
-      ...product,
-      images: JSON.parse(product.images),
-      skinType: product.skinType ? JSON.parse(product.skinType) : null,
-      shades: product.shades ? JSON.parse(product.shades) : null,
-      ingredients: product.ingredients ? JSON.parse(product.ingredients) : null,
-    }
+    const serializedProduct = serializeProductJsonColumns(product)
     void indexProduct({ id: product.id, name: product.name, slug: product.slug, price: product.price, image: data.images[0] || '', brand: product.brand?.name, category: product.category.name })
       .catch((error) => console.error('Product search indexing failed:', error instanceof Error ? error.message : 'unknown'))
 
