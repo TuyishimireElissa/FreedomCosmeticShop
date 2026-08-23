@@ -40,6 +40,13 @@
 export const MAX_URL_CHARS = 1800
 
 /**
+ * Room set aside for the signed photo link when batches are sized before one
+ * exists. A real quick-price JWT plus the origin measures ~270 characters;
+ * 320 leaves margin for a longer host or a future claim.
+ */
+export const PHOTO_LINK_RESERVE = 320
+
+/**
  * Batch size, chosen by measuring every batch against the real 97 products
  * rather than picking a round number.
  *
@@ -74,20 +81,56 @@ export interface PriceBatch {
   products: PricingProduct[]
 }
 
-/** Split the unpriced list into batches that each fit in one WhatsApp message. */
+/**
+ * Split the unpriced list into batches that each fit in one WhatsApp message.
+ *
+ * `batchSize` is a CEILING, not a promise. Batches are also split by measured
+ * encoded length, because a fixed item count is not safe: 17 of the 97 real
+ * products have non-ASCII names, and percent-encoding inflates them badly.
+ * "ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ)" is 67
+ * characters that become 275 in a URL — four times the cost of an ASCII name
+ * of the same length. A batch of 8 such rows blows the limit even though 8
+ * ASCII rows fit comfortably.
+ *
+ * So each product is added only while the resulting URL still fits, and a
+ * single product that cannot fit on its own is still emitted alone rather than
+ * silently dropped from the catalogue.
+ */
 export function buildPriceBatches(
   products: PricingProduct[],
   batchSize: number = DEFAULT_BATCH_SIZE,
+  options: PriceRequestOptions = {},
 ): PriceBatch[] {
   const size = Math.max(1, Math.floor(batchSize))
-  const batches: PriceBatch[] = []
-  for (let start = 0; start < products.length; start += size) {
-    batches.push({ index: 0, total: 0, products: products.slice(start, start + size) })
+  const groups: PricingProduct[][] = []
+  let current: PricingProduct[] = []
+
+  // A signed photo link is attached later by the dashboard. Reserve room for
+  // it now, or a batch sized without one overflows the moment it is added.
+  const reserved = options.photoUrl ? 0 : PHOTO_LINK_RESERVE
+  const fits = (candidate: PricingProduct[]) => {
+    const message = generateWhatsAppPriceRequest(
+      { index: 1, total: 1, products: candidate },
+      options,
+    )
+    return buildPriceRequestUrl(message).length + reserved <= MAX_URL_CHARS
   }
-  return batches.map((batch, position) => ({
-    ...batch,
+
+  for (const product of products) {
+    const next = [...current, product]
+    if (current.length > 0 && (next.length > size || !fits(next))) {
+      groups.push(current)
+      current = [product]
+    } else {
+      current = next
+    }
+  }
+  if (current.length > 0) groups.push(current)
+
+  return groups.map((batch, position) => ({
     index: position + 1,
-    total: batches.length,
+    total: groups.length,
+    products: batch,
   }))
 }
 
