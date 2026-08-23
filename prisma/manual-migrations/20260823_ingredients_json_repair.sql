@@ -1,0 +1,94 @@
+-- Repair the one malformed `ingredients` value — owner-approved 2026-08-23.
+--
+-- WHY HAND-WRITTEN SQL AND NOT `prisma migrate dev`
+--
+-- This database has no `_prisma_migrations` table and the repo has no
+-- prisma/migrations/ folder — every change here has been hand-written SQL in
+-- this directory. Pointing `migrate dev` at an untracked database makes it read
+-- the entire live schema as drift and offer to reset, which would destroy 108
+-- products. Never run it against this project.
+--
+-- This migration touches DATA only, in ONE column of ONE row. No column is
+-- added, dropped or retyped. No row is deleted. No price is read or written.
+--
+-- ─── BACKGROUND ──────────────────────────────────────────────────────────
+--
+-- `Product.ingredients` is a legacy column that stores a JSON array *as a
+-- string* (see prisma/schema.prisma — "Legacy JSON array; retained for
+-- backward compatibility"). Nothing at the database level enforces that shape.
+--
+-- On 2026-08-21, commit 1cb819f added "Movit Blow Out Creme Hair Relaxer
+-- (150g)" via a direct database script and wrote a plain English sentence into
+-- that column instead of a JSON array:
+--
+--     Refer to the product packaging for the complete INCI ingredient list.
+--
+-- /api/admin/products then ran a bare JSON.parse() inside a .map(). That single
+-- row threw, the map aborted, and the whole page returned HTTP 500. Because the
+-- product is the newest one and the list sorts newest-first, it always sat at
+-- position 0 on page 1 — so the admin product list rendered "No products" while
+-- 108 products sat healthy in the database.
+--
+-- Commit 1d979dc already fixed the CODE: admin routes now parse defensively via
+-- src/lib/product-json.ts, so a malformed value degrades to [] for that one
+-- field and can never blank the page again. That fix is deployed and verified
+-- live (page 1 = HTTP 200, 20 products, total 108).
+--
+-- This migration fixes the DATA, so the sentence is actually displayed to the
+-- owner and to shoppers instead of silently rendering as an empty list.
+--
+-- ─── VERIFIED BEFORE WRITING (live database, 2026-08-23) ─────────────────
+--
+--   * EXACTLY ONE row in all 108 has a non-JSON-array `ingredients`:
+--       SELECT count(*) FROM "Product"
+--       WHERE ingredients IS NOT NULL AND ingredients NOT LIKE '[%';   -- = 1
+--   * The other 107 are already valid JSON arrays and are NOT touched.
+--   * `images`, `skinType` and `shades` are clean across all 108 rows.
+--   * The stored value is 69 characters and contains no single quote, no
+--     double quote and no backslash, so it needs no SQL or JSON escaping.
+--     (Checked byte-by-byte, not assumed.)
+--   * `ingredientsRw` holds the Kinyarwanda sentence and is plain text BY
+--     DESIGN — every other product stores prose there too. It is CORRECT as-is
+--     and is deliberately left alone.
+--
+-- ─── THE REPAIR ──────────────────────────────────────────────────────────
+--
+-- Wrap the existing sentence into a valid one-element JSON array, preserving
+-- the wording character-for-character:
+--
+--   before: Refer to the product packaging for the complete INCI ingredient list.
+--   after:  ["Refer to the product packaging for the complete INCI ingredient list."]
+--
+-- to_jsonb(...)::text does the wrapping and the JSON escaping itself, so the
+-- text is never hand-quoted and cannot be corrupted by a stray character.
+--
+-- Guards, so this is safe to re-run and cannot touch anything else:
+--   * keyed on the exact product id
+--   * AND ingredients IS NOT NULL
+--   * AND ingredients NOT LIKE '[%'  -> already-repaired rows are skipped,
+--     making the statement idempotent
+--
+-- No price column appears anywhere in this file.
+
+UPDATE "Product"
+SET "ingredients" = to_jsonb(ARRAY["ingredients"])::text
+WHERE "id" = 'cmt3dgjql000111mi1q0ol4ei'
+  AND "ingredients" IS NOT NULL
+  AND "ingredients" NOT LIKE '[%';
+
+-- ─── VERIFY ──────────────────────────────────────────────────────────────
+-- Expect exactly 0 rows after this migration:
+--
+--   SELECT id, name, ingredients FROM "Product"
+--   WHERE ingredients IS NOT NULL AND ingredients NOT LIKE '[%';
+--
+-- And the repaired row should read:
+--   ["Refer to the product packaging for the complete INCI ingredient list."]
+
+-- ─── ROLLBACK ────────────────────────────────────────────────────────────
+-- Restores the exact original string. Kept as a comment so it can never
+-- execute by accident.
+--
+-- UPDATE "Product"
+-- SET "ingredients" = 'Refer to the product packaging for the complete INCI ingredient list.'
+-- WHERE "id" = 'cmt3dgjql000111mi1q0ol4ei';
