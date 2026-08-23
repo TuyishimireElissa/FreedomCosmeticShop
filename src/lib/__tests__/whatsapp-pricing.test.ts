@@ -17,6 +17,8 @@ import { describe, expect, it } from 'vitest'
 import {
   BATCH_HEADER_MARGIN,
   DEFAULT_BATCH_SIZE,
+  DEFAULT_PRICE_REQUEST_MODE,
+  PHOTO_MODE_BATCH_SIZE,
   MAX_PRICE_RWF,
   MAX_URL_CHARS,
   MIN_PRICE_RWF,
@@ -229,15 +231,212 @@ describe('a REAL signed photo link still fits (the 2026-08-23 reserve bug)', () 
   })
 })
 
+/**
+ * Owner decision 2026-08-24: two mutually exclusive photo modes.
+ *
+ * Inline Cloudinary URLs cost ~116 characters each; the signed app link costs
+ * 340. Asking for both at 5 items per batch produced a worst message of 2,165
+ * characters and put 17 of 20 batches over the limit. So the modes must never
+ * combine, and each must fit on its own.
+ */
+describe('photo delivery modes', () => {
+  const REAL_LINK = `https://freedomcosmeticshop.com/quick-prices?token=${'x'.repeat(289)}`
+  const IMG = (n: number) =>
+    `https://res.cloudinary.com/dohoc0tmp/image/upload/v178552693${n}/freedomcosmeticshop/products/vwj4mnnahfjk8pm9hsx${n}.jpg`
+
+  /** Real catalogue shape: 97 items, every 6th non-ASCII, 3 with no photo. */
+  const catalogue: PricingProduct[] = Array.from({ length: 97 }, (_, index) => ({
+    slug: `product-${index}`,
+    name: index % 6 === 0
+      ? 'ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ) 125g'
+      : `American Dream Cocoa Butter Lemon Cream ${index} (500ml)`,
+    sku: `FCS-${index}A1B2C3`,
+    imageUrl: index < 3 ? null : IMG(index % 10),
+  }))
+
+  it('link mode omits inline photos and keeps the signed link', () => {
+    const batch = { index: 1, total: 1, products: catalogue.slice(3, 8) }
+    const message = generateWhatsAppPriceRequest(batch, { photoUrl: REAL_LINK, mode: 'link' })
+    expect(message).toContain(REAL_LINK)
+    expect(message).not.toContain('res.cloudinary.com')
+  })
+
+  it('photos mode inlines each image and drops the link entirely', () => {
+    const batch = { index: 1, total: 1, products: catalogue.slice(3, 8) }
+    const message = generateWhatsAppPriceRequest(batch, { photoUrl: REAL_LINK, mode: 'photos' })
+    // Even though a photoUrl was passed, photos mode must ignore it: the two
+    // together overflow the URL.
+    expect(message).not.toContain(REAL_LINK)
+    expect(message).not.toContain('/quick-prices?token=')
+    for (const product of catalogue.slice(3, 8)) expect(message).toContain(product.imageUrl!)
+  })
+
+  it('defaults to link mode when no mode is given', () => {
+    expect(DEFAULT_PRICE_REQUEST_MODE).toBe('link')
+    const batch = { index: 1, total: 1, products: catalogue.slice(3, 8) }
+    expect(generateWhatsAppPriceRequest(batch, { photoUrl: REAL_LINK })).toContain(REAL_LINK)
+  })
+
+  it('imageless products degrade to name + SKU, never a broken link', () => {
+    const batch = { index: 1, total: 1, products: catalogue.slice(0, 3) }
+    const message = generateWhatsAppPriceRequest(batch, { mode: 'photos' })
+    expect(message).not.toContain('Ifoto')
+    expect(message).not.toContain('undefined')
+    expect(message).not.toContain('null')
+    for (const product of catalogue.slice(0, 3)) expect(message).toContain(product.sku!)
+  })
+
+  it('honours the owner-chosen ceiling of 5 for photos mode', () => {
+    // The length guard binds before the item count on the real catalogue, so
+    // changing this constant does not overflow anything -- it silently changes
+    // how many messages the owner sends by hand. Pin the agreed number.
+    expect(PHOTO_MODE_BATCH_SIZE).toBe(5)
+  })
+
+  it('photos mode fits at 5 per batch across the whole catalogue', () => {
+    const batches = buildPriceBatches(catalogue, PHOTO_MODE_BATCH_SIZE, { mode: 'photos', language: 'rw' })
+    for (const batch of batches) {
+      const message = generateWhatsAppPriceRequest(batch, { mode: 'photos', language: 'rw' })
+      expect(buildPriceRequestUrl(message).length).toBeLessThanOrEqual(MAX_URL_CHARS)
+      expect(batch.products.length).toBeLessThanOrEqual(PHOTO_MODE_BATCH_SIZE)
+    }
+    expect(batches.flatMap((b) => b.products)).toHaveLength(97)
+  })
+
+  it('photos mode fits in English too', () => {
+    const batches = buildPriceBatches(catalogue, PHOTO_MODE_BATCH_SIZE, { mode: 'photos', language: 'en' })
+    for (const batch of batches) {
+      const message = generateWhatsAppPriceRequest(batch, { mode: 'photos', language: 'en' })
+      expect(buildPriceRequestUrl(message).length).toBeLessThanOrEqual(MAX_URL_CHARS)
+    }
+    expect(batches.flatMap((b) => b.products)).toHaveLength(97)
+  })
+
+  it('photos mode does not waste the link reserve on a link it never sends', () => {
+    // Direct proof rather than a guess about batch sizes: if the 400-char
+    // reserve were still being subtracted, no batch could exceed
+    // MAX_URL_CHARS - PHOTO_LINK_RESERVE - BATCH_HEADER_MARGIN. At least one
+    // batch must use the space the link would have occupied.
+    const cap = MAX_URL_CHARS - PHOTO_LINK_RESERVE - BATCH_HEADER_MARGIN
+    const batches = buildPriceBatches(catalogue, PHOTO_MODE_BATCH_SIZE, { mode: 'photos' })
+    const lengths = batches.map((batch) =>
+      buildPriceRequestUrl(generateWhatsAppPriceRequest(batch, { mode: 'photos' })).length)
+    expect(Math.max(...lengths)).toBeGreaterThan(cap)
+    // ...while still respecting the real limit.
+    expect(Math.max(...lengths)).toBeLessThanOrEqual(MAX_URL_CHARS)
+  })
+
+  it('the parser reads a photos-mode reply unchanged', () => {
+    // The 📷 line must be ignored, not misread as a product or a price.
+    const batch = { index: 1, total: 1, products: catalogue.slice(3, 6) }
+    const sent = generateWhatsAppPriceRequest(batch, { mode: 'photos' })
+    expect(sent).toContain('res.cloudinary.com')
+    const result = parseWhatsAppPriceReply('1. 2500 / 2000\n2. 3000\n3. 4500', batch.products)
+    expect(result.issues).toHaveLength(0)
+    expect(result.matched.map((row) => row.retail)).toEqual([2500, 3000, 4500])
+    expect(result.matched[0].wholesale).toBe(2000)
+  })
+
+  it('a pasted photo URL in the reply cannot be read as a price', () => {
+    // The father might quote the message back. Digits inside a Cloudinary URL
+    // (v1785526939) must never become a price.
+    const batch = { index: 1, total: 1, products: catalogue.slice(3, 5) }
+    const reply = `1. ${IMG(1)}\n1. 2500\n2. 3000`
+    const result = parseWhatsAppPriceReply(reply, batch.products)
+    const prices = result.matched.map((row) => row.retail)
+    expect(prices).not.toContain(1785526931)
+    expect(prices).toEqual([2500, 3000])
+  })
+})
+
+describe('the dashboard exposes both modes', () => {
+  const dashboard = read('src/components/admin/AdminWhatsAppPricing.tsx')
+
+  it('renders a mode selector', () => {
+    expect(dashboard).toContain("name=\"pricing-mode\"")
+    expect(dashboard).toContain('pricing.mode_link')
+    expect(dashboard).toContain('pricing.mode_photos')
+  })
+
+  it('uses the smaller ceiling in photos mode', () => {
+    expect(dashboard).toContain('PHOTO_MODE_BATCH_SIZE')
+    expect(dashboard).toMatch(/mode === 'photos' \? PHOTO_MODE_BATCH_SIZE : DEFAULT_BATCH_SIZE/)
+  })
+
+  it('never sends the signed link in photos mode', () => {
+    expect(dashboard).toMatch(/photoUrl: mode === 'photos' \? null : photoLink/)
+  })
+
+  it('batches and renders through one shared options object', () => {
+    expect(dashboard).toContain('requestOptions')
+    expect(dashboard).toMatch(/buildPriceBatches\(products, batchCeiling, requestOptions\)/)
+    expect(dashboard).toMatch(/generateWhatsAppPriceRequest\(batch, requestOptions\)/)
+  })
+
+  it('resets to the first batch when the mode changes', () => {
+    expect(dashboard).toMatch(/setMode\(value\); setBatchIndex\(0\)/)
+  })
+})
+
+describe("the father's mobile app", () => {
+  const client = read('src/components/admin/QuickPricesClient.tsx')
+
+  it('uses real Tailwind sizing, not the dead h-15 class', () => {
+    // h-15/w-15 are not in the default spacing scale, so they emitted no CSS
+    // and the thumbnail only rendered at 60px via its width/height attributes.
+    expect(client).not.toMatch(/\bh-15\b/)
+    expect(client).not.toMatch(/\bw-15\b/)
+    expect(client).not.toMatch(/\bh-22\b/)
+    expect(client).toContain('h-20 w-20')
+  })
+
+  it('requests a thumbnail matching the rendered size', () => {
+    expect(client).toContain('w_160,h_160,c_fill,q_auto,f_auto')
+    expect(client).toContain('width={80}')
+  })
+
+  it('gives retail the full width and folds wholesale away', () => {
+    expect(client).not.toContain('grid-cols-2')
+    expect(client).toContain('wholesaleOpen')
+    expect(client).toContain('setOpenWholesale')
+    expect(client).toContain('aria-expanded')
+  })
+
+  it('marks each saved row individually, from the server response', () => {
+    expect(client).toContain('savedSlugs')
+    expect(client).toContain("status === 'updated'")
+    expect(client).toContain('pricing.saved_row')
+  })
+
+  it('keeps inputs at or above the 44px touch target', () => {
+    const inputs = client.match(/min-h-1[12]/g) || []
+    expect(inputs.length).toBeGreaterThanOrEqual(4)
+  })
+
+  it('uses only fcs-* tokens, with no dead opacity modifiers', () => {
+    // Strip comments first: the contrast reasoning is documented in-file and
+    // legitimately names hex values.
+    const code = stripComments(client)
+    expect(code).not.toMatch(/#[0-9a-fA-F]{6}/)
+    // Opacity modifiers on fcs-* tokens generate NO CSS -- the palette is bare
+    // var(--x) with no <alpha-value>.
+    expect(code).not.toMatch(/fcs-[a-z-]+\/\d/)
+  })
+})
+
 describe('the dashboard sizes batches with the same link it renders with', () => {
   const dashboard = read('src/components/admin/AdminWhatsAppPricing.tsx')
 
-  it('passes photoLink into buildPriceBatches', () => {
-    expect(dashboard).toMatch(/buildPriceBatches\(\s*products,\s*DEFAULT_BATCH_SIZE,\s*\{\s*photoUrl:\s*photoLink/)
+  it('passes the link into buildPriceBatches via the shared options', () => {
+    // Was an inline object; now requestOptions, which carries photoUrl and is
+    // used for BOTH batching and rendering so the two cannot drift apart.
+    expect(dashboard).toMatch(/buildPriceBatches\(products, batchCeiling, requestOptions\)/)
+    expect(dashboard).toMatch(/photoUrl: mode === 'photos' \? null : photoLink/)
   })
 
-  it('recomputes batches when the link arrives', () => {
-    expect(dashboard).toMatch(/\[products,\s*photoLink\]/)
+  it('recomputes batches when the link arrives or the mode changes', () => {
+    expect(dashboard).toMatch(/\[mode,\s*photoLink\]/)
+    expect(dashboard).toMatch(/\[products,\s*batchCeiling,\s*requestOptions\]/)
   })
 
   it('clamps the selected batch if re-batching shortens the list', () => {

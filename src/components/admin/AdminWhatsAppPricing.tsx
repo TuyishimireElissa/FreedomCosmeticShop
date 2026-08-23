@@ -20,6 +20,8 @@ import { useToast } from '@/hooks/use-toast'
 import { formatRWF } from '@/lib/format'
 import {
   DEFAULT_BATCH_SIZE,
+  DEFAULT_PRICE_REQUEST_MODE,
+  PHOTO_MODE_BATCH_SIZE,
   buildPriceBatches,
   buildPriceRequestUrl,
   fitsWhatsAppUrl,
@@ -27,6 +29,7 @@ import {
   parseWhatsAppPriceReply,
   type ParsedPrice,
   type ParseIssue,
+  type PriceRequestMode,
   type PricingProduct,
 } from '@/lib/whatsapp-pricing'
 
@@ -42,6 +45,7 @@ export default function AdminWhatsAppPricing() {
   const [products, setProducts] = useState<UnpricedProduct[]>([])
   const [loading, setLoading] = useState(true)
   const [batchIndex, setBatchIndex] = useState(0)
+  const [mode, setMode] = useState<PriceRequestMode>(DEFAULT_PRICE_REQUEST_MODE)
   const [photoLink, setPhotoLink] = useState<string | null>(null)
   const [reply, setReply] = useState('')
   const [parsed, setParsed] = useState<{ matched: ParsedPrice[]; issues: ParseIssue[] } | null>(null)
@@ -70,20 +74,30 @@ export default function AdminWhatsAppPricing() {
   // then rendering with it is what pushed 2 of 13 batches over the wa.me
   // limit; buildPriceBatches falls back to PHOTO_LINK_RESERVE only while the
   // link is still being minted.
+  // One options object for both batching and rendering, so the length that was
+  // measured is the length that gets sent. Photos mode drops the link and uses
+  // the smaller ceiling; the library ignores photoUrl in that mode anyway.
+  const requestOptions = useMemo(
+    () => ({ photoUrl: mode === 'photos' ? null : photoLink, language: 'rw' as const, mode }),
+    [mode, photoLink],
+  )
+  const batchCeiling = mode === 'photos' ? PHOTO_MODE_BATCH_SIZE : DEFAULT_BATCH_SIZE
+
   const batches = useMemo(
-    () => buildPriceBatches(products, DEFAULT_BATCH_SIZE, { photoUrl: photoLink, language: 'rw' }),
-    [products, photoLink],
+    () => buildPriceBatches(products, batchCeiling, requestOptions),
+    [products, batchCeiling, requestOptions],
   )
   const batch = batches[batchIndex]
 
-  // Re-batching on link arrival can shrink the list; never point past its end.
+  // Re-batching on link arrival or a mode switch can shrink the list; never
+  // point past its end.
   useEffect(() => {
     if (batchIndex > 0 && batchIndex >= batches.length) setBatchIndex(Math.max(0, batches.length - 1))
   }, [batchIndex, batches.length])
 
   const message = useMemo(
-    () => (batch ? generateWhatsAppPriceRequest(batch, { photoUrl: photoLink, language: 'rw' }) : ''),
-    [batch, photoLink],
+    () => (batch ? generateWhatsAppPriceRequest(batch, requestOptions) : ''),
+    [batch, requestOptions],
   )
   const waUrl = useMemo(() => buildPriceRequestUrl(message), [message])
   const tooLong = useMemo(() => (message ? !fitsWhatsAppUrl(message) : false), [message])
@@ -186,6 +200,44 @@ export default function AdminWhatsAppPricing() {
           {/* ─── 1. Send ─────────────────────────────────────────────── */}
           <section className="mt-6 rounded-fcs-md border border-fcs-border bg-white p-4">
             <h2 className="font-black text-fcs-text">{t('pricing.step1_title')}</h2>
+
+            {/* Mode picker. Radios, not a dropdown: two options that change
+                what the father receives deserve to be visible at a glance. */}
+            <fieldset className="mt-3">
+              <legend className="text-sm text-fcs-text-muted">{t('pricing.mode_label')}</legend>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {(['link', 'photos'] as const).map((value) => (
+                  <label
+                    key={value}
+                    className={`flex min-h-11 cursor-pointer items-start gap-2 rounded-fcs-md border p-3 text-sm ${
+                      mode === value
+                        ? 'border-fcs-brand-strong bg-fcs-surface'
+                        : 'border-fcs-border bg-white'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="pricing-mode"
+                      value={value}
+                      checked={mode === value}
+                      onChange={() => { setMode(value); setBatchIndex(0); setParsed(null) }}
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-fcs-brand-strong"
+                    />
+                    <span className="min-w-0">
+                      <span className="block font-bold text-fcs-text">
+                        {t(value === 'link' ? 'pricing.mode_link' : 'pricing.mode_photos')}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-fcs-text-muted">
+                        {t(value === 'link' ? 'pricing.mode_link_hint' : 'pricing.mode_photos_hint')}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-fcs-text-muted">
+                {t('pricing.mode_count', { count: String(batches.length) })}
+              </p>
+            </fieldset>
 
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <label htmlFor="batch" className="text-sm text-fcs-text-muted">{t('pricing.batch_label')}</label>

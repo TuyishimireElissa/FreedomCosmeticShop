@@ -422,6 +422,13 @@ export const rw = {
     all_done: 'Ibicuruzwa byose bifite igiciro. Nta cyo koherezwa.', // verified-rw
     step1_title: '1. Ohereza ubusabe bw’ibiciro', // verified-rw
     batch_label: 'Urutonde', // verified-rw
+    mode_label: 'Amafoto azamugeraho ate?', // verified-rw
+    mode_link: 'Kohereza umurongo', // verified-rw
+    mode_link_hint: 'Ubutumwa buke. Akanda umurongo maze yandike ibiciro kuri telefoni ye.', // verified-rw
+    mode_photos: 'Amafoto mu butumwa', // verified-rw
+    mode_photos_hint: 'Ubutumwa bwinshi. Buri foto iri mu nyandiko, nta paji yo gufungura.', // verified-rw
+    mode_count: 'Ubutumwa {count} bwo kohereza', // verified-rw
+    saved_row: 'Byabitswe', // verified-rw
     batch_option: 'Urutonde {index} kuri {total} (ibintu {count})', // verified-rw
     open_whatsapp: 'Fungura muri WhatsApp', // verified-rw
     copy_message: 'Koporora ubutumwa', // verified-rw

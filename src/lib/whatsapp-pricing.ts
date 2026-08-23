@@ -148,7 +148,13 @@ export function buildPriceBatches(
 
   // A signed photo link is attached later by the dashboard. Reserve room for
   // it now, or a batch sized without one overflows the moment it is added.
-  const reserved = options.photoUrl ? 0 : PHOTO_LINK_RESERVE
+  //
+  // Photos mode never carries the link, so reserving for it there would waste
+  // 400 characters and split batches far smaller than necessary. The inline
+  // image URLs are already counted, because they are part of the message the
+  // fit check measures.
+  const photosInline = (options.mode ?? DEFAULT_PRICE_REQUEST_MODE) === 'photos'
+  const reserved = photosInline || options.photoUrl ? 0 : PHOTO_LINK_RESERVE
 
   // Fitting is measured with a placeholder "1/1" header, but the batch is
   // finally rendered with its real position -- "11/13" is four characters
@@ -183,11 +189,48 @@ export function buildPriceBatches(
   }))
 }
 
+/**
+ * How the photos reach the father. Owner decision 2026-08-24.
+ *
+ * The two modes are mutually exclusive ON PURPOSE. Inline Cloudinary URLs cost
+ * about 116 characters each and the signed app link costs 340. Measured against
+ * the real 97 products, asking for both at 5 items per batch produces a worst
+ * message of 2,165 characters and puts 17 of 20 batches over the limit --
+ * WhatsApp truncates those and products fall off the end with no error shown.
+ *
+ * So the owner picks one:
+ *
+ *   'link'   13 messages. Signed app link, no inline photos. The father taps
+ *            through to a real UI with photos and inputs. Default.
+ *   'photos' 20 messages. One inline photo URL per product, no app link, for a
+ *            father who would rather reply as text than open a web page.
+ *
+ * Measured worst wa.me URL, all 97 products, limit 1800:
+ *   link mode,   ceiling 15 -> 13 batches, worst 1742
+ *   photos mode, ceiling  5 -> 20 batches, worst 1778
+ */
+export type PriceRequestMode = 'link' | 'photos'
+
+export const DEFAULT_PRICE_REQUEST_MODE: PriceRequestMode = 'link'
+
+/**
+ * Items per batch in photos mode.
+ *
+ * Five is the owner's number and it measures safe: worst 1,778 of 1,800 with
+ * SKU and a wholesale blank included. Six overflows on 13 of 17 batches, so
+ * there is no headroom to go higher. The length guard in buildPriceBatches is
+ * still what actually enforces the limit; this is only the ceiling.
+ */
+export const PHOTO_MODE_BATCH_SIZE = 5
+
 export interface PriceRequestOptions {
   /** Signed, expiring link to the photo page for this batch. Optional so the
    *  message still generates in tests and previews without a token. */
   photoUrl?: string | null
   language?: 'en' | 'rw'
+  /** Defaults to 'link'. In 'photos' mode the signed link is omitted even if
+   *  photoUrl is supplied, because the two cannot share one message. */
+  mode?: PriceRequestMode
 }
 
 /**
@@ -206,13 +249,24 @@ export function generateWhatsAppPriceRequest(
     ? `IBICIRO — FreedomCosmeticShop\nUrutonde ${batch.index}/${batch.total}`
     : `PRICE REQUEST — FreedomCosmeticShop\nBatch ${batch.index} of ${batch.total}`
 
+  const mode = options.mode ?? DEFAULT_PRICE_REQUEST_MODE
+  const photosInline = mode === 'photos'
+
   const lines = batch.products.map((product, position) => {
     const number = position + 1
     const id = product.sku?.trim() || product.slug
-    return `${number}. ${product.name}\n   ${id}\n   _____ / _____`
+    // Photos mode puts the image under the name. The 3 catalogue products with
+    // no photo simply get name + SKU, which the owner accepted: a missing line
+    // is better than a broken link.
+    const photo = photosInline && product.imageUrl
+      ? `\n   ${isRW ? 'Ifoto' : 'Photo'}: ${product.imageUrl}`
+      : ''
+    return `${number}. ${product.name}\n   ${id}${photo}\n   _____ / _____`
   })
 
-  const photoLine = options.photoUrl
+  // Link mode only. In photos mode the signed link is deliberately omitted:
+  // both together overflow the URL and WhatsApp truncates the message.
+  const photoLine = !photosInline && options.photoUrl
     ? (isRW
       ? `\nAmafoto y'ibi bicuruzwa:\n${options.photoUrl}\n`
       : `\nPhotos for these items:\n${options.photoUrl}\n`)

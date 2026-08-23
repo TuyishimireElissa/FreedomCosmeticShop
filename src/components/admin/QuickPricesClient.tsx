@@ -15,7 +15,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Check, Loader2 } from 'lucide-react'
+import { Check, Loader2, Plus } from 'lucide-react'
 import { useT } from '@/lib/i18n/LanguageContext'
 
 interface Row {
@@ -36,6 +36,12 @@ export default function QuickPricesClient() {
   const [state, setState] = useState<'loading' | 'ready' | 'denied' | 'saved'>('loading')
   const [saving, setSaving] = useState(false)
   const [savedCount, setSavedCount] = useState(0)
+  // Slugs the server confirmed it wrote, so each card can show its own tick
+  // rather than the whole page flipping to one summary screen.
+  const [savedSlugs, setSavedSlugs] = useState<string[]>([])
+  // Wholesale is hidden by default: at 360px two inputs side by side leave
+  // about 150px each, and wholesale is the optional one.
+  const [openWholesale, setOpenWholesale] = useState<string[]>([])
 
   const load = useCallback(async () => {
     if (!token) { setState('denied'); return }
@@ -83,6 +89,13 @@ export default function QuickPricesClient() {
       const body = await response.json()
       if (!response.ok || !body.success) throw new Error('failed')
       setSavedCount(body.data.updated)
+      // Mark only the rows the server actually wrote. A row it skipped because
+      // the product already had a price must not show a tick.
+      const written = Array.isArray(body.data.results)
+        ? body.data.results.filter((row: { status: string }) => row.status === 'updated')
+          .map((row: { slug: string }) => row.slug)
+        : filled.map(([slug]) => slug)
+      setSavedSlugs(written)
       setState('saved')
     } catch {
       setSaving(false)
@@ -127,45 +140,64 @@ export default function QuickPricesClient() {
       </header>
 
       <ol className="space-y-3 p-4">
-        {rows.map((row) => (
-          <li key={row.slug} className="rounded-fcs-md border border-fcs-border bg-white p-3">
+        {rows.map((row) => {
+          const isSaved = savedSlugs.includes(row.slug)
+          const wholesaleOpen = openWholesale.includes(row.slug)
+          return (
+          <li
+            key={row.slug}
+            className={`rounded-fcs-md border bg-white p-3 ${isSaved ? 'border-fcs-whatsapp-pill' : 'border-fcs-border'}`}
+          >
             <div className="flex gap-3">
               {row.imageUrl ? (
                 <img
-                  src={row.imageUrl.replace('/upload/', '/upload/w_120,h_120,c_fill,q_auto,f_auto/')}
+                  src={row.imageUrl.replace('/upload/', '/upload/w_160,h_160,c_fill,q_auto,f_auto/')}
                   alt=""
-                  width={60}
-                  height={60}
+                  width={80}
+                  height={80}
                   loading="lazy"
-                  className="h-15 w-15 shrink-0 rounded-fcs-sm object-cover"
+                  decoding="async"
+                  className="h-20 w-20 shrink-0 rounded-fcs-sm bg-fcs-surface object-cover"
                 />
               ) : (
-                <div className="grid h-15 w-15 shrink-0 place-items-center rounded-fcs-sm bg-fcs-surface text-[10px] text-fcs-text-muted">
+                <div className="grid h-20 w-20 shrink-0 place-items-center rounded-fcs-sm bg-fcs-surface px-1 text-center text-[11px] text-fcs-text-muted">
                   {t('pricing.no_photo')}
                 </div>
               )}
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-bold text-fcs-text">{row.nameRw || row.name}</p>
                 {row.sku && <p className="mt-0.5 font-mono text-[11px] text-fcs-text-muted">{row.sku}</p>}
+                {/* pill-hover, not pill: #1E874A on fcs-surface is 4.29:1,
+                    which fails AA for text. #17703D is 5.79:1. */}
+                {isSaved && (
+                  <p className="mt-1 inline-flex items-center gap-1 rounded-full bg-fcs-surface px-2 py-0.5 text-[11px] font-bold text-fcs-whatsapp-pill-hover">
+                    <Check className="h-3 w-3" aria-hidden="true" />
+                    {t('pricing.saved_row')}
+                  </p>
+                )}
               </div>
             </div>
 
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <div>
-                <label htmlFor={`r-${row.slug}`} className="block text-[11px] font-bold uppercase tracking-wide text-fcs-text-muted">
-                  {t('pricing.col_retail')}
-                </label>
-                <input
-                  id={`r-${row.slug}`}
-                  inputMode="numeric"
-                  autoComplete="off"
-                  value={values[row.slug]?.retail ?? ''}
-                  onChange={(event) => setField(row.slug, 'retail', event.target.value)}
-                  placeholder="0"
-                  className="mt-1 min-h-11 w-full rounded-fcs-sm border border-fcs-border bg-fcs-surface px-3 text-base text-fcs-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-strong"
-                />
-              </div>
-              <div>
+            {/* Retail takes the full width. At 360px a two-column grid gives
+                each input about 150px, and retail is the one that matters. */}
+            <div className="mt-3">
+              <label htmlFor={`r-${row.slug}`} className="block text-[11px] font-bold uppercase tracking-wide text-fcs-text-muted">
+                {t('pricing.col_retail')}
+              </label>
+              <input
+                id={`r-${row.slug}`}
+                inputMode="numeric"
+                autoComplete="off"
+                value={values[row.slug]?.retail ?? ''}
+                onChange={(event) => setField(row.slug, 'retail', event.target.value)}
+                placeholder="0"
+                className="mt-1 min-h-12 w-full rounded-fcs-sm border border-fcs-border bg-fcs-surface px-3 text-lg text-fcs-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-strong"
+              />
+            </div>
+
+            {/* Wholesale is optional, so it stays folded away until asked for. */}
+            {wholesaleOpen ? (
+              <div className="mt-2">
                 <label htmlFor={`w-${row.slug}`} className="block text-[11px] font-bold uppercase tracking-wide text-fcs-text-muted">
                   {t('pricing.col_wholesale')}
                 </label>
@@ -173,15 +205,28 @@ export default function QuickPricesClient() {
                   id={`w-${row.slug}`}
                   inputMode="numeric"
                   autoComplete="off"
+                  autoFocus
                   value={values[row.slug]?.wholesale ?? ''}
                   onChange={(event) => setField(row.slug, 'wholesale', event.target.value)}
                   placeholder={t('pricing.optional')}
-                  className="mt-1 min-h-11 w-full rounded-fcs-sm border border-fcs-border bg-fcs-surface px-3 text-base text-fcs-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-strong"
+                  className="mt-1 min-h-12 w-full rounded-fcs-sm border border-fcs-border bg-fcs-surface px-3 text-lg text-fcs-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-strong"
                 />
               </div>
-            </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setOpenWholesale((current) => [...current, row.slug])}
+                aria-expanded={false}
+                aria-controls={`w-${row.slug}`}
+                className="mt-2 inline-flex min-h-11 items-center gap-1 text-sm font-bold text-fcs-brand-text underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-strong"
+              >
+                <Plus className="h-4 w-4" aria-hidden="true" />
+                {t('pricing.col_wholesale')}
+              </button>
+            )}
           </li>
-        ))}
+          )
+        })}
       </ol>
 
       <div className="fixed inset-x-0 bottom-0 border-t border-fcs-border bg-white p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
