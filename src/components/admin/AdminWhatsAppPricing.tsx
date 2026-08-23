@@ -65,8 +65,21 @@ export default function AdminWhatsAppPricing() {
 
   useEffect(() => { void load() }, [load])
 
-  const batches = useMemo(() => buildPriceBatches(products, DEFAULT_BATCH_SIZE), [products])
+  // Batch with the SAME photoUrl the message is rendered with, so the length
+  // measurement matches what is actually sent. Sizing without the link and
+  // then rendering with it is what pushed 2 of 13 batches over the wa.me
+  // limit; buildPriceBatches falls back to PHOTO_LINK_RESERVE only while the
+  // link is still being minted.
+  const batches = useMemo(
+    () => buildPriceBatches(products, DEFAULT_BATCH_SIZE, { photoUrl: photoLink, language: 'rw' }),
+    [products, photoLink],
+  )
   const batch = batches[batchIndex]
+
+  // Re-batching on link arrival can shrink the list; never point past its end.
+  useEffect(() => {
+    if (batchIndex > 0 && batchIndex >= batches.length) setBatchIndex(Math.max(0, batches.length - 1))
+  }, [batchIndex, batches.length])
 
   const message = useMemo(
     () => (batch ? generateWhatsAppPriceRequest(batch, { photoUrl: photoLink, language: 'rw' }) : ''),

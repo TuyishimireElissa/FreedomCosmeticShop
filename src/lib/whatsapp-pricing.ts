@@ -41,26 +41,67 @@ export const MAX_URL_CHARS = 1800
 
 /**
  * Room set aside for the signed photo link when batches are sized before one
- * exists. A real quick-price JWT plus the origin measures ~270 characters;
- * 320 leaves margin for a longer host or a future claim.
+ * exists.
+ *
+ * CORRECTED 2026-08-23. The old value was 320, based on an estimate of ~270
+ * characters. That estimate was wrong. A token minted by the live
+ * /api/admin/products/quick-price-link endpoint is 289 characters, so the real
+ * link is:
+ *
+ *   https://freedomcosmeticshop.com/quick-prices?token=<289 chars>  = 340 chars
+ *
+ * and once percent-encoded inside the message it costs 374. Reserving 320 for
+ * something that costs 374 meant 2 of the 13 batches rendered at 1,846
+ * characters -- 46 over MAX_URL_CHARS -- so WhatsApp would have truncated
+ * those two messages and silently dropped products off the end.
+ *
+ * 400 covers the measured 374 with margin for a longer host or an extra claim.
+ * Prefer passing the real photoUrl to buildPriceBatches, which measures the
+ * true cost and makes this reserve a fallback rather than a guess.
  */
-export const PHOTO_LINK_RESERVE = 320
+export const PHOTO_LINK_RESERVE = 400
 
 /**
- * Batch size, chosen by measuring every batch against the real 97 products
- * rather than picking a round number.
+ * Slack for the batch header, which grows after fitting is measured.
  *
- *   size  batches  longest message  longest wa.me URL
- *      4       25              832               1221
- *      8       13             1212               1692   <- chosen
- *     10       10             1349               1946   (too close to 2057)
- *     12        9             1523               2226   (over the hard limit)
- *
- * 8 is the largest size that leaves real headroom. It also keeps the count to
- * 13 messages instead of 25, which matters when a person has to send them by
- * hand and read the replies.
+ * Batches are measured with a placeholder "Urutonde 1/1" header because the
+ * total is not known until every batch exists. The final render says
+ * "Urutonde 11/13", which is longer. Percent-encoding makes the newline and
+ * slash cost more than their raw length, so a batch measured at exactly
+ * MAX_URL_CHARS can ship over it. 32 covers a three-digit index and total
+ * with room to spare.
  */
-export const DEFAULT_BATCH_SIZE = 8
+export const BATCH_HEADER_MARGIN = 32
+
+/**
+ * Ceiling on items per batch. This is a CEILING, not a promise:
+ * buildPriceBatches also splits on measured encoded length, so a batch closes
+ * early whenever the next item would overflow the URL.
+ *
+ * Measured against the real 97 products with a real 340-character photo link.
+ * Naive fixed-size batching at the sizes people reach for does not survive:
+ *
+ *   size  batches  worst wa.me URL  result
+ *      8       13             1737  all fit
+ *     10       10             1991  8 of 10 OVER the 1800 limit
+ *     12        9             2271  8 of  9 OVER
+ *     15        7             2673  6 of  7 OVER
+ *
+ * The reason is that 17 of the 97 names are non-ASCII. "ASANTEE Tamarind &
+ * Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ)" is 67 characters that
+ * become 275 once percent-encoded -- four times the cost of an ASCII name of
+ * the same length. So item count alone can never be a safe unit.
+ *
+ * With adaptive splitting the ceiling can safely be raised to 15, which is
+ * what the owner asked for. Sizes then vary per batch as the encoder demands:
+ *
+ *   ceiling  8 -> 13 batches, sizes 8x12 + 1,          worst URL 1737
+ *   ceiling 15 -> 11 batches, sizes 8,9,10,10,8,9,9,9,9,9,7, worst URL 1785
+ *
+ * Both preserve all 97 products. 15 is chosen: fewer messages to send and
+ * read by hand, with the length guard still doing the real work.
+ */
+export const DEFAULT_BATCH_SIZE = 15
 
 /** Rwandan Franc sanity bounds. The real catalogue runs 2,300–17,000 RWF; the
  *  ceiling is deliberately generous but still catches a slipped decimal or a
@@ -108,12 +149,20 @@ export function buildPriceBatches(
   // A signed photo link is attached later by the dashboard. Reserve room for
   // it now, or a batch sized without one overflows the moment it is added.
   const reserved = options.photoUrl ? 0 : PHOTO_LINK_RESERVE
+
+  // Fitting is measured with a placeholder "1/1" header, but the batch is
+  // finally rendered with its real position -- "11/13" is four characters
+  // longer, and the count is not known until every batch has been formed.
+  // Without this margin a batch measured at exactly the limit ships one
+  // character over it. Also absorbs a future word added to the header.
+  const budget = MAX_URL_CHARS - BATCH_HEADER_MARGIN - reserved
+
   const fits = (candidate: PricingProduct[]) => {
     const message = generateWhatsAppPriceRequest(
       { index: 1, total: 1, products: candidate },
       options,
     )
-    return buildPriceRequestUrl(message).length + reserved <= MAX_URL_CHARS
+    return buildPriceRequestUrl(message).length <= budget
   }
 
   for (const product of products) {

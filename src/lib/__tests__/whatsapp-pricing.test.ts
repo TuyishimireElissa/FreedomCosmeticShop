@@ -15,10 +15,12 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
+  BATCH_HEADER_MARGIN,
   DEFAULT_BATCH_SIZE,
   MAX_PRICE_RWF,
   MAX_URL_CHARS,
   MIN_PRICE_RWF,
+  PHOTO_LINK_RESERVE,
   buildPriceBatches,
   buildPriceRequestUrl,
   fitsWhatsAppUrl,
@@ -47,10 +49,14 @@ describe('batching keeps every message inside the WhatsApp URL limit', () => {
       slug: `product-${index}`, name: `Product ${index}`, sku: `FCS-${index}`,
     }))
     const batches = buildPriceBatches(many)
-    expect(batches).toHaveLength(Math.ceil(97 / DEFAULT_BATCH_SIZE))
+    // Deliberately NOT ceil(97 / size): length splitting can close a batch
+    // early, so the count is a range, not a division. Asserting the division
+    // would silently re-break the moment a name grows.
+    expect(batches.length).toBeGreaterThanOrEqual(Math.ceil(97 / DEFAULT_BATCH_SIZE))
     expect(batches[0].index).toBe(1)
     expect(batches[0].total).toBe(batches.length)
     expect(batches.at(-1)?.index).toBe(batches.length)
+    for (const batch of batches) expect(batch.products.length).toBeGreaterThan(0)
     // Nothing may be dropped between batches.
     expect(batches.flatMap((batch) => batch.products)).toHaveLength(97)
   })
@@ -95,6 +101,147 @@ describe('batching keeps every message inside the WhatsApp URL limit', () => {
       slug: `p-${index}`, name: `Product number ${index} with a fairly long descriptive name`, sku: `FCS-${index}`,
     }))
     expect(fitsWhatsAppUrl(generateWhatsAppPriceRequest(batchOf(huge)))).toBe(false)
+  })
+})
+
+/**
+ * Regression cover for the 2026-08-23 reserve bug.
+ *
+ * PHOTO_LINK_RESERVE was 320, estimated at "~270 characters". A token minted
+ * by the live quick-price-link endpoint is 289 characters, so the real link is
+ * 340 and costs 374 once encoded. The dashboard sized batches WITHOUT the link
+ * and then rendered them WITH it, so 2 of 13 batches shipped at 1,846
+ * characters -- 46 over the limit -- and WhatsApp would have truncated them,
+ * dropping products off the end of the message.
+ *
+ * The old tests missed this because they used short placeholder tokens.
+ */
+describe('a REAL signed photo link still fits (the 2026-08-23 reserve bug)', () => {
+  // Exactly what /api/admin/products/quick-price-link returns today.
+  const REAL_TOKEN = 'x'.repeat(289)
+  const REAL_LINK = `https://freedomcosmeticshop.com/quick-prices?token=${REAL_TOKEN}`
+
+  /** The real catalogue shape: 97 items, 17 of them non-ASCII. */
+  const catalogue: PricingProduct[] = Array.from({ length: 97 }, (_, index) => (
+    index % 6 === 0
+      ? {
+        slug: `asantee-tamarind-goat-milk-herbal-soap-${index}`,
+        name: 'ASANTEE Tamarind & Goat Milk Herbal Soap (สบู่สมุนไพรมะขามผสมนมแพะ) 125g',
+        sku: `FCS-${index}A1B2C3`,
+      }
+      : {
+        slug: `american-dream-cocoa-butter-lemon-cream-${index}`,
+        name: `American Dream Cocoa Butter Lemon Cream ${index} (500ml)`,
+        sku: `FCS-${index}D4E5F6`,
+      }
+  ))
+
+  it('the real link is longer than the old 320 reserve, which is why it broke', () => {
+    expect(REAL_LINK.length).toBe(340)
+    expect(REAL_LINK.length).toBeGreaterThan(320)
+    // The reserve must now cover the real encoded cost.
+    expect(PHOTO_LINK_RESERVE).toBeGreaterThanOrEqual(REAL_LINK.length)
+  })
+
+  it('batching WITH the real link keeps every batch under the limit', () => {
+    const batches = buildPriceBatches(catalogue, DEFAULT_BATCH_SIZE, { photoUrl: REAL_LINK, language: 'rw' })
+    for (const batch of batches) {
+      const message = generateWhatsAppPriceRequest(batch, { photoUrl: REAL_LINK, language: 'rw' })
+      expect(buildPriceRequestUrl(message).length).toBeLessThanOrEqual(MAX_URL_CHARS)
+    }
+    expect(batches.flatMap((b) => b.products)).toHaveLength(97)
+  })
+
+  it('batching WITHOUT a link still fits once the real link is added later', () => {
+    // This is the exact path that broke: size on the reserve, render on the
+    // real link. It must hold while the token is still being minted.
+    const batches = buildPriceBatches(catalogue, DEFAULT_BATCH_SIZE)
+    for (const batch of batches) {
+      const message = generateWhatsAppPriceRequest(batch, { photoUrl: REAL_LINK, language: 'rw' })
+      expect(buildPriceRequestUrl(message).length).toBeLessThanOrEqual(MAX_URL_CHARS)
+    }
+    expect(batches.flatMap((b) => b.products)).toHaveLength(97)
+  })
+
+  it('holds for the English message too, which is not shorter', () => {
+    const batches = buildPriceBatches(catalogue, DEFAULT_BATCH_SIZE, { photoUrl: REAL_LINK, language: 'en' })
+    for (const batch of batches) {
+      const message = generateWhatsAppPriceRequest(batch, { photoUrl: REAL_LINK, language: 'en' })
+      expect(buildPriceRequestUrl(message).length).toBeLessThanOrEqual(MAX_URL_CHARS)
+    }
+  })
+
+  it('survives a token 25% longer than today, so a new claim cannot silently break it', () => {
+    const longer = `https://freedomcosmeticshop.com/quick-prices?token=${'x'.repeat(360)}`
+    const batches = buildPriceBatches(catalogue, DEFAULT_BATCH_SIZE, { photoUrl: longer, language: 'rw' })
+    for (const batch of batches) {
+      const message = generateWhatsAppPriceRequest(batch, { photoUrl: longer, language: 'rw' })
+      expect(buildPriceRequestUrl(message).length).toBeLessThanOrEqual(MAX_URL_CHARS)
+    }
+    expect(batches.flatMap((b) => b.products)).toHaveLength(97)
+  })
+
+  it('leaves real headroom, not a one-character escape', () => {
+    // The first corrected attempt passed with 1 character to spare, which is
+    // not a fix. BATCH_HEADER_MARGIN buys back room for the "11/13" header
+    // that is only known after every batch is formed.
+    const batches = buildPriceBatches(catalogue, DEFAULT_BATCH_SIZE, { photoUrl: REAL_LINK, language: 'rw' })
+    const worst = Math.max(...batches.map((batch) =>
+      buildPriceRequestUrl(generateWhatsAppPriceRequest(batch, { photoUrl: REAL_LINK, language: 'rw' })).length))
+    expect(MAX_URL_CHARS - worst).toBeGreaterThanOrEqual(16)
+    expect(BATCH_HEADER_MARGIN).toBeGreaterThan(0)
+  })
+
+  it('the margin is load-bearing: a boundary catalogue overflows without it', () => {
+    // Found by sweeping name lengths. At 102 characters the packer lands a
+    // batch exactly on MAX_URL_CHARS while measuring the "1/1" header, then
+    // the real "27/27" header pushes the shipped URL to 1,802 -- 2 over.
+    // BATCH_HEADER_MARGIN is what keeps this under. Without this fixture the
+    // margin could be deleted and every other test would still pass (it
+    // survived mutation M2 before this test existed).
+    const boundary: PricingProduct[] = Array.from({ length: 150 }, (_, index) => ({
+      slug: `p-${index}`,
+      name: `Product ${index} ${'N'.repeat(102)}`,
+      sku: `FCS-${index}ABCDEF`,
+    }))
+    const batches = buildPriceBatches(boundary, DEFAULT_BATCH_SIZE, { photoUrl: REAL_LINK, language: 'rw' })
+    for (const batch of batches) {
+      const rendered = generateWhatsAppPriceRequest(batch, { photoUrl: REAL_LINK, language: 'rw' })
+      expect(buildPriceRequestUrl(rendered).length).toBeLessThanOrEqual(MAX_URL_CHARS)
+    }
+    expect(batches.flatMap((b) => b.products)).toHaveLength(150)
+  })
+
+  it('the real multi-digit header is accounted for, not the 1/1 placeholder', () => {
+    // Fitting measures "1/1"; the shipped header can read "13/13".
+    const batches = buildPriceBatches(catalogue, DEFAULT_BATCH_SIZE, { photoUrl: REAL_LINK, language: 'rw' })
+    const last = batches.at(-1)!
+    expect(last.total).toBeGreaterThan(9)
+    const rendered = generateWhatsAppPriceRequest(last, { photoUrl: REAL_LINK, language: 'rw' })
+    expect(rendered).toContain(`${last.index}/${last.total}`)
+    expect(buildPriceRequestUrl(rendered).length).toBeLessThanOrEqual(MAX_URL_CHARS)
+  })
+
+  it('honours the owner-requested ceiling of 15 without ever exceeding it', () => {
+    expect(DEFAULT_BATCH_SIZE).toBe(15)
+    const batches = buildPriceBatches(catalogue, DEFAULT_BATCH_SIZE, { photoUrl: REAL_LINK, language: 'rw' })
+    for (const batch of batches) expect(batch.products.length).toBeLessThanOrEqual(15)
+  })
+})
+
+describe('the dashboard sizes batches with the same link it renders with', () => {
+  const dashboard = read('src/components/admin/AdminWhatsAppPricing.tsx')
+
+  it('passes photoLink into buildPriceBatches', () => {
+    expect(dashboard).toMatch(/buildPriceBatches\(\s*products,\s*DEFAULT_BATCH_SIZE,\s*\{\s*photoUrl:\s*photoLink/)
+  })
+
+  it('recomputes batches when the link arrives', () => {
+    expect(dashboard).toMatch(/\[products,\s*photoLink\]/)
+  })
+
+  it('clamps the selected batch if re-batching shortens the list', () => {
+    expect(dashboard).toContain('batchIndex >= batches.length')
   })
 })
 
