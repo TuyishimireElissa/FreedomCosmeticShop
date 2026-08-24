@@ -31,6 +31,7 @@ import {
   parseWhatsAppPriceReply,
   type PricingProduct,
 } from '@/lib/whatsapp-pricing'
+import { QUICK_PRICE_WHATSAPP_RECIPIENT } from '@/lib/business-config'
 
 const read = (path: string) => readFileSync(path, 'utf8')
 const stripComments = (source: string) =>
@@ -853,5 +854,25 @@ describe('buildPriceRequestTarget — where the open button actually goes', () =
     expect(buildPriceRequestTarget('Gahunda + 2/3', '').href).toContain(encodeURIComponent('Gahunda + 2/3'))
     vi.stubGlobal('navigator', { userAgent: DESKTOP })
     expect(buildPriceRequestTarget('Gahunda + 2/3', '+250790215965').href).toContain(encodeURIComponent('Gahunda + 2/3'))
+  })
+})
+
+describe('dashboard recipient — owner-confirmed config', () => {
+  it('resolves to the owner-confirmed number when no env override is set', () => {
+    expect(QUICK_PRICE_WHATSAPP_RECIPIENT).toBe('+250790215965')
+    expect(QUICK_PRICE_WHATSAPP_RECIPIENT.replace(/\D/g, '')).toBe('250790215965')
+  })
+
+  it('mobile: the shipped button lands in the recipient chat, not the picker', () => {
+    vi.stubGlobal('navigator', {
+      userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1',
+    })
+    const { href, target } = buildPriceRequestTarget(
+      generateWhatsAppPriceRequest({ index: 1, total: 1, products: PRODUCTS.slice(0, 2) }, { language: 'en' }),
+      QUICK_PRICE_WHATSAPP_RECIPIENT,
+    )
+    expect(href).toMatch(/^https:\/\/wa\.me\/250790215965\?text=/)
+    expect(target).toBe('_self')
+    vi.unstubAllGlobals()
   })
 })

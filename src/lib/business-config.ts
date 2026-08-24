@@ -33,14 +33,17 @@ export const WHATSAPP_ORDERING_NUMBERS: readonly string[] = [
 
 /**
  * Recipient of the price requests sent from the admin pricing dashboard — the
- * person who knows the prices (the father). LEFT UNSET until the owner
- * confirms the number: while empty, the dashboard uses WhatsApp's "share to a
- * chat" picker, so the message can never land with the wrong person. An env
- * var may still override a confirmed value without a deploy.
+ * person who knows the prices. CONFIRMED BY OWNER 2026-08-24: +250790215965
+ * (sent as 0790215965). That is the same line as the admin/owner account — set
+ * on the owner's explicit instruction. If the father uses a different number,
+ * one env var (NEXT_PUBLIC_QUICK_PRICE_RECIPIENT) or one line here changes it.
+ *
+ * NOTE: like the shop's other WhatsApp numbers, this is visible in the public
+ * JS bundle by design (client-side click-to-chat links).
  */
 export const QUICK_PRICE_WHATSAPP_RECIPIENT: string = resolveWhatsApp(
   process.env.NEXT_PUBLIC_QUICK_PRICE_RECIPIENT,
-  '',
+  '+250790215965',
 )
 
 /**
