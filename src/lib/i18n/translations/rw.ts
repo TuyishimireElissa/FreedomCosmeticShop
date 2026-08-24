@@ -428,7 +428,7 @@ export const rw = {
     mode_photos: 'Amafoto mu butumwa', // verified-rw
     mode_photos_hint: 'Ubutumwa bwinshi. Buri foto iri mu nyandiko, nta paji yo gufungura.', // verified-rw
     mode_count: 'Ubutumwa {count} bwo kohereza', // verified-rw
-    saved_row: 'Byabitswe', // verified-rw
+    saved_row: 'Yabitswe', // verified-rw — owner's exact wording
     batch_option: 'Urutonde {index} kuri {total} (ibintu {count})', // verified-rw
     open_whatsapp: 'Fungura muri WhatsApp', // verified-rw
     copy_message: 'Koporora ubutumwa', // verified-rw

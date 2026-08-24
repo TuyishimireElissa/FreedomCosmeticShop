@@ -151,16 +151,16 @@ export default function QuickPricesClient() {
             <div className="flex gap-3">
               {row.imageUrl ? (
                 <img
-                  src={row.imageUrl.replace('/upload/', '/upload/w_160,h_160,c_fill,q_auto,f_auto/')}
+                  src={row.imageUrl.replace('/upload/', '/upload/w_128,h_128,c_fill,q_auto,f_auto/')}
                   alt=""
-                  width={80}
-                  height={80}
+                  width={64}
+                  height={64}
                   loading="lazy"
                   decoding="async"
-                  className="h-20 w-20 shrink-0 rounded-fcs-sm bg-fcs-surface object-cover"
+                  className="h-16 w-16 shrink-0 rounded-fcs-sm bg-fcs-surface object-cover"
                 />
               ) : (
-                <div className="grid h-20 w-20 shrink-0 place-items-center rounded-fcs-sm bg-fcs-surface px-1 text-center text-[11px] text-fcs-text-muted">
+                <div className="grid h-16 w-16 shrink-0 place-items-center rounded-fcs-sm bg-fcs-surface px-1 text-center text-[11px] text-fcs-text-muted">
                   {t('pricing.no_photo')}
                 </div>
               )}

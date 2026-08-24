@@ -380,6 +380,8 @@ describe('the dashboard exposes both modes', () => {
 
 describe("the father's mobile app", () => {
   const client = read('src/components/admin/QuickPricesClient.tsx')
+  const en = read('src/lib/i18n/translations/en.ts')
+  const rw = read('src/lib/i18n/translations/rw.ts')
 
   it('uses real Tailwind sizing, not the dead h-15 class', () => {
     // h-15/w-15 are not in the default spacing scale, so they emitted no CSS
@@ -387,12 +389,17 @@ describe("the father's mobile app", () => {
     expect(client).not.toMatch(/\bh-15\b/)
     expect(client).not.toMatch(/\bw-15\b/)
     expect(client).not.toMatch(/\bh-22\b/)
-    expect(client).toContain('h-20 w-20')
+    // h-16 w-16 (64px) is the owner's specified size. I previously shipped
+    // h-20 without asking; pinned here so it cannot drift again.
+    expect(client).toContain('h-16 w-16')
+    expect(client).not.toMatch(/\bh-20 w-20\b/)
   })
 
   it('requests a thumbnail matching the rendered size', () => {
-    expect(client).toContain('w_160,h_160,c_fill,q_auto,f_auto')
-    expect(client).toContain('width={80}')
+    // 2x the 64px CSS box, for retina without over-fetching on 3G.
+    expect(client).toContain('w_128,h_128,c_fill,q_auto,f_auto')
+    expect(client).toContain('width={64}')
+    expect(client).toContain('height={64}')
   })
 
   it('gives retail the full width and folds wholesale away', () => {
@@ -406,6 +413,10 @@ describe("the father's mobile app", () => {
     expect(client).toContain('savedSlugs')
     expect(client).toContain("status === 'updated'")
     expect(client).toContain('pricing.saved_row')
+    // The owner asked for "Yabitswe" specifically. I shipped "Byabitswe"
+    // without asking; pinned so the wording cannot drift again.
+    expect(rw).toMatch(/saved_row:\s*'Yabitswe'/)
+    expect(en).toMatch(/saved_row:\s*'Saved'/)
   })
 
   it('keeps inputs at or above the 44px touch target', () => {
