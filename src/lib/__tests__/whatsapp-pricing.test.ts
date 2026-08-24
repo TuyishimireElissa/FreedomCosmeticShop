@@ -13,7 +13,7 @@
  */
 
 import { readFileSync } from 'node:fs'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   BATCH_HEADER_MARGIN,
   DEFAULT_BATCH_SIZE,
@@ -24,6 +24,7 @@ import {
   MIN_PRICE_RWF,
   PHOTO_LINK_RESERVE,
   buildPriceBatches,
+  buildPriceRequestTarget,
   buildPriceRequestUrl,
   fitsWhatsAppUrl,
   generateWhatsAppPriceRequest,
@@ -801,5 +802,56 @@ describe('translations', () => {
     for (const line of valueLines) {
       expect(line, `missing verified-rw: ${line.trim()}`).toContain('verified-rw')
     }
+  })
+})
+
+describe('buildPriceRequestTarget — where the open button actually goes', () => {
+  const MOBILE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1'
+  const DESKTOP = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+  const PHONE_DIGITS = '250790215965'
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('mobile: opens wa.me in the SAME tab — no blank tab from the whatsapp:// hand-off', () => {
+    vi.stubGlobal('navigator', { userAgent: MOBILE })
+    const { href, target } = buildPriceRequestTarget('Muraho', '+250790215965')
+    expect(href).toBe(`https://wa.me/${PHONE_DIGITS}?text=${encodeURIComponent('Muraho')}`)
+    expect(target).toBe('_self')
+  })
+
+  it('mobile with no configured recipient: share picker, still same tab', () => {
+    vi.stubGlobal('navigator', { userAgent: MOBILE })
+    const { href, target } = buildPriceRequestTarget('Muraho')
+    expect(href).toBe(`https://wa.me/?text=${encodeURIComponent('Muraho')}`)
+    expect(target).toBe('_self')
+  })
+
+  it('desktop: opens web.whatsapp.com in a new tab — plain HTTPS, no custom scheme', () => {
+    vi.stubGlobal('navigator', { userAgent: DESKTOP })
+    const { href, target } = buildPriceRequestTarget('Muraho', '+250790215965')
+    expect(href).toBe(`https://web.whatsapp.com/send?phone=${PHONE_DIGITS}&text=${encodeURIComponent('Muraho')}`)
+    expect(target).toBe('_blank')
+  })
+
+  it('desktop with no configured recipient: web share UI, still a usable page', () => {
+    vi.stubGlobal('navigator', { userAgent: DESKTOP })
+    const { href, target } = buildPriceRequestTarget('Muraho')
+    expect(href).toBe(`https://web.whatsapp.com/send?text=${encodeURIComponent('Muraho')}`)
+    expect(target).toBe('_blank')
+  })
+
+  it('strips non-digits from the recipient the same way the other builders do', () => {
+    vi.stubGlobal('navigator', { userAgent: MOBILE })
+    expect(buildPriceRequestTarget('x', '250 790 215 965').href).toContain(`wa.me/${PHONE_DIGITS}`)
+    expect(buildPriceRequestTarget('x', '0788123456').href).toContain('wa.me/0788123456')
+  })
+
+  it('percent-encodes the message in every shape, so non-ASCII names survive', () => {
+    vi.stubGlobal('navigator', { userAgent: MOBILE })
+    expect(buildPriceRequestTarget('Gahunda + 2/3', '').href).toContain(encodeURIComponent('Gahunda + 2/3'))
+    vi.stubGlobal('navigator', { userAgent: DESKTOP })
+    expect(buildPriceRequestTarget('Gahunda + 2/3', '+250790215965').href).toContain(encodeURIComponent('Gahunda + 2/3'))
   })
 })

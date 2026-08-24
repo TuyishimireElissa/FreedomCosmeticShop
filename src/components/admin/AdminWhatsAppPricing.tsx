@@ -23,7 +23,7 @@ import {
   DEFAULT_PRICE_REQUEST_MODE,
   PHOTO_MODE_BATCH_SIZE,
   buildPriceBatches,
-  buildPriceRequestUrl,
+  buildPriceRequestTarget,
   fitsWhatsAppUrl,
   generateWhatsAppPriceRequest,
   parseWhatsAppPriceReply,
@@ -32,6 +32,7 @@ import {
   type PriceRequestMode,
   type PricingProduct,
 } from '@/lib/whatsapp-pricing'
+import { QUICK_PRICE_WHATSAPP_RECIPIENT } from '@/lib/business-config'
 
 interface UnpricedProduct extends PricingProduct {
   nameRw: string | null
@@ -99,7 +100,10 @@ export default function AdminWhatsAppPricing() {
     () => (batch ? generateWhatsAppPriceRequest(batch, requestOptions) : ''),
     [batch, requestOptions],
   )
-  const waUrl = useMemo(() => buildPriceRequestUrl(message), [message])
+  const waTarget = useMemo(
+    () => buildPriceRequestTarget(message, QUICK_PRICE_WHATSAPP_RECIPIENT || null),
+    [message],
+  )
   const tooLong = useMemo(() => (message ? !fitsWhatsAppUrl(message) : false), [message])
 
   // The reply is parsed against the batch that was sent, so line numbers line up.
@@ -272,8 +276,8 @@ export default function AdminWhatsAppPricing() {
 
             <div className="mt-3 flex flex-wrap gap-2">
               <a
-                href={waUrl}
-                target="_blank"
+                href={waTarget.href}
+                target={waTarget.target}
                 rel="noopener noreferrer"
                 className="inline-flex min-h-11 items-center gap-2 rounded-fcs-md bg-fcs-whatsapp-pill px-4 text-sm font-bold text-white transition-colors hover:bg-fcs-whatsapp-pill-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-strong"
               >
@@ -289,6 +293,7 @@ export default function AdminWhatsAppPricing() {
                 {t('pricing.copy_message')}
               </button>
             </div>
+            <p className="mt-2 text-xs text-fcs-text-muted">{t('pricing.button_fallback_hint')}</p>
           </section>
 
           {/* ─── 2. Paste the reply ──────────────────────────────────── */}

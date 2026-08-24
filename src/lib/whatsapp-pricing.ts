@@ -474,3 +474,37 @@ export function buildPriceRequestUrl(message: string, phone?: string | null): st
 export function fitsWhatsAppUrl(message: string, phone?: string | null): boolean {
   return buildPriceRequestUrl(message, phone).length <= MAX_URL_CHARS
 }
+
+/** Where to open the price request, and how. */
+export interface PriceRequestTarget {
+  href: string
+  /** `_blank` is only safe for a normal HTTPS page (web.whatsapp.com). */
+  target: '_blank' | '_self'
+}
+
+/**
+ * Where and how to open the price request — same mobile/desktop split the rest
+ * of the shop already uses (see whatsapp-service.ts).
+ *
+ * Mobile: wa.me/... — a custom-scheme hand-off. It MUST stay in the same tab;
+ * with target="_blank" the whatsapp:// redirect strands an empty tab and
+ * silently fails on iOS Safari.
+ * Desktop: web.whatsapp.com — an ordinary HTTPS page, safe to open in a new tab.
+ *
+ * With no phone the URL is WhatsApp's "share to a chat" picker, which is the
+ * correct fallback while no confirmed recipient is configured: the message is
+ * never sent anywhere by accident.
+ */
+export function buildPriceRequestTarget(message: string, phone?: string | null): PriceRequestTarget {
+  const digits = (phone || '').replace(/\D/g, '')
+  const text = encodeURIComponent(message)
+  const isDesktop =
+    typeof navigator !== 'undefined' && !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+  if (isDesktop) {
+    return {
+      href: `https://web.whatsapp.com/send${digits ? `?phone=${digits}&text=${text}` : `?text=${text}`}`,
+      target: '_blank',
+    }
+  }
+  return { href: `https://wa.me/${digits}?text=${text}`, target: '_self' }
+}

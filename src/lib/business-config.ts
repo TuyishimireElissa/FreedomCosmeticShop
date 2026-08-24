@@ -32,6 +32,18 @@ export const WHATSAPP_ORDERING_NUMBERS: readonly string[] = [
 ]
 
 /**
+ * Recipient of the price requests sent from the admin pricing dashboard — the
+ * person who knows the prices (the father). LEFT UNSET until the owner
+ * confirms the number: while empty, the dashboard uses WhatsApp's "share to a
+ * chat" picker, so the message can never land with the wrong person. An env
+ * var may still override a confirmed value without a deploy.
+ */
+export const QUICK_PRICE_WHATSAPP_RECIPIENT: string = resolveWhatsApp(
+  process.env.NEXT_PUBLIC_QUICK_PRICE_RECIPIENT,
+  '',
+)
+
+/**
  * Join address parts, dropping unfilled owner placeholders and collapsing
  * consecutive duplicates (a sector and its district often share a name).
  */

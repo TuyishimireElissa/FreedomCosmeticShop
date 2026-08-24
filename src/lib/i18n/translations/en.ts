@@ -429,6 +429,7 @@ export const en = {
     copied: 'Message copied',
     copy_failed: 'Could not copy the message',
     too_long: 'This message is too long for a WhatsApp link and may be cut short. Send fewer items.',
+    button_fallback_hint: 'If WhatsApp does not open, tap Copy and paste the message into the chat with the person who knows the prices.',
     step2_title: '2. Paste the reply and check it',
     paste_label: 'Paste the WhatsApp reply',
     paste_placeholder: 'Paste the reply here, for example:\n1. 2500 / 2000\n2. 3000',

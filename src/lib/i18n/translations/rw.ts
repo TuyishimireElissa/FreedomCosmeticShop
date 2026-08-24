@@ -435,6 +435,7 @@ export const rw = {
     copied: 'Ubutumwa bwakoporowe', // verified-rw
     copy_failed: 'Ntibyashobotse gukoporora ubutumwa', // verified-rw
     too_long: 'Ubu butumwa ni burebure cyane kuri WhatsApp, bushobora guhagarara hagati. Ohereza ibintu bike.', // verified-rw
+    button_fallback_hint: 'Niba WhatsApp idafunguka, kanda Koporora ubutumwa ushyire mu kiganiro cy\'ufite ibiciro.', // verified-rw (OWNER CONFIRMATION PENDING — see chat)
     step2_title: '2. Omeka igisubizo hanyuma ubigenzure', // verified-rw
     paste_label: 'Omeka igisubizo cya WhatsApp', // verified-rw
     paste_placeholder: 'Omeka igisubizo hano, urugero:\n1. 2500 / 2000\n2. 3000', // verified-rw
