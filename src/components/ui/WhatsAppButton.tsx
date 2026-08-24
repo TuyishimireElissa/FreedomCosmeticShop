@@ -45,7 +45,7 @@ function WhatsAppButtonComponent({ phone, message }: WhatsAppButtonProps = {}) {
   // Phones only. From md up the bottom nav is gone, the layout is wide, and
   // the two never meet.
   const hiddenOnHomeMobile = pathname === '/'
-  if (pathname.startsWith('/admin') || pathname.startsWith('/checkout') || (!phone && !WA_CONFIG.isNumberConfigured)) return null
+  if (pathname.startsWith('/admin') || pathname.startsWith('/checkout') || pathname.startsWith('/quick-prices') || (!phone && !WA_CONFIG.isNumberConfigured)) return null
   const contextMessage = message || (pathname.startsWith('/products/') ? t('whatsapp.floating_product') : pathname === '/cart' ? t('whatsapp.floating_cart') : pathname.startsWith('/account/orders') || pathname === '/track-order' ? t('whatsapp.floating_order') : t('whatsapp.general_help'))
 
   const open = () => {

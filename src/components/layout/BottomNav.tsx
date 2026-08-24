@@ -41,7 +41,7 @@ export default function BottomNav() {
     }
   }, [mounted, pathname])
 
-  const hideOn = ['/admin', '/checkout']
+  const hideOn = ['/admin', '/checkout', '/quick-prices']
   if (hideOn.some((path) => pathname.startsWith(path))) return null
 
   const count = mounted ? cartCount() : 0
