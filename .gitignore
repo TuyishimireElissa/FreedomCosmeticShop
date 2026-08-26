@@ -66,3 +66,17 @@ db/
 # catalogue-latest.json / .csv are committed, so the repo always carries one
 # restorable snapshot without accumulating hundreds of near-identical blobs.
 /backups/catalogue-*T*.json
+
+# Full-store snapshots (scripts/backup-full-store.ts).
+#
+# THIS REPOSITORY IS PUBLIC. Anything matching *.private.json contains customer
+# names, phone numbers, emails and home delivery addresses. A leaked API key can
+# be rotated; a published home address cannot be un-published, and git history
+# keeps it after deletion. These patterns are the last line of defence if
+# someone runs `git add -A` without looking.
+/backups/*.private.json
+/backups/snapshot-*.private.json
+
+# Daily public snapshots are local working files. latest-snapshot.json is the
+# single committed copy, same rule as the catalogue above.
+/backups/snapshot-????-??-??.json

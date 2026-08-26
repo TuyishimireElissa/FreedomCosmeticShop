@@ -18,6 +18,7 @@ import {
   Settings,
   Shield,
   ShieldAlert,
+  ShieldCheck,
   ShoppingCart,
   Star,
   Store,
@@ -83,6 +84,8 @@ const menuGroups: Array<{ group: string; items: MenuItem[] }> = [
     group: 'System',
     items: [
       { label: 'Settings', tab: 'settings', icon: Settings, permission: 'settings.update' },
+      // href-based: its own page, not an AdminView tab.
+      { label: 'Backups', tab: 'settings', icon: ShieldCheck, permission: 'settings.update', href: '/admin/system-backups', translationKey: 'backups.nav' },
       { label: 'Staff Accounts', tab: 'staff', icon: Shield, roles: ['ADMIN', 'SUPER_ADMIN'], permission: 'staff.manage' },
       { label: 'Security Dashboard', tab: 'security', icon: ShieldAlert, roles: ['ADMIN', 'SUPER_ADMIN'] },
     ],

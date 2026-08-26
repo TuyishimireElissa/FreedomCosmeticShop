@@ -415,6 +415,40 @@ export const rw = {
     reviews_unavailable: 'Ibitekerezo ntibiboneka by’akanya.', // verified-rw
     delivery_exact_fee: 'Hitamo akarere kawe urebe ikiguzi cyo kukugezaho n’igihe giteganyijwe. Ikiguzi cya nyuma cyemezwa mu gihe cyo kwishyura.', // verified-rw
   },
+  backups: {
+    nav: 'Ububiko', // verified-rw
+    title: 'Ububiko no kugarura', // verified-rw
+    subtitle: 'Bika kopi y’iduka ahantu hizewe. Niba amakuru yongeye kuzimira, ni yo azayagarura.', // verified-rw
+    refresh: 'Vugurura', // verified-rw
+    load_failed: 'Ntibyashobotse kureba ububiko. Amakuru yawe ari amahoro — ni ikibazo cyo gupakira gusa.', // verified-rw
+    coverage_title: 'Ibyo ububiko bwabika ubu', // verified-rw
+    coverage_hint: 'Uyu ni umubare uri mu bubiko bw’amakuru muri iki gihe.', // verified-rw
+    products: 'Ibicuruzwa', // verified-rw
+    images: 'Amafoto', // verified-rw
+    categories: 'Ibyiciro', // verified-rw
+    brands: 'Amazina y’ibigo', // verified-rw
+    coupons: 'Ibaruwa z’igabanywa', // verified-rw
+    zones: 'Uturere two gutwara', // verified-rw
+    settings: 'Igenamiterere ry’iduka', // verified-rw
+    users: 'Konti', // verified-rw
+    orders: 'Komande', // verified-rw
+    last_change: 'Ibicuruzwa byahinduwe bwa nyuma: {when}', // verified-rw
+    download_title: 'Manura kopi ubu', // verified-rw
+    download_desc: 'Bika dosiye JSON kuri iyi telefoni cyangwa mudasobwa. Uyibike ahantu hatari kuri seriveri y’iduka.', // verified-rw
+    download_button: 'Manura ububiko', // verified-rw
+    download_done: 'Ububiko bwamanuwe', // verified-rw
+    download_hint: 'Bika iyi dosiye ahantu hizewe kandi h’ibanga.', // verified-rw
+    download_failed: 'Kumanura byanze. Ongera ugerageze.', // verified-rw
+    auto_title: 'Ububiko bwikora buri joro', // verified-rw
+    auto_schedule: 'Bukorwa buri joro saa {schedule}.', // verified-rw
+    health_title: 'Ubuzima bwa sisitemu', // verified-rw
+    svc_database: 'Ububiko bw’amakuru', // verified-rw
+    svc_cloudinary: 'Ububiko bw’amafoto (Cloudinary)', // verified-rw
+    svc_hosting: 'Aho urubuga rubitse', // verified-rw
+    restore_confirm_label: 'Andika RESTORE kugira ngo wemeze', // verified-rw
+    restore_confirm_word: 'RESTORE', // verified-rw
+    restore_warning: 'Ibi bisimbura ibicuruzwa, komande na konti n’ibiri muri dosiye. Ntibishobora gusubizwa inyuma.', // verified-rw
+  },
   pricing: {
     nav: 'Ibiciro kuri WhatsApp', // verified-rw
     title: 'Ibiciro kuri WhatsApp', // verified-rw

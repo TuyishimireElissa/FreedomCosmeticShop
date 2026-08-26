@@ -14,6 +14,8 @@
     "db:seed": "tsx scripts/seed.ts",
     "catalog:import": "tsx scripts/import-real-products.ts",
     "catalog:backup": "tsx scripts/backup-catalogue.ts",
+    "backup:store": "tsx scripts/backup-full-store.ts",
+    "store:restore": "tsx scripts/restore-full-store.ts",
     "catalog:rebuild-file": "tsx scripts/recovery-to-import.ts",
     "blog:seed": "tsx src/scripts/seed-blog-starters.ts",
     "typecheck": "tsc --noEmit",

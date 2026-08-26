@@ -916,6 +916,8 @@ function BackupManager() {
   const [preview, setPreview] = useState<BackupMetadata | null>(null)
   const [pendingBackup, setPendingBackup] = useState<unknown>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  /** Typed guard on the destructive restore; cleared whenever the dialog closes. */
+  const [confirmWord, setConfirmWord] = useState('')
 
   const handleDownload = async () => {
     setDownloading(true)
@@ -994,6 +996,7 @@ function BackupManager() {
         description: `${data.results?.users || 0} users, ${data.results?.products || 0} products, ${data.results?.orders || 0} orders restored. ${data.results?.errors?.length || 0} errors.`,
       })
       setConfirmOpen(false)
+      setConfirmWord('')
       setPendingBackup(null)
       setPreview(null)
     } catch (e) {
@@ -1124,7 +1127,7 @@ function BackupManager() {
       {confirmOpen && (
         <div
           className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4"
-          onClick={() => setConfirmOpen(false)}
+          onClick={() => { setConfirmOpen(false); setConfirmWord('') }}
         >
           <div
             className="w-full max-w-md rounded-2xl border bg-card p-6 shadow-lg"
@@ -1136,13 +1139,26 @@ function BackupManager() {
             </div>
             <p className="mb-4 text-sm text-muted-foreground">
               This will overwrite existing data with the backup contents. This action cannot be undone.
-              Are you absolutely sure?
             </p>
+            {/* A single click was the only thing between a mis-selected file
+                and overwriting the live shop. Typing the word forces the
+                operator to read the sentence above first. */}
+            <label htmlFor="restore-confirm" className="mb-1 block text-xs font-semibold text-foreground">
+              Type <span className="font-mono">RESTORE</span> to confirm
+            </label>
+            <input
+              id="restore-confirm"
+              value={confirmWord}
+              onChange={(e) => setConfirmWord(e.target.value)}
+              autoComplete="off"
+              placeholder="RESTORE"
+              className="mb-4 min-h-11 w-full rounded-lg border px-3 text-sm"
+            />
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 className="flex-1"
-                onClick={() => setConfirmOpen(false)}
+                onClick={() => { setConfirmOpen(false); setConfirmWord('') }}
                 disabled={uploading}
               >
                 Cancel
@@ -1151,7 +1167,7 @@ function BackupManager() {
                 variant="destructive"
                 className="flex-1"
                 onClick={handleRestore}
-                disabled={uploading}
+                disabled={uploading || confirmWord.trim().toUpperCase() !== 'RESTORE'}
               >
                 {uploading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

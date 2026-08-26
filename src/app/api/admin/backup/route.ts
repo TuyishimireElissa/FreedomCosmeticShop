@@ -53,6 +53,12 @@ interface BackupSnapshot {
   deliveryZoneSettings: unknown[]
   staffProfiles: unknown[]
   activityLogs: unknown[]
+  // Added 2026-08-26. Without these three a restore produced products with no
+  // photos and a dangling categoryId: 314 image rows, 17 categories and 6
+  // brands were silently absent from every snapshot this route had ever made.
+  categories: unknown[]
+  brands: unknown[]
+  productImages: unknown[]
 }
 
 export async function GET(req: Request) {
@@ -70,6 +76,9 @@ export async function GET(req: Request) {
       deliveryZoneSettings,
       staffProfiles,
       activityLogs,
+      categories,
+      brands,
+      productImages,
     ] = await Promise.all([
       db.user.findMany({
         select: {
@@ -101,6 +110,11 @@ export async function GET(req: Request) {
         orderBy: { createdAt: "desc" },
         take: 1000,
       }),
+      // A product without its category is unrestorable (categoryId is a
+      // required FK), and without ProductImage the shop comes back blank.
+      db.category.findMany({ orderBy: { slug: "asc" } }),
+      db.brand.findMany({ orderBy: { slug: "asc" } }),
+      db.productImage.findMany({ orderBy: [{ productId: "asc" }, { sortOrder: "asc" }] }),
     ])
 
     const snapshot: BackupSnapshot = {
@@ -117,6 +131,9 @@ export async function GET(req: Request) {
           deliveryZoneSettings: deliveryZoneSettings.length,
           staffProfiles: staffProfiles.length,
           activityLogs: activityLogs.length,
+          categories: categories.length,
+          brands: brands.length,
+          productImages: productImages.length,
         },
       },
       users,
@@ -128,6 +145,9 @@ export async function GET(req: Request) {
       deliveryZoneSettings,
       staffProfiles,
       activityLogs,
+      categories,
+      brands,
+      productImages,
     }
 
     // Best-effort audit log
