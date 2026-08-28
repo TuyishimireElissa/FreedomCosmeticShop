@@ -140,13 +140,13 @@ describe('the route implements it, once, after the count', () => {
   it('reports the clamped page back to the client', () => {
     // The grid reads pagination.page to decide whether to append or replace.
     // Echoing the requested page would desync it from the rows returned.
-    expect(route).toContain('const pagination = { page, pageSize, total,')
+    expect(route).toContain('const pagination = { page, pageSize, total: effectiveTotal,')
   })
 
   it('still reports totalPages 0 for an empty result', () => {
     // The floor of 1 is for the skip arithmetic, not for the client. A shop
     // with no matches has zero pages, and the grid should not offer page 1.
-    expect(route).toContain('totalPages: total === 0 ? 0 : totalPages')
+    expect(route).toContain('totalPages: effectiveTotal === 0 ? 0 : totalPages')
   })
 
   it('no longer trusts the raw page anywhere below the clamp', () => {

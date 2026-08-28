@@ -13,6 +13,7 @@ import { ProductCard } from '@/components/storefront/ProductCard'
 import DidYouMean from '@/components/products/DidYouMean'
 import CategoryComingSoon from '@/components/products/CategoryComingSoon'
 import SearchRfq from '@/components/products/SearchRfq'
+import SearchFallbackNotice from '@/components/products/SearchFallbackNotice'
 
 interface ProductGridProps {
   products: Product[]
@@ -39,9 +40,11 @@ interface ProductGridProps {
    * problem and must keep the existing "clear filters" message.
    */
   rfqQuery?: string | null
+  /** Set when the API returned closest-similar products instead of an exact match. */
+  fallbackReason?: string | null
 }
 
-export default function ProductGrid({ products, loading = false, error, onRetry, onClearFilters, hasActiveFilters = false, searchQuery, onSearchCorrection, comingSoonCategory = null, rfqQuery = null }: ProductGridProps) {
+export default function ProductGrid({ products, loading = false, error, onRetry, onClearFilters, hasActiveFilters = false, searchQuery, onSearchCorrection, comingSoonCategory = null, rfqQuery = null, fallbackReason = null }: ProductGridProps) {
   const { t } = useLanguage()
   const user = useStore((state) => state.user)
   const router = useRouter()
@@ -131,15 +134,22 @@ export default function ProductGrid({ products, loading = false, error, onRetry,
   }
 
   return (
-    <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
-      {products.map((product) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          wishlisted={wishlisted.has(product.id)}
-          onToggleWishlist={() => void toggleWishlist(product.id)}
-        />
-      ))}
+    <div>
+      {fallbackReason && products.length > 0 && (
+        <div className="mb-4">
+          <SearchFallbackNotice />
+        </div>
+      )}
+      <div className="grid grid-cols-2 items-stretch gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
+        {products.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            wishlisted={wishlisted.has(product.id)}
+            onToggleWishlist={() => void toggleWishlist(product.id)}
+          />
+        ))}
+      </div>
     </div>
   )
 }

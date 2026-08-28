@@ -58,6 +58,9 @@ function ProductsContent() {
   const [filtersLoading, setFiltersLoading] = useState(true)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  // Set when the API returned closest-similar products instead of an exact
+  // search match ("trigram" | "phonetic" | "category" | "popular").
+  const [fallbackReason, setFallbackReason] = useState<string | null>(null)
   const [request, setRequest] = useState(0)
   const [pagination, setPagination] = useState<Pagination>(EMPTY_PAGINATION)
   const lastProductRequest = useRef({ signature: '', page: 0 })
@@ -118,6 +121,7 @@ function ProductsContent() {
         lastProductRequest.current = { signature: requestSignature, page }
         const nextPagination = result.pagination || result.data?.pagination || EMPTY_PAGINATION
         setPagination(nextPagination)
+        setFallbackReason(result.data?.fallback?.reason || null)
         if (filters.search && page === 1 && nextPagination.total === 0) {
           void trackEvent({ event: EVENTS.ZERO_RESULT_SEARCH, path: '/products', metadata: { resultCount: 0, source: 'automatic' } })
         }
@@ -265,7 +269,7 @@ function ProductsContent() {
               onSelect={(slug) => setFilter('category', filters.category === slug ? '' : slug)}
             />
             <div id="product-results">
-              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} onClearFilters={clearAllFilters} hasActiveFilters={activeFilterCount > 0 || Boolean(filters.search)} searchQuery={filters.search} onSearchCorrection={(term) => setFilter('search', term)} comingSoonCategory={comingSoonCategory} rfqQuery={rfqQuery} />
+              <ProductGrid products={products} loading={loading && products.length === 0} error={products.length === 0 ? error : null} onRetry={() => setRequest((value) => value + 1)} onClearFilters={clearAllFilters} hasActiveFilters={activeFilterCount > 0 || Boolean(filters.search)} searchQuery={filters.search} onSearchCorrection={(term) => setFilter('search', term)} comingSoonCategory={comingSoonCategory} rfqQuery={rfqQuery} fallbackReason={fallbackReason} />
             </div>
             {/* Only under a search that produced results. On an empty grid the
                 sourcing panel owns the space, and on a bare browse there is no

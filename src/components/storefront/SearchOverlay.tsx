@@ -8,6 +8,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext'
 import { thumbnailImageUrl } from '@/lib/cloudinary-images'
 import { getAlternativeSuggestions } from '@/lib/search-vocabulary'
 import { CATEGORY_CHIPS, TRENDING_SEARCHES } from '@/lib/search-trending'
+import SearchFallbackNotice from '@/components/products/SearchFallbackNotice'
 import { useVoiceSearch } from '@/hooks/use-voice-search'
 import { useStore } from '@/store/useStore'
 
@@ -81,6 +82,9 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
   const [recent, setRecent] = useState<string[]>([])
+  // Set when the API returned closest-similar products instead of exact
+  // matches, so the results view can show the friendly fallback banner.
+  const [fallbackReason, setFallbackReason] = useState<string | null>(null)
 
   /**
    * Signed-in shoppers get history that survives closing the tab.
@@ -236,6 +240,7 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
     setProducts([])
     setTotal(0)
     setSearched(false)
+    setFallbackReason(null)
     returnFocusTo?.current?.focus()
     // voice.stop is stable; excluding it keeps this from firing on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -251,6 +256,7 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
       setTotal(0)
       setSearched(false)
       setLoading(false)
+      setFallbackReason(null)
       return
     }
 
@@ -267,6 +273,7 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
         const payload = await response.json()
         setProducts(payload?.data?.products || [])
         setTotal(payload?.pagination?.total ?? payload?.data?.total ?? 0)
+        setFallbackReason(payload?.data?.fallback?.reason || null)
         setSearched(true)
       } catch (error) {
         if (!(error instanceof DOMException && error.name === 'AbortError')) {
@@ -505,6 +512,11 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
 
           {!showIdle && !loading && products.length > 0 && (
             <div className="space-y-1">
+              {fallbackReason && (
+                <div className="mb-3">
+                  <SearchFallbackNotice />
+                </div>
+              )}
               {products.map((product) => {
                 const image = product.imageUrl || product.image || ''
                 const alt = language === 'rw' && product.imageAltRw ? product.imageAltRw : product.imageAlt || product.name

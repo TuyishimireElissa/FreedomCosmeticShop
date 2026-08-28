@@ -5,6 +5,7 @@ import { type Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { PUBLIC_PRODUCT_CARD_SELECT, getRealUnitSales, serializePublicProductCard } from '@/lib/public-product'
 import { buildFilterClauses, parseProductFilters, resolveSearchClause } from '@/lib/product-filters'
+import { resolveSearchFallback, type FallbackReason } from '@/lib/search-fallback'
 import { recordSearch } from '@/server/services/search-analytics'
 
 export async function GET(request: NextRequest) {
@@ -67,7 +68,37 @@ export async function GET(request: NextRequest) {
     const totalPages = Math.max(1, Math.ceil(total / pageSize))
     const page = Math.min(requestedPage, totalPages)
 
-    let rows
+    /**
+     * ZERO-RESULT FALLBACK — never a dead end.
+     *
+     * When a search term found nothing, walk the ladder in search-fallback
+     * (trigram → phonetic → category → popular) and return the closest
+     * products anyway, marked with `fallback.reason` so the UI can explain
+     * that these are similar items, not exact matches. Non-search filters
+     * (category/brand/price/inStock) still apply: `and` excludes the search
+     * clause but keeps everything else.
+     */
+    let fallbackReason: FallbackReason | null = null
+    // Same row shape every branch produces: the public card select.
+    type PublicCardRow = Awaited<ReturnType<typeof prisma.product.findMany<{ select: typeof PUBLIC_PRODUCT_CARD_SELECT }>>>[number]
+    let rows: PublicCardRow[] | null = null
+    if (search && total === 0) {
+      const fallback = await resolveSearchFallback(searchableText || search)
+      if (fallback && fallback.ids.length > 0) {
+        const fallbackRows = await prisma.product.findMany({
+          where: { AND: [...and, { id: { in: fallback.ids } }] },
+          select: PUBLIC_PRODUCT_CARD_SELECT,
+        })
+        const order = new Map(fallback.ids.map((id, index) => [id, index]))
+        const ordered = fallbackRows.sort((left, right) => (order.get(left.id) ?? 0) - (order.get(right.id) ?? 0))
+        if (ordered.length > 0) {
+          rows = ordered
+          fallbackReason = fallback.reason
+        }
+      }
+    }
+
+    if (!rows) {
     if (sort === 'best-selling' || sort === 'best_selling') {
       const matching = await prisma.product.findMany({ where, select: { id: true } })
       const allSales = await getRealUnitSales(matching.map((product) => product.id))
@@ -102,18 +133,23 @@ export async function GET(request: NextRequest) {
         rows = await prisma.product.findMany({ where, select: PUBLIC_PRODUCT_CARD_SELECT, orderBy, skip: (page - 1) * pageSize, take: pageSize })
       }
     }
+    }
+    const resolvedRows = rows ?? []
 
-    const sales = await getRealUnitSales(rows.map((product) => product.id))
-    const products = rows.map((product) => serializePublicProductCard(product, sales.get(product.id) || 0))
-    const pagination = { page, pageSize, total, totalPages: total === 0 ? 0 : totalPages, hasMore: page * pageSize < total }
+    const sales = await getRealUnitSales(resolvedRows.map((product) => product.id))
+    const products = resolvedRows.map((product) => serializePublicProductCard(product, sales.get(product.id) || 0))
+    // With a fallback, the "total" the client sees is the shelf it actually
+    // receives (one page of closest matches), not the zero the search got.
+    const effectiveTotal = fallbackReason ? products.length : total
+    const pagination = { page, pageSize, total: effectiveTotal, totalPages: effectiveTotal === 0 ? 0 : totalPages, hasMore: page * pageSize < effectiveTotal }
     const filters = { category, brand, minPrice: effectiveMinPrice, maxPrice: effectiveMaxPrice, skinType, hairType, inStock: params.get('inStock') === 'true', sort, shade, minRating: minRatingParam }
 
     if (search && page === 1) {
-      await recordSearch({ request, query: search, resultCount: total, sessionId: params.get('sessionId'), filters: filters as Prisma.InputJsonValue })
+      await recordSearch({ request, query: search, resultCount: effectiveTotal, sessionId: params.get('sessionId'), filters: filters as Prisma.InputJsonValue })
         .catch((error) => console.error('Search analytics write failed:', error))
     }
 
-    const response = NextResponse.json({ success: true, data: { products, pagination, total, pages: pagination.totalPages, query: search, filters, hasResults: total > 0 }, products, pagination })
+    const response = NextResponse.json({ success: true, data: { products, pagination, total: effectiveTotal, pages: pagination.totalPages, query: search, filters, hasResults: effectiveTotal > 0, fallback: fallbackReason ? { applied: true, reason: fallbackReason } : null }, products, pagination })
     // Product images, prices, and stock must reflect admin changes immediately.
     response.headers.set('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300')
     return response

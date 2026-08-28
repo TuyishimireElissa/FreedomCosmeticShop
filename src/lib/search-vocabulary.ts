@@ -70,7 +70,6 @@ export const LOCAL_SEARCH_VOCABULARY: Readonly<Record<string, readonly string[]>
   maybelline: ['Maybelline'],
   dove: ['Dove'],
   vaseline: ['Vaseline'],
-
   // Skin concerns — terms supplied by the Rwanda catalogue team; fluent review remains required.
   ibiheri: ['acne', 'pimples', 'blemishes', 'spots', 'breakouts'],
   'ibiheri byo mu maso': ['face acne', 'facial acne', 'acne treatment'],
@@ -379,6 +378,31 @@ export function jaroSimilarity(s1: string, s2: string): number {
   }
 
   return (matches / len1 + matches / len2 + (matches - transpositions / 2) / matches) / 3
+}
+
+/**
+ * Rwandan phonetic spellings of brand names → the spelling that actually
+ * appears in the catalogue.
+ *
+ * WHY IT EXISTS SEPARATELY FROM LOCAL_SEARCH_VOCABULARY
+ *
+ * The vocabulary maps meaning (seramu → serum); this maps sound. A Kinyarwanda
+ * speaker typing "piyari" writes what they hear, and it is not within 0.85
+ * Jaro-Winkler of "Pyary" (measured 0.79), so the fuzzy expander cannot catch
+ * it — the map can. It is consulted by the zero-result fallback
+ * (src/lib/search-fallback.ts) and only ever points at brand names verified
+ * against the live catalogue (measured 2026-08-26: Vaseline 6 products,
+ * Pyary 1, Dove 1, MIADI 2).
+ */
+export const BRAND_PHONETIC_MAP: Readonly<Record<string, string>> = {
+  piyari: 'Pyary',
+  pyari: 'Pyary',
+  vaserine: 'Vaseline',
+  vazeline: 'Vaseline',
+  vazelin: 'Vaseline',
+  vasilin: 'Vaseline',
+  dovo: 'Dove',
+  miadi: 'MIADI',
 }
 
 export function jaroWinkler(s1: string, s2: string): number {
