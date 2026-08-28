@@ -332,8 +332,9 @@ describe('the sticky mobile search bar (Phase 3)', () => {
     expect(bar).not.toMatch(/#[0-9A-Fa-f]{6}/)
   })
 
-  it('keeps both controls at a 44px target', () => {
-    expect(bar).toContain('min-h-11')
+  it('keeps both controls at a 44px minimum on mobile', () => {
+    // Field: 48px per the Phase 1 premium-search spec (exceeds the 44px floor).
+    expect(bar).toContain('min-h-12')
     expect(bar).toContain('h-11 w-11')
   })
 

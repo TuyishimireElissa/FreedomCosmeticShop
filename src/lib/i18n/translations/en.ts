@@ -506,7 +506,7 @@ export const en = {
     trending: 'Trending',
     open_full_search: 'Open search',
     close_search: 'Close search',
-    overlay_placeholder: 'Search products, skin type, categories...',
+    overlay_placeholder: 'Search products...',
     see_all_count: 'See all {count} results',
     did_you_mean: 'Did you mean: {term}?',
     chat_whatsapp: 'Chat on WhatsApp',

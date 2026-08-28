@@ -63,7 +63,7 @@ export default function MobileSearchBar({ onOpen, onOpenVoice }: MobileSearchBar
         <button
           type="button"
           onClick={onOpen}
-          className="flex min-h-11 flex-1 items-center gap-2 rounded-fcs-md border border-fcs-border bg-fcs-surface px-3 text-left transition-colors hover:border-fcs-brand-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-strong motion-reduce:transition-none"
+          className="flex min-h-12 flex-1 items-center gap-2 rounded-fcs-lg border border-fcs-border bg-fcs-surface px-3 text-left shadow-fcs-2 transition-colors hover:border-fcs-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-text motion-reduce:transition-none"
           aria-haspopup="dialog"
           aria-label={t('search.open_full_search')}
         >
@@ -80,7 +80,7 @@ export default function MobileSearchBar({ onOpen, onOpenVoice }: MobileSearchBar
           <button
             type="button"
             onClick={onOpenVoice}
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-fcs-md border border-fcs-border bg-fcs-surface text-fcs-brand-text transition-colors hover:border-fcs-brand-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-strong motion-reduce:transition-none"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-fcs-lg border border-fcs-border bg-fcs-surface text-fcs-brand-text transition-colors hover:border-fcs-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-text motion-reduce:transition-none"
             aria-haspopup="dialog"
             aria-label={t('search.voice_start')}
           >

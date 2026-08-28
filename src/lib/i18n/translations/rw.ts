@@ -512,7 +512,7 @@ export const rw = {
     trending: 'Bikunze gushakishwa', // verified-rw
     open_full_search: 'Fungura ahashakirwa', // verified-rw
     close_search: 'Funga ahashakirwa', // verified-rw
-    overlay_placeholder: 'Shakisha ibicuruzwa, ubwoko bw’uruhu, ibyiciro...', // verified-rw
+    overlay_placeholder: 'Shakisha ibicuruzwa...', // verified-rw
     see_all_count: 'Reba ibisubizo {count}', // verified-rw
     did_you_mean: 'Waba washakaga: {term}?', // verified-rw
     chat_whatsapp: 'Tuganire kuri WhatsApp', // verified-rw

@@ -302,14 +302,34 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
     }
   }
 
-  if (!open) return null
+  // 200ms open/close animation. The overlay stays mounted during the exit
+  // transition so the fade/slide is visible; unmount happens when it ends.
+  // prefers-reduced-motion: the CSS below drops the transition classes, and
+  // the panel disappears on the next frame — the timer only unmounts.
+  const [mounted, setMounted] = useState(open)
+  const [visible, setVisible] = useState(open)
+
+  useEffect(() => {
+    if (open) {
+      setMounted(true)
+      const raf = requestAnimationFrame(() => setVisible(true))
+      return () => cancelAnimationFrame(raf)
+    }
+    setVisible(false)
+    const timer = window.setTimeout(() => setMounted(false), 200)
+    return () => window.clearTimeout(timer)
+  }, [open])
+
+  if (!mounted) return null
 
   const showIdle = query.trim().length < 2
   const label = (rw: string, en: string) => (language === 'rw' ? rw : en)
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex flex-col bg-fcs-surface md:items-start md:justify-center md:bg-black/40 md:p-6"
+      className={`fixed inset-0 z-[60] flex flex-col bg-fcs-surface transition-opacity duration-200 motion-reduce:transition-none md:items-start md:justify-center md:bg-black/40 md:p-6 ${
+        visible ? 'opacity-100' : 'opacity-0'
+      }`}
       role="dialog"
       aria-modal="true"
       aria-label={t('search.open_full_search')}
@@ -317,12 +337,16 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
     >
       <div
         ref={panelRef}
-        className="flex h-full w-full flex-col overflow-hidden bg-fcs-surface md:mx-auto md:h-auto md:max-h-[80vh] md:max-w-3xl md:rounded-fcs-lg md:shadow-fcs-4"
+        className={`flex h-full w-full flex-col overflow-hidden bg-fcs-surface transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none md:mx-auto md:h-auto md:max-h-[80vh] md:max-w-3xl md:rounded-fcs-lg md:shadow-fcs-4 ${
+          visible ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0 md:translate-y-2'
+        }`}
       >
-        {/* Input row */}
+        {/* Input row. One bordered field: magnifier prefix, clear-X and
+            microphone suffixes, 48px on phones / 56px on desktop,
+            rounded-fcs-lg + shadow-fcs-2 per the Phase 1 spec. */}
         <div className="flex items-center gap-2 border-b border-fcs-border bg-fcs-bg px-4 py-3">
-          <div className="relative flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fcs-brand-text" aria-hidden="true" />
+          <div className="flex min-h-12 w-full flex-1 items-center gap-1 rounded-fcs-lg border border-fcs-border bg-fcs-surface px-2 shadow-fcs-2 transition-[box-shadow,border-color] duration-200 focus-within:border-fcs-brand-text focus-within:ring-2 focus-within:ring-fcs-brand-text motion-reduce:transition-none md:min-h-14">
+            <Search className="pointer-events-none ml-1.5 h-5 w-5 shrink-0 text-fcs-brand-text" aria-hidden="true" />
             <input
               ref={inputRef}
               type="search"
@@ -332,27 +356,40 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
               placeholder={t('search.overlay_placeholder')}
               aria-label={t('search.overlay_placeholder')}
               autoComplete="off"
-              className="min-h-14 w-full rounded-full border border-fcs-border-subtle bg-fcs-bg pl-10 pr-4 text-base text-fcs-text outline-none transition-colors focus:border-fcs-brand-strong"
+              className="h-full min-w-0 flex-1 bg-transparent px-2 text-base text-fcs-text outline-none placeholder:text-fcs-text-muted [&::-webkit-search-cancel-button]:hidden"
             />
-          </div>
 
-          {/* Microphone. Hidden entirely when the browser cannot do it —
-              on iOS every browser is WebKit, so this covers all iOS. */}
-          {voice.supported && (
-            <button
-              type="button"
-              onClick={voice.toggle}
-              aria-label={voice.listening ? t('search.voice_stop') : t('search.voice_start')}
-              aria-pressed={voice.listening}
-              className={`grid h-12 w-12 shrink-0 place-items-center rounded-full border transition-colors ${
-                voice.listening
-                  ? 'border-fcs-urgent bg-fcs-urgent text-white'
-                  : 'border-fcs-border-subtle bg-fcs-bg text-fcs-brand-text hover:bg-fcs-surface-muted'
-              }`}
-            >
-              {voice.status === 'denied' ? <MicOff className="h-5 w-5" aria-hidden="true" /> : <Mic className="h-5 w-5" aria-hidden="true" />}
-            </button>
-          )}
+            {/* Clear text. Only when there is something to clear; refocuses
+                the field so the shopper can keep typing. */}
+            {query.length > 0 && (
+              <button
+                type="button"
+                onClick={() => { setQuery(''); inputRef.current?.focus() }}
+                aria-label={t('common.clear')}
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-fcs-text-muted transition-colors hover:bg-fcs-surface-muted hover:text-fcs-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-text motion-reduce:transition-none"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+            )}
+
+            {/* Microphone suffix. Hidden entirely when the browser cannot do
+                it — on iOS every browser is WebKit, so this covers all iOS. */}
+            {voice.supported && (
+              <button
+                type="button"
+                onClick={voice.toggle}
+                aria-label={voice.listening ? t('search.voice_stop') : t('search.voice_start')}
+                aria-pressed={voice.listening}
+                className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcs-brand-text motion-reduce:transition-none ${
+                  voice.listening
+                    ? 'bg-fcs-urgent text-white'
+                    : 'text-fcs-brand-text hover:bg-fcs-surface-muted'
+                }`}
+              >
+                {voice.status === 'denied' ? <MicOff className="h-5 w-5" aria-hidden="true" /> : <Mic className="h-5 w-5" aria-hidden="true" />}
+              </button>
+            )}
+          </div>
 
           <button
             type="button"
