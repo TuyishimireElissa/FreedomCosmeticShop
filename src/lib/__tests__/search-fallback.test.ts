@@ -107,8 +107,12 @@ describe('API contract and filter safety', () => {
     expect(route).toContain('fallback: fallbackReason ? { applied: true, reason: fallbackReason } : null')
   })
 
-  it('still applies the non-search filters by id — a fallback never bypasses category/price/inStock', () => {
-    expect(route).toContain('AND: [...and, { id: { in: fallback.ids } }]')
+  it('applies the fallback over the BASE filters — never inheriting the empty search clause', () => {
+    // REGRESSION (caught live 2026-08-26): the fallback reused `and`, which
+    // still contained the empty search clause `id in ['__no_match__']`; the
+    // intersection was always empty, so the fallback silently never fired.
+    expect(route).toContain('AND: [...baseAnd, { id: { in: fallback.ids } }]')
+    expect(route).toContain("const and = searchClause ? [...baseAnd, searchClause] : baseAnd")
   })
 
   it('reports hasResults true once the fallback supplies a shelf', () => {

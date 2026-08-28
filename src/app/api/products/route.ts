@@ -28,9 +28,13 @@ export async function GET(request: NextRequest) {
     // so that /api/search/facets counts the SAME predicate this list returns.
     // If the two ever diverge the sidebar promises "Skincare (12)" and the grid
     // shows 9.
-    const and = buildFilterClauses(parsedFilters)
+    const baseAnd = buildFilterClauses(parsedFilters)
     const { clause: searchClause, match: searchMatch } = await resolveSearchClause(expandedTerms, searchableText || search)
-    if (searchClause) and.push(searchClause)
+    // The search clause is added separately from the base filters so the
+    // zero-result fallback can apply ITS OWN id list without inheriting the
+    // impossible `id in ['__no_match__']` the empty search produced — that
+    // intersection is always empty and silently disables the fallback.
+    const and = searchClause ? [...baseAnd, searchClause] : baseAnd
 
     const where: Prisma.ProductWhereInput = { AND: and }
     const total = await prisma.product.count({ where })
@@ -86,7 +90,7 @@ export async function GET(request: NextRequest) {
       const fallback = await resolveSearchFallback(searchableText || search)
       if (fallback && fallback.ids.length > 0) {
         const fallbackRows = await prisma.product.findMany({
-          where: { AND: [...and, { id: { in: fallback.ids } }] },
+          where: { AND: [...baseAnd, { id: { in: fallback.ids } }] },
           select: PUBLIC_PRODUCT_CARD_SELECT,
         })
         const order = new Map(fallback.ids.map((id, index) => [id, index]))
