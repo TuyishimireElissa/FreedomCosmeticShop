@@ -61,7 +61,13 @@ export const TRENDING_SEARCHES: readonly TrendingTerm[] = [
 /**
  * Category quick-filter chips for the overlay.
  *
- * Slugs are the live category slugs, verified against /api/categories.
+ * Eight pills (All + 7), sized to one scrollable row at 360px. Slugs are the
+ * live category slugs with in-stock products, verified against /api/categories
+ * 2026-08-26 (counts in parentheses):
+ *
+ *   soap 33 · fragrance 34 · whitening 9 · baby-kids 7 · haircare 7 ·
+ *   body-oil 2 · skincare 3
+ *
  * Kinyarwanda labels are lifted from the existing `categories` translation
  * block rather than invented — the brief proposed "Imikara" for makeup, which
  * is not a word this codebase or Kinyarwanda uses; the established term is
@@ -70,6 +76,9 @@ export const TRENDING_SEARCHES: readonly TrendingTerm[] = [
  * MAKEUP IS DELIBERATELY ABSENT. All 6 makeup rows are `isDeleted: true` seed
  * data — 0 live products. The chip would open an empty shelf. /api/categories
  * already hides it, so the overlay agrees with the rest of the site.
+ *
+ * Body Oil is short (2 products) but stays: the brief names it, and the count
+ * badge makes the shelf size honest before the shopper taps.
  */
 export interface CategoryChip {
   slug: string
@@ -79,8 +88,11 @@ export interface CategoryChip {
 
 export const CATEGORY_CHIPS: readonly CategoryChip[] = [
   { slug: '', rw: 'Byose', en: 'All' }, // verified-rw
-  { slug: 'skincare', rw: 'Kwita ku ruhu', en: 'Skin' }, // verified-rw
-  { slug: 'body-care', rw: 'Kwita ku mubiri', en: 'Body' }, // verified-rw
-  { slug: 'haircare', rw: 'Kwita ku musatsi', en: 'Hair' }, // verified-rw
+  { slug: 'soap', rw: 'Isabune', en: 'Soap' }, // verified-rw
   { slug: 'fragrance', rw: 'Imibavu', en: 'Fragrance' }, // verified-rw
+  { slug: 'whitening', rw: 'Kwera no Kurangaza', en: 'Whitening' }, // verified-rw
+  { slug: 'baby-kids', rw: 'Abana', en: 'Baby-Care' }, // verified-rw
+  { slug: 'haircare', rw: 'Kwita ku musatsi', en: 'Hair' }, // verified-rw
+  { slug: 'body-oil', rw: 'Amavuta y’Umubiri', en: 'Body Oil' }, // verified-rw
+  { slug: 'skincare', rw: 'Kwita ku ruhu', en: 'Skin' }, // verified-rw
 ] as const

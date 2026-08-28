@@ -143,8 +143,9 @@ describe('the overlay only offers things that exist', () => {
   })
 
   it('uses only category slugs the catalogue actually serves', () => {
-    // Verified live: skincare 23, body-care 44, haircare 5, fragrance 33.
-    const known = new Set(['', 'skincare', 'body-care', 'haircare', 'fragrance'])
+    // Verified live 2026-08-26: soap 33, fragrance 34, whitening 9,
+    // baby-kids 7, haircare 7, body-oil 2, skincare 3.
+    const known = new Set(['', 'soap', 'fragrance', 'whitening', 'baby-kids', 'haircare', 'body-oil', 'skincare'])
     for (const chip of CATEGORY_CHIPS) {
       expect(known.has(chip.slug), `unknown slug ${chip.slug}`).toBe(true)
     }

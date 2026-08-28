@@ -85,6 +85,13 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
   // Set when the API returned closest-similar products instead of exact
   // matches, so the results view can show the friendly fallback banner.
   const [fallbackReason, setFallbackReason] = useState<string | null>(null)
+  // Category chip counts (live in-stock product counts from /api/categories)
+  // and live popular-search terms (from /api/search/popular). Both are pure
+  // decoration: a failed fetch must never block the overlay, so each has a
+  // set-once guard and an empty fallback.
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
+  const [popularTerms, setPopularTerms] = useState<Array<{ term: string; searches: number }>>([])
+  const idleDataFetched = useRef(false)
 
   /**
    * Signed-in shoppers get history that survives closing the tab.
@@ -192,6 +199,39 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
     voice.start()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, autoStartVoice, voice.supported])
+
+  // Idle-state data: category counts + live popular searches. Fetched once
+  // per overlay session, best-effort. The curated TRENDING_SEARCHES is the
+  // fallback when the live popular list is empty or unreachable.
+  useEffect(() => {
+    if (!open || idleDataFetched.current) return
+    idleDataFetched.current = true
+
+    fetch('/api/categories', { cache: 'no-store' })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body) => {
+        const cats = body?.data?.categories || body?.categories || []
+        const counts: Record<string, number> = {}
+        for (const category of cats) {
+          if (category?.slug) counts[category.slug] = category?._count?.products ?? 0
+        }
+        setCategoryCounts(counts)
+      })
+      .catch(() => { /* counts are decoration; never block the overlay */ })
+
+    // A popular term that finds nothing is a dead-end chip — the exact thing
+    // this feature removes. Only terms with zero zero-result searches count.
+    fetch('/api/search/popular', { cache: 'no-store' })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body) => {
+        const rows = Array.isArray(body?.data)
+          ? body.data.filter((row: { term?: unknown; searches?: unknown; zeroResultSearches?: unknown }) =>
+              typeof row?.term === 'string' && row.term.trim().length >= 3 && (row.zeroResultSearches ?? 0) === 0)
+          : []
+        setPopularTerms(rows.slice(0, 5))
+      })
+      .catch(() => { /* keep the curated list */ })
+  }, [open])
 
   // Autofocus the field, and lock the page behind the overlay.
   useEffect(() => {
@@ -432,17 +472,25 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
         <div className="scrollbar-hide flex gap-2 overflow-x-auto border-b border-fcs-border bg-fcs-bg px-4 py-3">
           {CATEGORY_CHIPS.map((chip) => {
             const active = category === chip.slug
+            const count = chip.slug ? categoryCounts[chip.slug] : null
             return (
               <button
                 key={chip.slug || 'all'}
                 type="button"
                 onClick={() => setCategory(chip.slug)}
                 aria-pressed={active}
-                className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-semibold transition-colors ${
+                className={`inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition-colors ${
                   active ? 'bg-fcs-brand-strong text-white' : 'bg-fcs-surface-muted text-fcs-text hover:bg-fcs-border-subtle'
                 }`}
               >
                 {label(chip.rw, chip.en)}
+                {/* Live in-stock count. Inactive badge: muted on white 4.83:1;
+                    active: brand-strong on white 4.74:1 — both AA. */}
+                {typeof count === 'number' && (
+                  <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold tabular-nums ${active ? 'bg-white text-fcs-brand-strong' : 'bg-white text-fcs-text-muted'}`}>
+                    {count}
+                  </span>
+                )}
               </button>
             )
           })}
@@ -457,13 +505,13 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
                     <h2 className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-fcs-text-muted">
                       <Clock className="h-3 w-3" aria-hidden="true" />{t('search.recent')}
                     </h2>
-                    <button type="button" onClick={clearRecent} className="min-h-9 px-2 text-xs font-semibold text-fcs-brand-text">
+                    <button type="button" onClick={clearRecent} className="min-h-11 px-2 text-xs font-semibold text-fcs-brand-text">
                       {t('common.clear')}
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {recent.slice(0, 5).map((term) => (
-                      <button key={term} type="button" onClick={() => submit(term)} className="min-h-10 rounded-full bg-fcs-surface-muted px-4 text-sm font-medium text-fcs-text">
+                      <button key={term} type="button" onClick={() => submit(term)} className="min-h-11 rounded-full bg-fcs-surface-muted px-4 text-sm font-medium text-fcs-text">
                         {term}
                       </button>
                     ))}
@@ -471,23 +519,49 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
                 </section>
               )}
 
-              <section>
-                <h2 className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-fcs-text-muted">
-                  <TrendingUp className="h-3 w-3" aria-hidden="true" />{t('search.trending')}
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  {TRENDING_SEARCHES.map((term) => (
-                    <button
-                      key={term.query}
-                      type="button"
-                      onClick={() => submit(term.query)}
-                      className="min-h-10 rounded-full border border-fcs-border-subtle bg-fcs-bg px-4 text-sm font-medium text-fcs-brand-text transition-colors hover:bg-fcs-surface-muted"
-                    >
-                      {label(term.rw, term.en)}
-                    </button>
-                  ))}
-                </div>
-              </section>
+              {/* Popular Searches: live controlled-vocabulary counts first
+                  (zero-result terms filtered out upstream), curated list as
+                  the fallback. Both sections are chip rows with 44px targets. */}
+              {popularTerms.length > 0 ? (
+                <section>
+                  <h2 className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-fcs-text-muted">
+                    <TrendingUp className="h-3 w-3" aria-hidden="true" />{t('search.popular')}
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {popularTerms.map((item) => (
+                      <button
+                        key={item.term}
+                        type="button"
+                        onClick={() => submit(item.term)}
+                        className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-fcs-border-subtle bg-fcs-bg px-4 text-sm font-medium text-fcs-brand-text transition-colors hover:bg-fcs-surface-muted"
+                      >
+                        {item.term.charAt(0).toUpperCase() + item.term.slice(1)}
+                        <span className="rounded-full bg-fcs-surface px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-fcs-text-muted">
+                          {item.searches}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ) : (
+                <section>
+                  <h2 className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-fcs-text-muted">
+                    <TrendingUp className="h-3 w-3" aria-hidden="true" />{t('search.trending')}
+                  </h2>
+                  <div className="flex flex-wrap gap-2">
+                    {TRENDING_SEARCHES.map((term) => (
+                      <button
+                        key={term.query}
+                        type="button"
+                        onClick={() => submit(term.query)}
+                        className="min-h-11 rounded-full border border-fcs-border-subtle bg-fcs-bg px-4 text-sm font-medium text-fcs-brand-text transition-colors hover:bg-fcs-surface-muted"
+                      >
+                        {label(term.rw, term.en)}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              )}
             </div>
           )}
 
@@ -573,7 +647,7 @@ export default function SearchOverlay({ open, onClose, returnFocusTo, autoStartV
                       key={term}
                       type="button"
                       onClick={() => { setQuery(term); }}
-                      className="min-h-10 rounded-full bg-fcs-surface-muted px-4 text-sm font-medium text-fcs-brand-text"
+                      className="min-h-11 rounded-full bg-fcs-surface-muted px-4 text-sm font-medium text-fcs-brand-text"
                     >
                       {t('search.did_you_mean', { term })}
                     </button>
