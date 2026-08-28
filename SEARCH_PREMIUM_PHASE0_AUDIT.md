@@ -65,3 +65,25 @@ Current zero-result UX: overlay shows "no products found" + did-you-mean; `/prod
 ---
 
 PHASE 0 AUDIT COMPLETE — Awaiting approval.
+
+---
+
+## POST-DEPLOY LIVE VERIFICATION (2026-08-28, commit 7f7edd1, Vercel READY)
+
+Phase 2/3/4 verified against the public production API after the fallback fix:
+
+| Query   | total | hasResults | fallback           |
+|---------|-------|------------|--------------------|
+| vazeline| 6     | true       | None (upstream OK) |
+| eyeliner| 8     | true       | applied, category  |
+| xyzzy123| 8     | true       | applied, popular   |
+| piyari  | 1     | true       | applied, phonetic  |
+| shampo  | 1     | true       | None (upstream OK) |
+
+**Bug found and fixed (first deployment 2026-08-28):** the fallback produced
+`data.fallback` correctly but re-filtered its id list through the original
+search `and` clause, which still contained the empty-search sentinel
+`id in ['__no_match__']` — the intersection was always empty, so
+eyeliner/xyzzy123/piyari returned 0 with fallback present-but-null.
+Fix: fallback filters over `baseAnd` (user filters only) via fallback.ids.
+Regression pinned in `search-fallback.test.ts`; mutation-tested.
